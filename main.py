@@ -1706,6 +1706,8 @@ class MyCtrl(wxControl):
                 type = config.PAREN
             elif ch == "T":
                 type = config.TRANSITION
+            elif ch == "N":
+                type = config.NOTE
 
             if type != None:
                 self.convertCurrentTo(type)
@@ -1809,6 +1811,25 @@ class MyCtrl(wxControl):
             
             l = ls[i]
             tcfg = cfg.getType(l.type)
+
+            if l.type == config.NOTE:
+                dc.SetPen(cfgGui.notePen)
+                dc.SetBrush(cfgGui.noteBrush)
+
+                nx = cfg.offsetX + tcfg.indent * cfgGui.fontX - 5
+                nw = tcfg.width * cfgGui.fontX + 10
+                
+                dc.DrawRectangle(nx, y, nw, cfg.fontYdelta)
+
+                dc.SetPen(cfgGui.textPen)
+                util.drawLine(dc, nx - 1, y, 0, cfg.fontYdelta)
+                util.drawLine(dc, nx + nw, y, 0, cfg.fontYdelta)
+
+                if self.isFirstLineOfElem(i):
+                    util.drawLine(dc, nx - 1, y - 1, nw + 2, 0)
+
+                if self.isLastLineOfElem(i):
+                    util.drawLine(dc, nx - 1, y + cfg.fontYdelta, nw + 2, 0)
 
             if (self.mark != -1) and self.isLineMarked(i, marked):
                 dc.SetPen(cfgGui.selectedPen)

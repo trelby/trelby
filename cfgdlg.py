@@ -406,7 +406,7 @@ class ColorsPanel(wxPanel):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        self.colorsLb = wxListBox(panel, -1, size = (300, 150))
+        self.colorsLb = wxListBox(panel, -1, size = (300, 200))
 
         keys = self.cfg.colors.keys()
         keys.sort()

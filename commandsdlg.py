@@ -69,6 +69,7 @@ Alt + C                Change element to character
 Alt + P                Change element to parenthetical
 Alt + D                Change element to dialogue
 Alt + T                Change element to transition
+Alt + N                Change element to note
 
 CTRL + O               Open file
 CTRL + S               Save file

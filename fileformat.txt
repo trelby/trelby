@@ -50,6 +50,8 @@ Line types:
 
 '=' - Shot
 
+'%' - Note
+
 More line types are probably going to be added in the future without
 increasing the fileformat version number, so unknown line types should be
 converted to Action, and a warning given to user about this.
@@ -71,6 +73,7 @@ An example screenplay using this format:
 .:Hey man --
 |.Jason SHOOTS Jim in the chest, twice.
 ..Jim collapses to the ground and twitches for a while, then stops.
+.%Do we need a more gruesome death scene?
 ._JASON
 .:Bad things happen to bad people.
 ..Jason pockets the gun and hurriedly exits the building.

@@ -29,6 +29,7 @@ DIALOGUE = 4
 PAREN = 5
 TRANSITION = 6
 SHOT = 7
+NOTE = 8
 
 # mapping from character to line type
 _text2linetype = {
@@ -38,7 +39,8 @@ _text2linetype = {
     ':' : DIALOGUE,
     '(' : PAREN,
     '/' : TRANSITION,
-    '=' : SHOT
+    '=' : SHOT,
+    '%' : NOTE
     }
 
 # reverse to above, filled in init
@@ -236,6 +238,19 @@ class Config:
         t.prevTypeTab = SCENE
         self.types[t.type] = t
         
+        t = Type()
+        t.type = NOTE
+        t.name = "Note"
+        t.emptyLinesBefore = 1
+        t.indent = 5
+        t.width = 55
+        t.isItalic = True
+        t.newTypeEnter = ACTION
+        t.newTypeTab = CHARACTER
+        t.nextTypeTab = ACTION
+        t.prevTypeTab = CHARACTER
+        self.types[t.type] = t
+
         if wxPlatform == "__WXGTK__":
             self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
         elif wxPlatform == "__WXMSW__":
@@ -246,13 +261,13 @@ class Config:
         self.addColor("textColor", "Text foreground", 0, 0, 0)
         self.addColor("bgColor", "Text background", 204, 204, 204)
         self.addColor("selectedColor", "Selection", 128, 192, 192)
-        self.addColor("searchColor", "Search result", 255, 255, 0)
+        self.addColor("searchColor", "Search result", 255, 127, 0)
         self.addColor("cursorColor", "Cursor", 205, 0, 0)
         self.addColor("autoCompFgColor", "Auto-completion foreground",
                       0, 0, 0)
         self.addColor("autoCompBgColor", "Auto-completion background",
                       249, 222, 99)
-
+        self.addColor("noteColor", "Script note", 255, 255, 0)
         self.addColor("pagebreakColor", "Page-break line", 128, 128, 128)
         self.addColor("pagebreakNoAdjustColor",
             "Page-break (original, not adjusted) line", 128, 128, 128)
@@ -317,6 +332,9 @@ class ConfigGui:
 
         self.cursorBrush = wxBrush(cfg.cursorColor)
         self.cursorPen = wxPen(cfg.cursorColor)
+
+        self.noteBrush = wxBrush(cfg.noteColor)
+        self.notePen = wxPen(cfg.noteColor)
 
         self.autoCompPen = wxPen(cfg.autoCompFgColor)
         self.autoCompBrush = wxBrush(cfg.autoCompBgColor)
