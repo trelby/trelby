@@ -44,6 +44,7 @@ ID_HELP_COMMANDS = 12
 ID_HELP_ABOUT = 13
 ID_FILE_EXPORT = 14
 ID_EDIT_FIND = 15
+ID_EDIT_SELECT_SCENE = 16
 
 def refreshGuiConfig():
     global cfgGui
@@ -478,6 +479,36 @@ class MyCtrl(wxControl):
         
     def getElemIndexes(self):
         return (self.getElemFirstIndex(), self.getElemLastIndex())
+
+    def getElemIndexesFromLine(self, line):
+        return (self.getElemFirstIndexFromLine(line),
+                self.getElemLastIndexFromLine(line))
+
+    def getSceneIndexes(self):
+        top, bottom = self.getElemIndexes()
+        ls = self.sp.lines
+        
+        while 1:
+            if ls[top].type == config.SCENE:
+                break
+            
+            tmp = top - 1
+            if tmp < 0:
+                break
+            
+            top, nothing = self.getElemIndexesFromLine(tmp)
+
+        while 1:
+            tmp = bottom + 1
+            if tmp >= len(ls):
+                break
+            
+            if ls[tmp].type == config.SCENE:
+                break
+            
+            nothing, bottom = self.getElemIndexesFromLine(tmp)
+
+        return (top, bottom)
         
     def getLinesOnScreen(self):
         size = self.GetClientSize()
@@ -765,6 +796,13 @@ class MyCtrl(wxControl):
             self.makeLineVisible(self.line)
             self.updateScreen()
 
+    def OnSelectScene(self):
+        self.mark, self.line = self.getSceneIndexes()
+        self.column = 0
+
+        self.makeLineVisible(self.line)
+        self.updateScreen()
+        
     def OnFind(self):
         dlg = finddlg.FindDlg(mainFrame, self, cfg)
         dlg.ShowModal()
@@ -1221,6 +1259,8 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
         editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
         editMenu.AppendSeparator()
+        editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene\tCTRL-A")
+        editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace\tCTRL-F")
         
         formatMenu = wxMenu()
@@ -1282,6 +1322,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
+        EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
@@ -1382,6 +1423,9 @@ class MyFrame(wxFrame):
 
     def OnPaste(self, event):
         self.panel.ctrl.OnPaste()
+
+    def OnSelectScene(self, event):
+        self.panel.ctrl.OnSelectScene()
 
     def OnFind(self, event):
         self.panel.ctrl.OnFind()
