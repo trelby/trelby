@@ -95,7 +95,11 @@ class FontPanel(wxPanel):
         hsizer.Add(wxStaticText(panel, -1, "pixels"), 0,
                    wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND)
+        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 20)
+
+        vsizer.Add(wxStaticText(panel, -1, "This font is only used for"
+            " display on screen, printing always"))
+        vsizer.Add(wxStaticText(panel, -1, "uses 12-point Courier."))
                 
         panel.SetSizer(vsizer)
 
@@ -204,8 +208,8 @@ class ElementsPanel(wxPanel):
         EVT_SPINCTRL(self, self.indentEntry.GetId(), self.OnMisc)
         gsizer.Add(self.indentEntry, 0)
 
-        gsizer.Add(wxStaticText(panel, -1, "characters"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
+        gsizer.Add(wxStaticText(panel, -1, "characters (10 characters"
+            " = 1 inch)"), 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
         gsizer.Add(wxStaticText(panel, -1, "Width:"), 0,
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
@@ -215,8 +219,8 @@ class ElementsPanel(wxPanel):
         EVT_SPINCTRL(self, self.widthEntry.GetId(), self.OnMisc)
         gsizer.Add(self.widthEntry, 0)
 
-        gsizer.Add(wxStaticText(panel, -1, "characters"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
+        gsizer.Add(wxStaticText(panel, -1, "characters (10 characters"
+            " = 1 inch)"), 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
         vsizer.Add(gsizer, 0, wxBOTTOM, 10)
 
@@ -310,14 +314,14 @@ class ColorsPanel(wxPanel):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        self.colorsCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+        self.colorsLb = wxListBox(panel, -1, size = (300, 150))
 
         keys = self.cfg.colors.keys()
         keys.sort()
         for k in keys:
-            self.colorsCombo.Append(k, self.cfg.colors[k])
+            self.colorsLb.Append(k, self.cfg.colors[k])
 
-        hsizer.Add(self.colorsCombo, 1)
+        hsizer.Add(self.colorsLb, 1)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 10)
 
@@ -340,11 +344,12 @@ class ColorsPanel(wxPanel):
         
         self.SetSizer(vmsizer)
 
-        EVT_COMBOBOX(self, self.colorsCombo.GetId(), self.OnColorCombo)
-        self.OnColorCombo(None)
+        EVT_LISTBOX(self, self.colorsLb.GetId(), self.OnColorLb)
+        self.colorsLb.SetSelection(0)
+        self.OnColorLb()
 
-    def OnColorCombo(self, event):
-        self.color = self.colorsCombo.GetClientData(self.colorsCombo.
+    def OnColorLb(self, event = None):
+        self.color = self.colorsLb.GetClientData(self.colorsLb.
                                                     GetSelection())
         self.cfg2gui()
                          
