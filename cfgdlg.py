@@ -28,21 +28,23 @@ class CfgDlg(wxDialog):
         self.notebook = wxNotebook(self, -1, style = wxCLIP_CHILDREN)
         vsizer.Add(self.notebook, 1, wxEXPAND)
 
-        p = FontPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Font")
-
-        p = ElementsPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Elements")
-
         p = AutoCompPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Auto-completion")
-
-        p = PaperPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Paper")
 
         p = ColorsPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Colors")
 
+        p = ElementsPanel(self.notebook, -1, cfg)
+        self.notebook.AddPage(p, "Elements")
+
+        p = FontPanel(self.notebook, -1, cfg)
+        self.notebook.AddPage(p, "Font")
+
+        p = PaperPanel(self.notebook, -1, cfg)
+        self.notebook.AddPage(p, "Paper")
+
+        self.notebook.SetSelection(2)
+        
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
         hsizer.Add(1, 1, 1)
@@ -299,7 +301,7 @@ class ElementsPanel(wxPanel):
         for t in self.cfg.types.values():
             combo.Append(t.name, t.type)
 
-        sizer.Add(combo, 0)
+        sizer.Add(combo)
 
         EVT_COMBOBOX(self, combo.GetId(), self.OnMisc)
         
