@@ -66,7 +66,8 @@ class DrawOp:
 # underlined.
 class TextOp(DrawOp):
     def __init__(self, text, x, y, size, flags = NORMAL | COURIER,
-                 align = util.ALIGN_LEFT, valign = util.VALIGN_TOP):
+                 align = util.ALIGN_LEFT, valign = util.VALIGN_TOP,
+                 line = -1):
         DrawOp.__init__(self, OP_TEXT)
 
         self.text = text
@@ -75,6 +76,10 @@ class TextOp(DrawOp):
         self.size = size
         self.flags = flags
 
+        # index of line in Screenplay.lines, or -1 if some other text.
+        # only used when drawing display, pdf output doesn't use this.
+        self.line = line
+        
         if align != util.ALIGN_LEFT:
             w = util.getTextWidth(text, flags, size)
 

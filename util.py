@@ -633,13 +633,20 @@ def decrypt(s, e, n):
     
 # simple timer class for use during development only
 class TimerDev:
+
+    # how many TimerDev instances are currently in existence
+    nestingLevel = 0
+    
     def __init__(self, msg = ""):
-        self.msg = msg
+        self.msg = msg 
+        self.__class__.nestingLevel += 1
         self.t = time.time()
 
     def __del__(self):
         self.t = time.time() - self.t
-        print "%s took %.5f seconds" % (self.msg, self.t)
+        self.__class__.nestingLevel -= 1
+        print "%s%s took %.5f seconds" % (" " * self.__class__.nestingLevel,
+                                          self.msg, self.t)
 
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF

@@ -154,8 +154,11 @@ class DisplayPanel(wxPanel):
         
         btn = wxButton(self, -1, "Change")
         EVT_BUTTON(self, btn.GetId(), self.OnChangeFont)
-        vsizer.Add(btn, 0, wxBOTTOM, 15)
+        vsizer.Add(btn, 0, wxBOTTOM, 20)
 
+        vsizer.Add(wxStaticText(self, -1, "The settings below apply only"
+                                " to 'Draft' view mode."), 0, wxBOTTOM, 15)
+        
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
         hsizer.Add(wxStaticText(self, -1, "Row spacing:"), 0,
@@ -820,7 +823,7 @@ class PaginationPanel(wxPanel):
         gsizer = wxFlexGridSizer(1, 2, 5, 0)
         
         self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
-                     " (4 = disable)", self, gsizer, "paginateInterval")
+                     " (0 = disable)", self, gsizer, "paginateInterval")
 
         vsizer.Add(gsizer, 0, wxTOP, 10)
 

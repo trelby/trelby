@@ -187,15 +187,15 @@ class HeadersDlg(wxDialog):
         self.headers.generatePML(pg, "42", self.cfg)
 
         fs = self.cfg.fontSize
-        ch_y = util.getTextHeight(fs)
+        chY = util.getTextHeight(fs)
         
-        y = self.cfg.marginTop + self.headers.getNrOfLines() * ch_y
+        y = self.cfg.marginTop + self.headers.getNrOfLines() * chY
         
         pg.add(pml.TextOp("Mindy runs away from the dinosaur, but trips on"
             " the power", self.cfg.marginLeft, y, fs))
 
         pg.add(pml.TextOp("cord. The raptor approaches her slowly.",
-            self.cfg.marginLeft, y + ch_y, fs))
+            self.cfg.marginLeft, y + chY, fs))
 
         doc.add(pg)
         

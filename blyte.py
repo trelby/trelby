@@ -59,7 +59,8 @@ ID_EDIT_FIND,\
 ID_EDIT_PASTE,\
 ID_EDIT_PASTE_FROM_CB,\
 ID_EDIT_SELECT_SCENE,\
-ID_EDIT_SHOW_FORMATTING,\
+ID_FILE_CFG_LOAD,\
+ID_FILE_CFG_SAVE_AS,\
 ID_FILE_CLOSE,\
 ID_FILE_EXIT,\
 ID_FILE_EXPORT,\
@@ -71,8 +72,6 @@ ID_FILE_REVERT,\
 ID_FILE_SAVE,\
 ID_FILE_SAVE_AS,\
 ID_FILE_SETTINGS,\
-ID_FILE_CFG_LOAD,\
-ID_FILE_CFG_SAVE_AS,\
 ID_HELP_ABOUT,\
 ID_HELP_COMMANDS,\
 ID_HELP_LICENSE,\
@@ -85,12 +84,14 @@ ID_REPORTS_DIALOGUE_CHART,\
 ID_SCRIPT_FIND_ERROR,\
 ID_SCRIPT_HEADERS,\
 ID_SCRIPT_PAGINATE,\
-ID_SCRIPT_REFORMAT,\
 ID_SCRIPT_TITLES,\
 ID_TOOLS_CHARMAP,\
 ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
-= range(39)
+ID_VIEW_SHOW_FORMATTING,\
+ID_VIEW_STYLE_DRAFT,\
+ID_VIEW_STYLE_LAYOUT,\
+= range(40)
 
 def refreshGuiConfig():
     global cfgGui
@@ -119,6 +120,7 @@ class GlobalData:
         v.addInt("posY", 0, "PositionY", -20, 9999)
         v.addInt("width", 700, "Width", 500, 9999)
         v.addInt("height", 830, "Height", 300, 9999)
+        v.addBool("isDraft", False, "IsDraftMode")
         v.addStr("license", "", "License")
         
         v.makeDicts()
@@ -128,7 +130,21 @@ class GlobalData:
             wxSystemSettings_GetMetric(wxSYS_SCREEN_Y) - 50)
 
         self.makeConfDir()
-        
+
+    # update stuff that depends on configuration / window size etc.
+    def refresh(self):
+        self.chX = util.getTextWidth(" ", pml.COURIER, cfg.fontSize)
+        self.chY = util.getTextHeight(cfg.fontSize)
+
+        self.pageW = (cfg.paperWidth / self.chX) * cfgGui.fonts[pml.NORMAL].fx
+
+        # conversion factor from mm to pixels
+        self.mm2p = self.pageW / cfg.paperWidth
+
+        # page width and height on screen, in pixels
+        self.pageW = int(self.pageW)
+        self.pageH = int(self.mm2p * cfg.paperHeight)
+
     def makeConfDir(self):
         makeDir = False
 
@@ -147,23 +163,68 @@ class GlobalData:
 
 # a piece of text on screen.
 class TextString:
-    def __init__(self, i, text, x, y, font, partial):
+    def __init__(self, line, text, x, y, fi, isUnderlined, partial):
 
         # if this object is a screenplay line, this is the index of the
         # corresponding line in the Screenplay.lines list. otherwise this
         # is -1 (used for stuff like CONTINUED: etc).
-        self.i = i
+        self.line = line
 
         # x,y coordinates in pixels from widget's topleft corner
         self.x = x
         self.y = y
 
-        # text and its font
+        # text and its FontInfo and underline status
         self.text = text
-        self.font = font
+        self.fi = fi
+        self.isUnderlined = isUnderlined
 
         # if True, bottom cut off, i.e. only partially visible
         self.partial = partial
+
+# a page shown on screen.
+class DisplayPage:
+    def __init__(self, x1 = -1, y1 = -1, x2 = -1, y2 = -1):
+
+        # coordinates in pixels
+        self.x1 = x1
+        self.y1 = y1
+        self.x2 = x2
+        self.y2 = y2
+
+# used to iteratively add PML pages to a document
+class Pager:
+    def __init__(self, sp):
+        self.sp = sp
+        self.doc = pml.Document(cfg.paperWidth, cfg.paperHeight)
+
+        # used in several places, so keep around
+        self.charIndent = cfg.getType(config.CHARACTER).indent
+        self.sceneIndent = cfg.getType(config.SCENE).indent
+
+        # current scene number
+        self.scene = 0
+
+        # number of CONTINUED:'s lines added for current scene
+        self.sceneContNr = 0
+
+# caches pml.Pages for operations that repeatedly construct them over and
+# over again without the page contents changing
+class PageCache:
+    def __init__(self, ctrl):
+        self.ctrl = ctrl
+        
+        # cached pages. key = pageNr, value = pml.Page
+        self.pages = {}
+
+    def getPage(self, pager, pageNr):
+        pg = self.pages.get(pageNr)
+
+        if not pg:
+            pg = self.ctrl.generatePMLPage(pager, pageNr, False, False)
+            self.pages[pageNr] = pg
+            
+        return pg
 
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.
@@ -283,7 +344,7 @@ class MyCtrl(wxControl):
     def clearVars(self):
         self.line = 0
         self.column = 0
-        self.topLine = 0
+        self._topLine = 0
         self.mark = None
         self.autoComp = None
         self.autoCompSel = -1
@@ -594,120 +655,169 @@ class MyCtrl(wxControl):
         return str(output)
 
     # generate PDF file from given screenplay and return it as a string.
+    # assumes paginate/reformat is 100% correct for the screenplay.
     def generatePDF(self, sp):
+        #lsdjflksj = util.TimerDev("generatePDF")
+
+        pager = Pager(sp)
+        sp.titles.generatePages(pager.doc)
+        
+        for i in range(1, len(self.pages)):
+            pg = self.generatePMLPage(pager, i, True, True)
+
+            if pg:
+                pager.doc.add(pg)
+            else:
+                break
+            
+        return pdf.generate(pager.doc)
+
+    # generate one page of PML data and return it.
+    #
+    # if forPDF is True, output is meant for PDF generation (demo stamps,
+    # print settings, etc).
+    #
+    # if doExtra is False, omits headers and other stuff that is
+    # automatically added, i.e. outputs only actual screenplay lines. also
+    # text style/capitalization is not done 100% correctly. this should
+    # only be True for callers that do not show the results in any way,
+    # just calculate things based on text positions.
+    #
+    # can also return None, which means pagination is not up-to-date and
+    # the given page number doesn't point to a valid page anymore, and the
+    # caller should stop calling this since all pages have been generated
+    # (assuming 1-to-n calling sequence).
+    def generatePMLPage(self, pager, pageNr, forPDF, doExtra):
+        #lsdjflksj = util.TimerDev("generatePMLPage")
+
+        sp = pager.sp
         ls = sp.lines
         fs = cfg.fontSize
-
-        doc = pml.Document(cfg.paperWidth, cfg.paperHeight)
-
-        sp.titles.generatePages(doc)
+        chX = gd.chX
+        chY = gd.chY
+        length = len(ls)
         
-        ch_x = util.getTextWidth(" ", pml.COURIER, fs)
-        ch_y = util.getTextHeight(fs)
+        start = self.pages[pageNr - 1] + 1
+
+        if start >= length:
+            # text has been deleted at end of script and pagination has
+            # not been updated.
+            return None
         
-        # used in several places, so keep around
-        charIndent = cfg.getType(config.CHARACTER).indent
-        sceneIndent = cfg.getType(config.SCENE).indent
+        # pagination may not be up-to-date, so any overflow text gets
+        # dumped onto the last page which may thus be arbitrarily long.
+        if pageNr == (len(self.pages) - 1):
+            end = length - 1
+        else:
+            # another side-effect is that if text is deleted at the end,
+            # self.pages can point to lines that no longer exist, so we
+            # need to clamp it.
+            end = util.clamp(self.pages[pageNr], maxVal = length - 1)
 
-        # current scene number
-        scene = 0
+        pg = pml.Page(pager.doc)
 
-        # number of CONTINUED:'s lines added for current scene
-        sceneContNr = 0
-        
-        for p in range(1, len(self.pages)):
-            start = self.pages[p - 1] + 1
-            end = self.pages[p]
+        # what line we're on, counted from first line after top
+        # margin, units = line / 10
+        y = 0
 
-            pg = pml.Page(doc)
+        if pageNr != 1:
+            if doExtra:
+                sp.headers.generatePML(pg, str(pageNr), cfg)
+            y += sp.headers.getNrOfLines() * 10
 
-            # what line we're on, counted from first line after top
-            # margin, units = line / 10
-            y = 0
-
-            if p != 1:
-                sp.headers.generatePML(pg, str(p), cfg)
-                y += sp.headers.getNrOfLines() * 10
-
-                if cfg.sceneContinueds and not self.isFirstLineOfScene(start):
+            if cfg.sceneContinueds and not self.isFirstLineOfScene(start):
+                if doExtra:
                     s = "CONTINUED:"
-                    if sceneContNr != 0:
-                        s += " (%d)" % (sceneContNr + 1)
+                    if pager.sceneContNr != 0:
+                        s += " (%d)" % (pager.sceneContNr + 1)
 
                     pg.add(pml.TextOp(s,
-                        cfg.marginLeft + sceneIndent * ch_x,
-                        cfg.marginTop + (y / 10.0) * ch_y, fs))
+                        cfg.marginLeft + pager.sceneIndent * chX,
+                        cfg.marginTop + (y / 10.0) * chY, fs))
 
-                    sceneContNr += 1
-                    
+                    pager.sceneContNr += 1
+
                     if cfg.pdfShowSceneNumbers:
-                        self.addSceneNumbers(pg, "%d" % scene,
-                            cfg.getType(config.SCENE).width, y, ch_x, ch_y,
-                                             fs)
+                        self.addSceneNumbers(pg, "%d" % pager.scene,
+                            cfg.getType(config.SCENE).width, y)
 
-                    y += 20
+                y += 20
 
-                if self.needsMore(start - 1):
-                    pg.add(pml.TextOp(self.getPrevSpeaker(start) + " (cont'd)",
-                        cfg.marginLeft + charIndent * ch_x,
-                        cfg.marginTop + (y / 10.0) * ch_y, fs))
+            if self.needsMore(start - 1):
+                if doExtra:
+                    pg.add(pml.TextOp(self.getPrevSpeaker(start) +
+                        " (cont'd)",
+                        cfg.marginLeft + pager.charIndent * chX,
+                        cfg.marginTop + (y / 10.0) * chY, fs))
 
-                    y += 10
+                y += 10
 
+        for i in range(start, end + 1):
+            line = ls[i]
+            tcfg = cfg.getType(line.lt)
 
-            for i in range(start, end + 1):
-                line = ls[i]
-                tcfg = cfg.getType(line.lt)
+            if i != start:
+                y += sp.getSpacingBefore(i)
 
-                if tcfg.export.isCaps:
+            typ = pml.NORMAL
+
+            if doExtra:
+                if forPDF:
+                    tt = tcfg.export
+                else:
+                    tt = tcfg.screen
+
+                if tt.isCaps:
                     text = util.upper(line.text)
                 else:
                     text = line.text
 
-                if i != start:
-                    y += sp.getSpacingBefore(i)
-
-                typ = pml.NORMAL
-                if tcfg.export.isBold:
+                if tt.isBold:
                     typ |= pml.BOLD
-                if tcfg.export.isItalic:
+                if tt.isItalic:
                     typ |= pml.ITALIC
-                if tcfg.export.isUnderlined:
+                if tt.isUnderlined:
                     typ |= pml.UNDERLINED
+            else:
+                text = line.text
+                
+            pg.add(pml.TextOp(text,
+                cfg.marginLeft + tcfg.indent * chX,
+                cfg.marginTop + (y / 10.0) * chY, fs, typ, line = i))
 
-                pg.add(pml.TextOp(text,
-                    cfg.marginLeft + tcfg.indent * ch_x,
-                    cfg.marginTop + (y / 10.0) * ch_y, fs, typ))
+            if doExtra and (tcfg.lt == config.SCENE) and \
+                   self.isFirstLineOfElem(i):
+                pager.sceneContNr = 0
 
-                if (tcfg.lt == config.SCENE) and self.isFirstLineOfElem(i):
-                    sceneContNr = 0
-                    
-                    if cfg.pdfShowSceneNumbers:
-                        scene += 1
-                        self.addSceneNumbers(pg, "%d" % scene, tcfg.width,
-                                             y, ch_x, ch_y, fs)
-                    
-                if cfg.pdfShowLineNumbers:
-                    pg.add(pml.TextOp("%02d" % (i - start + 1),
-                        cfg.marginLeft - 3 * ch_x,
-                        cfg.marginTop + (y / 10.0) * ch_y, fs))
+                if cfg.pdfShowSceneNumbers:
+                    pager.scene += 1
+                    self.addSceneNumbers(pg, "%d" % pager.scene, tcfg.width,
+                                         y)
 
-                y += 10
+            if doExtra and cfg.pdfShowLineNumbers:
+                pg.add(pml.TextOp("%02d" % (i - start + 1),
+                    cfg.marginLeft - 3 * chX,
+                    cfg.marginTop + (y / 10.0) * chY, fs))
 
-            if self.needsMore(end):
+            y += 10
+
+        if self.needsMore(end):
+            if doExtra:
                 pg.add(pml.TextOp("(MORE)",
-                        cfg.marginLeft + charIndent * ch_x,
-                        cfg.marginTop + (y / 10.0) * ch_y, fs))
+                        cfg.marginLeft + pager.charIndent * chX,
+                        cfg.marginTop + (y / 10.0) * chY, fs))
 
-                y += 10
+            y += 10
 
-            if cfg.sceneContinueds and not self.isLastLineOfScene(end):
+        if cfg.sceneContinueds and not self.isLastLineOfScene(end):
+            if doExtra:
                 pg.add(pml.TextOp("(CONTINUED)",
-                        cfg.marginLeft + 45 * ch_x,
-                        cfg.marginTop + (y / 10.0 + 1.0) * ch_y, fs))
+                        cfg.marginLeft + 45 * chX,
+                        cfg.marginTop + (y / 10.0 + 1.0) * chY, fs))
 
-                y += 10
-            
+            y += 10
+
+        if forPDF:
             if not misc.license:
                 self.addDemoStamp(pg)
 
@@ -720,16 +830,13 @@ class MyCtrl(wxControl):
                 pg.add(pml.LineOp([(lx, uy), (rx, uy), (rx, dy), (lx, dy)],
                                   0, True))
 
-            doc.add(pg)
+        return pg
 
-        return pdf.generate(doc)
-
-    def addSceneNumbers(self, pg, s, width, y, ch_x, ch_y, fs):
-        pg.add(pml.TextOp(s, cfg.marginLeft - 6 * ch_x,
-             cfg.marginTop + (y / 10.0) * ch_y, fs))
-        pg.add(pml.TextOp(s,
-            cfg.marginLeft + (width + 1) * ch_x,
-            cfg.marginTop + (y / 10.0) * ch_y, fs))
+    def addSceneNumbers(self, pg, s, width, y):
+        pg.add(pml.TextOp(s, cfg.marginLeft - 6 * gd.chX,
+             cfg.marginTop + (y / 10.0) * gd.chY, cfg.fontSize))
+        pg.add(pml.TextOp(s, cfg.marginLeft + (width + 1) * gd.chX,
+            cfg.marginTop + (y / 10.0) * gd.chY, cfg.fontSize))
         
     # add demo stamp to given pml.Page object. this modifies line join
     # parameters, so should only be called when the page is otherwise
@@ -997,6 +1104,7 @@ class MyCtrl(wxControl):
         ls[line].text += ls[line + 1].text
         ls[line].lb = ls[line + 1].lb
         del ls[line + 1]
+
         self.line = line
         self.column = pos
 
@@ -1143,12 +1251,12 @@ class MyCtrl(wxControl):
     def isLastLineOfScene(self, line):
         ls = self.sp.lines
 
-        if line == (len(ls) - 1):
-            return True
-
         if ls[line].lb != config.LB_LAST:
             return False
         
+        if line == (len(ls) - 1):
+            return True
+
         if ls[line + 1].lt == config.SCENE:
             return True
         else:
@@ -1196,78 +1304,214 @@ class MyCtrl(wxControl):
 
         return (top, bottom)
 
-    # get a description of what the current screen contains. returns a
-    # list of TextString objects.
-    def getScreen(self):
-        ret = []
-        
+    # return scene number for the line before 'line'.
+    def getSceneNumber(self, line):
+        #lskdjf = util.TimerDev("getSceneNumber")
         ls = self.sp.lines
-        height = self.GetClientSize().height
+        cs = config.SCENE
+        scene = 0
+
+        for i in xrange(line):
+            if (ls[i].lt == cs) and self.isFirstLineOfElem(i):
+                scene += 1
+
+        return scene
         
-        y = cfg.offsetY
-        length = len(ls)
-        fyd = cfg.fontYdelta
-        cox = cfg.offsetX
+    # get a description of what the current screen contains. returns
+    # (texts, dpages), where texts = [TextString, ...], dpages =
+    # [DisplayPage, ...]. dpages is None if draft mode is in use or
+    # doExtra is False. doExtra has same meaning as for generatePMLPage
+    # otherwise. pageCache, if given, is used in layout mode to cache PML
+    # pages. it should only be given when doExtra = False as the cached
+    # pages aren't accurate down to that level.
+    def getScreen(self, doExtra, pageCache = None):
+        #lskdjf = util.TimerDev("getScreen")
+        texts = []
+        dpages = []
 
-        i = self.topLine
-        
-        while (y < height) and (i < length):
-            y += int((self.sp.getSpacingBefore(i) / 10.0) * fyd)
+        width, height = self.GetClientSizeTuple()
 
-            if y >= height:
-                break
-
-            partial = (y + fyd) > height
-                
-            l = ls[i]
-            tcfg = cfg.getType(l.lt)
-
-            if tcfg.screen.isCaps:
-                text = util.upper(l.text)
-            else:
-                text = l.text
+        if gd.isDraft:
+            ls = self.sp.lines
+            y = cfg.offsetY
+            i = self.getTopLine()
+            cox = cfg.offsetX
+            fyd = cfg.fontYdelta
+            length = len(ls)
             
-            ret.append(TextString(i, text, cox + tcfg.indent * tcfg.fontX,
-                                  y, cfgGui.getType(l.lt).font, partial))
+            while (y < height) and (i < length):
+                y += int((self.sp.getSpacingBefore(i) / 10.0) * fyd)
 
-            y += fyd
-            i += 1
+                if y >= height:
+                    break
 
-        return ret
+                partial = (y + fyd) > height
 
-    def getLinesOnScreen(self):
+                l = ls[i]
+                tcfg = cfg.getType(l.lt)
+
+                if tcfg.screen.isCaps:
+                    text = util.upper(l.text)
+                else:
+                    text = l.text
+
+                fi = cfgGui.getType(l.lt)
+                texts.append(TextString(i, text,
+                    cox + tcfg.indent * fi.fx, y, fi,
+                    tcfg.screen.isUnderlined, partial))
+
+                y += fyd
+                i += 1
+        else:
+            # gap between pages (pixels)
+            pageGap = 10
+            pager = Pager(self.sp)
+
+            mm2p = gd.mm2p
+            fontY = cfgGui.fonts[pml.NORMAL].fy
+            cox = util.clamp((width - gd.pageW) / 2, 0)
+            
+            y = 0
+            topLine = self.getTopLine()
+            pageNr = self.line2page(topLine)
+
+            if doExtra and cfg.pdfShowSceneNumbers:
+                pager.scene = self.getSceneNumber(topLine)
+
+            # find out starting place (if something bugs, generatePMLPage
+            # below could return None, but it shouldn't happen...)
+            if pageCache:
+                pg = pageCache.getPage(pager, pageNr)
+            else:
+                pg = self.generatePMLPage(pager, pageNr, False, doExtra)
+
+            topOfPage = True
+            for op in pg.ops:
+                if (op.type != pml.OP_TEXT) or (op.line == -1):
+                    continue
+
+                if op.line == topLine:
+                    if not topOfPage:
+                        y = -int(op.y * mm2p)
+                    else:
+                        y = pageGap
+
+                    break
+                else:
+                    topOfPage = False
+
+            # create pages, convert them to display format, repeat until
+            # script ends or we've filled the display.
+            
+            done = False
+            while 1:
+                if done or (y >= height):
+                    break
+                
+                if not pg:
+                    pageNr += 1
+                    if pageNr >= len(self.pages):
+                        break
+
+                    # we'd have to go back an arbitrary number of pages to
+                    # get an accurate number for this in the worst case,
+                    # so disable it altogether.
+                    pager.sceneContNr = 0
+
+                    if pageCache:
+                        pg = pageCache.getPage(pager, pageNr)
+                    else:
+                        pg = self.generatePMLPage(pager, pageNr, False,
+                                                  doExtra)
+                    if not pg:
+                        break
+
+                dp = DisplayPage(cox, y, cox + gd.pageW, y + gd.pageH)
+                dpages.append(dp)
+
+                pageY = y
+
+                for op in pg.ops:
+                    if op.type != pml.OP_TEXT:
+                        continue
+
+                    ypos = int(pageY + op.y * mm2p)
+
+                    # TODO: show partial lines at top of screen, or not?
+                    if ypos < 0:
+                        continue
+                    
+                    y = max(y, ypos)
+                    
+                    if y >= height:
+                        done = True
+                        break
+
+                    partial = (ypos + fontY) > height
+                    
+                    texts.append(TextString(op.line, op.text,
+                        int(cox + op.x * mm2p), ypos,
+                        cfgGui.fonts[op.flags & 3],
+                        op.flags & pml.UNDERLINED, partial))
+
+                y = pageY + gd.pageH + pageGap
+                pg = None
+
+            # if user has inserted new text causing the script to overflow
+            # the last page, we need to make the last page extra-long on
+            # the screen.
+            if dpages and texts and (pageNr >= (len(self.pages) - 1)):
+
+                lastY = texts[-1].y + fontY
+                if lastY >= dpages[-1].y2:
+                    dpages[-1].y2 = lastY + 10
+            else:
+                pass
+
+        return (texts, dpages)
+
+    def getLinesOnScreen(self, pageCache = None):
         lines = 0
 
-        for t in self.getScreen():
-            if (t.i != -1) and not t.partial:
+        for t in self.getScreen(False, pageCache)[0]:
+            if not t.partial:
                 lines += 1
 
         return lines
 
+    # return height for one line on screen
+    def getLineHeight(self):
+        if gd.isDraft:
+            return cfg.fontYdelta
+        else:
+            # the + 1.0 avoids occasional non-consecutive backgrounds for
+            # lines.
+            return int(gd.chY * gd.mm2p + 1.0)
+        
     def pos2linecol(self, pos):
         sel = None
-
-        for t in self.getScreen():
-            if t.i == -1:
+        lineh = self.getLineHeight()
+        
+        for t in self.getScreen(False)[0]:
+            if t.line == -1:
                 continue
 
             sel = t
             
-            if (t.y + cfg.fontYdelta) > pos.y:
+            if (t.y + lineh) > pos.y:
                 break
 
         # shouldn't happen, but let's check anyway
         if sel == None:
             return (0, 0)
 
-        line = sel.i
+        line = sel.line
         l = self.sp.lines[line]
-        tcfg = cfg.getType(l.lt)
 
-        column = util.clamp(int((pos.x - sel.x) / tcfg.fontX), 0, len(l.text))
+        column = util.clamp(int((pos.x - sel.x) / sel.fi.fx), 0, len(l.text))
 
         return (line, column)
-    
+
     def line2page(self, line):
         return self.line2pageReal(line, self.pages)
 
@@ -1312,29 +1556,51 @@ class MyCtrl(wxControl):
             return False
 
         return True
-        
-    def isLineVisible(self, line):
-        bottom = self.topLine + self.getLinesOnScreen() - 1
-        if (line >= self.topLine) and (line <= bottom):
-            return True
-        else:
-            return False
-        
-    def makeLineVisible(self, line, redraw = False):
-        if self.isLineVisible(line):
-            return
-        
-        self.topLine = max(0, int(line - (self.getLinesOnScreen() * 0.66)))
-        if not self.isLineVisible(line):
-            self.topLine = line
+
+    # get topLine, clamping it to the valid range in the process.
+    def getTopLine(self):
+        self._topLine = util.clamp(self._topLine, 0, len(self.sp.lines) - 1)
+
+        return self._topLine
+
+    # set topLine, clamping it to the valid range.
+    def setTopLine(self, line):
+        self._topLine = util.clamp(line, 0, len(self.sp.lines) - 1)
+
+    # los = results of self.getLinesOnScreen(), or if None, in which case
+    # it's called in this function.
+    def isLineVisible(self, line, los = None):
+        if los == None:
+            los = self.getLinesOnScreen()
             
-        if redraw:
-            self.Refresh(False)
+        top = self.getTopLine()
+        bottom = top + los - 1
+
+        return (line >= top) and (line <= bottom)
+        
+    def makeLineVisible(self, line):
+        #dlkj = util.TimerDev("makeLineVisible")
+
+        los = self.getLinesOnScreen()
+        if self.isLineVisible(line, los):
+            return
+
+        # TODO: this is kinda braindead...
+        
+        self.setTopLine(max(0, int(line - (los * 0.66))))
+        if not self.isLineVisible(line):
+            self.setTopLine(line)
         
     def adjustScrollBar(self):
-        pageSize = self.getLinesOnScreen()
-        self.panel.scrollBar.SetScrollbar(self.topLine, pageSize,
-                                          len(self.sp.lines), pageSize) 
+        height = self.GetClientSize().height
+
+        # rough approximation of how many lines fit onto the screen.
+        # accuracy is not that important for this, so we don't even care
+        # about draft / layout mode differences.
+        approx = int(((height / gd.mm2p) / gd.chY) / 1.3)
+        
+        self.panel.scrollBar.SetScrollbar(self.getTopLine(), approx,
+            len(self.sp.lines) + approx - 1, approx)
 
     # get a list of strings (single-line text elements for now) that start
     # with 'text' (not case sensitive) and are of of type 'type'. also
@@ -1718,6 +1984,8 @@ class MyCtrl(wxControl):
             line -= 1
 
     def paginate(self):
+        #sfdlksjf = util.TimerDev("paginate")
+        
         self.pages = [-1]
         self.pagesNoAdjust = [-1]
 
@@ -1938,7 +2206,8 @@ class MyCtrl(wxControl):
         
         cfg.recalc()
         refreshGuiConfig()
-
+        gd.refresh()
+        
         for c in mainFrame.getCtrls():
             c.reformatAll()
             c.paginate()
@@ -2013,11 +2282,11 @@ class MyCtrl(wxControl):
 
     def OnMouseWheel(self, event):
         if event.GetWheelRotation() > 0:
-            self.topLine -= cfg.mouseWheelLines
+            delta = -cfg.mouseWheelLines
         else:
-            self.topLine += cfg.mouseWheelLines
+            delta = cfg.mouseWheelLines
             
-        self.topLine = util.clamp(self.topLine, 0, len(self.sp.lines) - 1)
+        self.setTopLine(self.getTopLine() + delta)
         self.updateScreen()
         
     def OnTypeCombo(self, event):
@@ -2028,12 +2297,8 @@ class MyCtrl(wxControl):
 
     def OnScroll(self, event):
         pos = self.panel.scrollBar.GetThumbPosition()
-        self.topLine = pos
+        self.setTopLine(pos)
         self.autoComp = None
-        self.updateScreen()
-
-    def OnReformat(self):
-        self.reformatAll()
         self.updateScreen()
 
     def OnPaginate(self):
@@ -2185,7 +2450,7 @@ class MyCtrl(wxControl):
         dlt = tmp
         
         fs = cfg.fontSize
-        ch_y = util.getTextHeight(fs)
+        chY = util.getTextHeight(fs)
         
         doc = pml.Document(cfg.paperWidth, cfg.paperHeight)
 
@@ -2220,7 +2485,7 @@ class MyCtrl(wxControl):
                 pg.add(pml.PDFOp("0.75 g"))
                 w = 50.0
                 pg.add(pml.RectOp(doc.w / 2.0 - w /2.0, cfg.marginTop +
-                    y * ch_y + ch_y / 4, w, ch_y / 2, -1, True))
+                    y * chY + chY / 4, w, chY / 2, -1, True))
                 pg.add(pml.PDFOp("0.0 g"))
 
             else:
@@ -2235,12 +2500,12 @@ class MyCtrl(wxControl):
 
                 if color:
                     pg.add(pml.PDFOp("%s rg" % color))
-                    pg.add(pml.RectOp(cfg.marginLeft, cfg.marginTop + y * ch_y,
-                        doc.w - cfg.marginLeft - 5.0, ch_y, -1, True))
+                    pg.add(pml.RectOp(cfg.marginLeft, cfg.marginTop + y * chY,
+                        doc.w - cfg.marginLeft - 5.0, chY, -1, True))
                     pg.add(pml.PDFOp("0.0 g"))
 
                 textOps.append(pml.TextOp(s[1:], cfg.marginLeft,
-                    cfg.marginTop + y * ch_y, fs))
+                    cfg.marginTop + y * chY, fs))
 
             y += 1
 
@@ -2521,7 +2786,7 @@ class MyCtrl(wxControl):
         
         self.line = 0
         self.column = 0
-        self.topLine = 0
+        self.setTopLine(0)
         self.mark = None
         
         self.paginate()
@@ -2587,6 +2852,8 @@ class MyCtrl(wxControl):
         dlg.Destroy()
         
     def OnKeyChar(self, ev):
+        #ldkjfjv = util.TimerDev("OnKeyChar")
+        
         kc = ev.GetKeyCode()
         
         #print "kc: %d, ctrl/alt/shift: %d, %d, %d" %\
@@ -2595,7 +2862,7 @@ class MyCtrl(wxControl):
         ls = self.sp.lines
         tcfg = cfg.getType(ls[self.line].lt)
 
-        # FIXME: call ensureCorrectLine()
+        # TODO: call ensureCorrectLine()?
 
         # what to do about auto-completion
         AC_DEL = 0
@@ -2666,7 +2933,7 @@ class MyCtrl(wxControl):
                 self.maybeMark(ev.ShiftDown())
                 
                 self.line = 0
-                self.topLine = 0
+                self.setTopLine(0)
                 self.column = 0
                 
             elif kc == WXK_END:
@@ -2717,10 +2984,7 @@ class MyCtrl(wxControl):
                 
                 if self.line < (len(ls) - 1):
                     self.line += 1
-                    if self.line >= (self.topLine + self.getLinesOnScreen()):
-                        while (self.topLine + self.getLinesOnScreen() - 1)\
-                              < self.line:
-                            self.topLine += 1
+
             else:
                 self.autoCompSel = (self.autoCompSel + 1) % len(self.autoComp)
                 doAutoComp = AC_KEEP
@@ -2731,8 +2995,7 @@ class MyCtrl(wxControl):
                 
                 if self.line > 0:
                     self.line -= 1
-                    if self.line < self.topLine:
-                        self.topLine -= 1
+                    
             else:
                 self.autoCompSel = self.autoCompSel - 1
                 if self.autoCompSel < 0:
@@ -2756,12 +3019,36 @@ class MyCtrl(wxControl):
             if not self.autoComp:
                 self.maybeMark(ev.ShiftDown())
 
-                # FIXME: this is sucky since it skips over lines
-                # semi-randomly. bite the bullet and do it for real.
-                
-                self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
-                    0)
-                self.line = min(self.topLine + 5, len(ls) - 1)
+                pc = PageCache(self)
+                los = self.getLinesOnScreen(pc)
+
+                if not self.isLineVisible(self.line, los):
+                    # if cursor isn't visible, it's hard to know what
+                    # "page up" is supposed to mean, so just go up a few
+                    # lines.
+                    self.line = util.clamp(self.line - 5, 0, len(ls) - 1)
+                else:
+                    tl = self.getTopLine()
+                    if tl == (len(ls) - 1):
+                        self.setTopLine(tl - 5)
+                    else:
+                        self.line = tl
+
+                        while 1:
+                            tl = self.getTopLine()
+                            if tl == 0:
+                                break
+
+                            lastLine = tl + self.getLinesOnScreen(pc) - 1
+
+                            if self.line > lastLine:
+                                # line scrolled off screen, back up one line
+                                self.setTopLine(tl + 1)
+                                break
+                            elif self.line == lastLine:
+                                break
+
+                            self.setTopLine(tl - 1)
             else:
                 if len(self.autoComp) > self.maxAutoCompItems:
                     self.autoCompSel = self.autoCompSel - self.maxAutoCompItems
@@ -2774,17 +3061,18 @@ class MyCtrl(wxControl):
             if not self.autoComp:
                 self.maybeMark(ev.ShiftDown())
                 
-                oldTop = self.topLine
+                los = self.getLinesOnScreen()
 
-                self.topLine += self.getLinesOnScreen() - 2
-                if self.topLine >= len(ls):
-                    self.topLine = len(ls) - self.getLinesOnScreen() / 2
-
-                if self.topLine < 0:
-                    self.topLine = 0
-
-                self.line += self.topLine - oldTop
-                self.line = util.clamp(self.line, 0, len(ls) - 1)
+                if self.isLineVisible(self.line, los):
+                    self.line = util.clamp(self.getTopLine() + los - 1,
+                        0, len(ls) - 1)
+                    self.setTopLine(self.line - 1)
+                else:
+                    # if cursor isn't visible, it's hard to know what
+                    # "page down" is supposed to mean, so just go down a
+                    # few lines.
+                    self.line = util.clamp(self.line + 5, 0, len(ls) - 1)
+                    
             else:
                 if len(self.autoComp) > self.maxAutoCompItems:
                     self.autoCompSel = (self.autoCompSel +
@@ -2834,10 +3122,8 @@ class MyCtrl(wxControl):
         # FIXME: disable for beta2
         elif (kc < 256) and (chr(kc) == "å"):
             self.loadFile("default.blyte")
-#         elif (kc < 256) and (chr(kc) == "Å"):
-#             self.OnCfg()
-#         elif (kc < 256) and (chr(kc) == "¤"):
-#             pass
+        elif (kc < 256) and (chr(kc) == "¤"):
+            pass
 
         elif util.isValidInputChar(kc):
             char = chr(kc)
@@ -2868,7 +3154,7 @@ class MyCtrl(wxControl):
             ev.Skip()
             return
 
-        # FIXME: call ensureCorrectLine()
+        # TODO: call ensureCorrectLine()?
         self.column = min(self.column, len(ls[self.line].text))
 
         if doAutoComp == AC_DEL:
@@ -2877,7 +3163,7 @@ class MyCtrl(wxControl):
             self.fillAutoComp()
 
         if doUpdate:
-            if cfg.paginateInterval > 4:
+            if cfg.paginateInterval > 0:
                 now = time.time()
                 if (now - self.lastPaginated) >= cfg.paginateInterval:
                     self.paginate()
@@ -2886,33 +3172,64 @@ class MyCtrl(wxControl):
             self.updateScreen()
 
     def OnPaint(self, event):
-        #ldkjfldsj = util.TimerDev()
+        #ldkjfldsj = util.TimerDev("paint")
         
         ls = self.sp.lines
         dc = wxBufferedPaintDC(self, self.screenBuf)
 
         size = self.GetClientSize()
-        dc.SetBrush(cfgGui.bgBrush)
-        dc.SetPen(cfgGui.bgPen)
-        dc.DrawRectangle(0, 0, size.width, size.height)
-
         marked = self.getMarkedLines()
+        lineh = self.getLineHeight()
         posX = -1
         cursorY = -1
-        ccfg = None
 
-        # key = font, value = ([text, ...], [(x, y), ...])
+        # auto-comp FontInfo
+        acFi = None
+
+        # key = font, value = ([text, ...], [(x, y), ...], [wxColour, ...])
         texts = {}
 
-        for t in self.getScreen():
-            i = t.i
+        # lists of underline-lines to draw, one for normal text and one
+        # for header texts. list objects are (x, y, width) tuples.
+        ulines = []
+        ulinesHdr = []
+        
+        strings, dpages = self.getScreen(True)
+
+        if not dpages:
+            dc.SetBrush(cfgGui.textBgBrush)
+            dc.SetPen(cfgGui.textBgPen)
+
+            dc.DrawRectangle(0, 0, size.width, size.height)
+
+        else:
+            dc.SetBrush(cfgGui.workspaceBrush)
+            dc.SetPen(cfgGui.workspacePen)
+
+            dc.DrawRectangle(0, 0, size.width, size.height)
+            
+            dc.SetBrush(cfgGui.textBgBrush)
+            dc.SetPen(cfgGui.pageBorderPen)
+            for dp in dpages:
+                dc.DrawRectangle(dp.x1, dp.y1, dp.x2 - dp.x1 + 1,
+                                 dp.y2 - dp.y1 + 1)
+
+            dc.SetPen(cfgGui.pageShadowPen)
+            for dp in dpages:
+                # + 2 because DrawLine doesn't draw to end point but stops
+                # one pixel short...
+                dc.DrawLine(dp.x1 + 1, dp.y2 + 1, dp.x2 + 1, dp.y2 + 1)
+                dc.DrawLine(dp.x2 + 1, dp.y1 + 1, dp.x2 + 1, dp.y2 + 2)
+
+        for t in strings:
+            i = t.line
             y = t.y
+            fi = t.fi
+            fx = fi.fx
 
             if i != -1:
                 l = ls[i]
                 tcfg = cfg.getType(l.lt)
-                fx = tcfg.fontX
-                fy = tcfg.fontY
 
                 if l.lt == config.NOTE:
                     dc.SetPen(cfgGui.notePen)
@@ -2921,17 +3238,17 @@ class MyCtrl(wxControl):
                     nx = t.x - 5
                     nw = tcfg.width * fx + 10
 
-                    dc.DrawRectangle(nx, y, nw, cfg.fontYdelta)
+                    dc.DrawRectangle(nx, y, nw, lineh)
 
                     dc.SetPen(cfgGui.textPen)
-                    util.drawLine(dc, nx - 1, y, 0, cfg.fontYdelta)
-                    util.drawLine(dc, nx + nw, y, 0, cfg.fontYdelta)
+                    util.drawLine(dc, nx - 1, y, 0, lineh)
+                    util.drawLine(dc, nx + nw, y, 0, lineh)
 
                     if self.isFirstLineOfElem(i):
                         util.drawLine(dc, nx - 1, y - 1, nw + 2, 0)
 
                     if self.isLastLineOfElem(i):
-                        util.drawLine(dc, nx - 1, y + cfg.fontYdelta,
+                        util.drawLine(dc, nx - 1, y + lineh,
                                       nw + 2, 0)
 
                 if marked and self.isLineMarked(i, marked):
@@ -2941,81 +3258,94 @@ class MyCtrl(wxControl):
                     dc.SetBrush(cfgGui.selectedBrush)
 
                     dc.DrawRectangle(t.x + c1 * fx, y, (c2 - c1 + 1) * fx,
-                        cfg.fontYdelta)
+                        lineh)
 
                 if mainFrame.showFormatting:
                     dc.SetPen(cfgGui.bluePen)
-                    util.drawLine(dc, t.x, y, 0, cfg.fontYdelta)
+                    util.drawLine(dc, t.x, y, 0, lineh)
                     util.drawLine(dc, t.x + tcfg.width * fx, y, 0,
-                                  cfg.fontYdelta)
-
-                    if self.isFirstLineOfElem(i):
-                        util.drawLine(dc, t.x, y, tcfg.width * fx, 0)
-
-                    if self.isLastLineOfElem(i):
-                        util.drawLine(dc, t.x, y + cfg.fontYdelta,
-                            tcfg.width * fx, 0)
+                                  lineh)
 
                     dc.SetTextForeground(cfgGui.redColor)
-                    dc.SetFont(cfgGui.getType(config.ACTION).font)
+                    dc.SetFont(cfgGui.fonts[pml.NORMAL].font)
                     dc.DrawText(config.lb2text(l.lb), t.x - 10, y)
 
-                if cfg.pbi == config.PBI_REAL_AND_UNADJ:
-                    if self.line2pageNoAdjust(i) != self.line2pageNoAdjust(i + 1):
-                        dc.SetPen(cfgGui.pagebreakNoAdjustPen)
-                        util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
-                            size.width, 0)
+                if not dpages:
+                    if cfg.pbi == config.PBI_REAL_AND_UNADJ:
+                        if self.line2pageNoAdjust(i) != \
+                               self.line2pageNoAdjust(i + 1):
+                            dc.SetPen(cfgGui.pagebreakNoAdjustPen)
+                            util.drawLine(dc, 0, y + lineh - 1,
+                                size.width, 0)
 
-                if cfg.pbi in (config.PBI_REAL, config.PBI_REAL_AND_UNADJ):
-                    thisPage = self.line2page(i)
+                    if cfg.pbi in (config.PBI_REAL,
+                                   config.PBI_REAL_AND_UNADJ):
+                        thisPage = self.line2page(i)
 
-                    if thisPage != self.line2page(i + 1):
-                        dc.SetPen(cfgGui.pagebreakPen)
-                        util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
-                            size.width, 0)
+                        if thisPage != self.line2page(i + 1):
+                            dc.SetPen(cfgGui.pagebreakPen)
+                            util.drawLine(dc, 0, y + lineh - 1,
+                                size.width, 0)
 
                 if i == self.line:
                     posX = t.x
                     cursorY = y
-                    ccfg = tcfg
+                    acFi = fi
                     dc.SetPen(cfgGui.cursorPen)
                     dc.SetBrush(cfgGui.cursorBrush)
-                    dc.DrawRectangle(t.x + self.column * fx, y, fx, fy)
+                    dc.DrawRectangle(t.x + self.column * fx, y, fx, fi.fy)
 
                 if i == self.searchLine:
                     dc.SetPen(cfgGui.searchPen)
                     dc.SetBrush(cfgGui.searchBrush)
                     dc.DrawRectangle(t.x + self.searchColumn * fx, y,
-                                     self.searchWidth * fx, fy)
+                                     self.searchWidth * fx, fi.fy)
 
             if len(t.text) != 0:
-                tl = texts.get(t.font)
+                tl = texts.get(fi.font)
                 if tl == None:
-                    tl = ([], [])
-                    texts[t.font] = tl
+                    tl = ([], [], [])
+                    texts[fi.font] = tl
                     
                 tl[0].append(t.text)
                 tl[1].append((t.x, y))
+                if t.line != -1:
+                    tl[2].append(cfgGui.textColor)
+                else:
+                    tl[2].append(cfgGui.textHdrColor)
+                
+                if t.isUnderlined:
+                    if t.line != -1:
+                        uli = ulines
+                    else:
+                        uli = ulinesHdr
 
-                if i != -1:
-                    if tcfg.screen.isUnderlined and misc.isUnix:
-                        dc.SetPen(cfgGui.textPen)
-                        util.drawLine(dc, t.x, y + cfg.fontYdelta - 1,
-                            len(t.text) * fx - 1, 0)
+                    uli.append((t.x, y + lineh - 1,
+                               len(t.text) * fx - 1))
+
+        if ulines:
+            dc.SetPen(cfgGui.textPen)
+            
+            for ul in ulines:
+                util.drawLine(dc, ul[0], ul[1], ul[2], 0)
+
+        if ulinesHdr:
+            dc.SetPen(cfgGui.textHdrPen)
+            
+            for ul in ulinesHdr:
+                util.drawLine(dc, ul[0], ul[1], ul[2], 0)
 
         dc.SetTextForeground(cfgGui.textColor)
 
         for tl in texts.iteritems():
             dc.SetFont(tl[0])
-            dc.DrawTextList(tl[1][0], tl[1][1])
+
+            dc.DrawTextList(tl[1][0], tl[1][1], tl[1][2])
         
         if self.autoComp and (cursorY > 0):
-            self.drawAutoComp(dc, posX, cursorY, ccfg)
+            self.drawAutoComp(dc, posX, cursorY, acFi)
 
-    def drawAutoComp(self, dc, posX, cursorY, tcfg):
-        fx = tcfg.fontX
-        fy = tcfg.fontY
-        
+    def drawAutoComp(self, dc, posX, cursorY, fi):
         offset = 5
 
         # scroll bar width
@@ -3025,7 +3355,7 @@ class MyCtrl(wxControl):
 
         size = self.GetClientSize()
         
-        dc.SetFont(cfgGui.getType(tcfg.lt).font)
+        dc.SetFont(fi.font)
 
         show = min(self.maxAutoCompItems, len(self.autoComp))
         doSbw = show < len(self.autoComp)
@@ -3041,14 +3371,14 @@ class MyCtrl(wxControl):
             w = max(w, tw)
 
         w += offset * 2
-        h = show * fy + offset * 2
+        h = show * fi.fy + offset * 2
 
         itemW = w - offset * 2 + selBleed * 2
         if doSbw:
             w += sbw + offset * 2
             sbh = h - offset * 2 + selBleed * 2
 
-        posY = cursorY + cfg.fontYdelta
+        posY = cursorY + fi.fy + 5
 
         # if the box doesn't fit on the screen in the normal position, put
         # it above the current line. if it doesn't fit there either,
@@ -3068,15 +3398,15 @@ class MyCtrl(wxControl):
                 dc.SetBrush(cfgGui.autoCompRevBrush)
                 dc.SetTextForeground(cfgGui.autoCompBgColor)
                 dc.DrawRectangle(posX + offset - selBleed,
-                    posY + offset + (i - startPos) * fy - selBleed,
+                    posY + offset + (i - startPos) * fi.fy - selBleed,
                     itemW,
-                    fy + selBleed * 2)
+                    fi.fy + selBleed * 2)
                 dc.SetTextForeground(cfgGui.autoCompBgColor)
                 dc.SetPen(cfgGui.autoCompPen)
                 dc.SetBrush(cfgGui.autoCompBrush)
                 
             dc.DrawText(self.autoComp[i], posX + offset, posY + offset +
-                        (i - startPos) * fy)
+                        (i - startPos) * fi.fy)
 
             if i == self.autoCompSel:
                 dc.SetTextForeground(cfgGui.autoCompFgColor)
@@ -3146,15 +3476,22 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_DELETE_ELEMENTS, "&Remove elements...")
-        editMenu.AppendSeparator()
-        editMenu.AppendCheckItem(ID_EDIT_SHOW_FORMATTING, "S&how formatting")
+
+        viewMenu = wxMenu()
+        viewMenu.AppendRadioItem(ID_VIEW_STYLE_DRAFT, "&Draft")
+        viewMenu.AppendRadioItem(ID_VIEW_STYLE_LAYOUT, "&Layout")
+
+        if gd.isDraft:
+            viewMenu.Check(ID_VIEW_STYLE_DRAFT, True)
+        else:
+            viewMenu.Check(ID_VIEW_STYLE_LAYOUT, True)
+
+        viewMenu.AppendSeparator()
+        viewMenu.AppendCheckItem(ID_VIEW_SHOW_FORMATTING, "&Show formatting")
         
         scriptMenu = wxMenu()
         scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error\tCTRL-E")
 
-        # TODO: remove permanently if this is not needed anymore
-        #scriptMenu.Append(ID_SCRIPT_REFORMAT, "&Reformat all")
-        
         scriptMenu.Append(ID_SCRIPT_PAGINATE, "&Paginate")
         scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
         scriptMenu.Append(ID_SCRIPT_HEADERS, "&Headers...")
@@ -3185,6 +3522,7 @@ class MyFrame(wxFrame):
         self.menuBar = wxMenuBar()
         self.menuBar.Append(fileMenu, "&File")
         self.menuBar.Append(editMenu, "&Edit")
+        self.menuBar.Append(viewMenu, "&View")
         self.menuBar.Append(scriptMenu, "Scr&ipt")
         self.menuBar.Append(reportsMenu, "&Reports")
         self.menuBar.Append(toolsMenu, "Too&ls")
@@ -3260,9 +3598,10 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_EDIT_DELETE_ELEMENTS, self.OnDeleteElements)
-        EVT_MENU(self, ID_EDIT_SHOW_FORMATTING, self.OnShowFormatting)
+        EVT_MENU(self, ID_VIEW_STYLE_DRAFT, self.OnStyleChange)
+        EVT_MENU(self, ID_VIEW_STYLE_LAYOUT, self.OnStyleChange)
+        EVT_MENU(self, ID_VIEW_SHOW_FORMATTING, self.OnShowFormatting)
         EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindError)
-        EVT_MENU(self, ID_SCRIPT_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
         EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitles)
         EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeaders)
@@ -3508,11 +3847,15 @@ class MyFrame(wxFrame):
         self.panel.ctrl.OnDeleteElements()
 
     def OnShowFormatting(self, event):
-        self.showFormatting = self.menuBar.IsChecked(ID_EDIT_SHOW_FORMATTING)
+        self.showFormatting = self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING)
         self.panel.ctrl.Refresh(False)
 
-    def OnReformat(self, event):
-        self.panel.ctrl.OnReformat()
+    def OnStyleChange(self, event):
+        gd.isDraft = self.menuBar.IsChecked(ID_VIEW_STYLE_DRAFT)
+
+        c = self.panel.ctrl
+        c.makeLineVisible(c.line)
+        c.updateScreen()
 
     def OnPaginate(self, event = None):
         self.panel.ctrl.OnPaginate()
@@ -3689,6 +4032,9 @@ class MyApp(wxApp):
 
             if s:
                 gd.cvars.load(gd.cvars.makeVals(s), "", gd)
+
+        # we now have both config and gd, init stuff that needs both
+        gd.refresh()
         
         mainFrame = MyFrame(NULL, -1, "Blyte")
         bugreport.mainFrame = mainFrame

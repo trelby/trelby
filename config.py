@@ -171,11 +171,14 @@ class Type:
         self.screen.load(vals, prefix + "Screen/")
         self.export.load(vals, prefix + "Export/")
 
-# type-specific stuff that are wxwindows objects, so can't be in normal
-# Type (deepcopy dies)
-class TypeGui:
+# information about one screen font
+class FontInfo:
     def __init__(self):
         self.font = None
+
+        # font width and height
+        self.fx = 1
+        self.fy = 1
 
 class Config:
     cvars = None
@@ -336,8 +339,8 @@ class Config:
         # how many lines to scroll per mouse wheel event
         v.addInt("mouseWheelLines", 4, "MouseWheelLines", 1, 50)
 
-        # interval in seconds between automatic pagination (4 = disabled)
-        v.addInt("paginateInterval", 10, "PaginateInterval", 4, 60)
+        # interval in seconds between automatic pagination (0 = disabled)
+        v.addInt("paginateInterval", 1, "PaginateInterval", 0, 10)
 
         # paper size
         v.addFloat("paperHeight", 297.0, "Paper/Height", 100.0, 1000.0)
@@ -406,7 +409,12 @@ class Config:
 
         # colors
         v.addColor("text", 0, 0, 0, "TextFG", "Text foreground")
-        v.addColor("bg", 204, 204, 204, "TextBG", "Text background")
+        v.addColor("textHdr", 128, 128, 128, "TextHeadersFG",
+                   "Text foreground (headers)")
+        v.addColor("textBg", 255, 255, 255, "TextBG", "Text background")
+        v.addColor("workspace", 204, 204, 204, "Workspace", "Workspace")
+        v.addColor("pageBorder", 0, 0, 0, "PageBorder", "Page Border")
+        v.addColor("pageShadow", 128, 128, 128, "PageShadow", "Page Shadow")
         v.addColor("selected", 128, 192, 192, "Selected", "Selection")
         v.addColor("search", 255, 127, 0, "SearchResult", "Search result")
         v.addColor("cursor", 205, 0, 0, "Cursor", "Cursor")
@@ -508,13 +516,21 @@ class ConfigGui:
             tmp = wxColour(c.r, c.g, c.b)
             setattr(self, it.name, tmp)
 
-        # type-gui configs, key = line type, value = TypeGui
+        # font configs (pointers to objects actually stored in
+        # self.fonts), key = line type, value = FontInfo.
         self.types = { }
 
         self.textPen = wxPen(self.textColor)
+        self.textHdrPen = wxPen(self.textHdrColor)
         
-        self.bgBrush = wxBrush(self.bgColor)
-        self.bgPen = wxPen(self.bgColor)
+        self.workspaceBrush = wxBrush(self.workspaceColor)
+        self.workspacePen = wxPen(self.workspaceColor)
+
+        self.textBgBrush = wxBrush(self.textBgColor)
+        self.textBgPen = wxPen(self.textBgColor)
+
+        self.pageBorderPen = wxPen(self.pageBorderColor)
+        self.pageShadowPen = wxPen(self.pageShadowColor)
 
         self.selectedBrush = wxBrush(self.selectedColor)
         self.selectedPen = wxPen(self.selectedColor)
@@ -537,40 +553,32 @@ class ConfigGui:
         self.pagebreakNoAdjustPen = wxPen(self.pagebreakNoAdjustColor,
                                           style = wxDOT)
 
-        # FIXME: create fonts only once and make them accessible without
-        # types
+        # a 4-item list of FontInfo objects, indexed by the two lowest
+        # bits of pml.TextOp.flags.
+        self.fonts = []
         
         dc = wxMemoryDC()
-        for t in cfg.types.values():
-            tg = TypeGui()
+        for fname in ["fontNormal", "fontBold", "fontItalic",
+                      "fontBoldItalic"]:
+            fi = FontInfo()
             
-            if not t.screen.isBold and not t.screen.isItalic:
-                fname = "fontNormal"
-            elif t.screen.isBold and not t.screen.isItalic:
-                fname = "fontBold"
-            elif not t.screen.isBold and t.screen.isItalic:
-                fname = "fontItalic"
-            else:
-                fname = "fontBoldItalic"
-
             nfi = wxNativeFontInfo()
             nfi.FromString(getattr(cfg, fname))
-
-            nfi.SetUnderlined(t.screen.isUnderlined)
             nfi.SetEncoding(wxFONTENCODING_ISO8859_1)
 
-            tg.font = wxFontFromNativeInfo(nfi)
+            fi.font = wxFontFromNativeInfo(nfi)
 
-            dc.SetFont(tg.font)
+            dc.SetFont(fi.font)
             fx, fy = dc.GetTextExtent("O")
 
-            fx = max(1, fx)
-            fy = max(1, fy)
+            fi.fx = max(1, fx)
+            fi.fy = max(1, fy)
 
-            t.fontX = fx
-            t.fontY = fy
+            self.fonts.append(fi)
             
-            self.types[t.lt] = tg
+        for t in cfg.types.values():
+            self.types[t.lt] = self.fonts[t.screen.isBold |
+                                          (t.screen.isItalic << 1)]
 
     def getType(self, lt):
         return self.types[lt]
