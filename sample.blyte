@@ -1,4 +1,6 @@
 ﻿#Version 1
+#Header-String 1,0,r,${PAGE}.
+#Header-Empty-Lines 1
 .\ext. stonehenge - night
 >.A blizzard rages. Snow is everywhere and visibility is
 >.almost zero. Only at brief moments do we catch sight of the
