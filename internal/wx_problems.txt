@@ -1,5 +1,0 @@
-notebook.GetSelection() returns invalid values, eg. it can return 1
-when there is only one tab in existence, so it can't be relied on.
-this is currently worked around by never using the function, instead
-iterating over all tabs and searching for the current one by comparing
-the contained panels.
