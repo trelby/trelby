@@ -1,6 +1,8 @@
 # see fileformat.txt for more detailed information about the various
 # defines found here.
 
+from error import *
+
 # linebreak types
 LB_AUTO_SPACE = 1
 LB_AUTO_NONE = 2
@@ -148,7 +150,7 @@ _init()
 def _conv(dict, key):
     val = dict.get(key)
     if val == None:
-        raise Exception("key '%s' not found from '%s'" % (key, dict))
+        raise CfgError("key '%s' not found from '%s'" % (key, dict))
     
     return val
 
@@ -157,7 +159,7 @@ def _convPrev(dict, value):
         if v == value:
             return k
 
-    raise Exception("value '%s' not found from '%s'" % (value, dict))
+    raise CfgError("value '%s' not found from '%s'" % (value, dict))
     
 def text2lb(str):
     return _conv(_text2lb, str)

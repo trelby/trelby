@@ -1,6 +1,3 @@
--investigate spell checking possibilities (is aspell's database freely
-available?
-
 -ctrl+home/ctrl+end to go to start/end of script
 
 -mouse scroll wheel support
@@ -11,15 +8,11 @@ available?
 
 -cut, copy, paste (internal)
 
--clipboard support, at least for importing straight text
+-clipboard support, at least for importing / exporting straight text
 
 -help system, at least supported keyboard commands
 
--file save/load dialogs
-
- -file save as
-
--revert
+-file revert
 
 -cursor should be hollow when writing area doesn't have keyboard focus
 
@@ -98,3 +91,6 @@ that one, inserts it, and positions cursor at end of line.
  -when pressing enter in paren element, if current line after cursor
  only contains ")", keep it in the line instead of including it in the
  new element
+
+-investigate spell checking possibilities (is aspell's database freely
+available?

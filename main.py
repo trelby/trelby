@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+from error import *
 import cfg
 import string
 import time
@@ -54,11 +57,6 @@ class MyCtrl(wxControl):
     def __init__(self, parent, id):
         wxControl.__init__(self, parent, id)#, style=wxWANTS_CHARS)
 
-        self.line = 0
-        self.column = 0
-
-        self.topLine = 0
-        
         EVT_SIZE(self, self.OnSize)
         EVT_PAINT(self, self.OnPaint)
         EVT_LEFT_DOWN(self, self.OnLeftDown)
@@ -90,53 +88,91 @@ class MyCtrl(wxControl):
 #         print "basefont facename: %s" % cfg.baseFont.GetFaceName()
 #         print "basefont native: %s" % cfg.baseFont.GetNativeFontInfoDesc()
 #         print "basefont isfixedwidth: %s" % cfg.baseFont.IsFixedWidth()
+
+        self.sp = Screenplay()
+        self.sp.lines.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
+        self.line = 0
+        self.column = 0
+        self.topLine = 0
+        self.fileName = None
         
-        self.loadFile("default.nasp")
         self.updateScreen(redraw = False)
         
     def loadFile(self, fileName):
         try:
-            f = open(fileName, "rt")
-
             try:
-                lines = f.readlines()
-            finally:
-                f.close()
-        except IOError:
-            print "got IOError"
+                f = open(fileName, "rt")
+
+                try:
+                    lines = f.readlines()
+                finally:
+                    f.close()
+
+            except IOError, (errno, strerror):
+                raise MiscError("IOError: %s" % strerror)
+                
+            sp = Screenplay()
+
+            i = 0
+            for i in range(len(lines)):
+                str = lines[i].strip()
+
+                if len(str) == 0:
+                    continue
+
+                if len(str) < 2:
+                    raise MiscError("line %d is invalid" % (i + 1))
+
+                lb = cfg.text2lb(str[0])
+                type = cfg.text2linetype(str[1])
+                text = str[2:]
+
+                line = Line(lb, type, text)
+                sp.lines.append(line)
+
+            if len(sp.lines) == 0:
+                raise MiscError("empty file")
             
-            return
+            self.sp = sp
+            self.line = 0
+            self.column = 0
+            self.topLine = 0
+            self.setFile(fileName)
 
-        sp = Screenplay()
-        
-        i = 0
-        for i in range(len(lines)):
-            str = lines[i].strip()
-            
-            if len(str) == 0:
-                continue
-
-            if len(str) < 2:
-                raise Exception("line %d is invalid" % i)
-
-            lb = cfg.text2lb(str[0])
-            type = cfg.text2linetype(str[1])
-            text = str[2:]
-
-            line = Line(lb, type, text)
-            sp.lines.append(line)
-
-        self.sp = sp
+        except NaspError, e:
+            dlg = wxMessageDialog(self, "Error loading file: %s" % e, "Error",
+                                  wxOK)
+            dlg.ShowModal()
 
     def saveFile(self, fileName):
-        f = open(fileName, "wt")
-
-        ls = self.sp.lines
-        for i in range(0, len(ls)):
-            f.write(str(ls[i]) + "\n")
-
-        f.close()
+        try:
+            output = []
+            ls = self.sp.lines
+            for i in range(0, len(ls)):
+                output.append(str(ls[i]) + "\n")
         
+            try:
+                f = open(fileName, "wt")
+
+                try:
+                    f.writelines(output)
+                finally:
+                    f.close()
+                    
+                self.setFile(fileName)
+                
+            except IOError, (errno, strerror):
+                raise MiscError("IOError: %s" % strerror)
+                
+        except NaspError, e:
+            dlg = wxMessageDialog(self, "Error saving file: %s" % e, "Error",
+                                  wxOK)
+            dlg.ShowModal()
+
+    def setFile(self, fileName):
+        self.fileName = fileName
+        mainFrame.SetTitle("Nasp - %s" % fileName)
+            
     def updateTypeCb(self):
         if "typeCbRevMap" not in self.__dict__:
             self.typeCbRevMap = {}
@@ -377,8 +413,26 @@ class MyCtrl(wxControl):
         self.reformatAll()
         self.updateScreen()
 
+    def OnOpen(self, event):
+        dlg = wxFileDialog(self, "File to open",
+                           wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
+                           style = wxOPEN)
+        if dlg.ShowModal() == wxID_OK:
+            self.loadFile(dlg.GetPath())
+            self.updateScreen()
+
     def OnSave(self, event):
-        self.saveFile("output.nasp")
+        if self.fileName:
+            self.saveFile(self.fileName)
+        else:
+            self.OnSaveAs(None)
+
+    def OnSaveAs(self, event):
+        dlg = wxFileDialog(self, "Filename to save as",
+                           wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
+                           style = wxSAVE | wxOVERWRITE_PROMPT)
+        if dlg.ShowModal() == wxID_OK:
+            self.saveFile(dlg.GetPath())
         
     def OnKeyChar(self, event):
         kc = event.GetKeyCode()
@@ -503,10 +557,6 @@ class MyCtrl(wxControl):
                 
             self.convertCurrentTo(type)
             
-        elif kc == WXK_ESCAPE:
-            mainFrame.Close(True)
-            return
-        
         elif (kc == WXK_SPACE) or (kc > 32) and (kc < 256):
             str = ls[self.line].text
             str = str[:self.column] + chr(kc) + str[self.column:]
@@ -659,7 +709,9 @@ class MyFrame(wxFrame):
 
         EVT_COMMAND_SCROLL(self, self.scrollBar.GetId(), self.ctrl.OnScroll)
                            
+        EVT_MENU(self, ID_OPEN, self.ctrl.OnOpen)
         EVT_MENU(self, ID_SAVE, self.ctrl.OnSave)
+        EVT_MENU(self, ID_SAVE_AS, self.ctrl.OnSaveAs)
         EVT_MENU(self, ID_EXIT, self.OnExit)
         EVT_MENU(self, ID_REFORMAT, self.ctrl.OnReformat)
 
