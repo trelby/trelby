@@ -20,9 +20,9 @@ class SplashWindow(wxFrame):
         fileName = "logo.jpg"
         fileData = util.loadFile(fileName, parent)
 
-        if not fileData or (len(fileData) != 120900) or \
+        if not fileData or (len(fileData) != 126849) or \
                (md5.new(fileData).digest() != \
-          "\x79\xff\x05\x31\x2d\xa8\xdc\x09\x1e\x56\x43\xac\xda\xaf\x7c\xa3"):
+          "\x12\x3b\xe5\x43\x75\xa9\xec\x08\x34\x03\x16\x48\x24\xb1\xae\x60"):
             self.abort()
         
         self.pic = wxBitmap(fileName, wxBITMAP_TYPE_JPEG)
