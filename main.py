@@ -2,13 +2,14 @@
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
-import config
 import cfgdlg
 import commandsdlg
-import namesdlg
+import config
 import decode
+import dialoguechart
 import finddlg
 import misc
+import namesdlg
 import splash
 import util
 
@@ -51,6 +52,7 @@ ID_EDIT_FIND_ERROR = 17
 ID_EDIT_SHOW_FORMATTING = 18
 ID_FORMAT_PAGINATE = 19
 ID_TOOLS_NAME_DB = 20
+ID_REPORTS_DIALOGUE_CHART = 21
 
 def refreshGuiConfig():
     global cfgGui
@@ -1187,6 +1189,13 @@ class MyCtrl(wxControl):
         self.paginate()
         self.updateScreen()
 
+    def OnDialogueChart(self):
+        self.paginate()
+
+        dlg = dialoguechart.DialogueChartDlg(mainFrame, self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
     def canBeClosed(self):
         if self.isModified():
             if wxMessageBox("The script has been modified. Are you sure\n"
@@ -1638,17 +1647,17 @@ class MyCtrl(wxControl):
 
             if mainFrame.showFormatting:
                 dc.SetPen(cfgGui.bluePen)
-                self.myDrawLine(dc, cfg.offsetX + tcfg.indent * cfgGui.fontX,
+                util.drawLine(dc, cfg.offsetX + tcfg.indent * cfgGui.fontX,
                     y, 0, cfg.fontYdelta)
-                self.myDrawLine(dc, cfg.offsetX + (tcfg.indent + tcfg.width)
+                util.drawLine(dc, cfg.offsetX + (tcfg.indent + tcfg.width)
                     * cfgGui.fontX, y, 0, cfg.fontYdelta)
 
                 if self.isFirstLineOfElem(i):
-                    self.myDrawLine(dc, cfg.offsetX + tcfg.indent *
+                    util.drawLine(dc, cfg.offsetX + tcfg.indent *
                         cfgGui.fontX, y, tcfg.width * cfgGui.fontX, 0)
                         
                 if self.isLastLineOfElem(i):
-                    self.myDrawLine(dc, cfg.offsetX + tcfg.indent *
+                    util.drawLine(dc, cfg.offsetX + tcfg.indent *
                         cfgGui.fontX, y + cfg.fontYdelta,
                         tcfg.width * cfgGui.fontX, 0)
                         
@@ -1660,14 +1669,14 @@ class MyCtrl(wxControl):
             if cfg.pbi == config.PBI_REAL_AND_UNADJ:
                 if self.line2pageNoAdjust(i) != self.line2pageNoAdjust(i + 1):
                     dc.SetPen(cfgGui.pagebreakNoAdjustPen)
-                    self.myDrawLine(dc, 0, y + cfg.fontYdelta - 1,
+                    util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
                         size.width, 0)
 
             if cfg.pbi in (config.PBI_REAL, config.PBI_REAL_AND_UNADJ):
                 thisPage = self.line2page(i)
                 if  thisPage != self.line2page(i + 1):
                     dc.SetPen(cfgGui.pagebreakPen)
-                    self.myDrawLine(dc, 0, y + cfg.fontYdelta - 1,
+                    util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
                         size.width, 0)
 
                     # FIXME: take these out once done debugging
@@ -1703,7 +1712,7 @@ class MyCtrl(wxControl):
 
                 if tcfg.isUnderlined and (wxPlatform == "__WXGTK__"):
                     dc.SetPen(cfgGui.textPen)
-                    self.myDrawLine(dc, cfg.offsetX + tcfg.indent *
+                    util.drawLine(dc, cfg.offsetX + tcfg.indent *
                         cfgGui.fontX, y + cfg.fontYdelta - 1,
                         cfgGui.fontX * len(text) - 1, 0)
 
@@ -1775,16 +1784,13 @@ class MyCtrl(wxControl):
         if doSbw:
             dc.SetPen(cfgGui.autoCompPen)
             dc.SetBrush(cfgGui.autoCompRevBrush)
-            self.myDrawLine(dc, posX + w - offset * 2 - sbw,
+            util.drawLine(dc, posX + w - offset * 2 - sbw,
                 posY, 0, h)
             dc.DrawRectangle(posX + w - offset - sbw,
                 posY + offset - selBleed + int((float(startPos) /
                      len(self.autoComp)) * sbh),
                 sbw,
                 int((float(show) / len(self.autoComp)) * sbh))
-
-    def myDrawLine(self, dc, x, y, xd, yd):
-        dc.DrawLine(x, y, x + xd, y + yd)
 
 class MyFrame(wxFrame):
 
@@ -1824,6 +1830,9 @@ class MyFrame(wxFrame):
         formatMenu.Append(ID_FORMAT_REFORMAT, "&Reformat all")
         formatMenu.Append(ID_FORMAT_PAGINATE, "&Paginate")
 
+        reportsMenu = wxMenu()
+        reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart")
+        
         toolsMenu = wxMenu()
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
 
@@ -1836,6 +1845,7 @@ class MyFrame(wxFrame):
         self.menuBar.Append(fileMenu, "&File")
         self.menuBar.Append(editMenu, "&Edit")
         self.menuBar.Append(formatMenu, "F&ormat")
+        self.menuBar.Append(reportsMenu, "&Reports")
         self.menuBar.Append(toolsMenu, "Too&ls")
         self.menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(self.menuBar)
@@ -1897,6 +1907,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_SHOW_FORMATTING, self.OnShowFormatting)
         EVT_MENU(self, ID_FORMAT_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_FORMAT_PAGINATE, self.OnPaginate)
+        EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnDialogueChart)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
@@ -2024,6 +2035,9 @@ class MyFrame(wxFrame):
 
     def OnPaginate(self, event = None):
         self.panel.ctrl.OnPaginate()
+
+    def OnDialogueChart(self, event):
+        self.panel.ctrl.OnDialogueChart()
 
     def OnNameDb(self, event):
         if not hasattr(self, "names"):
