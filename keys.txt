@@ -1,0 +1,12 @@
+some non-obvious keys:
+
+enter - insert new element
+
+shift+enter / ctrl+enter - insert forced linebreak
+
+tab - change element to next style
+
+shift+tab - change element to previous style
+
+alt+s/a/c/p/d/t - change element to scene
+ heading/action/character/parenthetical/dialogue/transition

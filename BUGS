@@ -1,0 +1,32 @@
+keyboard focus is stolen by the combobox, should return to text area
+
+-----
+
+if you have:
+
+>.JIM and JASON, two men in their thirties, are standing
+>.inthe middle of an empty warehouse. The place looks
+
+and you position the cursor over 't', third letter of second row, and
+press space, nothing happens, even though it should rewrap the whole
+element, and 'in' will now fit on the first line. this is because the
+rewrap code currently does not consider lines above current line in
+the element at all. and this is because it doesn't handle keeping
+cursor position correct if wrapping begins somewhere other than on the
+current line.
+
+-----
+
+if the current line scrolls off the bottom of the screen as a result
+of pressing enter, display doesn't follow.
+
+------
+
+should cursor always stay on the visible page when scrolling?
+
+------
+
+page down doesn't reposition cursor if the target line is shorter than
+the source line.
+
+----------

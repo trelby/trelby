@@ -1,0 +1,80 @@
+The screenplay is represented as a series of lines. Lines are
+separated by a single byte 0xA. Each non-empty line has two bytes at
+the beginning that signal the type of linebreak at the end of that
+line and the general type of the line. Empty lines are ignored.
+
+Linebreak types:
+
+'>' - Automatic linebreak, and a space between this line and the next
+that's missing now since there's a linebreak. Used for normal breaks
+where the program broke the line between words.
+
+'&' - Automatic linebreak, with nothing missing between this line and
+the next. Used for breaks where the program broke the line in the
+middle of a word.
+
+'|' - Forced linebreak. Used when the user has inserted a forced line
+break.
+
+'.' - No linebreak. This is the last line of the element.
+
+Line types:
+
+'\' - Scene heading.
+
+'.' - Action.
+
+'_' - Character.
+
+':' - Dialogue.
+
+'(' - Parenthetical.
+
+'/' - Transition.
+
+
+
+An example screenplay using this format:
+
+.\INT. WAREHOUSE - NIGHT
+
+>.JIM and JASON, two men in their thirties, are standing in
+>.the middle of an empty warehouse. The place looks like it was
+..abandoned a long time ago.
+
+..Jason walks behind a barrel and stoops to pick something up.
+
+._JIM
+.:Hey, what's happening here?
+.((looks at Jason)
+>:What are you doing with that gun --
+.:Hey man --
+
+|.Jason SHOOTS Jim in the chest, twice.
+..Jim collapses to the ground and twitches for a while, then stops.
+
+._JASON
+.:Bad things happen to bad people.
+
+..Jason pockets the gun and hurriedly exits the building.
+
+>.A ghost-like figure rises up from Jim's body and hovers
+..above the ground.
+
+._JIM
+.:Hey man, you almost killed me!
+
+..He notices his own dead body on the ground.
+
+._JIM
+>:Uhh...I am dead, on second thought.
+>:Sorry Jason, didn't mean to
+.:question your shooting skills.
+
+./DISSOLVE TO:
+
+.\EXT. HIGHWAY, LOS ANGELES - DAY
+
+>.Jason is driving along in his Porsche convertible. The sun
+>.is shining, the radio is loud, and he has his sunglasses on.
+..All in all, the world is looking up for him right now.

@@ -1,0 +1,100 @@
+-investigate spell checking possibilities (is aspell's database freely
+available?
+
+-ctrl+home/ctrl+end to go to start/end of script
+
+-mouse scroll wheel support
+
+-left mouse click to position cursor at that point
+
+-search, search & replace
+
+-cut, copy, paste (internal)
+
+-clipboard support, at least for importing straight text
+
+-help system, at least supported keyboard commands
+
+-file save/load dialogs
+
+ -file save as
+
+-revert
+
+-cursor should be hollow when writing area doesn't have keyboard focus
+
+-show column that the cursor is in (is this really needed?)
+
+-undo/redo support
+
+-config dialogs
+
+ -element styles
+
+ -colors, fonts
+
+ -needs config file saving/loading as well
+
+-"find errors" function that finds obvious errors, like two dialogue
+elements one after another etc.
+
+-when entering scene heading text, after some x characters are
+written, the program should search through the entire script to find
+existing scene headings with matching starts, and if there are less
+than n matches, display some kind of helpful popup-window or something
+allowing you to easily insert one of the existing ones. maybe the
+choices are numbered alt-1 - alt-0, and then pressing that key selects
+that one, inserts it, and positions cursor at end of line.
+
+-30-day evaluation time limit
+
+ -registration code needed after that
+
+ -limited functionality in demo, like:
+
+  -not being able to save/export scripts over X pages (10?)
+
+-element style options:
+
+ -font (keep in cfg)
+
+ -underlined, italic, bold
+
+-import support for:
+
+ -rtf
+
+-export support for:
+
+ -rtf
+
+ -text
+
+ -html?
+
+ -pdf
+
+-report generation
+
+ -lots of report types to implement. some examples:
+
+  -scene count
+
+  -character list
+
+  -location list
+
+  -how many words each character speaks
+
+  -breakdown in percentages of action/dialogue of total script
+
+  -formatted output of one character's total dialogue
+ 
+-insert "()" when creating a new empty paren-element
+
+ -when switching element from paren to something else, if all it
+ contains is "()", delete them
+
+ -when pressing enter in paren element, if current line after cursor
+ only contains ")", keep it in the line instead of including it in the
+ new element
