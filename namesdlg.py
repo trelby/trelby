@@ -1,5 +1,7 @@
+import misc
 import namearray
 import util
+import random
 from wxPython.wx import *
 
 class NamesDlg(wxDialog):
@@ -116,15 +118,17 @@ class NamesDlg(wxDialog):
     def OnSearch(self, event = None):
         l = []
 
-        bc = wxBusyCursor()
+        wxBeginBusyCursor()
         
         s = util.lower(self.searchEntry.GetValue())
         sex = self.sexRb.GetSelection()
         nt = self.nameRb.GetSelection()
 
         selTypes = {}
-        
+        skipped = 0
         item = -1
+        eval = misc.isEval
+        
         while 1:
             item = self.typeList.GetNextItem(item, wxLIST_NEXT_ALL,
                 wxLIST_STATE_SELECTED)
@@ -158,15 +162,27 @@ class NamesDlg(wxDialog):
                 elif nt == 2:
                     if not name.endswith(s):
                         continue
+
+            if eval and (random.random() > 0.1):
+                skipped += 1
+                continue
             
             l.append(i)
 
         self.list.items = l
         self.list.SetItemCount(len(l))
         self.list.EnsureVisible(0)
-        
+
+        wxEndBusyCursor()
+
         self.foundLabel.SetLabel("%d names found." % len(l))
         
+        if skipped > 0:
+            wxMessageBox(
+                "Found %d additional names that are not included\n"
+                "in the results because this is an evaluation version."
+                % skipped, "Evaluation notice", wxOK, self)
+
 class MyListCtrl(wxListCtrl):
     def __init__(self, parent, nameArr):
         wxListCtrl.__init__(self, parent, -1,

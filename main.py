@@ -81,6 +81,8 @@ class Line:
         self.text = re.sub(r"\b(\w){3}\b", "BUY", self.text)
         self.text = re.sub(r"\b(\w){4}\b", "DEMO", self.text)
         self.text = re.sub(r"\b(\w){5}\b", "TRIAL", self.text)
+        self.text = re.sub(r"\b(\w){6}\b", "*TEST*", self.text)
+        self.text = re.sub(r"\b(\w){7}\b", "LIMITED", self.text)
         self.text = re.sub(r"\b(\w){10}\b", "EVALUATION", self.text)
         
 class Screenplay:
@@ -2016,8 +2018,8 @@ class MyFrame(wxFrame):
         for t in cfg.types.values():
             self.typeCb.Append(t.name, t.type)
 
-        # these are hidden here because they're much harder to find here
-        # than in misc.pyo
+        # these are hidden here because they're somewhat harder to find
+        # here than in misc.pyo
         misc.isEval = False
         misc.licensedTo = "Evaluation version."
         misc.version = "0.6"
