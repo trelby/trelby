@@ -2875,7 +2875,7 @@ class MyFrame(wxFrame):
         self.clipboard = None
         self.showFormatting = False
 
-        util.removeTempFiles(cfg.tmpPrefix)
+        util.removeTempFiles(misc.tmpPrefix)
 
         self.mySetIcons()
         
@@ -3273,7 +3273,7 @@ class MyFrame(wxFrame):
                 doExit = False
 
         if doExit:
-            util.removeTempFiles(cfg.tmpPrefix)
+            util.removeTempFiles(misc.tmpPrefix)
             self.Destroy()
             myApp.ExitMainLoop()
         else:

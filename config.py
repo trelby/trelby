@@ -129,9 +129,6 @@ class Config:
         # color list, key = color description, value = attribute name
         self.colors = { }
         
-        # prefix used for temp files
-        self.tmpPrefix = "oskusoft-blyte-tmp-"
-
         # offsets from upper left corner of main widget, ie. this much empty
         # space is left on the top and left sides.
         self.offsetY = 10

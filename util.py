@@ -1,4 +1,5 @@
 from error import *
+import misc
 
 import glob
 import os
@@ -481,9 +482,9 @@ def showTempPDF(pdfData, cfg, mainFrame):
     
     try:
         try:
-            removeTempFiles(cfg.tmpPrefix)
+            removeTempFiles(misc.tmpPrefix)
 
-            fd, filename = tempfile.mkstemp(prefix = cfg.tmpPrefix,
+            fd, filename = tempfile.mkstemp(prefix = misc.tmpPrefix,
                                             suffix = ".pdf")
 
             try:

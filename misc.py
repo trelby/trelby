@@ -5,7 +5,10 @@ import sys
 from wxPython.wx import *
 
 def init():
-    global isWindows, isUnix, progPath
+    global isWindows, isUnix, progPath, tmpPrefix
+
+    # prefix used for temp files
+    tmpPrefix = "oskusoft-blyte-tmp-"
     
     isWindows = False
     isUnix = False
