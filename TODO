@@ -8,8 +8,6 @@
 
 -clipboard support, at least for importing / exporting straight text
 
--help system, at least supported keyboard commands
-
 -undo/redo support
 
 -config dialogs

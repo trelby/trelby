@@ -4,6 +4,7 @@
 from error import *
 import cfg
 from cfgdlg import CfgDlg
+from commandsdlg import CommandsDlg
 
 import copy
 import string
@@ -33,6 +34,7 @@ ID_FILE_REVERT = 8
 ID_EDIT_CUT = 9
 ID_EDIT_COPY = 10
 ID_EDIT_PASTE = 11
+ID_HELP_COMMANDS = 12
 
 def clamp(val, min, max):
     if val < min:
@@ -961,11 +963,15 @@ class MyFrame(wxFrame):
         
         formatMenu = wxMenu()
         formatMenu.Append(ID_REFORMAT, "&Reformat all")
+
+        helpMenu = wxMenu()
+        helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
         
         menuBar = wxMenuBar()
         menuBar.Append(fileMenu, "&File")
         menuBar.Append(editMenu, "&Edit")
         menuBar.Append(formatMenu, "F&ormat")
+        menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(menuBar)
 
         EVT_SIZE(self, self.OnSize)
@@ -1015,6 +1021,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
+        EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
 
         EVT_CLOSE(self, self.OnCloseWindow)
         
@@ -1112,6 +1119,10 @@ class MyFrame(wxFrame):
     def OnReformat(self, event):
         self.panel.ctrl.OnReformat()
 
+    def OnHelpCommands(self, event):
+        dlg = CommandsDlg(self)
+        dlg.Show()
+        
     def OnTypeCombo(self, event):
         self.panel.ctrl.OnTypeCombo(event)
 
