@@ -1,11 +1,12 @@
 import util
 
+import os
 import sys
 
 from wxPython.wx import *
 
 def init():
-    global isWindows, isUnix, progPath, tmpPrefix
+    global isWindows, isUnix, progPath, confPath, tmpPrefix
 
     # prefix used for temp files
     tmpPrefix = "oskusoft-blyte-tmp-"
@@ -20,11 +21,14 @@ def init():
 
     if "--test" in sys.argv:
         progPath = "."
+        confPath = ".blyte"
     else:
         if isUnix:
             progPath = "/usr/local/blyte"
+            confPath = os.environ.get("HOME", ".blyte")
         else:
             progPath = r"C:\Program Files\Oskusoft\Blyte"
+            confPath = progPath + r"\conf"
 
 class MyColorSample(wxWindow):
     def __init__(self, parent, id, size):

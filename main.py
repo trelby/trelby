@@ -1725,7 +1725,29 @@ class MyCtrl(wxControl):
             c.adjustScrollBar()
 
         self.updateScreen()
+        self.saveConfig()
 
+    def saveConfig(self):
+        makeDir = False
+
+        try:
+            os.stat(misc.confPath)
+        except OSError:
+            makeDir = True
+
+        if makeDir:
+            try:
+                os.mkdir(misc.confPath, 0755)
+            except OSError, (errno, strerror):
+                wxMessageBox("Error creating configuration directory\n"
+                             "'%s': %s" % (misc.confPath, strerror), "Error",
+                             wxOK, mainFrame)
+
+                return
+            
+        util.writeToFile(misc.confPath + "/default.conf", cfg.save(),
+                         mainFrame)
+        
     def checkEval(self):
         if misc.isEval:
             wxMessageBox("This feature is not supported in the\n"
