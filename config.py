@@ -364,7 +364,7 @@ class Config:
         
         # PDF viewer program and args
         if misc.isUnix:
-            s1 = "/usr/local/Acrobat5/bin/acroread"
+            s1 = "/usr/local/Adobe/Acrobat7.0/bin/acroread"
             s2 = "-tempFile"
         elif misc.isWindows:
             s1 = r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe"
