@@ -14,6 +14,6 @@ class myimport:
 # code-archives
 #sys.meta_path.append(myimport())
 
-import main
+# import main
 
-main.main()
+# main.main()

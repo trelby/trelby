@@ -1,6 +1,11 @@
+#!/usr/bin/env python
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
+
+# FIXME: beta stuff
+import betatest
+
 import bugreport
 import cfgdlg
 import charmapdlg
@@ -2768,12 +2773,12 @@ class MyCtrl(wxControl):
             self.mark = None
 
         # FIXME: debug stuff
-        elif (kc < 256) and (chr(kc) == "å"):
-            self.loadFile("default.blyte")
-        elif (kc < 256) and (chr(kc) == "Å"):
-            self.OnCfg()
-        elif (kc < 256) and (chr(kc) == "¤"):
-            pass
+#         elif (kc < 256) and (chr(kc) == "å"):
+#             self.loadFile("default.blyte")
+#         elif (kc < 256) and (chr(kc) == "Å"):
+#             self.OnCfg()
+#         elif (kc < 256) and (chr(kc) == "¤"):
+#             pass
 
         elif util.isValidInputChar(kc):
             char = chr(kc)
@@ -3575,9 +3580,8 @@ class MyApp(wxApp):
                          "x >= 2." % wxVERSION_STRING, "Error", wxOK)
             sys.exit()
 
-        if 0:
-            import betatest
-            betatest.check()
+        # FIXME: beta stuff
+        betatest.check()
             
         misc.init()
         util.init()
@@ -3648,3 +3652,5 @@ def main():
     
     myApp = MyApp(0)
     myApp.MainLoop()
+
+main()
