@@ -78,16 +78,6 @@ ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
 = range(32)
 
-def loadConfig(path, frame):
-    try:
-        os.stat(path)
-    except OSError:
-        return
-
-    s = util.loadFile(path, frame)
-    if s:
-        cfg.load(s)
-
 def refreshGuiConfig():
     global cfgGui
 
@@ -1735,28 +1725,7 @@ class MyCtrl(wxControl):
             c.adjustScrollBar()
 
         self.updateScreen()
-        self.saveConfig()
-
-    def saveConfig(self):
-        makeDir = False
-
-        try:
-            os.stat(misc.confPath)
-        except OSError:
-            makeDir = True
-
-        if makeDir:
-            try:
-                os.mkdir(misc.confPath, 0755)
-            except OSError, (errno, strerror):
-                wxMessageBox("Error creating configuration directory\n"
-                             "'%s': %s" % (misc.confPath, strerror), "Error",
-                             wxOK, mainFrame)
-
-                return
-            
-        util.writeToFile(misc.confPath + "/default.conf", cfg.save(),
-                         mainFrame)
+        mainFrame.writeConfigFile("default.conf", cfg.save())
         
     def checkEval(self):
         if misc.isEval:
@@ -3127,6 +3096,41 @@ class MyFrame(wxFrame):
 
         return False
 
+    # write 's' into config_path/filename.
+    def writeConfigFile(self, filename, s):
+        makeDir = False
+
+        try:
+            os.stat(misc.confPath)
+        except OSError:
+            makeDir = True
+
+        if makeDir:
+            try:
+                os.mkdir(misc.confPath, 0755)
+            except OSError, (errno, strerror):
+                wxMessageBox("Error creating configuration directory\n"
+                             "'%s': %s" % (misc.confPath, strerror), "Error",
+                             wxOK, self)
+
+                return
+            
+        util.writeToFile(misc.confPath + "/" + filename, s, self)
+
+    # load config file config_path/filename. returns None if file doesn't
+    # exist or can't be read for some reason.
+    def loadConfigFile(filename, frame):
+        path = misc.confPath + "/" + filename
+        
+        try:
+            os.stat(path)
+        except OSError:
+            return None
+
+        return util.loadFile(path, frame)
+
+    loadConfigFile = staticmethod(loadConfigFile)
+    
     def OnTimer(self, event):
         self.OnPaginate()
 
@@ -3340,7 +3344,10 @@ class MyApp(wxApp):
         
         cfg = config.Config()
         config.currentCfg = cfg
-        loadConfig(misc.confPath + "/default.conf", None)
+        s = MyFrame.loadConfigFile("default.conf", None)
+        if s:
+            cfg.load(s)
+
         refreshGuiConfig()
 
         # cfg.scriptDir is the directory used on startup, while
