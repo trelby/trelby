@@ -956,7 +956,12 @@ class MyCtrl(wxControl):
             line += self.rewrapPara(line)
             if end:
                 break
-        
+
+    def clearAutoComp(self):
+        if self.autoComp:
+            self.autoComp = None
+            self.Refresh(False)
+
     def fillAutoComp(self):
         ls = self.sp.lines
 
@@ -2707,6 +2712,8 @@ class MyCtrl(wxControl):
         self.OnPaste(lines)
                 
     def OnSelectScene(self):
+        self.clearAutoComp()
+
         l1, l2 = self.getSceneIndexes()
         
         self.mark = Mark(l1, 0)
@@ -2718,6 +2725,8 @@ class MyCtrl(wxControl):
         self.updateScreen()
 
     def OnFindError(self):
+        self.clearAutoComp()
+
         line, msg = self.findError(self.line)
 
         if line != -1:
@@ -2733,6 +2742,8 @@ class MyCtrl(wxControl):
         wxMessageBox(msg, "Results", wxOK, mainFrame)
         
     def OnFind(self):
+        self.clearAutoComp()
+        
         dlg = finddlg.FindDlg(mainFrame, self, cfg)
         dlg.ShowModal()
         dlg.saveState()
@@ -2749,6 +2760,8 @@ class MyCtrl(wxControl):
         self.updateScreen()
 
     def OnDeleteElements(self):
+        self.clearAutoComp()
+
         types = []
         for t in cfg.types.values():
             types.append(misc.CheckBoxItem(t.name, False, t.lt))
