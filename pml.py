@@ -107,6 +107,10 @@ class LineOp(DrawOp):
         self.width = width
         self.isClosed = isClosed
 
+# helper function for creating simple lines
+def genLine(x, y, xd, yd, width):
+    return LineOp([(x, y), (x + xd, y + yd)], width)
+
 # Draw a rectangle, possibly filled, with specified lineWidth. (x, y) is
 # position of upper left corner. Line width of filled rectangles is
 # ignored.

@@ -180,7 +180,7 @@ class DialogueChart:
                 pg.add(pml.TextOp("%d" % (i + 1), x, self.pageY,
                                   10, align = util.ALIGN_CENTER))
                 if i != 0:
-                    pg.add(self.genLine(x, self.chartY, 0, self.chartHeight,
+                    pg.add(pml.genLine(x, self.chartY, 0, self.chartHeight,
                                         lw))
 
 
@@ -236,9 +236,6 @@ class DialogueChart:
                         -1, True))
                 
         return pg
-
-    def genLine(self, x, y, xd, yd, width):
-        return pml.LineOp([(x, y), (x + xd, y + yd)], width)
 
 # keeps track of each character's appearances
 class CharInfo:
