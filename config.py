@@ -28,6 +28,7 @@ CHARACTER = 3
 DIALOGUE = 4
 PAREN = 5
 TRANSITION = 6
+SHOT = 7
 
 # mapping from character to line type
 _text2linetype = {
@@ -36,7 +37,8 @@ _text2linetype = {
     '_' : CHARACTER,
     ':' : DIALOGUE,
     '(' : PAREN,
-    '/' : TRANSITION
+    '/' : TRANSITION,
+    '=' : SHOT
     }
 
 # reverse to above, filled in init
@@ -221,6 +223,19 @@ class Config:
             ]
         self.types[t.type] = t
 
+        t = Type()
+        t.type = SHOT
+        t.name = "Shot"
+        t.emptyLinesBefore = 1
+        t.indent = 0
+        t.width = 60
+        t.isCaps = True
+        t.newTypeEnter = ACTION
+        t.newTypeTab = CHARACTER
+        t.nextTypeTab = ACTION
+        t.prevTypeTab = SCENE
+        self.types[t.type] = t
+        
         if wxPlatform == "__WXGTK__":
             self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
         elif wxPlatform == "__WXMSW__":

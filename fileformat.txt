@@ -48,6 +48,8 @@ Line types:
 
 '/' - Transition.
 
+'=' - Shot
+
 More line types are probably going to be added in the future without
 increasing the fileformat version number, so unknown line types should be
 converted to Action, and a warning given to user about this.
@@ -61,6 +63,7 @@ An example screenplay using this format:
 >.the middle of an empty warehouse. The place looks like it was
 ..abandoned a long time ago.
 ..Jason walks behind a barrel and stoops to pick something up.
+.=Insert - gun in Jason's hand.
 ._JIM
 .:Hey, what's happening here?
 .((looks at Jason)
