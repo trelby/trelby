@@ -176,13 +176,16 @@ class Config:
             self.pdfViewerPath = "/usr/local/Acrobat5/bin/acroread"
             self.pdfViewerArgs = [ "-tempFile" ]
         elif misc.isWindows:
-            self.pdfViewerPath = "C:\\Program Files\\Adobe\\Acrobat 6.0\\Reader\\AcroRd32.exe"
+            self.pdfViewerPath = r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe"
             self.pdfViewerArgs = [""]
         else:
             self.pdfViewerPath = "not set yet (unknown platform %s)"\
                                  % wxPlatform
             self.pdfViewerArgs = []
 
+        # default script directory
+        self.scriptDir = misc.progPath
+        
         # whether to draw rectangle showing margins
         self.pdfShowMargins = False
 

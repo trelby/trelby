@@ -211,8 +211,7 @@ class MyCtrl(wxControl):
                 try:
                     bom = f.read(3)
                     if bom != codecs.BOM_UTF8:
-                        raise MiscError(
-                            "File does not start with Unicode BOM marker.")
+                        raise MiscError("File is not a Blyte screenplay.")
                     
                     lines = f.readlines()
                 finally:
@@ -2083,10 +2082,11 @@ class MyCtrl(wxControl):
         if self.checkEval():
             return
         
-        dlg = wxFileDialog(mainFrame, "Filename to save as",
+        dlg = wxFileDialog(mainFrame, "Filename to save as", misc.scriptDir,
             wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
             style = wxSAVE | wxOVERWRITE_PROMPT)
         if dlg.ShowModal() == wxID_OK:
+            misc.scriptDir = dlg.GetDirectory()
             self.saveFile(dlg.GetPath())
 
         dlg.Destroy()
@@ -2097,10 +2097,12 @@ class MyCtrl(wxControl):
             return
         
         dlg = wxFileDialog(mainFrame, "Filename to export as",
-            wildcard = "PDF|*.pdf|Formatted text|*.txt",
+            misc.scriptDir, wildcard = "PDF|*.pdf|Formatted text|*.txt",
             style = wxSAVE | wxOVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wxID_OK:
+            misc.scriptDir = dlg.GetDirectory()
+            
             if dlg.GetFilterIndex() == 0:
                 data = self.generatePDF(sp)
             else:
@@ -2836,11 +2838,13 @@ class MyFrame(wxFrame):
         self.panel = self.createNewPanel()
 
     def OnOpen(self, event):
-        dlg = wxFileDialog(self, "File to open",
+        dlg = wxFileDialog(self, "File to open", misc.scriptDir,
             wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
             style = wxOPEN)
         
         if dlg.ShowModal() == wxID_OK:
+            misc.scriptDir = dlg.GetDirectory()
+            
             if not self.notebook.GetPage(self.findPage(self.panel))\
                    .ctrl.isUntouched():
                 self.panel = self.createNewPanel()
@@ -2857,11 +2861,13 @@ class MyFrame(wxFrame):
         self.panel.ctrl.OnSaveAs()
 
     def OnImport(self, event):
-        dlg = wxFileDialog(self, "File to import",
+        dlg = wxFileDialog(self, "File to import", misc.scriptDir,
             wildcard = "Text files (*.txt)|*.txt|All files|*",
             style = wxOPEN)
         
         if dlg.ShowModal() == wxID_OK:
+            misc.scriptDir = dlg.GetDirectory()
+
             if not self.notebook.GetPage(self.findPage(self.panel))\
                    .ctrl.isUntouched():
                 self.panel = self.createNewPanel()
@@ -3010,7 +3016,12 @@ class MyApp(wxApp):
         cfg = config.Config()
         config.currentCfg = cfg
         refreshGuiConfig()
-                
+
+        # cfg.scriptDir is the directory used on startup, while
+        # misc.scriptDir is updated every time the user opens/saves
+        # something in a different directory.
+        misc.scriptDir = cfg.scriptDir
+        
         mainFrame = MyFrame(NULL, -1, "Blyte")
         mainFrame.init()
         mainFrame.Show(True)
