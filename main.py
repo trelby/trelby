@@ -794,15 +794,16 @@ class MyCtrl(wxControl):
         # adjust cursor position
         if cursorOffset != -1:
             for i in range(line1, line1 + len(wrappedLines)):
-                if cursorOffset <= len(ls[i].text):
+                ln = ls[i]
+                llen = len(ln.text) + len(config.lb2str(ln.lb))
+                
+                if cursorOffset < llen:
                     self.line = i
-                    self.column = cursorOffset
-
+                    self.column = min(cursorOffset, len(ln.text))
                     break
                 else:
-                    cursorOffset -= len(ls[i].text) + \
-                                    len(config.lb2str(ls[i].lb))
-                    
+                    cursorOffset -= llen
+            
         elif self.line >= line1:
             # cursor position is below current paragraph, modify its
             # linenumber appropriately
@@ -1690,7 +1691,7 @@ class MyCtrl(wxControl):
 
         sb = mainFrame.statusBar
         
-        sb.SetStatusText("Page: %3d / %3d" % (self.line2page(self.line),
+        sb.SetStatusText("Page: %d / %d" % (self.line2page(self.line),
             self.line2page(len(self.sp.lines) - 1)), 2)
 
         cur = cfg.getType(self.sp.lines[self.line].lt)
