@@ -231,10 +231,10 @@ class MyCtrl(wxControl):
             wxMessageBox("Error saving file: %s" % e, "Error",
                          wxOK, self)
 
-    def export(self, fileName):
+    def export(self, sp, fileName):
         try:
             output = []
-            ls = self.sp.lines
+            ls = sp.lines
             for i in range(0, len(ls)):
                 line = ls[i]
                 tcfg = cfg.getType(line.type)
@@ -243,7 +243,7 @@ class MyCtrl(wxControl):
                 else:
                     text = line.text
 
-                output.append(self.sp.getEmptyLinesBefore(i) * "\n" +
+                output.append(sp.getEmptyLinesBefore(i) * "\n" +
                               " " * tcfg.indent + text + "\n")
         
             try:
@@ -793,7 +793,10 @@ class MyCtrl(wxControl):
                            wildcard = "Text files (*.txt)|*.txt|All files|*",
                            style = wxSAVE | wxOVERWRITE_PROMPT)
         if dlg.ShowModal() == wxID_OK:
-            self.export(dlg.GetPath())
+            sp = copy.deepcopy(self.sp)
+            if misc.isEval:
+                sp.replace()
+            self.export(sp, dlg.GetPath())
 
         dlg.Destroy()
 
