@@ -2,6 +2,7 @@
 
 from error import *
 import cfgdlg
+import charmapdlg
 import commandsdlg
 import config
 import decode
@@ -52,6 +53,7 @@ ID_EDIT_SHOW_FORMATTING = 18
 ID_FORMAT_PAGINATE = 19
 ID_TOOLS_NAME_DB = 20
 ID_REPORTS_DIALOGUE_CHART = 21
+ID_TOOLS_CHARMAP = 22
 
 def refreshGuiConfig():
     global cfgGui
@@ -1386,6 +1388,11 @@ class MyCtrl(wxControl):
         dlg.ShowModal()
         dlg.Destroy()
 
+    def OnCharMap(self):
+        dlg = charmapdlg.CharMapDlg(mainFrame, self)
+        dlg.ShowModal()
+        dlg.Destroy()
+
     def canBeClosed(self):
         if self.isModified():
             if wxMessageBox("The script has been modified. Are you sure\n"
@@ -2060,6 +2067,7 @@ class MyFrame(wxFrame):
         
         toolsMenu = wxMenu()
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
+        toolsMenu.Append(ID_TOOLS_CHARMAP, "&Character map...")
 
         helpMenu = wxMenu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
@@ -2134,6 +2142,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FORMAT_PAGINATE, self.OnPaginate)
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnDialogueChart)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
+        EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharMap)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
 
@@ -2283,6 +2292,9 @@ class MyFrame(wxFrame):
         dlg = namesdlg.NamesDlg(self, self.names)
         dlg.ShowModal()
         dlg.Destroy()
+
+    def OnCharMap(self, event):
+        self.panel.ctrl.OnCharMap()
 
     def OnHelpCommands(self, event):
         dlg = commandsdlg.CommandsDlg(self)

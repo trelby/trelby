@@ -44,6 +44,8 @@ class DialogueChartDlg(wxDialog):
         self.sortCb.SetSelection(0)
         self.OnSortCombo()
 
+        self.CenterOnScreen()
+
     def OnSortCombo(self, event = None):
         sel = self.sortCb.GetSelection()
         if sel != -1:

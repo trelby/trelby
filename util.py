@@ -133,3 +133,28 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
         y -= h
         
     dc.DrawText(text, x, y)
+
+# fake key event, supports same operations as the real one
+class MyKeyEvent:
+    def __init__(self, kc = 0):
+        # keycode
+        self.kc = kc
+
+        self.controlDown = False
+        self.altDown = False
+        self.shiftDown = False
+
+    def GetKeyCode(self):
+        return self.kc
+    
+    def ControlDown(self):
+        return self.controlDown
+
+    def AltDown(self):
+        return self.altDown
+
+    def ShiftDown(self):
+        return self.shiftDown
+
+    def Skip(self):
+        pass
