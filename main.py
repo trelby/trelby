@@ -182,7 +182,7 @@ class MyCtrl(wxControl):
     def loadFile(self, fileName):
         try:
             try:
-                f = open(fileName, "rt")
+                f = open(fileName, "rb")
 
                 try:
                     lines = f.readlines()
@@ -252,7 +252,7 @@ class MyCtrl(wxControl):
                 output.append(str(ls[i]) + "\n")
         
             try:
-                f = open(fileName, "wt")
+                f = open(fileName, "wb")
 
                 try:
                     f.writelines(output)
@@ -305,7 +305,7 @@ class MyCtrl(wxControl):
                         indent + "(MORE)\n")
         
             try:
-                f = open(fileName, "wt")
+                f = open(fileName, "wb")
 
                 try:
                     f.writelines(output)
