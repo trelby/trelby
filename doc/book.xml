@@ -8,7 +8,7 @@
 ]>
 
 <book id="blyte-manual" lang="en">
-  <title>Blyte User's Manual</title>
+  <title>Blyte Manual</title>
 
   <subtitle>Version &blyte.version;</subtitle>
   
@@ -47,10 +47,272 @@
   </chapter>
 
   <chapter>
+	<title>Other commands</title>
+
+	<para>This chapter describes commands not discussed in other
+	chapters.</para>
+
+	<sect1>
+	  <title>Script/Find next error</title>
+
+	  <para>'Find next error' searches through the script, starting from
+	  the cursor position, looking for errors. This means that to search
+	  the entire script for errors you should first position the cursor at
+	  the beginning of the script.</para>
+
+	  <para>If it finds any errors, it positions the cursor on the line
+	  containing the error and displays a message box detailing the error.
+	  You should fix the error, back up a few lines, and activate the
+	  command again to search for more errors. Alternatively, if you don't
+	  want to fix the error right now, move the cursor down one line if
+	  you want to search for more errors.</para>
+
+	  <para>It can detect the following errors:</para>
+
+	  <itemizedlist>
+
+		<listitem>
+
+		  <para>Empty line, or a parenthetical element containing only
+		  ().</para>
+		  
+		</listitem>
+
+		<listitem>
+
+		  <para>A character element that is not followed by a
+		  parenthetical or a dialogue element.</para>
+
+		</listitem>
+
+		<listitem>
+
+		  <para>A parenthetical element that does not follow a character or
+		  a dialogue element.</para>
+		  
+		</listitem>
+
+		<listitem>
+
+		  <para>A dialogue element that does not follow a character or a
+			parenthetical element.</para>
+		  
+		</listitem>
+		
+	  </itemizedlist>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Script/Paginate</title>
+
+	  <para>'Paginate' simply repaginates the script. You normally don't
+	  need to run this if you have automatic repagination enabled, but the
+	  command is available for use when automatic repagination is disabled
+	  or you want immediate repagination after a large cut/paste
+	  operation.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Script/Title pages</title>
+
+	  <para>'Title pages' allows you to edit your script's title pages.
+	  You can have as many title pages as you want, or none at all.</para>
+
+	  <para>At the top of the window are add/delete/move/next buttons.
+	  'Add' adds a page, 'Delete' deletes the current page, 'Move' swaps
+	  the current page with the next page, and 'Next' changes the view to
+	  the next page.</para>
+
+	  <para>The strings listbox contains all text strings for the current
+	  page. Select the text string you want to edit in this listbox, and
+	  use the add/delete buttons to add/delete text strings.</para>
+
+	  <para>On the right side of the listbox is a coarse preview showing
+	  the approximate location of text strings on the current page, with
+	  the selected text string shown in red.</para>
+	  
+	  <para>At the bottom of the window are the settings for the selected
+	  text string. There's the text itself, the position of its upper left
+	  corner as an offset from the paper's upper left corner, font, size,
+	  and style. 'Centered' means that the text is centered horizontally
+	  on the page.</para>
+
+	  <para>Finally there's a 'Preview' button that you can use to get an
+	  accurate preview of all of the title pages.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Script/Headers</title>
+
+	  <para>'Headers' allows you to edit your script's headers. Headers
+	  are lines that are automatically added to the top of each page of
+	  the script, excluding title pages and the first page of the actual
+	  script.</para>
+	  
+	  <para>Topmost in the window is a setting for how many empty lines
+	  you want inserted after your header lines.</para>
+	  
+	  <para>After that is a listbox of all the strings in your headers.
+	  Select the text string you want to edit in this listbox, and use the
+	  add/delete buttons to add/delete text strings.</para>
+	  
+	  <para>Below the listbox are the settings for the selected string.
+	  You can adjust the string text, style, alignment, line and
+	  positioning.</para>
+
+	  <para>The text is first positioned according to the alignment
+	  setting, and then its horizontal starting position is adjusted by
+	  the number of characters given in 'X offset'. Note that this
+	  parameter can be negative, so for example, if you want your header
+	  string to start 2 characters before the left margin, select
+	  'Alignment: Left' and 'X offset: -2'.</para>
+	  
+	  <para>Any occurrences of '${PAGE}' in the text string will be
+	  replaced by the page number in the actual headers.</para>
+	  
+	  <para>Finally there's a 'Preview' button that you can use to get an
+	  accurate preview of your headers.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Tools/Name database</title>
+
+	  <para>'Name database' opens a window allowing you browse and search
+	  through a database of more than 200,000 character names, each name
+	  being categorized by its nationality and sex.</para>
+
+	  <para>On the left side of the window is a list of the name
+	  categories. The main groups available are nationalities, but there
+	  are some other interesting groups, e.g. Shakespeare, Medieval,
+	  Flowers etc.</para>
+	  
+	  <para>Select the groups you want to search in, either a single one
+	  by simply clicking on it, or multiple ones by holding down CTRL and
+	  then clicking on multiple items. If you want to go back to the
+	  default of having all the groups selected, press the 'Select all'
+	  button at the bottom of the list.</para>
+	  
+	  <para>On the upper right side of the window are the other search
+	  parameters. There's a text box in which you can write the text you
+	  want to search for, and two radio button groups.</para>
+	  
+	  <para>The first one affects how your search string is used. The
+	  string has to match either a) at the start of the name, b) anywhere
+	  in the name or c) at the end of the name.</para>
+	  
+	  <para>The second one selects whether male/female/both names are
+	  included in the search results.</para>
+	  
+	  <para>The search is always case-insensitive, and a blank search
+	  string matches all names.</para>
+	  
+	  <para>After having set all the search parameters, press the 'Search'
+	  button, at which point the results list will change to contain only
+	  the names matching the search parameters. A count of the matching
+	  names is shown at the bottom of the window.</para>
+
+	  <para>You can select names from the result list and press 'Insert'
+	  to insert that name at your script at the current cursor
+	  position.</para>
+
+	</sect1>
+
+	<sect1>
+	  <title>Tools/Character map</title>
+
+	  <para>'Character map' opens a window allowing you to insert any
+	  character from the supported ISO-8859-1 (i.e. Latin-1) character set
+	  into your script.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Tools/Compare scripts</title>
+
+	  <para>You need two different versions of the same script open to use
+	  'Compare scripts'. Select the older one as the first script and the
+	  newer one as the second script. The program then goes through the
+	  scripts looking for changes between them and displays the results as
+	  a PDF file.</para>
+
+	  <para>The PDF file contains only changed parts of the script. The
+	  changes are color coded: Deleted lines are red, added lines are
+	  green, non-changed lines (shown for context) are white, and marker
+	  lines for single-line changes are yellow. The changed parts are
+	  separated by two gray lines.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Help/Commands</title>
+
+	  <para>'Commands' opens a window showing all the keyboard
+	  commands.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Help/Manual</title>
+
+	  <para>'Manual' opens this manual you're reading right now.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Help/License</title>
+
+	  <para>The license submenu contains three commands for dealing with
+	  licenses:</para>
+
+	  <variablelist>
+		
+		<varlistentry>
+		  <term>Information</term>
+		  <listitem>
+			<para>Shows information about the current license.</para>
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Update</term>
+		  <listitem>
+			<para>Opens a file dialog allowing you to load a new
+			license.</para>
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Release</term>
+		  <listitem>
+			<para>Releases your license, i.e. goes back to evaluation
+			  mode.</para>
+		  </listitem>
+		</varlistentry>
+		
+	  </variablelist>
+	  
+	</sect1>
+	
+	<sect1>
+	  <title>Help/About</title>
+
+	  <para>'About' opens the about screen for the program, showing
+	  information such as the version and the date the program was
+	  released on.</para>
+	  
+	</sect1>
+	
+  </chapter>
+
+  <chapter>
 	<title>Importing existing screenplays</title>
 
-	<para>Existing screenplays can be imported in two formats: as
-	formatted ASCII text, or as RTF files. The following sections document
+	<para>Existing screenplays can currently be imported from only one
+	file format: as formatted ASCII text. The following section documents
 	the format these files should have for optimal import
 	processing.</para>
 	
@@ -137,12 +399,86 @@ Something starts beeping.
 
 	<sect1>
 	  <title>Dialogue chart</title>
-	  <para>jep jep.</para>
+
+	  <para>'Dialogue chart' first opens a window allowing you to specify
+	  what to include in the generated chart. The 'Sorted by:' options
+	  select what orderings to include, while the 'Characters appearing on
+	  a single page' option, if unselected, leaves out all characters
+	  appearing on a single page only from the generated chart. It's
+	  useful for long scripts that have many such characters, or otherwise
+	  if you want to concentrate on the more important characters.</para>
+
+	  <para>It then generates a chart in PDF format with one page for each
+	  selected ordering and shows that.</para>
+
+	  <para>The chart has two axes: The horizontal one, with page numbers
+	  increasing from left to right, and the vertical one, with characters
+	  ordered by the current page's sort criterion from top to
+	  bottom.</para>
+
+	  <para>If a character speaks on a given page, he will have a black
+	  mark on that page's position on the chart.</para>
+
+	  <para>Every other line has a light gray background to allow easier
+	  visual matching of distant markings to character names.</para>
+
+	  <para>You can use this chart in many ways. For example, you can at a
+	  glance see if your side characters disappear for 50 pages in the
+	  middle of the script, whether your main characters appear on nearly
+	  all pages or not, etc etc.</para>
+
+	  <para>At the top is another chart, this one showing the dialogue
+	  density for each page. Dialogue density is calculated as "number of
+	  dialogue/character/parenthetical lines on page divided by total
+	  number of non-empty lines on page". By looking at the chart you can
+	  easily see where the action scenes are by the lower dialogue density
+	  in those pages.</para>
+	  
 	</sect1>
 
 	<sect1>
 	  <title>Character report</title>
-	  <para>oh yeah.</para>
+
+	  <para>'Character report' first opens a window allowing you to
+	  specify what to include in the generated report. You can select what
+	  characters are included, and what kind of information to include for
+	  each character:</para>
+
+	  <variablelist>
+		<varlistentry>
+		  <term>Basic information</term>
+		  <listitem>
+			<para>Total number of speeches, total number of lines, the
+			percentage of all the dialogue lines in the script that this
+			character speaks (i.e. 25% would mean this character has
+			one-fourth of the total dialogue in the script), average
+			number of lines per speech, total words, average number of
+			words per speech and average number of characters per word.
+			</para>
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Page list</term>
+		  <listitem>
+			<para>Number of pages this character speaks on, followed by a
+			list of all of those pages.</para>
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Location list</term>
+		  <listitem>
+			<para>A list of all the locations this character speaks in,
+			preceded by the number of lines spoken at each
+			location.</para>
+		  </listitem>
+		</varlistentry>
+		
+	  </variablelist>
+
+	  <para>It then generates a report in PDF format containing the
+	  selected information and opens that file.</para>
 	</sect1>
 	
   </chapter>

@@ -7,7 +7,7 @@ BOOK_HTML_TARGET = book.html
 # index.html is created last
 BOOK_HTML_CHUNK_TARGET = $(BOOK_HTML_CHUNK_DIR)/index.html
 
-BOOK_PDF_TARGET = book.pdf
+BOOK_PDF_TARGET = manual.pdf
 BOOK_FO_TARGET = book.fo
 BOOK_XML_SOURCE = book.xml
 BOOK_VERSION_SOURCE = version.xml
@@ -34,26 +34,24 @@ BOOK_HTML_XSLTPROC_OPTS =
 # Uncomment the following line if you'd like to print on A4 paper
 # BOOK_PDF_XSLTPROC_OPTS = --stringparam paper.type A4
 
-#all: all-html all-pdf
-all: book-html
+#all: all-html pdf
+all: html
 
-all-html: book-html book-html-chunk
+all-html: html chunk
 
-all-pdf: book-pdf
-
-install: install-book-html install-book-html-chunk install-book-pdf
+install: install-html install-chunk install-pdf
 
 clean: book-clean
 
 #$(BOOK_VERSION_SOURCE): book-version
 
-book-html: $(BOOK_HTML_TARGET)
+html: $(BOOK_HTML_TARGET)
 
 $(BOOK_HTML_TARGET): $(BOOK_ALL_SOURCE) $(BOOK_VERSION_SOURCE)
 	$(XSLTPROC) $(BOOK_HTML_XSLTPROC_OPTS) \
            --output $(BOOK_HTML_TARGET) $(XSL_HTML) $(BOOK_XML_SOURCE)
 
-book-html-chunk: $(BOOK_HTML_CHUNK_TARGET)
+chunk: $(BOOK_HTML_CHUNK_TARGET)
 
 # The trailing slash is essential that xsltproc will output pages to the dir
 $(BOOK_HTML_CHUNK_TARGET): $(BOOK_ALL_SOURCE) $(BOOK_VERSION_SOURCE) \
@@ -65,7 +63,7 @@ $(BOOK_HTML_CHUNK_TARGET): $(BOOK_ALL_SOURCE) $(BOOK_VERSION_SOURCE) \
 	cp styles.css $(BOOK_HTML_CHUNK_DIR)
 #	cp $(BOOK_IMAGES) $(BOOK_HTML_CHUNK_DIR)
 
-book-pdf: $(BOOK_PDF_TARGET)
+pdf: $(BOOK_PDF_TARGET)
 
 $(BOOK_PDF_TARGET): $(BOOK_ALL_SOURCE) $(BOOK_VERSION_SOURCE) $(BOOK_IMAGES)
 	$(XSLTPROC) $(BOOK_PDF_XSLTPROC_OPTS) \
@@ -75,19 +73,19 @@ $(BOOK_PDF_TARGET): $(BOOK_ALL_SOURCE) $(BOOK_VERSION_SOURCE) $(BOOK_IMAGES)
 $(BOOK_INSTALL_DIR):
 	$(INSTALL) -d $(BOOK_INSTALL_DIR)
 
-install-book-html: $(BOOK_HTML_TARGET)
+install-html: $(BOOK_HTML_TARGET)
 #	$(INSTALL) -d $(BOOK_INSTALL_DIR)/images
 	$(INSTALL) $(BOOK_HTML_TARGET) $(BOOK_INSTALL_DIR)
 	$(INSTALL) styles.css $(BOOK_INSTALL_DIR)
 #	$(INSTALL) $(BOOK_IMAGES) $(BOOK_INSTALL_DIR)/images
 
-install-book-html-chunk: $(BOOK_HTML_CHUNK_TARGET)
+install-chunk: $(BOOK_HTML_CHUNK_TARGET)
 #	$(INSTALL) -d $(BOOK_INSTALL_DIR)/images
 	$(INSTALL) $(BOOK_HTML_CHUNK_DIR)/*.html $(BOOK_INSTALL_DIR)
 	$(INSTALL) styles.css $(BOOK_INSTALL_DIR)
 #	$(INSTALL) $(BOOK_IMAGES) $(BOOK_INSTALL_DIR)/images
 
-install-book-pdf: $(BOOK_PDF_TARGET) $(BOOK_INSTALL_DIR)
+install-pdf: $(BOOK_PDF_TARGET) $(BOOK_INSTALL_DIR)
 	$(INSTALL) $(BOOK_PDF_TARGET) $(BOOK_INSTALL_DIR)
 
 book-clean:
