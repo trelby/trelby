@@ -2825,6 +2825,7 @@ class MyCtrl(wxControl):
             self.mark = None
 
         # debug stuff
+        # FIXME: disable for beta2
         elif (kc < 256) and (chr(kc) == "å"):
             self.loadFile("default.blyte")
 #         elif (kc < 256) and (chr(kc) == "Å"):
@@ -2890,6 +2891,7 @@ class MyCtrl(wxControl):
         dc.DrawRectangle(0, 0, size.width, size.height)
 
         marked = self.getMarkedLines()
+        posX = -1
         cursorY = -1
         ccfg = None
 
@@ -2967,6 +2969,7 @@ class MyCtrl(wxControl):
                             size.width, 0)
 
                 if i == self.line:
+                    posX = t.x
                     cursorY = y
                     ccfg = tcfg
                     dc.SetPen(cfgGui.cursorPen)
@@ -3001,9 +3004,9 @@ class MyCtrl(wxControl):
             dc.DrawTextList(tl[1][0], tl[1][1])
         
         if self.autoComp and (cursorY > 0):
-            self.drawAutoComp(dc, cursorY, ccfg)
+            self.drawAutoComp(dc, posX, cursorY, ccfg)
 
-    def drawAutoComp(self, dc, cursorY, tcfg):
+    def drawAutoComp(self, dc, posX, cursorY, tcfg):
         fx = tcfg.fontX
         fy = tcfg.fontY
         
@@ -3039,7 +3042,6 @@ class MyCtrl(wxControl):
             w += sbw + offset * 2
             sbh = h - offset * 2 + selBleed * 2
 
-        posX = cfg.offsetX + tcfg.indent * fx
         posY = cursorY + cfg.fontYdelta
 
         # if the box doesn't fit on the screen in the normal position, put
