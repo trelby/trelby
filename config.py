@@ -501,34 +501,40 @@ class ConfigGui:
             ConfigGui.blackColor = wxColour(0, 0, 0)
 
             ConfigGui.constantsInited = True
-            
+
+        # convert cfg.MyColor -> cfgGui.wxColour
+        for it in cfg.cvars.color.itervalues():
+            c = getattr(cfg, it.name)
+            tmp = wxColour(c.r, c.g, c.b)
+            setattr(self, it.name, tmp)
+
         # type-gui configs, key = line type, value = TypeGui
         self.types = { }
 
-        self.textPen = wxPen(cfg.textColor)
+        self.textPen = wxPen(self.textColor)
         
-        self.bgBrush = wxBrush(cfg.bgColor)
-        self.bgPen = wxPen(cfg.bgColor)
+        self.bgBrush = wxBrush(self.bgColor)
+        self.bgPen = wxPen(self.bgColor)
 
-        self.selectedBrush = wxBrush(cfg.selectedColor)
-        self.selectedPen = wxPen(cfg.selectedColor)
+        self.selectedBrush = wxBrush(self.selectedColor)
+        self.selectedPen = wxPen(self.selectedColor)
 
-        self.searchBrush = wxBrush(cfg.searchColor)
-        self.searchPen = wxPen(cfg.searchColor)
+        self.searchBrush = wxBrush(self.searchColor)
+        self.searchPen = wxPen(self.searchColor)
 
-        self.cursorBrush = wxBrush(cfg.cursorColor)
-        self.cursorPen = wxPen(cfg.cursorColor)
+        self.cursorBrush = wxBrush(self.cursorColor)
+        self.cursorPen = wxPen(self.cursorColor)
 
-        self.noteBrush = wxBrush(cfg.noteColor)
-        self.notePen = wxPen(cfg.noteColor)
+        self.noteBrush = wxBrush(self.noteColor)
+        self.notePen = wxPen(self.noteColor)
 
-        self.autoCompPen = wxPen(cfg.autoCompFgColor)
-        self.autoCompBrush = wxBrush(cfg.autoCompBgColor)
-        self.autoCompRevPen = wxPen(cfg.autoCompBgColor)
-        self.autoCompRevBrush = wxBrush(cfg.autoCompFgColor)
+        self.autoCompPen = wxPen(self.autoCompFgColor)
+        self.autoCompBrush = wxBrush(self.autoCompBgColor)
+        self.autoCompRevPen = wxPen(self.autoCompBgColor)
+        self.autoCompRevBrush = wxBrush(self.autoCompFgColor)
 
-        self.pagebreakPen = wxPen(cfg.pagebreakColor)
-        self.pagebreakNoAdjustPen = wxPen(cfg.pagebreakNoAdjustColor,
+        self.pagebreakPen = wxPen(self.pagebreakColor)
+        self.pagebreakNoAdjustPen = wxPen(self.pagebreakNoAdjustColor,
                                           style = wxDOT)
 
         dc = wxMemoryDC()

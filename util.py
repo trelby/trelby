@@ -381,6 +381,27 @@ def finishWindow(window, topSizer, pad = 10, center = True):
     if center:
         window.Center()
 
+# wxColour replacement that can safely be copy.deepcopy'd
+class MyColor:
+    def __init__(self, r, g, b):
+        self.r = r
+        self.g = g
+        self.b = b
+
+    def toWx(self):
+        return wxColour(self.r, self.g, self.b)
+
+    def fromWx(c):
+        o = MyColor(0, 0, 0)
+
+        o.r = c.Red()
+        o.g = c.Green()
+        o.b = c.Blue()
+
+        return o
+    
+    fromWx = staticmethod(fromWx)
+
 # fake key event, supports same operations as the real one
 class MyKeyEvent:
     def __init__(self, kc = 0):

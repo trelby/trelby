@@ -2772,7 +2772,7 @@ class MyCtrl(wxControl):
         dc.SetPen(cfgGui.bgPen)
         dc.DrawRectangle(0, 0, size.width, size.height)
 
-        dc.SetTextForeground(cfg.textColor)
+        dc.SetTextForeground(cfgGui.textColor)
         
         y = cfg.offsetY
         length = len(ls)
@@ -2840,7 +2840,7 @@ class MyCtrl(wxControl):
                 dc.SetTextForeground(cfgGui.redColor)
                 dc.SetFont(cfgGui.getType(config.ACTION).font)
                 dc.DrawText(config.lb2text(l.lb), 0, y)
-                dc.SetTextForeground(cfg.textColor)
+                dc.SetTextForeground(cfgGui.textColor)
 
             if cfg.pbi == config.PBI_REAL_AND_UNADJ:
                 if self.line2pageNoAdjust(i) != self.line2pageNoAdjust(i + 1):
@@ -2941,18 +2941,18 @@ class MyCtrl(wxControl):
         dc.SetBrush(cfgGui.autoCompBrush)
         dc.DrawRectangle(posX, posY, w, h)
 
-        dc.SetTextForeground(cfg.autoCompFgColor)
+        dc.SetTextForeground(cfgGui.autoCompFgColor)
 
         for i in range(startPos, endPos):
             if i == self.autoCompSel:
                 dc.SetPen(cfgGui.autoCompRevPen)
                 dc.SetBrush(cfgGui.autoCompRevBrush)
-                dc.SetTextForeground(cfg.autoCompBgColor)
+                dc.SetTextForeground(cfgGui.autoCompBgColor)
                 dc.DrawRectangle(posX + offset - selBleed,
                     posY + offset + (i - startPos) * fy - selBleed,
                     itemW,
                     fy + selBleed * 2)
-                dc.SetTextForeground(cfg.autoCompBgColor)
+                dc.SetTextForeground(cfgGui.autoCompBgColor)
                 dc.SetPen(cfgGui.autoCompPen)
                 dc.SetBrush(cfgGui.autoCompBrush)
                 
@@ -2960,7 +2960,7 @@ class MyCtrl(wxControl):
                         (i - startPos) * fy)
 
             if i == self.autoCompSel:
-                dc.SetTextForeground(cfg.autoCompFgColor)
+                dc.SetTextForeground(cfgGui.autoCompFgColor)
 
         if doSbw:
             dc.SetPen(cfgGui.autoCompPen)

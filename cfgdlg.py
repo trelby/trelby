@@ -503,18 +503,19 @@ class ColorsPanel(wxPanel):
                          
     def OnChangeColor(self, event):
         cd = wxColourData()
-        cd.SetColour(getattr(self.cfg, self.color))
+        cd.SetColour(getattr(self.cfg, self.color).toWx())
         dlg = wxColourDialog(self, cd)
         dlg.SetTitle(self.colorsLb.GetStringSelection())
         if dlg.ShowModal() == wxID_OK:
             setattr(self.cfg, self.color,
-                    dlg.GetColourData().GetColour().Get())
+                    util.MyColor.fromWx(dlg.GetColourData().GetColour()))
         dlg.Destroy()
 
         self.cfg2gui()
             
     def cfg2gui(self):
-        self.colorSample.SetBackgroundColour(getattr(self.cfg, self.color))
+        self.colorSample.SetBackgroundColour(
+            getattr(self.cfg, self.color).toWx())
         self.colorSample.Refresh()
         
 class PaperPanel(wxPanel):
