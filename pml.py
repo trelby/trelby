@@ -46,8 +46,11 @@ class Document:
         self.pages.append(page)
 
 class Page:
-    def __init__(self):
+    def __init__(self, doc):
 
+        # link to containing document
+        self.doc = doc
+        
         # a collection of Operation objects
         self.ops = []
 

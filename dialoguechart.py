@@ -143,14 +143,14 @@ class DialogueChart:
 
         for func in funcs:
             self.cinfo.sort(func[1])
-            doc.add(self.generatePage(func[0]))
+            doc.add(self.generatePage(func[0], doc))
         
         return pdf.generate(doc)
 
-    def generatePage(self, title):
-        pg = pml.Page()
+    def generatePage(self, title, doc):
+        pg = pml.Page(doc)
 
-        pg.add(pml.TextOp(title, self.cfg.paperHeight / 2, self.margin, 18,
+        pg.add(pml.TextOp(title, doc.w / 2, self.margin, 18,
             pml.BOLD | pml.ITALIC | pml.UNDERLINED, util.ALIGN_CENTER))
 
         pageCnt = len(self.pages)

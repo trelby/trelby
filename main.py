@@ -427,7 +427,7 @@ class MyCtrl(wxControl):
             start = self.pages[p - 1] + 1
             end = self.pages[p]
 
-            pg = pml.Page()
+            pg = pml.Page(doc)
 
             # what line we're on, counted from first line after top
             # margin
