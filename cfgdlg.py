@@ -159,7 +159,7 @@ class DisplayPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
 
         self.spacingEntry = wxSpinCtrl(self, -1)
-        self.spacingEntry.SetRange(*self.cfg.getMinMax("fontYdelta"))
+        self.spacingEntry.SetRange(*self.cfg.cvars.getMinMax("fontYdelta"))
         EVT_SPINCTRL(self, self.spacingEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.spacingEntry, self.OnKillFocus)
         hsizer.Add(self.spacingEntry, 0)
@@ -271,8 +271,9 @@ class ElementsPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         self.emptyLinesEntry = wxSpinCtrl(self, -1)
-        self.emptyLinesEntry.SetRange(*self.cfg.getMinMax(
-            "elementEmptyLinesBefore"))
+        self.emptyLinesEntry.SetRange(
+            *self.cfg.getType(config.ACTION).cvars.getMinMax(
+            "emptyLinesBefore"))
         EVT_SPINCTRL(self, self.emptyLinesEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.emptyLinesEntry, self.OnKillFocus)
         hsizer2.Add(self.emptyLinesEntry, 0)
@@ -285,7 +286,8 @@ class ElementsPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         self.indentEntry = wxSpinCtrl(self, -1)
-        self.indentEntry.SetRange(*self.cfg.getMinMax("elementIndent"))
+        self.indentEntry.SetRange(
+            *self.cfg.getType(config.ACTION).cvars.getMinMax("indent"))
         EVT_SPINCTRL(self, self.indentEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.indentEntry, self.OnKillFocus)
         gsizer.Add(self.indentEntry, 0)
@@ -297,7 +299,8 @@ class ElementsPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         self.widthEntry = wxSpinCtrl(self, -1)
-        self.widthEntry.SetRange(*self.cfg.getMinMax("elementWidth"))
+        self.widthEntry.SetRange(
+            *self.cfg.getType(config.ACTION).cvars.getMinMax("width"))
         EVT_SPINCTRL(self, self.widthEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.widthEntry, self.OnKillFocus)
         gsizer.Add(self.widthEntry, 0)
@@ -444,7 +447,7 @@ class ColorsPanel(wxPanel):
 
         self.colorsLb = wxListBox(self, -1, size = (300, 250))
 
-        tmp = self.cfg.colorVars.values()
+        tmp = self.cfg.cvars.color.values()
         tmp.sort(lambda c1, c2: cmp(c1.descr, c2.descr))
         
         for it in tmp:
@@ -748,7 +751,7 @@ class AutoCompPanel(wxPanel):
     def OnMisc(self, event = None):
         tcfg = self.cfg.types[self.lt]
 
-        tcfg.doAutoComp = self.enabledCb.IsChecked()
+        tcfg.doAutoComp = bool(self.enabledCb.IsChecked())
         self.itemsEntry.Enable(tcfg.doAutoComp)
         
         l = self.itemsEntry.GetValue().split("\n")
@@ -803,7 +806,7 @@ class PaginationPanel(wxPanel):
                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         entry = wxSpinCtrl(parent, -1)
-        entry.SetRange(*self.cfg.getMinMax(cfgName))
+        entry.SetRange(*self.cfg.cvars.getMinMax(cfgName))
         EVT_SPINCTRL(self, entry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(entry, self.OnKillFocus)
         sizer.Add(entry, 0)
@@ -879,7 +882,7 @@ class MiscPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         tmp = wxSpinCtrl(parent, -1)
-        tmp.SetRange(*self.cfg.getMinMax(cfgName))
+        tmp.SetRange(*self.cfg.cvars.getMinMax(cfgName))
         EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(tmp, self.OnKillFocus)
         hsizer.Add(tmp)
@@ -960,7 +963,7 @@ class PDFPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
 
         self.fontSizeEntry = wxSpinCtrl(self, -1)
-        self.fontSizeEntry.SetRange(*self.cfg.getMinMax("fontSize"))
+        self.fontSizeEntry.SetRange(*self.cfg.cvars.getMinMax("fontSize"))
         EVT_SPINCTRL(self, self.fontSizeEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.fontSizeEntry, self.OnKillFocus)
         hsizer.Add(self.fontSizeEntry, 0)

@@ -1,6 +1,13 @@
+import copy
+
 import util
 
 from wxPython.wx import wxColour
+
+# ElementName is the only one who needs to access the containing object
+# (for the cfg variable), so instead of passing it through all functions
+# we record it here.
+currentObj = None
 
 # keep track about one object's variables
 class Vars:
@@ -11,20 +18,72 @@ class Vars:
         for v in self.cvars:
             yield v
 
+    # make various dictionaries pointing to the config variables.
+    def makeDicts(self):
+        self.all = self.getDict()
+        self.color = self.getDict(ColorVar)
+        self.numeric = self.getDict(NumericVar)
+
+    # return dictionary containing given type of variable objects, or all
+    # if typeObj is None.
+    def getDict(self, typeObj = None):
+        tmp = {}
+        
+        for it in self.cvars:
+            if not typeObj or isinstance(it, typeObj):
+                tmp[it.name] = it
+
+        return tmp
+
+    # get default value of a setting
+    def getDefault(self, name):
+        return self.all[name].defVal
+        
+    # get minimum value of a numeric setting
+    def getMin(self, name):
+        return self.numeric[name].minVal
+        
+    # get maximum value of a numeric setting
+    def getMax(self, name):
+        return self.numeric[name].maxVal
+        
+    # get minimum and maximum value of a numeric setting as a (min,max)
+    # tuple.
+    def getMinMax(self, name):
+        return (self.getMin(name), self.getMax(name))
+
     def setDefaults(self, obj):
         for it in self.cvars:
-            setattr(obj, it.name, it.defVal)
+            setattr(obj, it.name, copy.deepcopy(it.defVal))
                 
-    # convert all tracked variables to a string format and return that.
     def save(self, prefix, obj):
+        global currentObj
+        currentObj = obj
+        
         s = ""
         
         for it in self.cvars:
             if it.name2:
-                s += it.toStr(getattr(obj, it.name), prefix + it.name2, obj)
+                s += it.toStr(getattr(obj, it.name), prefix + it.name2)
 
+        currentObj = None
+        
         return s
     
+    def load(self, vals, prefix, obj):
+        global currentObj
+        currentObj = obj
+        
+        for it in self.cvars:
+            if it.name2:
+                name = prefix + it.name2
+                if vals.has_key(name):
+                    res = it.fromStr(vals, vals[name], name)
+                    setattr(obj, it.name, res)
+                    del vals[name]
+
+        currentObj = None
+
     def addVar(self, var):
         self.cvars.append(var)
 
@@ -50,18 +109,6 @@ class Vars:
     def addList(self, *params):
         self.addVar(ListVar(*params))
 
-    # return dictionary containing given type of variable objects, or all
-    # if typeObj is None.
-    def getDict(self, typeObj = None):
-        tmp = {}
-        
-        for it in self.cvars:
-            if not typeObj or isinstance(it, typeObj):
-                tmp[it.name] = it
-
-        return tmp
-
-
 class ConfVar:
     # name2 is the name to use while saving/loading the variable. if it's
     # empty, the variable is not loaded/saved, i.e. is used only
@@ -75,16 +122,30 @@ class BoolVar(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
 
-    def toStr(self, val, prefix, obj):
-        return "%s:%s\n" % (prefix, str(val))
+    def toStr(self, val, prefix):
+        return "%s:%s\n" % (prefix, str(bool(val)))
+
+    def fromStr(self, vals, val, prefix):
+        return val == "True"
 
 class ColorVar(ConfVar):
     def __init__(self, name, defVal, name2, descr):
         ConfVar.__init__(self, name, defVal, name2)
         self.descr = descr
 
-    def toStr(self, val, prefix, obj):
+    def toStr(self, val, prefix):
         return "%s:%d,%d,%d\n" % (prefix, val.Red(), val.Green(), val.Blue())
+
+    def fromStr(self, vals, val, prefix):
+        v = val.split(",")
+        if len(v) != 3:
+            return copy.deepcopy(self.defVal)
+
+        r = util.str2int(v[0], 0, 0, 255)
+        g = util.str2int(v[1], 0, 0, 255)
+        b = util.str2int(v[2], 0, 0, 255)
+        
+        return wxColour(r, g, b)
 
 class NumericVar(ConfVar):
     def __init__(self, name, defVal, name2, minVal, maxVal):
@@ -97,30 +158,46 @@ class FloatVar(NumericVar):
         NumericVar.__init__(self, name, defVal, name2, minVal, maxVal)
         self.precision = precision
 
-    def toStr(self, val, prefix, obj):
+    def toStr(self, val, prefix):
         return "%s:%.*f\n" % (prefix, self.precision, val)
         
+    def fromStr(self, vals, val, prefix):
+        return util.str2float(val, self.defVal, self.minVal, self.maxVal)
+
 class IntVar(NumericVar):
     def __init__(self, name, defVal, name2, minVal, maxVal):
         NumericVar.__init__(self, name, defVal, name2, minVal, maxVal)
 
-    def toStr(self, val, prefix, obj):
+    def toStr(self, val, prefix):
         return "%s:%d\n" % (prefix, val)
+
+    def fromStr(self, vals, val, prefix):
+        return util.str2int(val, self.defVal, self.minVal, self.maxVal)
         
 class StrVar(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
         
-    def toStr(self, val, prefix, obj):
+    def toStr(self, val, prefix):
         return "%s:%s\n" % (prefix, util.encodeStr(val))
 
+    def fromStr(self, vals, val, prefix):
+        return util.decodeStr(val)
+        
 class ElementNameVar(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
         
-    def toStr(self, val, prefix, obj):
-        return "%s:%s\n" % (prefix, obj.cfg.getType(val).name)
+    def toStr(self, val, prefix):
+        return "%s:%s\n" % (prefix, currentObj.cfg.getType(val).name)
 
+    def fromStr(self, vals, val, prefix):
+        for t in currentObj.cfg.types.values():
+            if t.name == val:
+                return t.lt
+
+        return self.defVal
+        
 class ListVar(ConfVar):
     def __init__(self, name, defVal, name2, itemType):
         ConfVar.__init__(self, name, defVal, name2)
@@ -129,14 +206,31 @@ class ListVar(ConfVar):
         # type of item contained in the list.
         self.itemType = itemType
         
-    def toStr(self, val, prefix, obj):
+    def toStr(self, val, prefix):
         s = ""
 
         s += "%s:%d\n" % (prefix, len(val))
 
         i = 1
         for v in val:
-            s += self.itemType.toStr(v, prefix + "/%d" % i, obj)
+            s += self.itemType.toStr(v, prefix + "/%d" % i)
             i += 1
 
         return s
+
+    def fromStr(self, vals, val, prefix):
+        # 1000 is totally arbitrary, increase if needed
+        count = util.str2int(val, -1, -1, 1000)
+        if count == -1:
+            return copy.deepcopy(self.defVal)
+
+        tmp = []
+        for i in range(1, count + 1):
+            name = prefix + "/%d" % i
+
+            if vals.has_key(name):
+                res = self.itemType.fromStr(vals, vals[name], name)
+                tmp.append(res)
+                del vals[name]
+
+        return tmp

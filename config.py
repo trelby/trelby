@@ -101,6 +101,9 @@ class TextType:
     def save(self, prefix):
         return self.cvars.save(prefix, self)
 
+    def load(self, vals, prefix):
+        self.cvars.load(vals, prefix, self)
+
 class Type:
     cvars = None
 
@@ -121,23 +124,25 @@ class Type:
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
 
-            v.addInt("emptyLinesBefore", 0, "EmptyLinesBefore", 0, 0)
-            v.addInt("indent", 0, "Indent", 0, 0)
-            v.addInt("width", 0, "Width", 0, 0)
+            v.addInt("emptyLinesBefore", 0, "EmptyLinesBefore", 0, 5)
+            v.addInt("indent", 0, "Indent", 0, 80)
+            v.addInt("width", 5, "Width", 5, 80)
 
             # what type of element to insert when user presses enter or tab.
-            v.addElemName("newTypeEnter", None, "NewTypeEnter")
-            v.addElemName("newTypeTab", None, "NewTypeTab")
+            v.addElemName("newTypeEnter", ACTION, "NewTypeEnter")
+            v.addElemName("newTypeTab", ACTION, "NewTypeTab")
 
             # what element to switch to when user hits tab / shift-tab.
-            v.addElemName("nextTypeTab", None, "NextTypeTab")
-            v.addElemName("prevTypeTab", None, "PrevTypeTab")
+            v.addElemName("nextTypeTab", ACTION, "NextTypeTab")
+            v.addElemName("prevTypeTab", ACTION, "PrevTypeTab")
             
             # auto-completion stuff, only used for some element types
             v.addBool("doAutoComp", False, "AutoCompletion")
             v.addList("autoCompList", [], "AutoCompletionList",
                       mypickle.StrVar("", "", ""))
 
+            v.makeDicts()
+            
         self.__class__.cvars.setDefaults(self)
             
     def save(self, prefix):
@@ -148,6 +153,13 @@ class Type:
         s += self.export.save(prefix + "Export/")
 
         return s
+
+    def load(self, vals, prefix):
+        prefix += "%s/" % self.name
+        
+        self.cvars.load(vals, prefix, self)
+        self.screen.load(vals, prefix + "Screen/")
+        self.export.load(vals, prefix + "Export/")
 
 # type-specific stuff that are wxwindows objects, so can't be in normal
 # Type (deepcopy dies)
@@ -301,12 +313,6 @@ class Config:
         # least this many lines. (0 = disabled)
         v.addInt("confirmDeletes", 2, "ConfirmDeletes", 0, 500)
 
-        # not used perse, but listed here so that we can easily query
-        # min/max values for these in various places
-        v.addInt("elementEmptyLinesBefore", 0, "", 0, 5)
-        v.addInt("elementIndent", 0, "", 0, 80)
-        v.addInt("elementWidth", 5, "", 5, 80)
-
         # vertical distance between rows, in pixels
         v.addInt("fontYdelta", 18, "FontYDelta", 4, 125)
 
@@ -396,34 +402,27 @@ class Config:
         v.addColor("pagebreakNoAdjust", 128, 128, 128,
                    "PageBreakNoAdjustLine",
                    "Page-break (original, not adjusted) line")
-        
-        # make various dictionaries pointing to the config variables.
-        self.allVars = v.getDict()
-        self.colorVars = v.getDict(mypickle.ColorVar)
-        self.numericVars = v.getDict(mypickle.NumericVar)
 
-    # get default value of a setting
-    def getDefault(self, name):
-        return self.allVars[name].defVal
+        v.makeDicts()
         
-    # get minimum value of a numeric setting
-    def getMin(self, name):
-        return self.numericVars[name].minVal
-        
-    # get maximum value of a numeric setting
-    def getMax(self, name):
-        return self.numericVars[name].maxVal
-        
-    # get minimum and maximum value of a numeric setting as a (min,max)
-    # tuple.
-    def getMinMax(self, name):
-        return (self.getMin(name), self.getMax(name))
-
     # load config from string 's'. does not throw any exceptions, silently
     # ignores any errors, and always leaves config in an ok state.
     def load(self, s):
-        pass
+        tmp = util.fixNL(s).split("\n")
 
+        vals = {}
+        for it in tmp:
+            if it.find(":") != -1:
+                name, v = it.split(":", 1)
+                vals[name] = v
+
+        self.cvars.load(vals, "", self)
+
+        for t in self.types.itervalues():
+            t.load(vals, "Element/")
+
+        self.recalc()
+        
     # save config into a string and return that.
     def save(self):
         s = self.cvars.save("", self)
@@ -443,16 +442,22 @@ class Config:
     # box, thus getting the minimum value), which would then possibly
     # modify the value of other variables which is not what we want.
     def recalc(self, doAll = True):
-        for it in self.numericVars.itervalues():
+        for it in self.cvars.numeric.itervalues():
             util.clampObj(self, it.name, it.minVal, it.maxVal)
 
-        # FIXME: check that required string vars are valid input text
-        
         for el in self.types.itervalues():
             util.clampObj(el, "emptyLinesBefore",
-                          *self.getMinMax("elementEmptyLinesBefore"))
-            util.clampObj(el, "indent", *self.getMinMax("elementIndent"))
-            util.clampObj(el, "width", *self.getMinMax("elementWidth"))
+                          *el.cvars.getMinMax("emptyLinesBefore"))
+            util.clampObj(el, "indent", *el.cvars.getMinMax("indent"))
+            util.clampObj(el, "width", *el.cvars.getMinMax("width"))
+
+            tmp = []
+            for v in el.autoCompList:
+                v = util.toInputStr(v).strip()
+                if len(v) > 0:
+                    tmp.append(v)
+
+            el.autoCompList = tmp
             
         # make sure usable space on the page isn't too small
         if doAll and (self.marginTop + self.marginBottom) >= \

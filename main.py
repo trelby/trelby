@@ -78,6 +78,16 @@ ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
 = range(32)
 
+def loadConfig(path, frame):
+    try:
+        os.stat(path)
+    except OSError:
+        return
+
+    s = util.loadFile(path, frame)
+    if s:
+        cfg.load(s)
+
 def refreshGuiConfig():
     global cfgGui
 
@@ -3330,6 +3340,7 @@ class MyApp(wxApp):
         
         cfg = config.Config()
         config.currentCfg = cfg
+        loadConfig(misc.confPath + "/default.conf", None)
         refreshGuiConfig()
 
         # cfg.scriptDir is the directory used on startup, while
