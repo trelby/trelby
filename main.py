@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: ISO-8859-1 -*-
 
 from error import *
 import cfg
@@ -546,6 +547,7 @@ class MyCtrl(wxControl):
                 self.line = len(self.sp.lines) - 1
             else:
                 event.Skip()
+                return
                 
         elif (kc == WXK_LEFT) or (kc == KC_CTRL_B):
             self.column = max(self.column - 1, 0)
@@ -622,6 +624,10 @@ class MyCtrl(wxControl):
                 type = cfg.getPrevTypeTab(type)
                 
             self.convertCurrentTo(type)
+
+        # FIXME: debug stuff
+        elif (chr(kc) == "å"):
+            self.loadFile("default.nasp")
             
         elif (kc == WXK_SPACE) or (kc > 32) and (kc < 256):
             str = ls[self.line].text
@@ -722,11 +728,11 @@ class MyFrame(wxFrame):
 
         fileMenu = wxMenu()
         fileMenu.Append(ID_FILE_NEW, "&New")
-        fileMenu.Append(ID_FILE_OPEN, "&Open...")
-        fileMenu.Append(ID_FILE_SAVE, "&Save")
-        fileMenu.Append(ID_FILE_SAVE_AS, "Save &As")
+        fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
+        fileMenu.Append(ID_FILE_SAVE, "&Save\tCTRL-S")
+        fileMenu.Append(ID_FILE_SAVE_AS, "Save &As...")
         fileMenu.AppendSeparator()
-        fileMenu.Append(ID_FILE_EXIT, "E&xit")
+        fileMenu.Append(ID_FILE_EXIT, "E&xit\tCTRL-Q")
 
         formatMenu = wxMenu()
         formatMenu.Append(ID_REFORMAT, "&Reformat all")
