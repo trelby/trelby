@@ -165,7 +165,7 @@ class DialogueChart:
             y = self.chartY + i * self.charY
             
             if (i % 2) == 1:
-                pg.add(pml.PDFOp("0.95 g")) 
+                pg.add(pml.PDFOp("0.93 g")) 
                 pg.add(pml.RectOp(self.chartX, y, self.chartWidth,
                                   self.charY, -1, True))
                 pg.add(pml.PDFOp("0.0 g"))
