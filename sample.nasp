@@ -1,25 +1,21 @@
 .\ext. stonehenge - night
->.A blizzard is raging. Snow is flying everywhere, with
->.visibility down to almost zero. Only at brief moments do we
->.catch sight of the huge stones forming the monument. No one
-..in his right mind would be out in this kind of weather.
+>.A blizzard rages. Snow is everywhere and visibility is
+>.almost zero. Only at brief moments do we catch sight of the
+>.huge stones forming the monument. No one in his right mind
+..would be out in this kind of weather.
 >.However, the rumble of engines appears, growing louder by
->.the second. In a few moments, a dozen huge trucks, one with
->.a crane in its back, emerge from the storm and stop right by
->.the stones. Figures in work clothes jump down from the
->.trucks and start attaching heavy lifting cables to the
-..stones.
->.The crane's lifting hook is attached to the cable in the
->.first stone, and the stone is slowly lifted out of the
->.ground and onto the flatbed of the truck beside it. This is
->.repeated for each of the stones, until all of the trucks are
->.filled to capacity and not a single stone is left on the
+>.the second. A dozen huge trucks emerge from the storm and
+..stop right by the stones. One of the trucks has a crane.
+>.Men jump down from the trucks and start attaching heavy
+>.lifting cables to the stones. One of them is lifted onto the
+>.flatbed of the truck beside it. This is repeated until all
+>.of the trucks are full and not a single stone is left in the
 ..ground.
->.The people pile back into the trucks and they start off into
->.the storm. Momentarily they are gone, and in place of the
+>.The men pile back into the trucks and start off into the
+>.storm. Momentarily they are gone, and in place of the
 >.familiar Stonehenge monument is just a few holes in the
 ..ground, rapidly filling with snow.
-.\ext. airport - night - later
+.\ext. airport - night
 >.A small local airport, with the storm still raging. Not a
 >.person or a light can be seen, it being obviously abandoned
 ..for the night.
@@ -37,9 +33,9 @@
 ..ends.
 .\int. airplane cargo bay - night
 >.Up until now everyone has been wearing heavy winter clothes
->.and face masks, which they now start taking off and tossing
->.away. JASON, in his thirties, climbs on top of a stone pile
-..and addresses the crowd.
+>.and face masks, which they now take off. JASON, in his
+>.thirties, climbs on top of a stone pile and addresses the
+..crowd.
 ._JASON
 >:I want to congratulate you all on a
 >:job well done. It's now three in
@@ -47,8 +43,7 @@
 >:won't notice anything's wrong for
 >:at least 3 hours. By that time
 >:we'll be in the middle of the
->:Atlantic, far away from their
-.:prying eyes.
+.:Atlantic and they'll be helpless.
 >.He looks at the crowd with a slight smile creeping into his
 ..face.
 ._JASON
@@ -74,8 +69,8 @@
 .:plan.
 ._JASON
 >:Tough luck. May I remind you that
->:I'm the criminal mastermind behind
-.:this operation, not you?
+>:I'm in charge of this operation,
+.:not you?
 ._sarah
 >:Boys, take it easy. Eddie, you know
 >:as well as the rest of us that we
@@ -102,21 +97,21 @@
 ..Laughter all around. Jason looks at his watch and gets up.
 .\INT. AIRPLANE COCKPIT - NIGHT
 >.All four of them are back in the cockpit. Sarah and Kevin
->.are already in the pilots' seats, strapped in tightly. Jason
->.and Eddie sit in the other two seats behind them and grab
-..ahold of whatever they can.
+>.are in the pilots' seats, strapped in tightly. Jason and
+>.Eddie sit in the other two seats behind them and grab ahold
+..of whatever they can.
 ._KEVIN
 .:Here goes nothing...
 ..Kevin presses a button on the console.
 .\ext. outside the airplane - night
-..The rear cargo door is opening.
+..The rear cargo door starts to open.
 .\INT. AIRPLANE CARGO BAY - NIGHT
 >.A whistling sound grows into a roar as the cargo door keeps
->.opening. Items start tumbling toward it, and people are
->.beginning to panic. The two people who were sitting right by
->.the door are swept out into the air, their screams cut off
-..in an instant as they disappear.
-._MAN #1
+>.opening. Items start to tumble toward it, and people are
+>.starting to panic. The two people who were sitting by the
+>.door are swept out into the air, their screams cut off in an
+..instant as they disappear.
+._Crew member
 >:Those fuckers are trying to dump
 >:us! Cut the control cables and use
 .:the manual override!
@@ -124,10 +119,10 @@
 >.Eventually someone hits something, as there's a spark and
 ..the opening of the cargo door is halted.
 >.Someone is holding on to a cargo net with his other hand and
->.tapping furiously on a console with his other hand, near the
+>.tapping furiously on a keypad with his other hand, near the
 ..cargo door.
 ..He succeeds, as the cargo door starts to close.
-._MAN #1
+._CREW MEMBER
 .:Kill the motherfuckers!
 >.The crowd starts running toward the front of the cargo bay,
 ..waving guns and yelling threats.
@@ -140,11 +135,11 @@
 >.Kevin pulls his stick back, sending the plane on a steep
 ..ascent.
 .\INT. AIRPLANE CARGO BAY - NIGHT
->.The crowd loses its balance as the floor rises up in front
->.of them, and falls down. They try to get up, but the angle
->.of the plane keeps rising, and they have problems keeping
->.from sliding toward the back of the plane. All kinds of
-..items are raining down on them from above.
+>.The crowd loses its balance as the floor tilts. They try to
+>.get up, but the angle of the plane keeps rising, and they
+>.have problems keeping from sliding toward the back of the
+>.plane. All kinds of items are raining down on them from
+..above.
 >.A grinding noise is starting to be heard. Horrified, they
 >.look up to see the huge mass of stones beginning to slide
 >.toward them. They try to escape to the sides of the cargo
@@ -163,7 +158,7 @@
 >:Aye, it's nights like this that
 >:make me remember why I love being a
 >:fisherman. Nothing but you, your
->:boat, and the sea. Doesn't get any
+>:boat, and the sea. Don't get any
 .:better than this.
 ._FISHERMAN #2
 >:I could use a bit more action,
@@ -171,8 +166,8 @@
 >.Suddenly, huge blocks of stone rain down on the boat,
 ..smashing it to pieces.
 .\INT. AIRPLANE COCKPIT - NIGHT
->.Satisfied smiles all around. Kevin eases his stick back to a
-..normal position, and the plane slowly levels itself.
+>.Satisfied smiles all around. Kevin eases his stick forward
+..until the plane is flying normally again.
 ._JASON
 >:That wraps up phase one of the
 >:operation. Is everything ready for
@@ -180,7 +175,52 @@
 ._SARAH
 .:The boat is ready and waiting.
 ._EDDIE
-.:So is the raft.
+.:The raft's ready.
 ._KEVIN
 >:We're 5 minutes from the jump-off
 .:point.
+._JASON
+.:Good. In your places, everyone.
+.\EXT. OUTSIDE THE AIRPLANE - NIGHT
+>.A bright yellow package drops from the airplane with 4
+>.people holding on to it. They tumble down, waiting until the
+>.last possible moment before opening their parachutes. In the
+..background, the plane crashes into the ocean.
+.\Ext. Ocean - night
+>.The package hits the water and is submerged. A few seconds
+>.later, a rapidly inflating liferaft appears. The people have
+>.disposed of their parachutes and start to swim toward the
+..liferaft.
+.\Int. Liferaft - night
+>.When they're all aboard, they close the entrance to the
+>.tent-like liferaft, and start to take off their clothes.
+>.When they're all nude, Sarah gathers the wet clothes and
+>.throws them out. The men openly admire Sarah's body, as she
+>.opens a storage locker and takes dry clothes for everyone
+..which they then put on.
+._EDDIE
+.((to Sarah)
+.:I know a great way to warm up.
+._SARAH
+>:Sorry, I got over the "older men"
+.:thing a while back.
+._EDDIE
+>:Anytime you have a flashback, let
+.:me know.
+..A device starts beeping.
+._KEVIN
+>:Dead-on accurate, even if I say so
+.:myself.
+.\EXT. OCEAN - NIGHT
+>.The liferaft bobs in the waves, utterly alone in the world.
+>.Or maybe not so alone after all, for a giant submarine
+>.surfaces just beside it. The tower opens and men with ropes
+..appear.
+.\Int. Submarine - night
+>.The gang of four descend from the tower. The captain is
+..waiting for them.
+._Captain
+>:Welcome aboard. I trust everything
+.:went well?
+._KEVIN
+.:Yes.
