@@ -352,16 +352,11 @@ class MyCtrl(wxControl):
     def fillAutoComp(self):
         ls = self.sp.lines
 
-        t = time.time()
-
         tcfg = cfg.getType(ls[self.line].type)
         if tcfg.doAutoComp:
             self.autoComp = self.getMatchingText(ls[self.line].text,
                                                  tcfg.type)
             self.autoCompSel = 0
-
-        t = time.time() - t
-        print "took %.4f seconds" % t
 
     # wraps a single line into however many lines are needed, according to
     # the type's width. doesn't modify the input line, returns a list of
@@ -732,7 +727,7 @@ class MyCtrl(wxControl):
             if (ls[i].type == type) and (ls[i].lb == config.LB_LAST):
                 upstr = util.upper(ls[i].text)
                 
-                if i != self.line and upstr.startswith(text):
+                if upstr.startswith(text) and i != self.line:
                     matches[upstr] = None
                     if i < self.line:
                         last = upstr
