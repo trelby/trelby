@@ -1348,6 +1348,9 @@ class MyCtrl(wxControl):
             if i < length:
                 pageLines = 1
                 
+                # advance i until it points to the last line to put on
+                # this page (before adjustments)
+                
                 while i < (length - 1):
 
                     pageLines += 1
@@ -1359,7 +1362,7 @@ class MyCtrl(wxControl):
 
                     i += 1
 
-            if i == length:
+            if i >= (length - 1):
                 if pageLines != 0:
                     self.pages.append(length - 1)
                     self.pagesNoAdjust.append(length - 1)
@@ -1390,6 +1393,7 @@ class MyCtrl(wxControl):
                 i = self.removeDanglingElement(i, config.SCENE, lastBreak)
 
             elif line.lt in (config.DIALOGUE, config.PAREN):
+                
                 if line.lb != config.LB_LAST or\
                        self.getTypeOfNextElem(i) in\
                        (config.DIALOGUE, config.PAREN):
