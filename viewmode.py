@@ -258,7 +258,8 @@ class ViewModeLayout(ViewMode):
         pageNr = ctrl.sp.line2page(topLine)
 
         if doExtra and ctrl.sp.cfg.pdfShowSceneNumbers:
-            pager.scene = ctrl.sp.getSceneNumber(topLine)
+            pager.scene = ctrl.sp.getSceneNumber(
+                ctrl.sp.page2lines(pageNr)[0])
 
         # find out starting place (if something bugs, generatePMLPage
         # below could return None, but it shouldn't happen...)
@@ -391,11 +392,12 @@ class ViewModeSideBySide(ViewMode):
         pager = mypager.Pager(ctrl.sp.cfg)
 
         topLine = ctrl.sp.getTopLine()
+        pageNr = ctrl.sp.line2page(topLine)
         
         if doExtra and ctrl.sp.cfg.pdfShowSceneNumbers:
-            pager.scene = ctrl.sp.getSceneNumber(topLine)
+            pager.scene = ctrl.sp.getSceneNumber(
+                ctrl.sp.page2lines(pageNr)[0])
 
-        pageNr = ctrl.sp.line2page(topLine)
         pagesDone = 0
         
         while 1:
