@@ -47,48 +47,6 @@ KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
 
-ID_EDIT_COPY,\
-ID_EDIT_COPY_TO_CB,\
-ID_EDIT_CUT,\
-ID_EDIT_DELETE_ELEMENTS,\
-ID_EDIT_FIND,\
-ID_EDIT_PASTE,\
-ID_EDIT_PASTE_FROM_CB,\
-ID_EDIT_SELECT_SCENE,\
-ID_FILE_CFG_LOAD,\
-ID_FILE_CFG_SAVE_AS,\
-ID_FILE_CLOSE,\
-ID_FILE_EXIT,\
-ID_FILE_EXPORT,\
-ID_FILE_IMPORT,\
-ID_FILE_NEW,\
-ID_FILE_OPEN,\
-ID_FILE_PRINT,\
-ID_FILE_REVERT,\
-ID_FILE_SAVE,\
-ID_FILE_SAVE_AS,\
-ID_FILE_SETTINGS,\
-ID_HELP_ABOUT,\
-ID_HELP_COMMANDS,\
-ID_HELP_LICENSE,\
-ID_HELP_MANUAL,\
-ID_LICENSE_INFO,\
-ID_LICENSE_RELEASE,\
-ID_LICENSE_UPDATE,\
-ID_REPORTS_CHARACTER_REP,\
-ID_REPORTS_DIALOGUE_CHART,\
-ID_SCRIPT_FIND_ERROR,\
-ID_SCRIPT_HEADERS,\
-ID_SCRIPT_PAGINATE,\
-ID_SCRIPT_TITLES,\
-ID_TOOLS_CHARMAP,\
-ID_TOOLS_COMPARE_SCRIPTS,\
-ID_TOOLS_NAME_DB,\
-ID_VIEW_SHOW_FORMATTING,\
-ID_VIEW_STYLE_DRAFT,\
-ID_VIEW_STYLE_LAYOUT,\
-= range(40)
-
 def refreshGuiConfig():
     global cfgGui
 
@@ -3459,6 +3417,7 @@ class MyFrame(wxFrame):
         util.removeTempFiles(misc.tmpPrefix)
 
         self.mySetIcons()
+        self.allocIds()
         
         fileMenu = wxMenu()
         fileMenu.Append(ID_FILE_NEW, "&New")
@@ -3657,6 +3616,55 @@ class MyFrame(wxFrame):
         ib.AddIcon(icon)
 
         self.SetIcons(ib)
+
+    def allocIds(self):
+        names = [
+            "ID_EDIT_COPY",
+            "ID_EDIT_COPY_TO_CB",
+            "ID_EDIT_CUT",
+            "ID_EDIT_DELETE_ELEMENTS",
+            "ID_EDIT_FIND",
+            "ID_EDIT_PASTE",
+            "ID_EDIT_PASTE_FROM_CB",
+            "ID_EDIT_SELECT_SCENE",
+            "ID_FILE_CFG_LOAD",
+            "ID_FILE_CFG_SAVE_AS",
+            "ID_FILE_CLOSE",
+            "ID_FILE_EXIT",
+            "ID_FILE_EXPORT",
+            "ID_FILE_IMPORT",
+            "ID_FILE_NEW",
+            "ID_FILE_OPEN",
+            "ID_FILE_PRINT",
+            "ID_FILE_REVERT",
+            "ID_FILE_SAVE",
+            "ID_FILE_SAVE_AS",
+            "ID_FILE_SETTINGS",
+            "ID_HELP_ABOUT",
+            "ID_HELP_COMMANDS",
+            "ID_HELP_LICENSE",
+            "ID_HELP_MANUAL",
+            "ID_LICENSE_INFO",
+            "ID_LICENSE_RELEASE",
+            "ID_LICENSE_UPDATE",
+            "ID_REPORTS_CHARACTER_REP",
+            "ID_REPORTS_DIALOGUE_CHART",
+            "ID_SCRIPT_FIND_ERROR",
+            "ID_SCRIPT_HEADERS",
+            "ID_SCRIPT_PAGINATE",
+            "ID_SCRIPT_TITLES",
+            "ID_TOOLS_CHARMAP",
+            "ID_TOOLS_COMPARE_SCRIPTS",
+            "ID_TOOLS_NAME_DB",
+            "ID_VIEW_SHOW_FORMATTING",
+            "ID_VIEW_STYLE_DRAFT",
+            "ID_VIEW_STYLE_LAYOUT"
+            ]
+
+        g = globals()
+        
+        for n in names:
+            g[n] = wxNewId()
 
     def createNewPanel(self):
         newPanel = MyPanel(self.notebook, -1)
