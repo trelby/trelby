@@ -3,6 +3,9 @@
 
 from error import *
 import cfg
+from cfgdlg import CfgDlg
+
+import copy
 import string
 import time
 from wxPython.wx import *
@@ -23,6 +26,7 @@ ID_FILE_SAVE_AS = 2
 ID_FILE_EXIT = 3
 ID_REFORMAT = 4
 ID_FILE_NEW = 5
+ID_FILE_SETTINGS = 6
 
 def clamp(val, min, max):
     if val < min:
@@ -82,15 +86,7 @@ class MyCtrl(wxControl):
             style = wxSHORT_DASH)
         
         cfg.baseFont = wxFont(cfg.fontY, wxMODERN, wxNORMAL, wxNORMAL)
-
-#         fd = wxFontData()
-#         dlg = wxFontDialog(self, fd)
-#         if dlg.ShowModal() == wxID_OK:
-#             cfg.baseFont = dlg.GetFontData().GetChosenFont()
-            
-#         print "basefont facename: %s" % cfg.baseFont.GetFaceName()
-#         print "basefont native: %s" % cfg.baseFont.GetNativeFontInfoDesc()
-#         print "basefont isfixedwidth: %s" % cfg.baseFont.IsFixedWidth()
+        cfg.sceneFont = wxFont(cfg.fontY, wxMODERN, wxNORMAL, wxBOLD)
 
         self.OnNew(redraw = False)
         
@@ -422,6 +418,14 @@ class MyCtrl(wxControl):
         mainFrame.scrollBar.SetScrollbar(self.topLine, pageSize,
                                          len(self.sp.lines), pageSize) 
 
+    def isFixedWidth(self, font):
+        dc = wxMemoryDC()
+        dc.SetFont(font)
+        w1, h1 = dc.GetTextExtent("iiiii")
+        w2, h2 = dc.GetTextExtent("OOOOO")
+
+        return w1 == w2
+        
     def updateScreen(self, redraw = True):
         mainFrame.statusBar.SetStatusText("Page: %3d / %3d" %
             (self.line / 55 + 1, len(self.sp.lines)/55 + 1), 0)
@@ -490,6 +494,25 @@ class MyCtrl(wxControl):
                            style = wxSAVE | wxOVERWRITE_PROMPT)
         if dlg.ShowModal() == wxID_OK:
             self.saveFile(dlg.GetPath())
+
+    def OnSettings(self, event = None):
+        dlg = CfgDlg(self, copy.deepcopy(cfg._types))
+        dlg.ShowModal()
+        
+        fd = wxFontData()
+        fd.SetInitialFont(cfg.baseFont)
+        dlg = wxFontDialog(self, fd)
+        if dlg.ShowModal() == wxID_OK:
+            cfg.baseFont = dlg.GetFontData().GetChosenFont()
+
+            # FIXME: test fixed widthness and refuse to use if not
+            #self.isFixedWidth(cfg.baseFont)
+
+            cfg.sceneFont = wxFontFromNativeInfo(
+                cfg.baseFont.GetNativeFontInfo())
+            cfg.sceneFont.SetWeight(wxBOLD)
+            
+            self.updateScreen()
         
     def OnKeyChar(self, event):
         kc = event.GetKeyCode()
@@ -628,6 +651,8 @@ class MyCtrl(wxControl):
         # FIXME: debug stuff
         elif (chr(kc) == "å"):
             self.loadFile("default.nasp")
+        elif (chr(kc) == "Å"):
+            self.OnSettings()
             
         elif (kc == WXK_SPACE) or (kc > 32) and (kc < 256):
             str = ls[self.line].text
@@ -642,7 +667,7 @@ class MyCtrl(wxControl):
                     ls[self.line].type = cfg.SCENE
 
             self.rewrap()
-            
+
         else:
             print "something other than printable/handled character (%d)" % kc
 
@@ -699,10 +724,15 @@ class MyCtrl(wxControl):
                 dc.DrawRectangle(cfg.offsetX + (self.column + tcfg.indent)
                     * cfg.fontX, y, cfg.fontX, cfg.fontY)
                 
-            savedFont = None
+#             savedFont = None
+#             if l.type == cfg.SCENE:
+#                 savedFont = dc.GetFont()
+#                 dc.SetFont(wxFont(cfg.fontY, wxMODERN, wxNORMAL, wxBOLD))
+
+            savedFont = False
             if l.type == cfg.SCENE:
-                savedFont = dc.GetFont()
-                dc.SetFont(wxFont(cfg.fontY, wxMODERN, wxNORMAL, wxBOLD))
+                savedFont = True
+                dc.SetFont(cfg.sceneFont)
 
             if tcfg.isCaps:
                 text = l.text.upper()
@@ -712,7 +742,7 @@ class MyCtrl(wxControl):
             dc.DrawText(text, cfg.offsetX + tcfg.indent * cfg.fontX, y)
 
             if savedFont:
-                dc.SetFont(savedFont)
+                dc.SetFont(cfg.baseFont)
             
             y += cfg.fontYdelta
             i += 1
@@ -731,6 +761,8 @@ class MyFrame(wxFrame):
         fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
         fileMenu.Append(ID_FILE_SAVE, "&Save\tCTRL-S")
         fileMenu.Append(ID_FILE_SAVE_AS, "Save &As...")
+        fileMenu.AppendSeparator()
+        fileMenu.Append(ID_FILE_SETTINGS, "Se&ttings...")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_EXIT, "E&xit\tCTRL-Q")
 
@@ -761,9 +793,9 @@ class MyFrame(wxFrame):
 
         vsizer.Add(hsizer, 0, wxALL, 5)
         vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND)
-        
+
         hsizer = wxBoxSizer(wxHORIZONTAL)
-        
+
         self.ctrl = MyCtrl(self, -1)
         size = self.GetSize()
         self.ctrl.SetSize(wxSize(size.width, size.height-30))
@@ -789,6 +821,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FILE_OPEN, self.ctrl.OnOpen)
         EVT_MENU(self, ID_FILE_SAVE, self.ctrl.OnSave)
         EVT_MENU(self, ID_FILE_SAVE_AS, self.ctrl.OnSaveAs)
+        EVT_MENU(self, ID_FILE_SETTINGS, self.ctrl.OnSettings)
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
         EVT_MENU(self, ID_REFORMAT, self.ctrl.OnReformat)
 

@@ -84,6 +84,9 @@ offsetX = 10
 # base font from which style-specific fonts are constructed
 baseFont = None
 
+# FIXME: ugly hack, remove
+sceneFont = None
+
 class Type:
     def __init__(self):
         self.linetype = None
