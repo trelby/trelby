@@ -2,6 +2,9 @@ import config
 import misc
 import string
 import util
+
+import os.path
+
 from wxPython.wx import *
 
 # stupid hack to get correct window modality stacking for message box
@@ -24,7 +27,12 @@ class MyListBook(wxListBox):
         for i in range(self.GetCount()):
             self.GetClientData(i).Hide()
 
-        self.GetClientData(self.GetSelection()).Show()
+        panel = self.GetClientData(self.GetSelection())
+
+        if hasattr(panel, "doForcedUpdate"):
+            panel.doForcedUpdate()
+
+        panel.Show()
     
 class CfgDlg(wxDialog):
     def __init__(self, parent, cfg, applyFunc):
@@ -60,6 +68,7 @@ class CfgDlg(wxDialog):
         self.AddPage(MiscPanel, "Misc")
         self.AddPage(PaginationPanel, "Pagination")
         self.AddPage(PaperPanel, "Paper")
+        self.AddPage(PDFPanel, "PDF")
 
         self.listbook.SetSelection(3)
 
@@ -602,6 +611,9 @@ class PaperPanel(wxPanel):
         EVT_TEXT(self, entry.GetId(), self.OnMarginMm)
         EVT_TEXT(self, entry2.GetId(), self.OnMarginInch)
 
+    def doForcedUpdate(self):
+        self.setLines()
+
     def setLines(self):
         self.cfg.recalc()
         self.linesLabel.SetLabel("Lines per page: %d\n"
@@ -889,3 +901,98 @@ class MiscPanel(wxPanel):
     def cfg2gui(self):
         self.autoCapSentences.SetValue(self.cfg.capitalize)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
+
+class PDFPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        panel = wxPanel(self, -1)
+        
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        vsizer.Add(wxStaticText(panel, -1, "PDF viewer application:"), 0,
+                   wxBOTTOM, 5)
+        
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        hsizer.Add(wxStaticText(panel, -1, "Path:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        self.progEntry = wxTextCtrl(panel, -1)
+        hsizer.Add(self.progEntry, 1, wxLEFT, 10)
+
+        btn = wxButton(panel, -1, "Browse")
+        EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
+        hsizer.Add(btn, 0, wxLEFT, 10)
+
+        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM | wxLEFT, 5)
+        
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        hsizer.Add(wxStaticText(panel, -1, "Arguments:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        self.argsEntry = wxTextCtrl(panel, -1)
+        hsizer.Add(self.argsEntry, 1)
+
+        vsizer.Add(hsizer, 0, wxEXPAND | wxLEFT, 5)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        hsizer.Add(wxStaticText(panel, -1, "Font size:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.fontSizeEntry = wxSpinCtrl(panel, -1)
+        self.fontSizeEntry.SetRange(4, 72)
+        EVT_SPINCTRL(self, self.fontSizeEntry.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(self.fontSizeEntry, self.OnKillFocus)
+        hsizer.Add(self.fontSizeEntry, 0)
+
+        vsizer.Add(hsizer, 0, wxTOP, 20)
+
+        self.checkErrorsCb = wxCheckBox(panel, -1,
+            "Check script for errors before print or export")
+        EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
+        vsizer.Add(self.checkErrorsCb, 0, wxTOP, 10)
+
+        panel.SetSizer(vsizer)
+
+        self.cfg2gui()
+        
+        vmsizer = wxBoxSizer(wxVERTICAL)
+        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
+        
+        self.SetSizer(vmsizer)
+
+        EVT_TEXT(self, self.progEntry.GetId(), self.OnMisc)
+        EVT_TEXT(self, self.argsEntry.GetId(), self.OnMisc)
+
+    def OnKillFocus(self, event):
+        self.OnMisc()
+
+        # if we don't call this, the spin entry on wxGTK gets stuck in
+        # some weird state
+        event.Skip()
+        
+    def OnBrowse(self, event):
+        dlg = wxFileDialog(cfgFrame, "Choose program",
+            os.path.dirname(self.cfg.pdfViewerPath), self.cfg.pdfViewerPath,
+            style = wxOPEN)
+
+        if dlg.ShowModal() == wxID_OK:
+            self.progEntry.SetValue(dlg.GetPath())
+
+        dlg.Destroy()
+    
+    def OnMisc(self, event = None):
+        self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
+        self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
+        self.cfg.pdfViewerPath = self.progEntry.GetValue()
+        self.cfg.pdfViewerArgs = self.argsEntry.GetValue().split()
+        
+    def cfg2gui(self):
+        self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
+        self.fontSizeEntry.SetValue(self.cfg.fontSize)
+        self.progEntry.SetValue(self.cfg.pdfViewerPath)
+        self.argsEntry.SetValue(" ".join(self.cfg.pdfViewerArgs))

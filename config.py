@@ -125,6 +125,9 @@ class Config:
         self.marginLeft = 38.1
         self.marginRight = 25.4
 
+        # whether to check script for errors before export / print
+        self.checkOnExport = True
+        
         # whether to auto-capitalize start of sentences
         self.capitalize = True
 

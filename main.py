@@ -1439,14 +1439,15 @@ class MyCtrl(wxControl):
     # the action, e.g. "export" or "print", that'll be done to the script,
     # and is used in dialogue with the user if needed.
     def getExportable(self, action):
-        line, msg = self.findError(0)
+        if cfg.checkOnExport:
+            line, msg = self.findError(0)
 
-        if line != -1:
-            if wxMessageBox("The script seems to contain errors.\n"
-                "Are you sure you want to %s it?" % action, "Confirm",
-                 wxYES_NO | wxNO_DEFAULT, mainFrame) == wxNO:
-                
-                return None
+            if line != -1:
+                if wxMessageBox("The script seems to contain errors.\n"
+                    "Are you sure you want to %s it?" % action, "Confirm",
+                     wxYES_NO | wxNO_DEFAULT, mainFrame) == wxNO:
+
+                    return None
 
         self.paginate()
 
