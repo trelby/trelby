@@ -77,7 +77,7 @@ class License:
         if d != dig:
             raise BlyteError("corrupt data")
 
-        if ord(s[0]) != 1:
+        if ord(s[0]) != 2:
             raise BlyteError("incorrect version")
 
         t = ord(s[1])
@@ -95,7 +95,7 @@ class License:
 
     # -DONT_INCLUDE-: DON'T INCLUDE THIS IN BLYTE
     def toStr(self):
-        s = chr(0x01) + chr(self.type)
+        s = chr(0x02) + chr(self.type)
         td = self.lastDate - datetime.date(2000, 1, 1)
         s += chr((td.days >> 8) & 0xFF) + chr(td.days & 0xFF)
 

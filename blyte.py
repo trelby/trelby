@@ -2,10 +2,6 @@
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
-
-# FIXME: beta stuff
-import betatest
-
 import bugreport
 import cfgdlg
 import charmapdlg
@@ -118,7 +114,14 @@ class GlobalData:
 
         v.addInt("posX", 0, "PositionX", -20, 9999)
         v.addInt("posY", 0, "PositionY", -20, 9999)
-        v.addInt("width", 750, "Width", 500, 9999)
+
+        # linux has bigger font by default so it needs a wider window
+        defaultW = 750
+        if misc.isUnix:
+            defaultW = 800
+
+        v.addInt("width", defaultW, "Width", 500, 9999)
+        
         v.addInt("height", 830, "Height", 300, 9999)
         v.addBool("isDraft", False, "IsDraftMode")
         v.addStr("license", "", "License")
@@ -3132,7 +3135,7 @@ class MyCtrl(wxControl):
             self.mark = None
 
         # debug stuff
-        # FIXME: disable for beta2
+        # FIXME: enable these when --test is on
 #         elif (kc < 256) and (chr(kc) == "å"):
 #             self.loadFile("default.blyte")
 #         elif (kc < 256) and (chr(kc) == "¤"):
@@ -3557,11 +3560,11 @@ class MyFrame(wxFrame):
 
         # this is hidden here because it's somewhat harder to find here
         # than in misc.pyo
-        misc.version = "1.0beta2"
+        misc.version = "1.0"
 
         # slightly obfuscated in a desperate attempt to fool at least some
         # people...
-        misc.releaseDate = datetime.date(500 * 4 + 4, 5 + 6, 14 + 13 + 1)
+        misc.releaseDate = datetime.date(500 * 4 + 4, 5 + 7, 14 + 6 - 1)
 
         misc.license = None
 
@@ -4004,12 +4007,18 @@ class MyApp(wxApp):
                          "x >= 2." % wxVERSION_STRING, "Error", wxOK)
             sys.exit()
 
-        # FIXME: beta stuff
-        betatest.check()
-            
         misc.init()
         util.init()
 
+        # if we're on linux and running a released version, remove all
+        # ~/.oskusoft-tmp/*.pyo files now, we've already loaded them all,
+        # and we don't want them lying around for the user to stumble on.
+        if misc.isUnix and "--test" not in sys.argv:
+            tmpDir = os.environ["HOME"] + "/.oskusoft-tmp"
+            os.chdir(tmpDir)
+            os.system("rm -f *.pyo")
+            os.rmdir(tmpDir)
+            
         gd = GlobalData()
 
         if misc.isWindows:

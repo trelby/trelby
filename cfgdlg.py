@@ -1,6 +1,5 @@
 import config
 import misc
-import string
 import util
 
 import os.path

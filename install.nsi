@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Blyte"
-!define PRODUCT_VERSION "1.0beta2"
+!define PRODUCT_VERSION "1.0"
 !define PRODUCT_PUBLISHER "Oskusoft"
 !define PRODUCT_WEB_SITE "http://www.oskusoft.com"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\blyte.exe"
@@ -105,7 +105,6 @@ Section Uninstall
   Delete "$INSTDIR\wxc.pyd"
   Delete "$INSTDIR\wxmsw24h.dll"
   Delete "$INSTDIR\sample.blyte"
-  Delete "$INSTDIR\default.blyte"
   Delete "$INSTDIR\_socket.pyd"
   Delete "$INSTDIR\_ssl.pyd"
   Delete "$INSTDIR\_winreg.pyd"

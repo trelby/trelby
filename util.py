@@ -578,7 +578,7 @@ class License:
             if d != dig:
                 raise BlyteError("corrupt data")
                           
-            if ord(s[0]) != 1:
+            if ord(s[0]) != 2:
                 raise BlyteError("incorrect version")
 
             t = ord(s[1])

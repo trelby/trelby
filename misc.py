@@ -25,7 +25,7 @@ def init():
     else:
         if isUnix:
             progPath = "/usr/local/blyte"
-            confPath = os.environ.get("HOME", ".blyte")
+            confPath = os.environ["HOME"] + "/.blyte"
         else:
             progPath = r"C:\Program Files\Oskusoft\Blyte"
             confPath = progPath + r"\conf"
