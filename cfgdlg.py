@@ -482,29 +482,33 @@ class PaperPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL)
         self.topEntry = wxTextCtrl(panel, -1)
         gsizer.Add(self.topEntry, 0)
-        gsizer.Add(wxStaticText(panel, -1, "mm"), 0,
-                   wxALIGN_CENTER_VERTICAL)
+        self.topLabel = wxStaticText(panel, -1, "mm")
+        gsizer.Add(self.topLabel, 0,
+            wxALIGN_CENTER_VERTICAL | wxADJUST_MINSIZE)
 
         gsizer.Add(wxStaticText(panel, -1, "Bottom:"), 0,
                    wxALIGN_CENTER_VERTICAL)
         self.bottomEntry = wxTextCtrl(panel, -1)
         gsizer.Add(self.bottomEntry, 0)
-        gsizer.Add(wxStaticText(panel, -1, "mm"), 0,
-                   wxALIGN_CENTER_VERTICAL)
+        self.bottomLabel = wxStaticText(panel, -1, "mm")
+        gsizer.Add(self.bottomLabel, 0,
+            wxALIGN_CENTER_VERTICAL | wxADJUST_MINSIZE)
 
         gsizer.Add(wxStaticText(panel, -1, "Left:"), 0,
                    wxALIGN_CENTER_VERTICAL)
         self.leftEntry = wxTextCtrl(panel, -1)
         gsizer.Add(self.leftEntry, 0)
-        gsizer.Add(wxStaticText(panel, -1, "mm"), 0,
-                   wxALIGN_CENTER_VERTICAL)
+        self.leftLabel = wxStaticText(panel, -1, "mm")
+        gsizer.Add(self.leftLabel, 0,
+            wxALIGN_CENTER_VERTICAL | wxADJUST_MINSIZE)
 
         gsizer.Add(wxStaticText(panel, -1, "Right:"), 0,
                    wxALIGN_CENTER_VERTICAL)
         self.rightEntry = wxTextCtrl(panel, -1)
         gsizer.Add(self.rightEntry, 0)
-        gsizer.Add(wxStaticText(panel, -1, "mm"), 0,
-                   wxALIGN_CENTER_VERTICAL)
+        self.rightLabel = wxStaticText(panel, -1, "mm")
+        gsizer.Add(self.rightLabel, 0,
+            wxALIGN_CENTER_VERTICAL | wxADJUST_MINSIZE)
             
         bsizer.Add(gsizer, 0, wxEXPAND | wxALL, 10)
         
@@ -569,6 +573,8 @@ class PaperPanel(wxPanel):
         self.entry2float(self.rightEntry, "marginRight", 0.0)
         self.entry2float(self.widthEntry, "paperWidth", 100.0)
         self.entry2float(self.heightEntry, "paperHeight", 100.0)
+
+        self.mm2inchAll()
     
     def cfg2gui(self):
         self.topEntry.SetValue(str(self.cfg.marginTop))
@@ -576,6 +582,19 @@ class PaperPanel(wxPanel):
         self.leftEntry.SetValue(str(self.cfg.marginLeft))
         self.rightEntry.SetValue(str(self.cfg.marginRight))
 
+        self.mm2inchAll()
+
+    def mm2inchAll(self):
+        self.mm2inch(self.cfg.marginTop, self.topLabel)
+        self.mm2inch(self.cfg.marginBottom, self.bottomLabel)
+        self.mm2inch(self.cfg.marginLeft, self.leftLabel)
+        self.mm2inch(self.cfg.marginRight, self.rightLabel)
+
+        self.Layout()
+        
+    def mm2inch(self, val, ctrl):
+        ctrl.SetLabel("mm (%.3f inch)" % (val / 25.4))
+        
     def entry2float(self, entry, name, minVal):
         try:
             val = max(minVal, float(entry.GetValue()))
