@@ -2,7 +2,7 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Blyte"
-!define PRODUCT_VERSION "1.0beta1"
+!define PRODUCT_VERSION "1.0beta2"
 !define PRODUCT_PUBLISHER "Oskusoft"
 !define PRODUCT_WEB_SITE "http://www.oskusoft.com"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\blyte.exe"
