@@ -4,12 +4,53 @@ import pdf
 import pml
 import util
 
-# show all all dialogue charts as a PDF document
-def show(mainFrame, ctrl, cfg):
-    tmp = DialogueChart(ctrl, cfg, 0)
-    s = tmp.generate()
+from wxPython.wx import *
 
-    util.showTempPDF(s, cfg, mainFrame)
+# show all all dialogue charts as a PDF document
+def genDialogueChart(mainFrame, ctrl, cfg):
+    inf = []
+    for it in [ ("Characters appearing on a single page", None),
+                ("Sorted by: First appearance", cmpFirst),
+                ("Sorted by: Last appearance", cmpLast),
+                ("Sorted by: Number of appearances", cmpCount),
+                ("Sorted by: Name", cmpName)
+                ]:
+        inf.append(misc.CheckBoxItem(it[0], cdata = it[1]))
+    
+
+    dlg = misc.CheckBoxDlg(mainFrame, "Report type", (300, 160),
+                           inf, "Information to include:", False)
+
+    if dlg.ShowModal() != wxID_OK:
+        dlg.Destroy()
+
+        return
+
+    dlg.Destroy()
+
+    minPages = 1
+    if not inf[0].selected:
+        minPages = 2
+
+    chart = DialogueChart(ctrl, cfg, minPages)
+
+    if not chart.cinfo:
+        wxMessageBox("No characters speaking found.", "Error", wxOK,
+                     mainFrame)
+
+        return
+
+    del inf[0]
+    
+    if len(misc.CheckBoxItem.getClientData(inf)) == 0:
+        wxMessageBox("Can't disable all output.", "Error", wxOK,
+                     mainFrame)
+
+        return
+        
+    data = chart.generate(inf)
+
+    util.showTempPDF(data, cfg, mainFrame)
     
 class DialogueChart:
     def __init__(self, ctrl, cfg, minPages):
@@ -74,7 +115,7 @@ class DialogueChart:
         # character info, list of CharInfo objects
         self.cinfo = []
         for v in tmpMap.values():
-            if v.pageCnt > minPages:
+            if v.pageCnt >= minPages:
                 self.cinfo.append(v)
 
         # start Y of page markers
@@ -128,18 +169,14 @@ class DialogueChart:
         # width of chart
         self.chartWidth = self.cfg.paperHeight - self.chartX - self.margin
 
-    def generate(self):
+    def generate(self, cbil):
         doc = pml.Document(self.cfg.paperHeight, self.cfg.paperWidth,
                            self.cfg.paperType)
 
-        funcs = [ ("First appearance", cmpFirst),
-                  ("Last appearance", cmpLast),
-                  ("Number of appearances", cmpCount),
-                  ("Name", cmpName) ]
-
-        for func in funcs:
-            self.cinfo.sort(func[1])
-            doc.add(self.generatePage(func[0], doc))
+        for it in cbil:
+            if it.selected:
+                self.cinfo.sort(it.cdata)
+                doc.add(self.generatePage(it.text, doc))
         
         return pdf.generate(doc)
 

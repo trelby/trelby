@@ -1608,7 +1608,7 @@ class MyCtrl(wxControl):
         
     def OnDialogueChart(self):
         self.paginate()
-        dialoguechart.show(mainFrame, self, cfg)
+        dialoguechart.genDialogueChart(mainFrame, self, cfg)
 
     def OnCharacterReport(self):
         self.paginate()
