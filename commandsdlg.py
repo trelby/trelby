@@ -2,8 +2,8 @@ from wxPython.wx import *
 from wxPython.html import *
 
 class CommandsDlg(wxDialog):
-    def __init__(self, parent):
-        wxDialog.__init__(self, parent, -1, "Commands",
+    def __init__(self):
+        wxDialog.__init__(self, None, -1, "Commands",
                           size = (650, 600),
                           style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 
@@ -36,8 +36,8 @@ Delete                 Delete current character / selected text
 
 ENTER                  Insert new element
 
-TAB                    Change element to next style
-SHIFT + TAB            Change element to previous style
+TAB                    Change element's style or insert new element
+SHIFT + TAB            Change element's style
 
 SHIFT/CTRL + ENTER     Insert forced linebreak
 
@@ -57,7 +57,7 @@ R                      Replace
 
 Up/Down/Page up/       Move selection
  Page down            
-Enter                  Complete selection, start new element
+Enter/Tab              Complete selection, start new element
 End                    Complete selection
 ESCAPE                 Abort auto-completion
 

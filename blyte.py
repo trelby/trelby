@@ -2773,7 +2773,7 @@ class MyCtrl(wxControl):
         elif kc == WXK_ESCAPE:
             self.mark = None
 
-        # FIXME: debug stuff
+        # debug stuff
 #         elif (kc < 256) and (chr(kc) == "å"):
 #             self.loadFile("default.blyte")
 #         elif (kc < 256) and (chr(kc) == "Å"):
@@ -3151,8 +3151,11 @@ class MyFrame(wxFrame):
 
         # this is hidden here because it's somewhat harder to find here
         # than in misc.pyo
-        misc.version = "0.95"
-        misc.releaseDate = datetime.date(2004, 10, 11)
+        misc.version = "1.0beta1"
+
+        # slightly obfuscated in a desperate attempt to fool at least some
+        # people...
+        misc.releaseDate = datetime.date(500 * 4 + 4, 5 + 5, 12 + 11)
 
         misc.license = None
 
@@ -3500,7 +3503,7 @@ class MyFrame(wxFrame):
         self.panel.ctrl.OnCompareScripts()
 
     def OnHelpCommands(self, event):
-        dlg = commandsdlg.CommandsDlg(self)
+        dlg = commandsdlg.CommandsDlg()
         dlg.Show()
 
     def OnHelpManual(self, event):

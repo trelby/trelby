@@ -52,7 +52,7 @@ class MyListBook(wxListBox):
     
 class CfgDlg(wxDialog):
     def __init__(self, parent, cfg, applyFunc):
-        wxDialog.__init__(self, parent, -1, "Config dialog",
+        wxDialog.__init__(self, parent, -1, "Settings dialog",
                           style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
         self.cfg = cfg
         self.applyFunc = applyFunc
