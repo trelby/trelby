@@ -84,9 +84,9 @@ def refreshGuiConfig():
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.
 class Mark:
-    def __init__(self, line, col):
+    def __init__(self, line, column):
         self.line = line
-        self.col = col
+        self.column = column
     
 class Screenplay:
     def __init__(self):
@@ -1127,24 +1127,81 @@ class MyCtrl(wxControl):
     # returns pair (start, end) of marked lines, inclusive. if mark is
     # after the end of the script (text has been deleted since setting
     # it), returns a valid pair (by truncating selection to current
-    # end). returns (-1, -1) if no lines marked.
+    # end). returns None if no lines marked.
     def getMarkedLines(self):
-        if self.mark:
-            mark = min(len(self.sp.lines) - 1, self.mark.line)
-            if self.line < mark:
-                return (self.line, mark)
-            else:
-                return (mark, self.line)
-        else:
-            return (-1, -1)
+        if not self.mark:
+            return (None, None)
+        
+        mark = min(len(self.sp.lines) - 1, self.mark.line)
 
-    # checks if a line is marked. marked is the pair of the type
-    # returned by the above function.
-    def isLineMarked(self, line, marked):
-        if (line >= marked[0]) and (line <= marked[1]):
-            return True
+        if self.line < mark:
+            return (self.line, mark)
         else:
-            return False
+            return (mark, self.line)
+
+    # returns pair (start, end) (inclusive) of marked columns for the
+    # given line (line must be inside the marked lines). 'marked' is the
+    # value returned from getMarkedLines. if marked column is invalid
+    # (text has been deleted since setting the mark), returns a valid pair
+    # by truncating selection as needed. returns None on errors.
+    def getMarkedColumns(self, line, marked):
+        if not self.mark:
+            return None
+
+        # line is not marked at all
+        if (line < marked[0]) or (line > marked[1]):
+            return None
+
+        ls = self.sp.lines
+
+        # last valid offset for given line's text
+        lvo = max(0, len(ls[line].text) - 1)
+        
+        # only one line marked
+        if (line == marked[0]) and (marked[0] == marked[1]):
+            c1 = min(self.mark.column, self.column)
+            c2 = max(self.mark.column, self.column)
+
+        # line is between end lines, so totally marked
+        elif (line > marked[0]) and (line < marked[1]):
+            c1 = 0
+            c2 = lvo
+
+        # line is first line marked
+        elif line == marked[0]:
+
+            if line == self.line:
+                c1 = self.column
+
+            else:
+                c1 = self.mark.column
+
+            c2 = lvo
+
+        # line is last line marked
+        elif line == marked[1]:
+
+            if line == self.line:
+                c2 = self.column
+
+            else:
+                c2 = self.mark.column
+
+            c1 = 0
+
+        # should't happen
+        else:
+            return None
+
+        c1 = util.clamp(c1, 0, lvo)
+        c2 = util.clamp(c2, 0, lvo)
+
+        return (c1, c2)
+        
+    # checks if a line is marked. 'marked' is the value returned from
+    # getMarkedLines.
+    def isLineMarked(self, line, marked):
+        return (line >= marked[0]) and (line <= marked[1])
         
     # returns true if there are no contents at all and we're not
     # attached to any file
@@ -1595,7 +1652,7 @@ class MyCtrl(wxControl):
                             len(self.sp.lines[self.line].text))
 
         if mark and not self.mark:
-            self.mark = Mark(self.line, -42)
+            self.mark = Mark(self.line, self.column)
             
         self.updateScreen()
 
@@ -2001,10 +2058,10 @@ class MyCtrl(wxControl):
     def OnSelectScene(self):
         l1, l2 = self.getSceneIndexes()
         
-        self.mark = Mark(l1, -42)
+        self.mark = Mark(l1, 0)
 
         self.line = l2
-        self.column = 0
+        self.column = len(self.sp.lines[l2].text)
 
         self.makeLineVisible(self.line)
         self.updateScreen()
@@ -2204,7 +2261,7 @@ class MyCtrl(wxControl):
 
         elif ev.ControlDown():
             if kc == WXK_SPACE:
-                self.mark = Mark(self.line, -42)
+                self.mark = Mark(self.line, self.column)
                 
             elif kc == WXK_HOME:
                 self.line = 0
@@ -2451,9 +2508,14 @@ class MyCtrl(wxControl):
                     util.drawLine(dc, nx - 1, y + cfg.fontYdelta, nw + 2, 0)
 
             if self.mark and self.isLineMarked(i, marked):
+                c1, c2 = self.getMarkedColumns(i, marked)
+                
                 dc.SetPen(cfgGui.selectedPen)
                 dc.SetBrush(cfgGui.selectedBrush)
-                dc.DrawRectangle(0, y, size.width, cfg.fontYdelta)
+
+                dc.DrawRectangle(cfg.offsetX + (tcfg.indent + c1) *
+                    cfgGui.fontX, y, (c2 - c1 + 1) * cfgGui.fontX,
+                    cfg.fontYdelta)
 
             if mainFrame.showFormatting:
                 dc.SetPen(cfgGui.bluePen)
@@ -2484,7 +2546,8 @@ class MyCtrl(wxControl):
 
             if cfg.pbi in (config.PBI_REAL, config.PBI_REAL_AND_UNADJ):
                 thisPage = self.line2page(i)
-                if  thisPage != self.line2page(i + 1):
+
+                if thisPage != self.line2page(i + 1):
                     dc.SetPen(cfgGui.pagebreakPen)
                     util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
                         size.width, 0)
