@@ -1,17 +1,18 @@
-The screenplay is represented as a series of lines. Lines are
-separated by a single byte 0xA. Each non-empty line has two bytes at
-the beginning that signal the type of linebreak at the end of that
-line and the general type of the line. Empty lines are ignored.
+The screenplay is represented as a series of lines. Lines are separated by
+a single byte 0x0A. Empty lines is a line that contains nothing but the
+byte 0x0A. Each non-empty line has two bytes at the beginning that signal
+the type of linebreak at the end of that line and the general type of the
+line. Empty lines are ignored.
 
 Linebreak types:
 
 '>' - Automatic linebreak, and a space between this line and the next
-that's missing now since there's a linebreak. Used for normal breaks
-where the program broke the line between words.
+that's missing now since there's a linebreak. Used for normal breaks where
+the program broke the line between words.
 
-'&' - Automatic linebreak, with nothing missing between this line and
-the next. Used for breaks where the program broke the line in the
-middle of a word.
+'&' - Automatic linebreak, with nothing missing between this line and the
+next. Used for breaks where the program broke the line in the middle of a
+word.
 
 '|' - Forced linebreak. Used when the user has inserted a forced line
 break.
