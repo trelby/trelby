@@ -5,6 +5,7 @@ from error import *
 import config
 from cfgdlg import CfgDlg
 from commandsdlg import CommandsDlg
+import finddlg
 import misc
 import splash
 import util
@@ -42,6 +43,7 @@ ID_EDIT_PASTE = 11
 ID_HELP_COMMANDS = 12
 ID_HELP_ABOUT = 13
 ID_FILE_EXPORT = 14
+ID_EDIT_FIND = 15
 
 def refreshGuiConfig():
     global cfgGui
@@ -759,6 +761,11 @@ class MyCtrl(wxControl):
             self.mark = -1
             self.makeLineVisible(self.line)
             self.updateScreen()
+
+    def OnFind(self):
+        dlg = finddlg.FindDlg(mainFrame)
+        dlg.ShowModal()
+        dlg.Destroy()
         
     def OnSave(self):
         if self.checkEval():
@@ -773,7 +780,7 @@ class MyCtrl(wxControl):
         if self.checkEval():
             return
         
-        dlg = wxFileDialog(self, "Filename to save as",
+        dlg = wxFileDialog(mainFrame, "Filename to save as",
                            wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
                            style = wxSAVE | wxOVERWRITE_PROMPT)
         if dlg.ShowModal() == wxID_OK:
@@ -782,7 +789,7 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnExport(self):
-        dlg = wxFileDialog(self, "Filename to export as",
+        dlg = wxFileDialog(mainFrame, "Filename to export as",
                            wildcard = "Text files (*.txt)|*.txt|All files|*",
                            style = wxSAVE | wxOVERWRITE_PROMPT)
         if dlg.ShowModal() == wxID_OK:
@@ -791,7 +798,7 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnSettings(self):
-        dlg = CfgDlg(self, copy.deepcopy(cfg), self.applyCfg)
+        dlg = CfgDlg(mainFrame, copy.deepcopy(cfg), self.applyCfg)
         if dlg.ShowModal() == wxID_OK:
             self.applyCfg(dlg.cfg)
 
@@ -1190,6 +1197,8 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_CUT, "Cu&t\tCTRL-X")
         editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
         editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
+        editMenu.AppendSeparator()
+        editMenu.Append(ID_EDIT_FIND, "&Find && Replace\tCTRL-F")
         
         formatMenu = wxMenu()
         formatMenu.Append(ID_REFORMAT, "&Reformat all")
@@ -1250,6 +1259,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
+        EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
@@ -1349,6 +1359,9 @@ class MyFrame(wxFrame):
 
     def OnPaste(self, event):
         self.panel.ctrl.OnPaste()
+
+    def OnFind(self, event):
+        self.panel.ctrl.OnFind()
 
     def OnReformat(self, event):
         self.panel.ctrl.OnReformat()
