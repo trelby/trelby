@@ -39,7 +39,7 @@ ID_FILE_OPEN = 0
 ID_FILE_SAVE = 1
 ID_FILE_SAVE_AS = 2
 ID_FILE_EXIT = 3
-ID_FORMAT_REFORMAT = 4
+ID_SCRIPT_REFORMAT = 4
 ID_FILE_NEW = 5
 ID_FILE_SETTINGS = 6
 ID_FILE_CLOSE = 7
@@ -52,9 +52,9 @@ ID_HELP_ABOUT = 13
 ID_FILE_EXPORT = 14
 ID_EDIT_FIND = 15
 ID_EDIT_SELECT_SCENE = 16
-ID_EDIT_FIND_ERROR = 17
+ID_SCRIPT_FIND_ERROR = 17
 ID_EDIT_SHOW_FORMATTING = 18
-ID_FORMAT_PAGINATE = 19
+ID_SCRIPT_PAGINATE = 19
 ID_TOOLS_NAME_DB = 20
 ID_REPORTS_DIALOGUE_CHART = 21
 ID_TOOLS_CHARMAP = 22
@@ -2216,13 +2216,13 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene\tCTRL-A")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace\tCTRL-F")
-        editMenu.Append(ID_EDIT_FIND_ERROR, "Find next &error\tCTRL-E")
         editMenu.AppendSeparator()
         editMenu.AppendCheckItem(ID_EDIT_SHOW_FORMATTING, "S&how formatting")
         
-        formatMenu = wxMenu()
-        formatMenu.Append(ID_FORMAT_REFORMAT, "&Reformat all")
-        formatMenu.Append(ID_FORMAT_PAGINATE, "&Paginate")
+        scriptMenu = wxMenu()
+        scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error\tCTRL-E")
+        scriptMenu.Append(ID_SCRIPT_REFORMAT, "&Reformat all")
+        scriptMenu.Append(ID_SCRIPT_PAGINATE, "&Paginate")
 
         reportsMenu = wxMenu()
         reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart")
@@ -2239,7 +2239,7 @@ class MyFrame(wxFrame):
         self.menuBar = wxMenuBar()
         self.menuBar.Append(fileMenu, "&File")
         self.menuBar.Append(editMenu, "&Edit")
-        self.menuBar.Append(formatMenu, "F&ormat")
+        self.menuBar.Append(scriptMenu, "Scr&ipt")
         self.menuBar.Append(reportsMenu, "&Reports")
         self.menuBar.Append(toolsMenu, "Too&ls")
         self.menuBar.Append(helpMenu, "&Help")
@@ -2297,11 +2297,11 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
-        EVT_MENU(self, ID_EDIT_FIND_ERROR, self.OnFindError)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_EDIT_SHOW_FORMATTING, self.OnShowFormatting)
-        EVT_MENU(self, ID_FORMAT_REFORMAT, self.OnReformat)
-        EVT_MENU(self, ID_FORMAT_PAGINATE, self.OnPaginate)
+        EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindError)
+        EVT_MENU(self, ID_SCRIPT_REFORMAT, self.OnReformat)
+        EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnDialogueChart)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharMap)
