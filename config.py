@@ -158,6 +158,12 @@ class Config:
             self.pdfViewerPath = "not set yet (unknown platform %s)"\
                                  % wxPlatform
             self.pdfViewerArgs = []
+
+        # whether to draw rectangle showing margins
+        self.pdfShowMargins = False
+
+        # whether to show line numbers next to each line
+        self.pdfShowLineNumbers = False
         
         # construct reverse lookup tables
         for k, v in _text2lb.items():

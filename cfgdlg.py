@@ -956,6 +956,15 @@ class PDFPanel(wxPanel):
         EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
         vsizer.Add(self.checkErrorsCb, 0, wxTOP, 10)
 
+        self.marginsCb = wxCheckBox(panel, -1,
+            "Show margins (debug)")
+        EVT_CHECKBOX(self, self.marginsCb.GetId(), self.OnMisc)
+        vsizer.Add(self.marginsCb, 0, wxTOP, 10)
+
+        self.lineNumbersCb = wxCheckBox(panel, -1, "Show line numbers (debug)")
+        EVT_CHECKBOX(self, self.lineNumbersCb.GetId(), self.OnMisc)
+        vsizer.Add(self.lineNumbersCb, 0, wxTOP, 5)
+
         panel.SetSizer(vsizer)
 
         self.cfg2gui()
@@ -986,13 +995,17 @@ class PDFPanel(wxPanel):
         dlg.Destroy()
     
     def OnMisc(self, event = None):
-        self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
-        self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
         self.cfg.pdfViewerPath = self.progEntry.GetValue()
         self.cfg.pdfViewerArgs = self.argsEntry.GetValue().split()
+        self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
+        self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
+        self.cfg.pdfShowMargins = self.marginsCb.GetValue()
+        self.cfg.pdfShowLineNumbers = self.lineNumbersCb.GetValue()
         
     def cfg2gui(self):
-        self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
-        self.fontSizeEntry.SetValue(self.cfg.fontSize)
         self.progEntry.SetValue(self.cfg.pdfViewerPath)
         self.argsEntry.SetValue(" ".join(self.cfg.pdfViewerArgs))
+        self.fontSizeEntry.SetValue(self.cfg.fontSize)
+        self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
+        self.marginsCb.SetValue(self.cfg.pdfShowMargins)
+        self.lineNumbersCb.SetValue(self.cfg.pdfShowLineNumbers)

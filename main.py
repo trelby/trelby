@@ -471,12 +471,10 @@ class MyCtrl(wxControl):
                     cfg.marginLeft + tcfg.indent * ch_x,
                     cfg.marginTop + y * ch_y, fs, typ))
 
-                # FIXME: either remove or make an option
-
-                # show line numbers next to each line
-                #pg.add(pml.TextOp("%02d:" % y,
-                #    cfg.marginLeft - 3 * ch_x,
-                #    cfg.marginTop + y * ch_y, fs))
+                if cfg.pdfShowLineNumbers:
+                    pg.add(pml.TextOp("%02d" % (y + 1),
+                        cfg.marginLeft - 3 * ch_x,
+                        cfg.marginTop + y * ch_y, fs))
 
                 y += 1
 
@@ -518,15 +516,14 @@ class MyCtrl(wxControl):
 
                     pg.add(pml.LineOp(p, 10))
 
-            # FIXME: either remove or make an option
+            if cfg.pdfShowMargins:
+                lx = cfg.marginLeft
+                rx = cfg.paperWidth - cfg.marginRight
+                uy = cfg.marginTop
+                dy = cfg.paperHeight - cfg.marginBottom
 
-            #lx = cfg.marginLeft
-            #rx = cfg.paperWidth - cfg.marginRight
-            #uy = cfg.marginTop
-            #dy = cfg.paperHeight - cfg.marginBottom
-
-            #pg.add(pml.LineOp([(lx, uy), (rx, uy), (rx, dy), (lx, dy)],
-            #                  0, True))
+                pg.add(pml.LineOp([(lx, uy), (rx, uy), (rx, dy), (lx, dy)],
+                                  0, True))
 
             doc.add(pg)
 
@@ -1242,20 +1239,27 @@ class MyCtrl(wxControl):
         lastBreak = -1
 
         # fast aliases for stuff
-        lp = cfg.linesOnPage
         lbl = config.LB_LAST
         ct = cfg.types
         
         i = 0
         while 1:
+            lp = cfg.linesOnPage
+
+            if i != 0:
+                # decrease by 2 for every page but the first to account
+                # for the page number
+                lp -= 2
+
+                # decrease by 1 if we have to put a "WHOEVER (cont'd)" on
+                # top of this page.
+                if self.needsMore(i - 1):
+                    lp -= 1
+
+            # just a safeguard
+            lp = max(5, lp)
+
             pageLines = 0
-
-            # FIXME: need to adjust lp here if we have to put a "FOO (cont'd)"
-            # on top of the page.
-
-            # FIXME: decrease lp by 2 for every page but the first to
-            # account for the page number
-            
             if i < length:
                 pageLines = 1
                 
