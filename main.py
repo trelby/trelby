@@ -1417,13 +1417,15 @@ class MyCtrl(wxControl):
             self.loadFile(self.fileName)
             self.updateScreen()
 
-    def OnCut(self, doUpdate = True):
+    def OnCut(self, doUpdate = True, copyToClip = True):
         if self.mark != -1:
             marked = self.getMarkedLines()
 
             ls = self.sp.lines
+
+            if copyToClip:
+                mainFrame.clipboard = ls[marked[0] : marked[1] + 1]
             
-            mainFrame.clipboard = ls[marked[0] : marked[1] + 1]
             del ls[marked[0] : marked[1] + 1]
             
             if len(ls) == 0:
@@ -1619,7 +1621,7 @@ class MyCtrl(wxControl):
 
                 self.rewrapPara()
             else:
-                self.OnCut(False)
+                self.OnCut(False, False)
 
         elif ev.ControlDown():
             if kc == WXK_SPACE:

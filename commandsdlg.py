@@ -31,7 +31,7 @@ Page up / Page down    Move one page up/down
 CTRL + Home/End        Move to start/end of script
 
 Backspace              Delete previous character
-Delete                 Delete current character
+Delete                 Delete current character / selected text
 
 ENTER                  Insert new element
 
@@ -74,7 +74,7 @@ Alt + N                Change element to note
 CTRL + O               Open file
 CTRL + S               Save file
 
-CTRL + X / Delete      Cut
+CTRL + X               Cut
 CTRL + C               Copy
 CTRL + V               Paste
 
