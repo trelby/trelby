@@ -349,6 +349,9 @@ class Config:
         # leave at least this many dialogue lines on the end of a page
         v.addInt("pbDialogueLines", 2, "PageBreakDialogueLines", 1, 30)
 
+        # whether scene continueds are enabled
+        v.addBool("sceneContinueds", True, "SceneContinueds")
+        
         # whether to check script for errors before export / print
         v.addBool("checkOnExport", True, "CheckScriptForErrors")
         

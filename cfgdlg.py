@@ -810,13 +810,18 @@ class PaginationPanel(wxPanel):
         self.addSpin("dialogue", "Dialogue", self, gsizer, "pbDialogueLines")
 
         vsizer.Add(gsizer, 0, wxLEFT, 10)
+
+        self.sceneContinuedsCb = wxCheckBox(self, -1,
+            "Include scene continueds")
+        EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
+        vsizer.Add(self.sceneContinuedsCb, 0, wxTOP, 20)
         
         gsizer = wxFlexGridSizer(1, 2, 5, 0)
         
         self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
                      " (0 = disable)", self, gsizer, "paginateInterval")
 
-        vsizer.Add(gsizer, 0, wxTOP, 20)
+        vsizer.Add(gsizer, 0, wxTOP, 10)
 
         self.cfg2gui()
         
@@ -844,6 +849,7 @@ class PaginationPanel(wxPanel):
     def OnMisc(self, event = None):
         self.cfg.pbActionLines = util.getSpinValue(self.actionEntry)
         self.cfg.pbDialogueLines = util.getSpinValue(self.dialogueEntry)
+        self.cfg.sceneContinueds = self.sceneContinuedsCb.GetValue()
         self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
         
     def cfg2gui(self):
@@ -855,6 +861,7 @@ class PaginationPanel(wxPanel):
         
         self.actionEntry.SetValue(self.cfg.pbActionLines)
         self.dialogueEntry.SetValue(self.cfg.pbDialogueLines)
+        self.sceneContinuedsCb.SetValue(self.cfg.sceneContinueds)
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
 
 class MiscPanel(wxPanel):

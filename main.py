@@ -526,8 +526,13 @@ class MyCtrl(wxControl):
         
         # used in several places, so keep around
         charIndent = cfg.getType(config.CHARACTER).indent
+        sceneIndent = cfg.getType(config.SCENE).indent
 
+        # current scene number
         scene = 0
+
+        # number of CONTINUED:'s lines added for current scene
+        sceneContNr = 0
         
         for p in range(1, len(self.pages)):
             start = self.pages[p - 1] + 1
@@ -543,12 +548,31 @@ class MyCtrl(wxControl):
                 sp.headers.generatePML(pg, str(p), cfg)
                 y += sp.headers.getNrOfLines() * 10
 
+                if cfg.sceneContinueds and not self.isFirstLineOfScene(start):
+                    s = "CONTINUED:"
+                    if sceneContNr != 0:
+                        s += " (%d)" % (sceneContNr + 1)
+
+                    pg.add(pml.TextOp(s,
+                        cfg.marginLeft + sceneIndent * ch_x,
+                        cfg.marginTop + (y / 10.0) * ch_y, fs))
+
+                    sceneContNr += 1
+                    
+                    if cfg.pdfShowSceneNumbers:
+                        self.addSceneNumbers(pg, "%d" % scene,
+                            cfg.getType(config.SCENE).width, y, ch_x, ch_y,
+                                             fs)
+
+                    y += 20
+
                 if self.needsMore(start - 1):
                     pg.add(pml.TextOp(self.getPrevSpeaker(start) + " (cont'd)",
                         cfg.marginLeft + charIndent * ch_x,
                         cfg.marginTop + (y / 10.0) * ch_y, fs))
 
                     y += 10
+
 
             for i in range(start, end + 1):
                 line = ls[i]
@@ -577,12 +601,9 @@ class MyCtrl(wxControl):
                 if (tcfg.lt == config.SCENE) and cfg.pdfShowSceneNumbers and\
                    self.isFirstLineOfElem(i):
                     scene += 1
-                    pg.add(pml.TextOp("%d" % scene,
-                        cfg.marginLeft - 6 * ch_x,
-                        cfg.marginTop + (y / 10.0) * ch_y, fs))
-                    pg.add(pml.TextOp("%d" % scene,
-                        cfg.marginLeft + (tcfg.width + 1) * ch_x,
-                        cfg.marginTop + (y / 10.0) * ch_y, fs))
+                    sceneContNr = 0
+                    self.addSceneNumbers(pg, "%d" % scene, tcfg.width, y,
+                        ch_x, ch_y, fs)
                     
                 if cfg.pdfShowLineNumbers:
                     pg.add(pml.TextOp("%02d" % (i - start + 1),
@@ -596,6 +617,15 @@ class MyCtrl(wxControl):
                         cfg.marginLeft + charIndent * ch_x,
                         cfg.marginTop + (y / 10.0) * ch_y, fs))
 
+                y += 10
+
+            if cfg.sceneContinueds and not self.isLastLineOfScene(end):
+                pg.add(pml.TextOp("(CONTINUED)",
+                        cfg.marginLeft + 45 * ch_x,
+                        cfg.marginTop + (y / 10.0 + 1.0) * ch_y, fs))
+
+                y += 10
+            
             if misc.isEval:
                 self.addDemoStamp(pg)
 
@@ -612,6 +642,13 @@ class MyCtrl(wxControl):
 
         return pdf.generate(doc)
 
+    def addSceneNumbers(self, pg, s, width, y, ch_x, ch_y, fs):
+        pg.add(pml.TextOp(s, cfg.marginLeft - 6 * ch_x,
+             cfg.marginTop + (y / 10.0) * ch_y, fs))
+        pg.add(pml.TextOp(s,
+            cfg.marginLeft + (width + 1) * ch_x,
+            cfg.marginTop + (y / 10.0) * ch_y, fs))
+        
     # add demo stamp to given pml.Page object. this modifies line join
     # parameters, so should only be called when the page is otherwise
     # ready.
@@ -983,12 +1020,15 @@ class MyCtrl(wxControl):
         return line
 
     def isFirstLineOfElem(self, line):
+        # TODO: can be done faster by custom code
         return self.getElemFirstIndexFromLine(line) == line
 
     def isLastLineOfElem(self, line):
+        # TODO: can be done faster by custom code
         return self.getElemLastIndexFromLine(line) == line
 
     def isOnlyLineOfElem(self, line):
+        # TODO: can be done faster by custom code
         return self.isLastLineOfElem(line) and self.isFirstLineOfElem(line)
         
     def getElemIndexes(self):
@@ -1000,6 +1040,36 @@ class MyCtrl(wxControl):
 
     def getSceneIndexes(self):
         return self.getSceneIndexesFromLine(self.line)
+
+    def isFirstLineOfScene(self, line):
+        if line == 0:
+            return True
+
+        ls = self.sp.lines
+
+        if ls[line].lt != config.SCENE:
+            return False
+
+        l = ls[line - 1]
+        
+        if (l.lt != config.SCENE) or (l.lb == config.LB_LAST):
+            return True
+        else:
+            return False
+
+    def isLastLineOfScene(self, line):
+        ls = self.sp.lines
+
+        if line == (len(ls) - 1):
+            return True
+
+        if ls[line].lb != config.LB_LAST:
+            return False
+        
+        if ls[line + 1].lt == config.SCENE:
+            return True
+        else:
+            return False
 
     def getTypeOfPrevElem(self, line):
         line = self.getElemFirstIndexFromLine(line)
@@ -1550,6 +1620,11 @@ class MyCtrl(wxControl):
 
             if i != 0:
                 lp -= hdrLines * 10
+
+                # decrease by 2 if we have to put a "CONTINUED:" on top of
+                # this page.
+                if cfg.sceneContinueds and not self.isFirstLineOfScene(i):
+                    lp -= 20
 
                 # decrease by 1 if we have to put a "WHOEVER (cont'd)" on
                 # top of this page.
