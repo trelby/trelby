@@ -856,6 +856,20 @@ class MiscPanel(wxPanel):
         
         vsizer = wxBoxSizer(wxVERTICAL)
 
+        vsizer.Add(wxStaticText(panel, -1, "Default script directory:"), 0,
+                   wxBOTTOM, 5)
+        
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        self.scriptDirEntry = wxTextCtrl(panel, -1)
+        hsizer.Add(self.scriptDirEntry, 1, wxLEFT, 10)
+
+        btn = wxButton(panel, -1, "Browse")
+        EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
+        hsizer.Add(btn, 0, wxLEFT, 10)
+
+        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 10)
+
         self.autoCapSentences = wxCheckBox(panel, -1,
                                            "Auto-capitalize sentences")
         EVT_CHECKBOX(self, self.autoCapSentences.GetId(), self.OnMisc)
@@ -883,7 +897,9 @@ class MiscPanel(wxPanel):
         self.SetSizer(vmsizer)
 
         self.cfg2gui()
-        
+
+        EVT_TEXT(self, self.scriptDirEntry.GetId(), self.OnMisc)
+
     def OnKillFocus(self, event):
         self.OnMisc()
 
@@ -892,10 +908,20 @@ class MiscPanel(wxPanel):
         event.Skip()
 
     def OnMisc(self, event = None):
+        self.cfg.scriptDir = self.scriptDirEntry.GetValue().rstrip("/\\")
         self.cfg.capitalize = self.autoCapSentences.GetValue()
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
+
+    def OnBrowse(self, event):
+        dlg = wxDirDialog(cfgFrame, defaultPath = self.cfg.scriptDir)
+
+        if dlg.ShowModal() == wxID_OK:
+            self.scriptDirEntry.SetValue(dlg.GetPath())
+
+        dlg.Destroy()
             
     def cfg2gui(self):
+        self.scriptDirEntry.SetValue(self.cfg.scriptDir)
         self.autoCapSentences.SetValue(self.cfg.capitalize)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
 

@@ -1517,8 +1517,16 @@ class MyCtrl(wxControl):
     def applyCfg(self, newCfg):
         global cfg
         
+        oldCfg = cfg
+
         cfg = copy.deepcopy(newCfg)
         config.currentCfg = cfg
+
+        # if user has ventured from the old default directory, keep it as
+        # the current one, otherwise set the new default as current.
+        if misc.scriptDir == oldCfg.scriptDir:
+            misc.scriptDir = cfg.scriptDir
+        
         cfg.recalc()
         refreshGuiConfig()
 
