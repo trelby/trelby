@@ -389,10 +389,9 @@ class MyCtrl(wxControl):
             end = self.pages[p]
 
             if doPages and (p != 1):
-                output += "\n%70s%d.\n\n" % (" ", p)
-
-                if self.needsMore(start - 1):
-                    output += " " * charIndent + "OSKU (cont'd)\n"
+                s = "%s %d. " % ("-" * 30, p)
+                s += "-" * (60 - len(s))
+                output += "\n%s\n\n" % s
 
             for i in range(start, end + 1):
                 line = ls[i]
@@ -407,9 +406,6 @@ class MyCtrl(wxControl):
                     output += sp.getEmptyLinesBefore(i) * "\n"
 
                 output += " " * tcfg.indent + text + "\n"
-
-            if doPages and self.needsMore(i):
-                output += " " * charIndent + "(MORE)\n"
 
         return str(output)
 
@@ -445,7 +441,7 @@ class MyCtrl(wxControl):
                 y += 2
 
                 if self.needsMore(start - 1):
-                    pg.add(pml.TextOp("OSKU (cont'd)",
+                    pg.add(pml.TextOp(self.getPrevSpeaker(start) + " (cont'd)",
                         cfg.marginLeft + charIndent * ch_x,
                         cfg.marginTop + y * ch_y, fs))
 
@@ -484,7 +480,7 @@ class MyCtrl(wxControl):
 
                 y += 1
 
-            if self.needsMore(i):
+            if self.needsMore(end):
                 pg.add(pml.TextOp("(MORE)",
                         cfg.marginLeft + charIndent * ch_x,
                         cfg.marginTop + y * ch_y, fs))
@@ -1213,30 +1209,28 @@ class MyCtrl(wxControl):
         else:
             return False
 
-    # returns total number of lines, not counting empty ones at the end,
-    # on the given page. assumes that pagination is up-to-date.
-    def linesOnPage(self, page):
+    # starting at line, go backwards until a line with type of CHARACTER
+    # and lb of LAST is found, and return that line's text, possibly
+    # upper-cased if CHARACTER's config for export says so.
+    def getPrevSpeaker(self, line):
+        ls = self.sp.lines
 
-        # not supposed to be called with invalid page argument, but you
-        # never know...
-        if (page < 1) or (page >= (len(self.pages) - 1)):
-            return 1
-        
-        start = self.pages[page - 1] + 1
-        end = self.pages[page]
+        while 1:
+            if line < 0:
+                return "UNKNOWN"
 
-        lines = 1
-        for i in range(start + 1, end + 1):
-            lines += self.sp.getEmptyLinesBefore(i) + 1
+            ln = ls[line]
+            
+            if (ln.type == config.CHARACTER) and (ln.lb == config.LB_LAST):
+                s = ln.text
+                
+                if cfg.getType(config.CHARACTER).export.isCaps:
+                    s = util.upper(s)
+                
+                return s
 
-        if self.needsMore(start - 1):
-            lines += 1
+            line -= 1
 
-        if self.needsMore(end):
-            lines += 1
-
-        return lines
-        
     def paginate(self):
         #t = time.time()
         
@@ -1256,15 +1250,12 @@ class MyCtrl(wxControl):
         while 1:
             pageLines = 0
 
-            # FIXME: need to adjust lp here if we have to put a (cont'd)
-            # on top of the page. problem is it can take n lines if the
-            # character's name is long, and the (cont'd) itself can change
-            # the number of lines needed...
+            # FIXME: need to adjust lp here if we have to put a "FOO (cont'd)"
+            # on top of the page.
 
             # FIXME: decrease lp by 2 for every page but the first to
             # account for the page number
             
-            #print "starting page %d at %d" % (len(self.pages), i)
             if i < length:
                 pageLines = 1
                 
@@ -2041,13 +2032,6 @@ class MyCtrl(wxControl):
                     dc.SetPen(cfgGui.pagebreakPen)
                     util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
                         size.width, 0)
-
-                    # FIXME: take these out once done debugging
-                    dc.DrawText("%d" % self.linesOnPage(thisPage),
-                                size.width - 100, y + cfg.fontYdelta / 2)
-                    if self.needsMore(i):
-                        dc.DrawText("(MORE)", size.width - 50,
-                                    y + cfg.fontYdelta / 2)
 
             if i == self.line:
                 cursorY = y
