@@ -336,8 +336,8 @@ class Config:
         # how many lines to scroll per mouse wheel event
         v.addInt("mouseWheelLines", 4, "MouseWheelLines", 1, 50)
 
-        # interval in seconds between automatic pagination (0 = disabled)
-        v.addInt("paginateInterval", 10, "PaginateInterval", 5, 60)
+        # interval in seconds between automatic pagination (4 = disabled)
+        v.addInt("paginateInterval", 10, "PaginateInterval", 4, 60)
 
         # paper size
         v.addFloat("paperHeight", 297.0, "Paper/Height", 100.0, 1000.0)
@@ -537,6 +537,9 @@ class ConfigGui:
         self.pagebreakNoAdjustPen = wxPen(self.pagebreakNoAdjustColor,
                                           style = wxDOT)
 
+        # FIXME: create fonts only once and make them accessible without
+        # types
+        
         dc = wxMemoryDC()
         for t in cfg.types.values():
             tg = TypeGui()

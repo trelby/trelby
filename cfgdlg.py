@@ -820,7 +820,7 @@ class PaginationPanel(wxPanel):
         gsizer = wxFlexGridSizer(1, 2, 5, 0)
         
         self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
-                     " (0 = disable)", self, gsizer, "paginateInterval")
+                     " (4 = disable)", self, gsizer, "paginateInterval")
 
         vsizer.Add(gsizer, 0, wxTOP, 10)
 

@@ -2870,7 +2870,7 @@ class MyCtrl(wxControl):
             self.fillAutoComp()
 
         if doUpdate:
-            if cfg.paginateInterval > 0:
+            if cfg.paginateInterval > 4:
                 now = time.time()
                 if (now - self.lastPaginated) >= cfg.paginateInterval:
                     self.paginate()
