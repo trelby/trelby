@@ -175,6 +175,18 @@ def reverseComboSelect(combo, clientData):
 
     return False
 
+# set widget's client size. if w or h is -1, that dimension is not changed.
+def setWH(ctrl, w = -1, h = -1):
+    size = ctrl.GetClientSize()
+
+    if w != -1:
+        size.width = w
+
+    if h != -1:
+        size.height = h
+        
+    ctrl.SetClientSizeWH(size.width, size.height)
+
 # wxMSW doesn't respect the control's min/max values at all, so we have to
 # implement this ourselves
 def getSpinValue(spinCtrl):

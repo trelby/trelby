@@ -180,10 +180,10 @@ class FindDlg(wxDialog):
 
         if flag:
             self.moreButton.SetLabel("<<< Less")
-            self.SetClientSizeWH(self.GetClientSize().width, 260)
+            util.setWH(self, h = 260)
         else:
             self.moreButton.SetLabel("More >>>")
-            self.SetClientSizeWH(self.GetClientSize().width, 130)
+            util.setWH(self, h = 130)
             
     def getParams(self):
         self.dirUp = self.direction.GetSelection() == 0
