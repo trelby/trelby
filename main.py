@@ -38,13 +38,20 @@ def clamp(val, min, max):
         return max
     else:
         return val
-    
+
 class Line:
     def __init__(self, lb = cfg.LB_LAST, type = cfg.ACTION, text = ""):
         self.lb = lb
         self.type = type
         self.text = text
 
+    def __eq__(self, other):
+        return (self.lb == other.lb) and (self.type == other.type) and \
+               (self.text == other.text)
+    
+    def __ne__(self, other):
+        return not self == other
+        
     def __str__(self):
         return cfg.lb2text(self.lb) + cfg.linetype2text(self.type) + self.text
 
@@ -52,6 +59,19 @@ class Screenplay:
     def __init__(self):
         self.lines = []
 
+    def __eq__(self, other):
+        if len(self.lines) != len(other.lines):
+            return False
+
+        for i in range(len(self.lines)):
+            if self.lines[i] != other.lines[i]:
+                return False
+
+        return True
+    
+    def __ne__(self, other):
+        return not self == other
+    
     def getEmptyLinesBefore(self, i):
         if i == 0:
             return 0
@@ -96,7 +116,7 @@ class MyCtrl(wxControl):
 
         self.createEmptySp()
         self.updateScreen(redraw = False)
-        
+
     def loadFile(self, fileName):
         try:
             try:
@@ -137,13 +157,13 @@ class MyCtrl(wxControl):
             self.column = 0
             self.topLine = 0
             self.setFile(fileName)
+            self.makeBackup()
 
             return True
 
         except NaspError, e:
-            dlg = wxMessageDialog(self, "Error loading file: %s" % e, "Error",
-                                  wxOK)
-            dlg.ShowModal()
+            wxMessageBox("Error loading file: %s" % e, "Error",
+                         wxOK, self)
 
             return False
 
@@ -163,24 +183,27 @@ class MyCtrl(wxControl):
                     f.close()
                     
                 self.setFile(fileName)
+                self.makeBackup()
                 
             except IOError, (errno, strerror):
                 raise MiscError("IOError: %s" % strerror)
                 
         except NaspError, e:
-            dlg = wxMessageDialog(self, "Error saving file: %s" % e, "Error",
-                                  wxOK)
-            dlg.ShowModal()
+            wxMessageBox("Error saving file: %s" % e, "Error",
+                         wxOK, self)
 
+    def makeBackup(self):
+        self.backup = copy.deepcopy(self.sp)
+        
     def setFile(self, fileName):
         self.fileName = fileName
         if fileName:
-            t = os.path.basename(fileName)
+            self.fileNameDisplay = os.path.basename(fileName)
         else:
-            t = "<new>"
+            self.fileNameDisplay = "<new>"
             
-        mainFrame.setTabText(self.panel, t)
-        mainFrame.SetTitle("Nasp - %s" % t)
+        mainFrame.setTabText(self.panel, self.fileNameDisplay)
+        mainFrame.setTitle(self.fileNameDisplay)
             
     def updateTypeCb(self):
         if "typeCbRevMap" not in self.__dict__:
@@ -436,25 +459,37 @@ class MyCtrl(wxControl):
 
         return w1 == w2
 
+    # returns true if there are no contents at all and we're not
+    # attached to any file
     def isUntouched(self):
         if self.fileName or (len(self.sp.lines) > 1) or \
            (len(self.sp.lines[0].text) > 0):
             return False
         else:
             return True
+
+    # returns True if the current contents differ from the version
+    # supposedly on the disk (content at last load/save time), or if
+    # this is totally new modified content and doesn't have disk
+    # backing yet
+    def isModified(self):
+        return self.sp != self.backup
         
-    def updateScreen(self, redraw = True, setFull = False):
-        mainFrame.statusBar.SetStatusText("Page: %3d / %3d" %
-            (self.line / 55 + 1, len(self.sp.lines)/55 + 1), 0)
-                                                           
-        self.updateTypeCb()
+    def updateScreen(self, redraw = True, setCommon = True):
         self.adjustScrollBar()
-        if setFull:
-            self.setFile(self.fileName)
+        
+        if setCommon:
+            self.updateCommon()
             
         if redraw:
             self.Refresh(False)
 
+    # update GUI elements shared by all scripts, like statusbar etc
+    def updateCommon(self):
+        self.updateTypeCb()
+        mainFrame.statusBar.SetStatusText("Page: %3d / %3d" %
+            (self.line / 55 + 1, len(self.sp.lines)/55 + 1), 0)
+                                                           
     def OnEraseBackground(self, event):
         pass
         
@@ -493,9 +528,22 @@ class MyCtrl(wxControl):
         self.column = 0
         self.topLine = 0
         self.setFile(None)
-        
+        self.makeBackup()
+
+    def canBeClosed(self):
+        if self.isModified():
+            if wxMessageBox("The script has been modified. Are you sure\n"
+                            "you want to discard the changes?", "Confirm",
+                            wxYES_NO | wxNO_DEFAULT, self) == wxNO:
+                return False
+
+        return True
+
     def OnRevert(self, event):
         if self.fileName:
+            if not self.canBeClosed():
+                return
+        
             self.loadFile(self.fileName)
             self.updateScreen()
             
@@ -512,9 +560,12 @@ class MyCtrl(wxControl):
         if dlg.ShowModal() == wxID_OK:
             self.saveFile(dlg.GetPath())
 
+        dlg.Destroy()
+
     def OnSettings(self, event = None):
         dlg = CfgDlg(self, copy.deepcopy(cfg._types))
         dlg.ShowModal()
+        dlg.Destroy()
         
         fd = wxFontData()
         fd.SetInitialFont(cfg.baseFont)
@@ -530,6 +581,8 @@ class MyCtrl(wxControl):
             cfg.sceneFont.SetWeight(wxBOLD)
             
             self.updateScreen()
+
+        dlg.Destroy()
         
     def OnKeyChar(self, event):
         kc = event.GetKeyCode()
@@ -839,6 +892,8 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
 
+        EVT_CLOSE(self, self.OnCloseWindow)
+        
         self.Layout()
         
     def init(self):
@@ -851,35 +906,53 @@ class MyFrame(wxFrame):
 
         return newPanel
 
+    def setTitle(self, text):
+        self.SetTitle("Nasp - %s" % text)
+
     def setTabText(self, panel, text):
+        i = self.findPage(panel)
+        if i != -1:
+            self.notebook.SetPageText(i, text)
+    
+    def findPage(self, panel):
         for i in range(self.notebook.GetPageCount()):
             p = self.notebook.GetPage(i)
             if p == panel:
-                self.notebook.SetPageText(i, text)
+                return i
 
-                return
-        
+        return -1
+
+    def isModifications(self):
+        for i in range(self.notebook.GetPageCount()):
+            p = self.notebook.GetPage(i)
+            if p.ctrl.isModified():
+                return True
+
+        return False
+            
     def OnPageChange(self, event):
         newPage = event.GetSelection()
         self.panel = self.notebook.GetPage(newPage)
         self.panel.ctrl.SetFocus()
-        self.panel.ctrl.updateScreen(setFull = True)
+        self.panel.ctrl.updateCommon()
+        self.setTitle(self.panel.ctrl.fileNameDisplay)
         
     def OnNew(self, event = None):
         self.panel = self.createNewPanel()
 
     def OnOpen(self, event):
-        oldPage = self.notebook.GetSelection()
         dlg = wxFileDialog(self, "File to open",
                            wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
                            style = wxOPEN)
         if dlg.ShowModal() == wxID_OK:
-            self.panel = self.createNewPanel()
-            if self.panel.ctrl.loadFile(dlg.GetPath()):
-                if self.notebook.GetPage(oldPage).ctrl.isUntouched():
-                    self.notebook.DeletePage(oldPage)
-            else:
-                self.OnClose()
+            if not self.notebook.GetPage(self.findPage(self.panel))\
+                   .ctrl.isUntouched():
+                self.panel = self.createNewPanel()
+
+            self.panel.ctrl.loadFile(dlg.GetPath())
+            self.panel.ctrl.updateScreen()
+
+        dlg.Destroy()
 
     def OnSave(self, event):
         self.panel.ctrl.OnSave(event)
@@ -888,9 +961,14 @@ class MyFrame(wxFrame):
         self.panel.ctrl.OnSaveAs(event)
 
     def OnClose(self, event = None):
-        self.notebook.DeletePage(self.notebook.GetSelection())
-        if self.notebook.GetPageCount() == 0:
-            self.OnNew()
+        if not self.panel.ctrl.canBeClosed():
+            return
+        
+        if self.notebook.GetPageCount() > 1:
+            self.notebook.DeletePage(self.findPage(self.panel))
+        else:
+            self.panel.ctrl.createEmptySp()
+            self.panel.ctrl.updateScreen()
 
     def OnRevert(self, event):
         self.panel.ctrl.OnRevert(event)
@@ -905,10 +983,20 @@ class MyFrame(wxFrame):
         self.panel.ctrl.OnReformat(event)
 
     def OnCloseWindow(self, event):
-        self.Destroy()
+        doExit = True
+        if event.CanVeto() and self.isModifications():
+            if wxMessageBox("You have unsaved changes. Are\n"
+                            "you sure you want to exit?", "Confirm",
+                            wxYES_NO | wxNO_DEFAULT, self) == wxNO:
+                doExit = False
+
+        if doExit:
+            self.Destroy()
+        else:
+            event.Veto()
 
     def OnExit(self, event):
-        self.Close(True)
+        self.Close(False)
         
     def OnSize(self, event):
         event.Skip()

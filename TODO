@@ -2,8 +2,6 @@
 
 -cut, copy, paste (internal)
 
--file changed warnings for close file,exit
-
 -"are you sure you want to open multiple copies of the same file?"
 
 -mouse scroll wheel support

@@ -12,3 +12,10 @@ cursor position correct if wrapping begins somewhere other than on the
 current line.
 
 -----
+
+if a script gets opened into a new tab, the scrollbar is not displayed
+correctly at first. looks like a wxwindows/wxpython problem to me.
+
+-----
+
+
