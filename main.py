@@ -433,7 +433,7 @@ class MyCtrl(wxControl):
 
         output += "#Header-Empty-Lines %d\n" % self.sp.headers.emptyLinesAfter
         
-        for i in range(0, len(ls)):
+        for i in range(len(ls)):
             output += util.toUTF8(str(ls[i]) + "\n")
 
         if util.writeToFile(fileName, str(output), mainFrame):
@@ -1090,7 +1090,7 @@ class MyCtrl(wxControl):
         matches = {}
         last = None
 
-        for i in range(0, len(ls)):
+        for i in range(len(ls)):
             if (ls[i].lt == lt) and (ls[i].lb == config.LB_LAST):
                 upstr = util.upper(ls[i].text)
                 

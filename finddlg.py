@@ -72,7 +72,7 @@ class FindDlg(wxDialog):
             self.elements.Append(t.name)
             self.elementTypes.append(t.lt)
 
-        for i in range(0, self.elements.GetCount()):
+        for i in range(self.elements.GetCount()):
             self.elements.Check(i, True)
             
         vsizer.Add(self.elements, 1, wxEXPAND)
@@ -192,7 +192,7 @@ class FindDlg(wxDialog):
 
         if self.useExtra:
             self.elementMap = {}
-            for i in range(0, self.elements.GetCount()):
+            for i in range(self.elements.GetCount()):
                 self.elementMap[self.elementTypes[i]] = \
                     self.elements.IsChecked(i)
             
