@@ -13,6 +13,7 @@ import headers
 import headersdlg
 import misc
 import myimport
+import mypickle
 import namesdlg
 import pdf
 import pml
@@ -2648,10 +2649,6 @@ class MyCtrl(wxControl):
             self.autoComp = None
         elif doAutoComp == AC_REDO:
             self.fillAutoComp()
-        elif doAutoComp == AC_KEEP:
-            pass
-        else:
-            print "unknown value of doAutoComp: %s" % doAutoComp
 
         if doUpdate:
             self.makeLineVisible(self.line)
@@ -2875,6 +2872,26 @@ class MyFrame(wxFrame):
         self.clipboard = None
         self.showFormatting = False
 
+        v = self.cvars = mypickle.Vars()
+
+        v.addInt("posX", 0, "PositionX", -20, 9999)
+        v.addInt("posY", 0, "PositionY", -20, 9999)
+        v.addInt("width", 700, "Width", 500, 9999)
+        v.addInt("height", 830, "Height", 300, 9999)
+
+        v.makeDicts()
+        
+        self.cvars.setDefaults(self)
+
+        self.SetSizeHints(v.getMin("width"), v.getMin("height"))
+        
+        s = self.loadConfigFile("state", self)
+        if s:
+            self.cvars.load(self.cvars.makeVals(s), "", self)
+
+        self.MoveXY(self.posX, self.posY)
+        self.SetSize(wxSize(self.width, self.height))
+        
         util.removeTempFiles(misc.tmpPrefix)
 
         self.mySetIcons()
@@ -2945,6 +2962,7 @@ class MyFrame(wxFrame):
         self.menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(self.menuBar)
 
+        EVT_MOVE(self, self.OnMove)
         EVT_SIZE(self, self.OnSize)
 
         vsizer = wxBoxSizer(wxVERTICAL)
@@ -3308,6 +3326,7 @@ class MyFrame(wxFrame):
                 doExit = False
 
         if doExit:
+            self.writeConfigFile("state", self.cvars.save("", self))
             util.removeTempFiles(misc.tmpPrefix)
             self.Destroy()
             myApp.ExitMainLoop()
@@ -3317,7 +3336,12 @@ class MyFrame(wxFrame):
     def OnExit(self, event):
         self.Close(False)
         
+    def OnMove(self, event):
+        self.posX, self.posY = self.GetPositionTuple()
+        event.Skip()
+
     def OnSize(self, event):
+        self.width, self.height = self.GetSizeTuple()
         event.Skip()
 
 class MyApp(wxApp):
