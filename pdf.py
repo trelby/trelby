@@ -201,7 +201,7 @@ class PDFExporter:
                             "/Encoding /WinAnsiEncoding\n"
                             ">>" % fi.name)
 
-        xrefPos = self.data.getPos()
+        xrefPos = len(self.data)
 
         self.data += "xref\n0 %d\n" % (self.objectCnt)
         self.data += str(self.xref) + "\n"
@@ -240,7 +240,7 @@ class PDFExporter:
     # add a reference to the xref table, using generation 'gen' and type
     # 'typ'.
     def addXref(self, gen = 0, typ = "n"):
-        self.xref += "%010d %05d %s \n" % (self.data.getPos(), gen, typ)
+        self.xref += "%010d %05d %s \n" % (len(self.data), gen, typ)
 
     # get font number to use for given flags.
     def getFontNr(self, flags):

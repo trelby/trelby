@@ -327,7 +327,7 @@ class MyKeyEvent:
 # for large strings, since it keeps each appended string as an item in a
 # list.
 class String:
-    def __init__(self):
+    def __init__(self, s = None):
 
         # byte count of data appended
         self.pos = 0
@@ -335,7 +335,10 @@ class String:
         # list of strings
         self.data = []
 
-    def getPos(self):
+        if s:
+            self += s
+            
+    def __len__(self):
         return self.pos
 
     def __str__(self):
