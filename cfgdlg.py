@@ -57,6 +57,7 @@ class CfgDlg(wxDialog):
         self.AddPage(ColorsPanel, "Colors")
         self.AddPage(ElementsPanel, "Elements")
         self.AddPage(FontPanel, "Font")
+        self.AddPage(MiscPanel, "Misc")
         self.AddPage(PaginationPanel, "Pagination")
         self.AddPage(PaperPanel, "Paper")
 
@@ -814,3 +815,69 @@ class PaginationPanel(wxPanel):
         self.actionEntry.SetValue(self.cfg.pbActionLines)
         self.dialogueEntry.SetValue(self.cfg.pbDialogueLines)
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
+
+class MiscPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        #-auto-capitalize sentences
+        #-lines to scroll for one mouse wheel event
+        #-page break indicators: none, normal, normal + unadjusted
+
+        panel = wxPanel(self, -1)
+        
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        self.autoCapSentences = wxCheckBox(panel, -1,
+                                           "Auto-capitalize sentences")
+        EVT_CHECKBOX(self, self.autoCapSentences.GetId(), self.OnMisc)
+        vsizer.Add(self.autoCapSentences, 0, wxBOTTOM, 5)
+            
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        hsizer.Add(wxStaticText(panel, -1,
+            "Lines to scroll per mouse wheel event:"), 0,
+            wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        self.wheelScrollEntry = wxSpinCtrl(panel, -1)
+        self.wheelScrollEntry.SetRange(1, 50)
+        EVT_SPINCTRL(self, self.wheelScrollEntry.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(self.wheelScrollEntry, self.OnKillFocus)
+        hsizer.Add(self.wheelScrollEntry)
+        
+        vsizer.Add(hsizer, 0, wxBOTTOM, 10)
+        
+        self.pbRb = wxRadioBox(panel, -1, "Page break lines to show",
+            style = wxRA_SPECIFY_COLS, majorDimension = 1,
+            choices = [ "None", "Normal", "Normal + unadjusted   " ])
+        vsizer.Add(self.pbRb)
+
+        panel.SetSizer(vsizer)
+
+        vmsizer = wxBoxSizer(wxVERTICAL)
+        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
+        
+        self.SetSizer(vmsizer)
+
+        EVT_RADIOBOX(self, self.pbRb.GetId(), self.OnMisc)
+
+        self.cfg2gui()
+        
+    def OnKillFocus(self, event):
+        self.OnMisc()
+
+        # if we don't call this, the spin entry on wxGTK gets stuck in
+        # some weird state
+        event.Skip()
+
+    def OnMisc(self, event = None):
+        self.cfg.capitalize = self.autoCapSentences.GetValue()
+        self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
+        self.cfg.pbi = self.pbRb.GetSelection()
+            
+    def cfg2gui(self):
+        self.autoCapSentences.SetValue(self.cfg.capitalize)
+
+        self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
+        self.pbRb.SetSelection(self.cfg.pbi)
