@@ -87,6 +87,16 @@ class Config:
         self.offsetY = 10
         self.offsetX = 10
 
+        # paper size
+        self.paperType = "A4"
+        self.paperWidth = 210.0
+        self.paperHeight = 297.0
+
+        # margins
+        self.marginTop = 10.0
+        self.marginBottom = 10.0
+        self.marginLeft = 10.0
+        self.marginRight = 10.0
         
         # construct reverse lookup tables
         for k, v in _text2lb.items():

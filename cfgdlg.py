@@ -10,6 +10,8 @@ class CfgDlg(wxDialog):
                           style = wxDEFAULT_DIALOG_STYLE)
         self.cfg = cfg
         self.applyFunc = applyFunc
+
+        self.Center()
         
         vsizer = wxBoxSizer(wxVERTICAL)
         self.SetSizer(vsizer)
@@ -22,6 +24,9 @@ class CfgDlg(wxDialog):
 
         p = ElementsPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Elements")
+
+        p = PaperPanel(self.notebook, -1, cfg)
+        self.notebook.AddPage(p, "Paper")
 
         p = ColorsPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Colors")
@@ -347,7 +352,6 @@ class ColorsPanel(wxPanel):
         cd = wxColourData()
         cd.SetColour(getattr(self.cfg, self.color))
         dlg = wxColourDialog(self, cd)
-        #dlg.GetColourData().SetChooseFull(True)
         if dlg.ShowModal() == wxID_OK:
             setattr(self.cfg, self.color,
                     dlg.GetColourData().GetColour().Get())
@@ -358,4 +362,162 @@ class ColorsPanel(wxPanel):
     def cfg2gui(self):
         self.sampleBtn.SetBackgroundColour(getattr(self.cfg, self.color))
         self.sampleBtn.Refresh()
+        
+class PaperPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        self.paperSizes = {
+            "A4" : (210.0, 297.0),
+            "Letter" : (215.9, 279.4),
+            "Custom" : (1.0, 1.0)
+            }
+        
+        panel = wxPanel(self, -1)
+        
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        gsizer = wxFlexGridSizer(3, 2, 5, 5)
+
+        gsizer.Add(wxStaticText(panel, -1, "Type:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.paperCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+
+        for k, v in self.paperSizes.items():
+            self.paperCombo.Append(k, v)
+
+        gsizer.Add(self.paperCombo)
+
+        gsizer.Add(wxStaticText(panel, -1, "Width:"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        self.widthEntry = wxTextCtrl(panel, -1)
+        hsizer.Add(self.widthEntry)
+        hsizer.Add(wxStaticText(panel, -1, "mm"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxLEFT, 5)
+        gsizer.Add(hsizer)
+
+        gsizer.Add(wxStaticText(panel, -1, "Height:"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        self.heightEntry = wxTextCtrl(panel, -1)
+        hsizer.Add(self.heightEntry)
+        hsizer.Add(wxStaticText(panel, -1, "mm"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxLEFT, 5)
+        gsizer.Add(hsizer)
+
+        vsizer.Add(gsizer, 0, wxBOTTOM, 10)
+        
+        bsizer = wxStaticBoxSizer(wxStaticBox(panel, -1, "Margins"),
+                                  wxHORIZONTAL)
+
+        gsizer = wxFlexGridSizer(4, 3, 5, 5)
+
+        gsizer.Add(wxStaticText(panel, -1, "Top:"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+        self.topEntry = wxTextCtrl(panel, -1)
+        gsizer.Add(self.topEntry, 0)
+        gsizer.Add(wxStaticText(panel, -1, "mm"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+
+        gsizer.Add(wxStaticText(panel, -1, "Bottom:"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+        self.bottomEntry = wxTextCtrl(panel, -1)
+        gsizer.Add(self.bottomEntry, 0)
+        gsizer.Add(wxStaticText(panel, -1, "mm"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+
+        gsizer.Add(wxStaticText(panel, -1, "Left:"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+        self.leftEntry = wxTextCtrl(panel, -1)
+        gsizer.Add(self.leftEntry, 0)
+        gsizer.Add(wxStaticText(panel, -1, "mm"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+
+        gsizer.Add(wxStaticText(panel, -1, "Right:"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+        self.rightEntry = wxTextCtrl(panel, -1)
+        gsizer.Add(self.rightEntry, 0)
+        gsizer.Add(wxStaticText(panel, -1, "mm"), 0,
+                   wxALIGN_CENTER_VERTICAL)
+            
+        bsizer.Add(gsizer, 0, wxEXPAND | wxALL, 10)
+        
+        vsizer.Add(bsizer, 0, wxBOTTOM, 10)
+
+        vsizer.Add(wxStaticText(panel, -1, "(1 inch = 25.4 mm)"), 0,
+                   wxLEFT, 25)
+
+        panel.SetSizer(vsizer)
+
+        vmsizer = wxBoxSizer(wxVERTICAL)
+        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
+        
+        self.SetSizer(vmsizer)
+
+        self.blockEvents = True
+        
+        idx = self.paperCombo.FindString(self.cfg.paperType)
+        if idx != -1:
+            self.paperCombo.SetSelection(idx)
+        
+        EVT_COMBOBOX(self, self.paperCombo.GetId(), self.OnPaperCombo)
+        self.OnPaperCombo(None)
+
+        EVT_TEXT(self, self.widthEntry.GetId(), self.OnMisc)
+        EVT_TEXT(self, self.heightEntry.GetId(), self.OnMisc)
+        
+        self.cfg2gui()
+        
+        EVT_TEXT(self, self.topEntry.GetId(), self.OnMisc)
+        EVT_TEXT(self, self.bottomEntry.GetId(), self.OnMisc)
+        EVT_TEXT(self, self.leftEntry.GetId(), self.OnMisc)
+        EVT_TEXT(self, self.rightEntry.GetId(), self.OnMisc)
+
+        self.blockEvents = False
+        
+    def OnPaperCombo(self, event):
+        w, h = self.paperCombo.GetClientData(self.paperCombo.GetSelection())
+
+        type = self.paperCombo.GetStringSelection()
+        self.cfg.paperType = type
+        
+        if type == "Custom":
+            self.widthEntry.Enable(True)
+            self.heightEntry.Enable(True)
+            w = self.cfg.paperWidth
+            h = self.cfg.paperHeight
+        else:
+            self.widthEntry.Disable()
+            self.heightEntry.Disable()
+        
+        self.widthEntry.SetValue(str(w))
+        self.heightEntry.SetValue(str(h))
+                         
+    def OnMisc(self, event):
+        if self.blockEvents:
+            return
+
+        self.entry2float(self.topEntry, "marginTop", 0.0)
+        self.entry2float(self.bottomEntry, "marginBottom", 0.0)
+        self.entry2float(self.leftEntry, "marginLeft", 0.0)
+        self.entry2float(self.rightEntry, "marginRight", 0.0)
+        self.entry2float(self.widthEntry, "paperWidth", 100.0)
+        self.entry2float(self.heightEntry, "paperHeight", 100.0)
+    
+    def cfg2gui(self):
+        self.topEntry.SetValue(str(self.cfg.marginTop))
+        self.bottomEntry.SetValue(str(self.cfg.marginBottom))
+        self.leftEntry.SetValue(str(self.cfg.marginLeft))
+        self.rightEntry.SetValue(str(self.cfg.marginRight))
+
+    def entry2float(self, entry, name, minVal):
+        try:
+            val = max(minVal, float(entry.GetValue()))
+        except ValueError:
+            val = minVal
+
+        setattr(self.cfg, name, val)
         
