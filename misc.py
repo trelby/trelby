@@ -1,9 +1,11 @@
 import util
 
+import sys
+
 from wxPython.wx import *
 
 def init():
-    global isWindows, isUnix
+    global isWindows, isUnix, progPath
     
     isWindows = False
     isUnix = False
@@ -12,6 +14,14 @@ def init():
         isWindows = True
     else:
         isUnix = True
+
+    if "--test" in sys.argv:
+        progPath = "."
+    else:
+        if isUnix:
+            progPath = "/usr/local/blyte"
+        else:
+            progPath = r"C:\Program Files\Oskusoft\Blyte"
 
 class MyColorSample(wxWindow):
     def __init__(self, parent, id, size):

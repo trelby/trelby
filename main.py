@@ -25,6 +25,7 @@ import util
 import codecs
 import copy
 import difflib
+import os
 import os.path
 import re
 import signal
@@ -2683,7 +2684,7 @@ class MyFrame(wxFrame):
         # here than in misc.pyo
         misc.isEval = False
         misc.licensedTo = "Evaluation copy."
-        misc.version = "0.71"
+        misc.version = "0.8"
 
         hsizer.Add(self.typeCb)
 
@@ -3003,6 +3004,8 @@ class MyApp(wxApp):
 
         misc.init()
         util.init()
+
+        os.chdir(misc.progPath)
         
         cfg = config.Config()
         config.currentCfg = cfg
@@ -3017,7 +3020,7 @@ class MyApp(wxApp):
         
         self.SetTopWindow(mainFrame)
 
-        if "--no-splash" not in sys.argv:
+        if "--test" not in sys.argv:
             win = splash.SplashWindow(mainFrame, 5000)
             win.Show()
             win.Raise()
