@@ -21,8 +21,16 @@ _text2lb = {
     '.' : LB_LAST
     }
 
-# reverse to above, filled in _init
-_lb2text = { }
+# reverse to above
+_lb2text = {}
+
+# what string each linebreak type should be mapped to.
+_lb2str = {
+    LB_AUTO_SPACE : " ",
+    LB_AUTO_NONE : "",
+    LB_FORCED : "\n",
+    LB_LAST : "\n"
+    }
 
 # line types
 SCENE = 1
@@ -46,8 +54,8 @@ _text2lt = {
     '%' : NOTE
     }
 
-# reverse to above, filled in init
-_lt2text = { }
+# reverse to above
+_lt2text = {}
 
 # page break indicators
 PBI_NONE = 0
@@ -56,6 +64,16 @@ PBI_REAL_AND_UNADJ = 2
 
 # current config.
 currentCfg = None
+
+
+# construct reverse lookup tables
+
+for k, v in _text2lb.items():
+    _lb2text[v] = k
+
+for k, v in _text2lt.items():
+    _lt2text[v] = k
+
 
 class TextType:
     def __init__(self):
@@ -196,13 +214,6 @@ class Config:
         # whether to show line numbers next to each line
         self.pdfShowLineNumbers = False
         
-        # construct reverse lookup tables
-        for k, v in _text2lb.items():
-            _lb2text[v] = k
-
-        for k, v in _text2lt.items():
-            _lt2text[v] = k
-
         # element types
         t = Type()
         t.lt = SCENE
@@ -483,6 +494,9 @@ def text2lb(str, raiseException = True):
 
 def lb2text(lb):
     return _conv(_lb2text, lb)
+
+def lb2str(lb):
+    return _conv(_lb2str, lb)
 
 def text2lt(str, raiseException = True):
     return _conv(_text2lt, str, raiseException)

@@ -44,6 +44,7 @@ KC_CTRL_P = 16
 KC_CTRL_V = 22
 
 ID_EDIT_COPY,\
+ID_EDIT_COPY_TO_CB,\
 ID_EDIT_CUT,\
 ID_EDIT_DELETE_ELEMENTS,\
 ID_EDIT_FIND,\
@@ -74,7 +75,7 @@ ID_SCRIPT_TITLES,\
 ID_TOOLS_CHARMAP,\
 ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
-= range(31)
+= range(32)
 
 def refreshGuiConfig():
     global cfgGui
@@ -2054,6 +2055,31 @@ class MyCtrl(wxControl):
     def OnCopy(self):
         self.OnCut(doDelete = False)
 
+    def OnCopyCb(self):
+        cd = self.getSelected(False)
+
+        if not cd:
+            return
+
+        tmpSp = Screenplay()
+        tmpSp.lines = cd.lines
+
+        if misc.isEval:
+            tmpSp.replace()
+
+        s = util.String()
+        for ln in tmpSp.lines:
+            s += ln.text + config.lb2str(ln.lb)
+            
+        if wxTheClipboard.Open():
+            wxTheClipboard.UsePrimarySelection(True)
+            
+            wxTheClipboard.Clear()
+            wxTheClipboard.AddData(wxTextDataObject(str(s)))
+            wxTheClipboard.Flush()
+                
+            wxTheClipboard.Close()
+
     def OnPaste(self):
         # FIXME: make this work again
         
@@ -2822,6 +2848,8 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_CUT, "Cu&t\tCTRL-X")
         editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
         editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
+        editMenu.AppendSeparator()
+        editMenu.Append(ID_EDIT_COPY_TO_CB, "C&opy to clipboard")
         editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste from clipboard")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene\tCTRL-A")
@@ -2919,6 +2947,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
+        EVT_MENU(self, ID_EDIT_COPY_TO_CB, self.OnCopyCb)
         EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteCb)
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
@@ -3099,6 +3128,9 @@ class MyFrame(wxFrame):
 
     def OnCopy(self, event):
         self.panel.ctrl.OnCopy()
+
+    def OnCopyCb(self, event):
+        self.panel.ctrl.OnCopyCb()
 
     def OnPaste(self, event):
         self.panel.ctrl.OnPaste()
