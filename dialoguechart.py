@@ -100,7 +100,7 @@ class MyDiagChart(wxWindow):
             
             if (line.type == config.CHARACTER) and\
                    (line.lb == config.LB_LAST):
-                name = line.text.upper()
+                name = util.upper(line.text)
                 self.characters[name] = None
                 
             elif line.type in (config.DIALOGUE, config.PAREN):

@@ -8,6 +8,55 @@ VALIGN_TOP    = 1
 VALIGN_CENTER = 2
 VALIGN_BOTTOM = 3
 
+# mappings from lowercase to uppercase letters for different charsets
+_iso_8859_1_map = {
+    97 : 65, 98 : 66, 99 : 67, 100 : 68, 101 : 69,
+    102 : 70, 103 : 71, 104 : 72, 105 : 73, 106 : 74,
+    107 : 75, 108 : 76, 109 : 77, 110 : 78, 111 : 79,
+    112 : 80, 113 : 81, 114 : 82, 115 : 83, 116 : 84,
+    117 : 85, 118 : 86, 119 : 87, 120 : 88, 121 : 89,
+    122 : 90, 224 : 192, 225 : 193, 226 : 194, 227 : 195,
+    228 : 196, 229 : 197, 230 : 198, 231 : 199, 232 : 200,
+    233 : 201, 234 : 202, 235 : 203, 236 : 204, 237 : 205,
+    238 : 206, 239 : 207, 240 : 208, 241 : 209, 242 : 210,
+    243 : 211, 244 : 212, 245 : 213, 246 : 214, 248 : 216,
+    249 : 217, 250 : 218, 251 : 219, 252 : 220, 253 : 221,
+    254 : 222
+    }
+
+# current mappings, 256 chars long.
+_to_upper = ""
+_to_lower = ""
+
+# we only support ISO-8859-1 for now, so this doesn't take any parameters
+def setCharset():
+    global _to_upper, _to_lower
+
+    _to_upper = ""
+    _to_lower = ""
+    tmpUpper = []
+    tmpLower = []
+
+    for i in range(256):
+        tmpUpper.append(i)
+        tmpLower.append(i)
+
+    for k, v in _iso_8859_1_map.iteritems():
+        tmpUpper[k] = v
+        tmpLower[v] = k
+
+    for i in range(256):
+        _to_upper += chr(tmpUpper[i])
+        _to_lower += chr(tmpLower[i])
+
+# like string.upper/lower, but we do our own charset-handling that doesn't
+# need locales etc
+def upper(s):
+    return s.translate(_to_upper)
+
+def lower(s):
+    return s.translate(_to_lower)
+
 def clamp(val, min, max):
     if val < min:
         return min

@@ -208,7 +208,7 @@ class FindDlg(wxDialog):
 
         value = self.findEntry.GetValue()
         if not self.matchCase:
-            value = value.upper()
+            value = util.upper(value)
 
         if value == "":
             return
@@ -256,7 +256,7 @@ class FindDlg(wxDialog):
                 if self.typeIncluded(ls[line].type):
                     text = ls[line].text
                     if not self.matchCase:
-                        text = text.upper()
+                        text = util.upper(text)
 
                     if inc > 0:
                         res = text.find(value, col)

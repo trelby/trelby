@@ -291,7 +291,7 @@ class MyCtrl(wxControl):
                     tcfg = cfg.getType(line.type)
                     
                     if tcfg.isCaps:
-                        text = line.text.upper()
+                        text = util.upper(line.text)
                     else:
                         text = line.text
 
@@ -352,11 +352,16 @@ class MyCtrl(wxControl):
     def fillAutoComp(self):
         ls = self.sp.lines
 
+        t = time.time()
+
         tcfg = cfg.getType(ls[self.line].type)
         if tcfg.doAutoComp:
             self.autoComp = self.getMatchingText(ls[self.line].text,
                                                  tcfg.type)
             self.autoCompSel = 0
+
+        t = time.time() - t
+        print "took %.4f seconds" % t
 
     # wraps a single line into however many lines are needed, according to
     # the type's width. doesn't modify the input line, returns a list of
@@ -717,7 +722,7 @@ class MyCtrl(wxControl):
     # with 'text' (not case sensitive) and are of of type 'type'. also
     # mixes in the type's default items from config. ignores current line.
     def getMatchingText(self, text, type):
-        text = text.upper()
+        text = util.upper(text)
         tcfg = cfg.getType(type)
         ls = self.sp.lines
         matches = {}
@@ -725,15 +730,18 @@ class MyCtrl(wxControl):
 
         for i in range(0, len(ls)):
             if (ls[i].type == type) and (ls[i].lb == config.LB_LAST):
-                if i != self.line and ls[i].text.upper().\
-                       startswith(text):
-                    matches[ls[i].text.upper()] = None
+                upstr = util.upper(ls[i].text)
+                
+                if i != self.line and upstr.startswith(text):
+                    matches[upstr] = None
                     if i < self.line:
-                        last = ls[i].text.upper()
+                        last = upstr
 
         for i in tcfg.autoCompList:
-            if i.upper().startswith(text):
-                matches[i.upper()] = None
+            upstr = util.upper(i)
+            
+            if upstr.startswith(text):
+                matches[upstr] = None
 
         if last:
             del matches[last]
@@ -1585,7 +1593,7 @@ class MyCtrl(wxControl):
             char = chr(kc)
 
             if self.capitalizeNeeded():
-                char = char.upper()
+                char = util.upper(char)
             
             str = ls[self.line].text
             str = str[:self.column] + char + str[self.column:]
@@ -1720,7 +1728,7 @@ class MyCtrl(wxControl):
                     self.searchWidth * cfgGui.fontX, cfgGui.fontY)
 
             if tcfg.isCaps:
-                text = l.text.upper()
+                text = util.upper(l.text)
             else:
                 text = l.text
 
@@ -2124,6 +2132,8 @@ class MyApp(wxApp):
     def OnInit(self):
         global cfg, mainFrame
 
+        util.setCharset()
+        
         cfg = config.Config()
         refreshGuiConfig()
                 

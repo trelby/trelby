@@ -1,4 +1,5 @@
 import namearray
+import util
 from wxPython.wx import *
 
 class NamesDlg(wxDialog):
@@ -117,7 +118,7 @@ class NamesDlg(wxDialog):
 
         bc = wxBusyCursor()
         
-        s = self.searchEntry.GetValue()
+        s = util.lower(self.searchEntry.GetValue())
         sex = self.sexRb.GetSelection()
         nt = self.nameRb.GetSelection()
 
@@ -146,7 +147,7 @@ class NamesDlg(wxDialog):
                 continue
             
             if s:
-                name = self.nameArr.name[i].lower()
+                name = util.lower(self.nameArr.name[i])
                 
                 if nt == 0:
                     if not name.startswith(s):
