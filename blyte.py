@@ -145,6 +145,26 @@ class GlobalData:
                              "'%s': %s" % (misc.confPath, strerror), "Error",
                              wxOK, None)
 
+# a piece of text on screen.
+class TextString:
+    def __init__(self, i, text, x, y, font, partial):
+
+        # if this object is a screenplay line, this is the index of the
+        # corresponding line in the Screenplay.lines list. otherwise this
+        # is -1 (used for stuff like CONTINUED: etc).
+        self.i = i
+
+        # x,y coordinates in pixels from widget's topleft corner
+        self.x = x
+        self.y = y
+
+        # text and its font
+        self.text = text
+        self.font = font
+
+        # if True, bottom cut off, i.e. only partially visible
+        self.partial = partial
+
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.
 class Mark:
@@ -1174,46 +1194,79 @@ class MyCtrl(wxControl):
             nothing, bottom = self.getElemIndexesFromLine(tmp)
 
         return (top, bottom)
+
+    # get a description of what the current screen contains. returns a
+    # list of TextString objects.
+    def getScreen(self):
+        ret = []
         
-    def getLinesOnScreen(self):
-        size = self.GetClientSize()
-        length = len(self.sp.lines)
-
-        lines = 0
+        ls = self.sp.lines
+        height = self.GetClientSize().height
+        
         y = cfg.offsetY
-        i = self.topLine
-        while (y < size.height) and (i < length):
-            y += int((self.sp.getSpacingBefore(i) / 10.0) * cfg.fontYdelta)
+        length = len(ls)
+        fyd = cfg.fontYdelta
+        cox = cfg.offsetX
 
-            if (y + cfg.fontYdelta) > size.height:
+        i = self.topLine
+        
+        while (y < height) and (i < length):
+            y += int((self.sp.getSpacingBefore(i) / 10.0) * fyd)
+
+            if y >= height:
                 break
 
-            lines += 1
-            y += cfg.fontYdelta
+            partial = (y + fyd) > height
+                
+            l = ls[i]
+            tcfg = cfg.getType(l.lt)
+
+            if tcfg.screen.isCaps:
+                text = util.upper(l.text)
+            else:
+                text = l.text
+            
+            ret.append(TextString(i, text, cox + tcfg.indent * tcfg.fontX,
+                                  y, cfgGui.getType(l.lt).font, partial))
+
+            y += fyd
             i += 1
+
+        return ret
+
+    def getLinesOnScreen(self):
+        lines = 0
+
+        for t in self.getScreen():
+            if (t.i != -1) and not t.partial:
+                lines += 1
 
         return lines
 
-    def pos2line(self, pos):
-        size = self.GetClientSize()
-        length = len(self.sp.lines)
+    def pos2linecol(self, pos):
+        sel = None
 
-        line = self.topLine
-        y = cfg.offsetY
-        while (y < size.height) and (line < (length -1)):
-            y += int((self.sp.getSpacingBefore(line) / 10.0) * cfg.fontYdelta)
+        for t in self.getScreen():
+            if t.i == -1:
+                continue
 
-            if (y + cfg.fontYdelta) > size.height:
-                break
-
-            if (y + cfg.fontYdelta) > pos.y:
-                break
+            sel = t
             
-            y += cfg.fontYdelta
-            line += 1
+            if (t.y + cfg.fontYdelta) > pos.y:
+                break
 
-        return line
+        # shouldn't happen, but let's check anyway
+        if sel == None:
+            return (0, 0)
 
+        line = sel.i
+        l = self.sp.lines[line]
+        tcfg = cfg.getType(l.lt)
+
+        column = util.clamp(int((pos.x - sel.x) / tcfg.fontX), 0, len(l.text))
+
+        return (line, column)
+    
     def line2page(self, line):
         return self.line2pageReal(line, self.pages)
 
@@ -1938,12 +1991,7 @@ class MyCtrl(wxControl):
     
     def OnLeftDown(self, event, mark = False):
         self.autoComp = None
-        pos = event.GetPosition()
-        self.line = self.pos2line(pos)
-        tcfg = cfg.getType(self.sp.lines[self.line].lt)
-        x = pos.x - tcfg.indent * tcfg.fontX - cfg.offsetX
-        self.column = util.clamp(x / tcfg.fontX, 0,
-                            len(self.sp.lines[self.line].text))
+        self.line, self.column = self.pos2linecol(event.GetPosition())
 
         if mark and not self.mark:
             self.mark = Mark(self.line, self.column)
@@ -2701,6 +2749,9 @@ class MyCtrl(wxControl):
         elif kc == WXK_PRIOR:
             if not self.autoComp:
                 self.maybeMark(ev.ShiftDown())
+
+                # FIXME: this is sucky since it skips over lines
+                # semi-randomly. bite the bullet and do it for real.
                 
                 self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
                     0)
@@ -2774,8 +2825,8 @@ class MyCtrl(wxControl):
             self.mark = None
 
         # debug stuff
-#         elif (kc < 256) and (chr(kc) == "å"):
-#             self.loadFile("default.blyte")
+        elif (kc < 256) and (chr(kc) == "å"):
+            self.loadFile("default.blyte")
 #         elif (kc < 256) and (chr(kc) == "Å"):
 #             self.OnCfg()
 #         elif (kc < 256) and (chr(kc) == "¤"):
@@ -2828,6 +2879,8 @@ class MyCtrl(wxControl):
             self.updateScreen()
 
     def OnPaint(self, event):
+        #ldkjfldsj = util.TimerDev()
+        
         ls = self.sp.lines
         dc = wxBufferedPaintDC(self, self.screenBuf)
 
@@ -2836,123 +2889,117 @@ class MyCtrl(wxControl):
         dc.SetPen(cfgGui.bgPen)
         dc.DrawRectangle(0, 0, size.width, size.height)
 
-        dc.SetTextForeground(cfgGui.textColor)
-        
-        y = cfg.offsetY
-        length = len(ls)
         marked = self.getMarkedLines()
-
         cursorY = -1
         ccfg = None
-        i = self.topLine
-        while (y < size.height) and (i < length):
-            y += int((self.sp.getSpacingBefore(i) / 10.0) * cfg.fontYdelta)
 
-            if y >= size.height:
-                break
-            
-            l = ls[i]
-            tcfg = cfg.getType(l.lt)
-            fx = tcfg.fontX
-            fy = tcfg.fontY
-            
-            if l.lt == config.NOTE:
-                dc.SetPen(cfgGui.notePen)
-                dc.SetBrush(cfgGui.noteBrush)
+        # key = font, value = ([text, ...], [(x, y), ...])
+        texts = {}
 
-                nx = cfg.offsetX + tcfg.indent * fx - 5
-                nw = tcfg.width * fx + 10
-                
-                dc.DrawRectangle(nx, y, nw, cfg.fontYdelta)
+        for t in self.getScreen():
+            i = t.i
+            y = t.y
 
-                dc.SetPen(cfgGui.textPen)
-                util.drawLine(dc, nx - 1, y, 0, cfg.fontYdelta)
-                util.drawLine(dc, nx + nw, y, 0, cfg.fontYdelta)
+            if i != -1:
+                l = ls[i]
+                tcfg = cfg.getType(l.lt)
+                fx = tcfg.fontX
+                fy = tcfg.fontY
 
-                if self.isFirstLineOfElem(i):
-                    util.drawLine(dc, nx - 1, y - 1, nw + 2, 0)
+                if l.lt == config.NOTE:
+                    dc.SetPen(cfgGui.notePen)
+                    dc.SetBrush(cfgGui.noteBrush)
 
-                if self.isLastLineOfElem(i):
-                    util.drawLine(dc, nx - 1, y + cfg.fontYdelta, nw + 2, 0)
+                    nx = t.x - 5
+                    nw = tcfg.width * fx + 10
 
-            if marked and self.isLineMarked(i, marked):
-                c1, c2 = self.getMarkedColumns(i, marked)
-                
-                dc.SetPen(cfgGui.selectedPen)
-                dc.SetBrush(cfgGui.selectedBrush)
+                    dc.DrawRectangle(nx, y, nw, cfg.fontYdelta)
 
-                dc.DrawRectangle(cfg.offsetX + (tcfg.indent + c1) *
-                    fx, y, (c2 - c1 + 1) * fx,
-                    cfg.fontYdelta)
-
-            if mainFrame.showFormatting:
-                dc.SetPen(cfgGui.bluePen)
-                util.drawLine(dc, cfg.offsetX + tcfg.indent * fx,
-                    y, 0, cfg.fontYdelta)
-                util.drawLine(dc, cfg.offsetX + (tcfg.indent + tcfg.width)
-                    * fx, y, 0, cfg.fontYdelta)
-
-                if self.isFirstLineOfElem(i):
-                    util.drawLine(dc, cfg.offsetX + tcfg.indent *
-                        fx, y, tcfg.width * fx, 0)
-                        
-                if self.isLastLineOfElem(i):
-                    util.drawLine(dc, cfg.offsetX + tcfg.indent *
-                        fx, y + cfg.fontYdelta,
-                        tcfg.width * fx, 0)
-                        
-                dc.SetTextForeground(cfgGui.redColor)
-                dc.SetFont(cfgGui.getType(config.ACTION).font)
-                dc.DrawText(config.lb2text(l.lb), 0, y)
-                dc.SetTextForeground(cfgGui.textColor)
-
-            if cfg.pbi == config.PBI_REAL_AND_UNADJ:
-                if self.line2pageNoAdjust(i) != self.line2pageNoAdjust(i + 1):
-                    dc.SetPen(cfgGui.pagebreakNoAdjustPen)
-                    util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
-                        size.width, 0)
-
-            if cfg.pbi in (config.PBI_REAL, config.PBI_REAL_AND_UNADJ):
-                thisPage = self.line2page(i)
-
-                if thisPage != self.line2page(i + 1):
-                    dc.SetPen(cfgGui.pagebreakPen)
-                    util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
-                        size.width, 0)
-
-            if i == self.line:
-                cursorY = y
-                ccfg = tcfg
-                dc.SetPen(cfgGui.cursorPen)
-                dc.SetBrush(cfgGui.cursorBrush)
-                dc.DrawRectangle(cfg.offsetX + (self.column + tcfg.indent)
-                    * fx, y, fx, fy)
-
-            if i == self.searchLine:
-                dc.SetPen(cfgGui.searchPen)
-                dc.SetBrush(cfgGui.searchBrush)
-                dc.DrawRectangle(cfg.offsetX + (tcfg.indent +
-                    self.searchColumn) * fx, y,
-                    self.searchWidth * fx, fy)
-
-            if tcfg.screen.isCaps:
-                text = util.upper(l.text)
-            else:
-                text = l.text
-
-            if len(text) != 0:
-                dc.SetFont(cfgGui.getType(l.lt).font)
-                dc.DrawText(text, cfg.offsetX + tcfg.indent * fx, y)
-
-                if tcfg.screen.isUnderlined and misc.isUnix:
                     dc.SetPen(cfgGui.textPen)
-                    util.drawLine(dc, cfg.offsetX + tcfg.indent *
-                        fx, y + cfg.fontYdelta - 1,
-                        fx * len(text) - 1, 0)
+                    util.drawLine(dc, nx - 1, y, 0, cfg.fontYdelta)
+                    util.drawLine(dc, nx + nw, y, 0, cfg.fontYdelta)
 
-            y += cfg.fontYdelta
-            i += 1
+                    if self.isFirstLineOfElem(i):
+                        util.drawLine(dc, nx - 1, y - 1, nw + 2, 0)
 
+                    if self.isLastLineOfElem(i):
+                        util.drawLine(dc, nx - 1, y + cfg.fontYdelta,
+                                      nw + 2, 0)
+
+                if marked and self.isLineMarked(i, marked):
+                    c1, c2 = self.getMarkedColumns(i, marked)
+
+                    dc.SetPen(cfgGui.selectedPen)
+                    dc.SetBrush(cfgGui.selectedBrush)
+
+                    dc.DrawRectangle(t.x + c1 * fx, y, (c2 - c1 + 1) * fx,
+                        cfg.fontYdelta)
+
+                if mainFrame.showFormatting:
+                    dc.SetPen(cfgGui.bluePen)
+                    util.drawLine(dc, t.x, y, 0, cfg.fontYdelta)
+                    util.drawLine(dc, t.x + tcfg.width * fx, y, 0,
+                                  cfg.fontYdelta)
+
+                    if self.isFirstLineOfElem(i):
+                        util.drawLine(dc, t.x, y, tcfg.width * fx, 0)
+
+                    if self.isLastLineOfElem(i):
+                        util.drawLine(dc, t.x, y + cfg.fontYdelta,
+                            tcfg.width * fx, 0)
+
+                    dc.SetTextForeground(cfgGui.redColor)
+                    dc.SetFont(cfgGui.getType(config.ACTION).font)
+                    dc.DrawText(config.lb2text(l.lb), t.x - 10, y)
+
+                if cfg.pbi == config.PBI_REAL_AND_UNADJ:
+                    if self.line2pageNoAdjust(i) != self.line2pageNoAdjust(i + 1):
+                        dc.SetPen(cfgGui.pagebreakNoAdjustPen)
+                        util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
+                            size.width, 0)
+
+                if cfg.pbi in (config.PBI_REAL, config.PBI_REAL_AND_UNADJ):
+                    thisPage = self.line2page(i)
+
+                    if thisPage != self.line2page(i + 1):
+                        dc.SetPen(cfgGui.pagebreakPen)
+                        util.drawLine(dc, 0, y + cfg.fontYdelta - 1,
+                            size.width, 0)
+
+                if i == self.line:
+                    cursorY = y
+                    ccfg = tcfg
+                    dc.SetPen(cfgGui.cursorPen)
+                    dc.SetBrush(cfgGui.cursorBrush)
+                    dc.DrawRectangle(t.x + self.column * fx, y, fx, fy)
+
+                if i == self.searchLine:
+                    dc.SetPen(cfgGui.searchPen)
+                    dc.SetBrush(cfgGui.searchBrush)
+                    dc.DrawRectangle(t.x + self.searchColumn * fx, y,
+                                     self.searchWidth * fx, fy)
+
+            if len(t.text) != 0:
+                tl = texts.get(t.font)
+                if tl == None:
+                    tl = ([], [])
+                    texts[t.font] = tl
+                    
+                tl[0].append(t.text)
+                tl[1].append((t.x, y))
+
+                if i != -1:
+                    if tcfg.screen.isUnderlined and misc.isUnix:
+                        dc.SetPen(cfgGui.textPen)
+                        util.drawLine(dc, t.x, y + cfg.fontYdelta - 1,
+                            len(t.text) * fx - 1, 0)
+
+        dc.SetTextForeground(cfgGui.textColor)
+
+        for tl in texts.iteritems():
+            dc.SetFont(tl[0])
+            dc.DrawTextList(tl[1][0], tl[1][1])
+        
         if self.autoComp and (cursorY > 0):
             self.drawAutoComp(dc, cursorY, ccfg)
 

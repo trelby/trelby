@@ -639,7 +639,7 @@ class TimerDev:
 
     def __del__(self):
         self.t = time.time() - self.t
-        print "%s took %.4f seconds" % (self.msg, self.t)
+        print "%s took %.5f seconds" % (self.msg, self.t)
 
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF
