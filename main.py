@@ -220,6 +220,18 @@ class MyCtrl(wxControl):
 
             # did we encounter characters not in ISO-8859-1
             invalidChars = False
+
+            # did we encounter characters in ISO-8859-1, but undesired
+            unwantedChars = False
+
+            # construct fast translate table for getting rid of unwanted
+            # characters
+            tbl = ""
+            for i in xrange(256):
+                if util.isValidInputChar(i):
+                    tbl += chr(i)
+                else:
+                    tbl += "\\"
             
             # convert to ISO-8859-1, remove newlines
             for i in range(len(lines)):
@@ -234,8 +246,14 @@ class MyCtrl(wxControl):
                 except ValueError:
                     invalidChars = True
                     s = s.encode("ISO-8859-1", "backslashreplace")
+
+                s = util.fixNL(s.rstrip("\n"))
                 
-                lines[i] = util.fixNL(s.rstrip("\n"))
+                newS = s.translate(tbl)
+                if s != newS:
+                    unwantedChars = True
+                    
+                lines[i] = newS
 
             if len(lines) < 2:
                 raise MiscError("File has too few lines to be a valid"
@@ -319,6 +337,11 @@ class MyCtrl(wxControl):
                              "These characters have been converted to their\n"
                              "Unicode escape sequences. Search for '\u' to\n"
                              "find them.", "Warning", wxOK, mainFrame)
+
+            if unwantedChars:
+                wxMessageBox("Screenplay contained invalid characters.\n"
+                             "These characters have been converted to '\\'.",
+                             "Warning", wxOK, mainFrame)
                 
             return True
 
