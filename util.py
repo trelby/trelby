@@ -259,6 +259,15 @@ def countInitial(s, ch):
 
     return cnt
 
+# searches string 's' for each item of list 'seq', returning True if any
+# of them were found.
+def multiFind(s, seq):
+    for it in seq:
+        if s.find(it) != -1:
+            return True
+
+    return False
+
 # DrawLine-wrapper that makes it easier when the end-point is just
 # offsetted from the starting point
 def drawLine(dc, x, y, xd, yd):

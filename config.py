@@ -54,6 +54,9 @@ PBI_NONE = 0
 PBI_REAL = 1
 PBI_REAL_AND_UNADJ = 2
 
+# current config.
+currentCfg = None
+
 class TextType:
     def __init__(self):
         self.isCaps = False

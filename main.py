@@ -11,6 +11,7 @@ import finddlg
 import headers
 import headersdlg
 import misc
+import myimport
 import namesdlg
 import pdf
 import pml
@@ -52,6 +53,7 @@ ID_EDIT_SHOW_FORMATTING,\
 ID_FILE_CLOSE,\
 ID_FILE_EXIT,\
 ID_FILE_EXPORT,\
+ID_FILE_IMPORT,\
 ID_FILE_NEW,\
 ID_FILE_OPEN,\
 ID_FILE_PRINT,\
@@ -71,7 +73,7 @@ ID_SCRIPT_TITLES,\
 ID_TOOLS_CHARMAP,\
 ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
-= range(30)
+= range(31)
 
 def refreshGuiConfig():
     global cfgGui
@@ -407,6 +409,22 @@ class MyCtrl(wxControl):
         if util.writeToFile(fileName, str(output), mainFrame):
             self.setFile(fileName)
             self.makeBackup()
+
+    def importFile(self, fileName):
+        lines = myimport.importTextFile(fileName, mainFrame)
+
+        if not lines:
+            return
+        
+        sp = Screenplay()
+        sp.lines = lines
+
+        self.clearVars()
+        self.sp = sp
+        self.reformatAll(False)
+        self.setFile(None)
+        self.makeBackup()
+        self.paginate()
 
     # generate formatted text from given screenplay and return it as a
     # string. if 'dopages' is True, marks pagination in the output.
@@ -1468,6 +1486,7 @@ class MyCtrl(wxControl):
         global cfg
         
         cfg = copy.deepcopy(newCfg)
+        config.currentCfg = cfg
         cfg.recalc()
         refreshGuiConfig()
 
@@ -2556,6 +2575,7 @@ class MyFrame(wxFrame):
         fileMenu.Append(ID_FILE_CLOSE, "&Close")
         fileMenu.Append(ID_FILE_REVERT, "&Revert")
         fileMenu.AppendSeparator()
+        fileMenu.Append(ID_FILE_IMPORT, "&Import...")
         fileMenu.Append(ID_FILE_EXPORT, "&Export...")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_PRINT, "&Print\tCTRL-P")
@@ -2655,6 +2675,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FILE_OPEN, self.OnOpen)
         EVT_MENU(self, ID_FILE_SAVE, self.OnSave)
         EVT_MENU(self, ID_FILE_SAVE_AS, self.OnSaveAs)
+        EVT_MENU(self, ID_FILE_IMPORT, self.OnImport)
         EVT_MENU(self, ID_FILE_EXPORT, self.OnExport)
         EVT_MENU(self, ID_FILE_CLOSE, self.OnClose)
         EVT_MENU(self, ID_FILE_REVERT, self.OnRevert)
@@ -2763,6 +2784,7 @@ class MyFrame(wxFrame):
         dlg = wxFileDialog(self, "File to open",
             wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
             style = wxOPEN)
+        
         if dlg.ShowModal() == wxID_OK:
             if not self.notebook.GetPage(self.findPage(self.panel))\
                    .ctrl.isUntouched():
@@ -2778,6 +2800,21 @@ class MyFrame(wxFrame):
 
     def OnSaveAs(self, event):
         self.panel.ctrl.OnSaveAs()
+
+    def OnImport(self, event):
+        dlg = wxFileDialog(self, "File to import",
+            wildcard = "Text files (*.txt)|*.txt|All files|*",
+            style = wxOPEN)
+        
+        if dlg.ShowModal() == wxID_OK:
+            if not self.notebook.GetPage(self.findPage(self.panel))\
+                   .ctrl.isUntouched():
+                self.panel = self.createNewPanel()
+
+            self.panel.ctrl.importFile(dlg.GetPath())
+            self.panel.ctrl.updateScreen()
+
+        dlg.Destroy()
 
     def OnExport(self, event):
         self.panel.ctrl.OnExport()
@@ -2914,6 +2951,7 @@ class MyApp(wxApp):
         util.init()
         
         cfg = config.Config()
+        config.currentCfg = cfg
         refreshGuiConfig()
                 
         mainFrame = MyFrame(NULL, -1, "Blyte")
