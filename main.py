@@ -11,14 +11,18 @@ import finddlg
 import misc
 import namesdlg
 import pdf
+import pml
 import splash
 import util
 
 import codecs
 import copy
+import glob
 import os.path
 import re
+import signal
 import sys
+import tempfile
 import time
 from wxPython.wx import *
 
@@ -55,6 +59,7 @@ ID_FORMAT_PAGINATE = 19
 ID_TOOLS_NAME_DB = 20
 ID_REPORTS_DIALOGUE_CHART = 21
 ID_TOOLS_CHARMAP = 22
+ID_FILE_PRINT = 23
 
 def refreshGuiConfig():
     global cfgGui
@@ -356,103 +361,188 @@ class MyCtrl(wxControl):
             return False
 
     def saveFile(self, fileName):
-        try:
-            output = []
-            ls = self.sp.lines
-            for i in range(0, len(ls)):
-                s = unicode(str(ls[i]) + "\n", "ISO-8859-1").encode("UTF-8")
-                output.append(s)
+        ls = self.sp.lines
+
+        output = util.String()
+
+        output += codecs.BOM_UTF8
+        output += "#Version 1\n"
+
+        for i in range(0, len(ls)):
+            output += unicode(str(ls[i]) + "\n",
+                              "ISO-8859-1").encode("UTF-8")
+
+        if util.writeToFile(fileName, str(output), mainFrame):
+            self.setFile(fileName)
+            self.makeBackup()
+
+    # generate formatted text from given screenplay and return it as a
+    # string. if 'dopages' is True, marks pagination in the output.
+    def generateText(self, sp, doPages):
+        ls = sp.lines
         
-            try:
-                f = open(fileName, "wb")
+        output = util.String()
 
-                try:
-                    f.write(codecs.BOM_UTF8)
-                    f.write("#Version 1\n")
-                    f.writelines(output)
-                finally:
-                    f.close()
-                    
-                self.setFile(fileName)
-                self.makeBackup()
-                
-            except IOError, (errno, strerror):
-                raise MiscError("IOError: %s" % strerror)
-                
-        except NaspError, e:
-            wxMessageBox("Error saving file: %s" % e, "Error",
-                         wxOK, mainFrame)
-
-    # script must be correctly paginated before this is called
-    def export(self, sp, fileName, doPages):
-        try:
-            output = []
-            ls = sp.lines
-            
-            for p in range(1, len(self.pages)):
-                start = self.pages[p - 1] + 1
-                end = self.pages[p]
-
-                if doPages and (p != 1):
-                    output.append("\n%70s%d.\n\n" % (" ", p))
-
-                    if self.needsMore(start - 1):
-                        output.append(" " * cfg.getType(config.CHARACTER).
-                                      indent + "OSKU (cont'd)\n")
-                
-                for i in range(start, end + 1):
-                    line = ls[i]
-                    tcfg = cfg.getType(line.type)
-                    
-                    if tcfg.isCaps:
-                        text = util.upper(line.text)
-                    else:
-                        text = line.text
-
-                    if i != start:
-                        output.append(sp.getEmptyLinesBefore(i) * "\n")
-                        
-                    output.append(" " * tcfg.indent + text + "\n")
-
-                if doPages and self.needsMore(i):
-                    output.append(" " * cfg.getType(config.CHARACTER).
-                        indent + "(MORE)\n")
+        # used in several places, so keep around
+        charIndent = cfg.getType(config.CHARACTER).indent
         
-            try:
-                f = open(fileName, "wb")
+        for p in range(1, len(self.pages)):
+            start = self.pages[p - 1] + 1
+            end = self.pages[p]
 
-                try:
-                    f.writelines(output)
-                finally:
-                    f.close()
-                    
-            except IOError, (errno, strerror):
-                raise MiscError("IOError: %s" % strerror)
-                
-        except NaspError, e:
-            wxMessageBox("Error saving file: %s" % e, "Error",
-                         wxOK, mainFrame)
+            if doPages and (p != 1):
+                output += "\n%70s%d.\n\n" % (" ", p)
 
-    # FIXME: take a screenplay object like export above does
-    def exportPDF(self):
-        try:
-            exporter = pdf.PDFExporter()
-            s = exporter.generate()
-            
-            try:
-                f = open("test.pdf", "wb")
+                if self.needsMore(start - 1):
+                    output += " " * charIndent + "OSKU (cont'd)\n"
 
-                try:
-                    f.write(s)
-                finally:
-                    f.close()
-                    
-            except IOError, (errno, strerror):
-                raise MiscError("IOError: %s" % strerror)
-                
-        except NaspError, e:
-            wxMessageBox("Error exporting PDF: %s" % e, "Error",
-                         wxOK, mainFrame)
+            for i in range(start, end + 1):
+                line = ls[i]
+                tcfg = cfg.getType(line.type)
+
+                if tcfg.isCaps:
+                    text = util.upper(line.text)
+                else:
+                    text = line.text
+
+                if i != start:
+                    output += sp.getEmptyLinesBefore(i) * "\n"
+
+                output += " " * tcfg.indent + text + "\n"
+
+            if doPages and self.needsMore(i):
+                output += " " * charIndent + "(MORE)\n"
+
+        return str(output)
+
+    # generate PDF file from given screenplay and return it as a string.
+    def generatePDF(self, sp):
+        ls = sp.lines
+
+        doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
+                           cfg.paperType)
+
+        # one character takes 2.54 mm horizontally
+        CH_X = 2.54
+
+        # ...and 4.233333 mm vertically
+        CH_Y = 4.2333333
+
+        # used in several places, so keep around
+        charIndent = cfg.getType(config.CHARACTER).indent
+
+        for p in range(1, len(self.pages)):
+            start = self.pages[p - 1] + 1
+            end = self.pages[p]
+
+            pg = pml.Page()
+
+            # what line we're on, counted from first line after top
+            # margin
+            y = 0
+
+            if p != 1:
+                tmp = "%d." % p
+                pg.add(pml.TextOp(tmp,
+                    cfg.paperWidth - cfg.marginRight - len(tmp) * CH_X,
+                    cfg.marginTop, pml.NORMAL))
+
+                y += 2
+
+                if self.needsMore(start - 1):
+                    pg.add(pml.TextOp("OSKU (cont'd)",
+                        cfg.marginLeft + charIndent * CH_X,
+                        cfg.marginTop + y * CH_Y, pml.NORMAL))
+
+                    y += 1
+
+            for i in range(start, end + 1):
+                line = ls[i]
+                tcfg = cfg.getType(line.type)
+
+                if tcfg.isCaps:
+                    text = util.upper(line.text)
+                else:
+                    text = line.text
+
+                if i != start:
+                    y += sp.getEmptyLinesBefore(i)
+
+                typ = pml.NORMAL
+                if tcfg.isBold:
+                    typ |= pml.BOLD
+                if tcfg.isItalic:
+                    typ |= pml.ITALIC
+                if tcfg.isUnderlined:
+                    typ |= pml.UNDERLINED
+
+                pg.add(pml.TextOp(text,
+                    cfg.marginLeft + tcfg.indent * CH_X,
+                    cfg.marginTop + y * CH_Y, typ))
+
+                # FIXME: either remove or make an option
+
+                # show line numbers next to each line
+                #pg.add(pml.TextOp("%02d:" % y,
+                #    cfg.marginLeft - 3 * CH_X,
+                #    cfg.marginTop + y * CH_Y, pml.NORMAL))
+
+                y += 1
+
+            if self.needsMore(i):
+                pg.add(pml.TextOp("(MORE)",
+                        cfg.marginLeft + charIndent * CH_X,
+                        cfg.marginTop + y * CH_Y, pml.NORMAL))
+
+            if misc.isEval:
+                # list of lines which together draw a "DEMO" in
+                # a 45-degree angle over the page. coordinates are
+                # percentages of page width/height.
+                dl = [
+                    # D
+                    [ (0.056, 0.286), (0.208, 0.156), (0.23, 0.31),
+                      (0.056, 0.286) ],
+
+                    # E
+                    [ (0.356, 0.542), (0.238, 0.42), (0.38, 0.302),
+                      (0.502, 0.4) ],
+                    [ (0.328, 0.368), (0.426, 0.452) ],
+
+                    # M
+                    [ (0.432, 0.592), (0.574, 0.466), (0.522, 0.650),
+                      (0.722, 0.62), (0.604, 0.72) ],
+
+                    # O
+                    [ (0.67, 0.772), (0.794, 0.678), (0.896, 0.766),
+                      (0.772, 0.858), (0.67, 0.772) ]
+                    ]
+
+                pg.add(pml.PDFOp("1 J 1 j"))
+
+                for path in dl:
+                    p = []
+                    for point in path:
+                        p.append((point[0] * cfg.paperWidth,
+                                  point[1] * cfg.paperHeight))
+
+                    pg.add(pml.LineOp(p, 10))
+
+            # FIXME: either remove or make an option
+
+            #lx = cfg.marginLeft
+            #rx = cfg.paperWidth - cfg.marginRight
+            #uy = cfg.marginTop
+            #dy = cfg.paperHeight - cfg.marginBottom
+
+            #pg.add(pml.LineOp([(lx, uy), (rx, uy), (rx, dy), (lx, dy)],
+            #                  0, True))
+
+            doc.pages.append(pg)
+
+        exporter = pdf.PDFExporter()
+        s = exporter.generate(doc)
+
+        return s
 
     def makeBackup(self):
         self.backup = copy.deepcopy(self.sp)
@@ -1351,7 +1441,30 @@ class MyCtrl(wxControl):
             return True
 
         return False
+
+    # return an exportable, paginated Screenplay object, or None if for
+    # some reason that's not possible / wanted. 'action' is the name of
+    # the action, e.g. "export" or "print", that'll be done to the script,
+    # and is used in dialogue with the user if needed.
+    def getExportable(self, action):
+        line, msg = self.findError(0)
+
+        if line != -1:
+            if wxMessageBox("The script seems to contain errors.\n"
+                "Are you sure you want to %s it?" % action, "Confirm",
+                 wxYES_NO | wxNO_DEFAULT, mainFrame) == wxNO:
                 
+                return None
+
+        self.paginate()
+
+        sp = self.sp
+        if misc.isEval:
+            sp = copy.deepcopy(self.sp)
+            sp.replace()
+
+        return sp
+
     def OnEraseBackground(self, event):
         pass
         
@@ -1562,25 +1675,59 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnExport(self):
-        line, msg = self.findError(0)
-
-        if line != -1:
-            if wxMessageBox("The script seems to contain errors.\n"
-                            "Are you sure you want to export it?", "Confirm",
-                            wxYES_NO | wxNO_DEFAULT, mainFrame) == wxNO:
-                return
+        sp = self.getExportable("export")
+        if not sp:
+            return
         
         dlg = wxFileDialog(mainFrame, "Filename to export as",
-                           wildcard = "Text files (*.txt)|*.txt|All files|*",
+                           wildcard = "PDF|*.pdf|Formatted text|*.txt",
                            style = wxSAVE | wxOVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wxID_OK:
-            sp = copy.deepcopy(self.sp)
-            if misc.isEval:
-                sp.replace()
-            self.export(sp, dlg.GetPath(), True)
+            if dlg.GetFilterIndex() == 0:
+                data = self.generatePDF(sp)
+            else:
+                data = self.generateText(sp, True)
+
+            util.writeToFile(dlg.GetPath(), data, mainFrame)
 
         dlg.Destroy()
+
+    def OnPrint(self):
+        sp = self.getExportable("print")
+        if not sp:
+            return
+        
+        pdf = self.generatePDF(sp)
+
+        try:
+            try:
+                prefix = "script-print-"
+
+                mainFrame.removeTempFiles()
+
+                fd, filename = tempfile.mkstemp(
+                    prefix = mainFrame.tmpPrefix + prefix,
+                    suffix = ".pdf")
+
+                try:
+                    os.write(fd, pdf)
+                finally:
+                    os.close(fd)
+
+                # on Windows, Acrobat complains about "invalid path" if we
+                # give the full path of the program as first arg, so give a
+                # dummy arg.
+                args = ["pdf"] + cfg.pdfViewerArgs + [filename]
+
+                os.spawnv(os.P_NOWAIT, cfg.pdfViewerPath, args)
+
+            except IOError, (errno, strerror):
+                raise MiscError("IOError: %s" % strerror)
+
+        except NaspError, e:
+            wxMessageBox("Error writing temporary PDF file: %s" % e,
+                         "Error", wxOK, mainFrame)
 
     def OnSettings(self):
         dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfg), self.applyCfg)
@@ -1795,8 +1942,6 @@ class MyCtrl(wxControl):
             self.loadFile("default.nasp")
         elif (kc < 256) and (chr(kc) == "Å"):
             self.OnSettings()
-        elif (kc < 256) and (chr(kc) == "¤"):
-            self.exportPDF()
 
         elif util.isValidInputChar(kc):
             char = chr(kc)
@@ -2063,17 +2208,28 @@ class MyFrame(wxFrame):
         wxFrame.__init__(self, parent, id, title,
                          wxPoint(100, 100), wxSize(700, 830))
 
+        # automatically reaps zombies
+        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        
         self.clipboard = None
         self.showFormatting = False
+
+        # prefix used for temp files
+        self.tmpPrefix = "oskusoft-nasp-tmp-"
+
+        self.removeTempFiles()
         
         fileMenu = wxMenu()
         fileMenu.Append(ID_FILE_NEW, "&New")
         fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
         fileMenu.Append(ID_FILE_SAVE, "&Save\tCTRL-S")
         fileMenu.Append(ID_FILE_SAVE_AS, "Save &As...")
-        fileMenu.Append(ID_FILE_EXPORT, "&Export...")
         fileMenu.Append(ID_FILE_CLOSE, "&Close")
         fileMenu.Append(ID_FILE_REVERT, "&Revert")
+        fileMenu.AppendSeparator()
+        fileMenu.Append(ID_FILE_EXPORT, "&Export...")
+        fileMenu.AppendSeparator()
+        fileMenu.Append(ID_FILE_PRINT, "&Print\tCTRL-P")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_SETTINGS, "Se&ttings...")
         fileMenu.AppendSeparator()
@@ -2132,7 +2288,7 @@ class MyFrame(wxFrame):
         # here than in misc.pyo
         misc.isEval = False
         misc.licensedTo = "Evaluation version."
-        misc.version = "0.6"
+        misc.version = "0.7"
         misc.copyright = "© Oskusoft 2004. All rights reserved."
 
         hsizer.Add(self.typeCb)
@@ -2162,6 +2318,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FILE_EXPORT, self.OnExport)
         EVT_MENU(self, ID_FILE_CLOSE, self.OnClose)
         EVT_MENU(self, ID_FILE_REVERT, self.OnRevert)
+        EVT_MENU(self, ID_FILE_PRINT, self.OnPrint)
         EVT_MENU(self, ID_FILE_SETTINGS, self.OnSettings)
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
         EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
@@ -2223,6 +2380,17 @@ class MyFrame(wxFrame):
 
         return False
 
+    def removeTempFiles(self, prefix2 = "", ignore = None):
+        files = glob.glob(tempfile.gettempdir() +
+                             "/%s%s*" % (self.tmpPrefix, prefix2))
+
+        for fn in files:
+            if fn != ignore:
+                try:
+                    os.remove(fn)
+                except OSError:
+                    continue
+                
     def OnTimer(self, event):
         self.OnPaginate()
 
@@ -2271,6 +2439,9 @@ class MyFrame(wxFrame):
 
     def OnRevert(self, event):
         self.panel.ctrl.OnRevert()
+
+    def OnPrint(self, event):
+        self.panel.ctrl.OnPrint()
 
     def OnSettings(self, event):
         self.panel.ctrl.OnSettings()
@@ -2349,6 +2520,7 @@ class MyFrame(wxFrame):
                 doExit = False
 
         if doExit:
+            self.removeTempFiles()
             self.Destroy()
             myApp.ExitMainLoop()
         else:

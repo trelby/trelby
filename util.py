@@ -110,8 +110,11 @@ def isWordBoundary(c):
     if len(c) != 1:
         return True
 
+    # FIXME: this is broken for ISO-8859-1 characters
     if not c.isalnum():
         return True
+
+    return False
 
 # DrawLine-wrapper that makes it easier when the end-point is just
 # offsetted from the starting point
@@ -178,8 +181,28 @@ class String:
         return "".join(self.data)
     
     def __iadd__(self, s):
-        # should check that s is a string object...
-        self.data.append(s)
-        self.pos += len(s)
+        s2 = str(s)
+        
+        self.data.append(s2)
+        self.pos += len(s2)
 
         return self
+
+# write 'data' to 'filename', popping up a messagebox using 'frame' as
+# parent on errors. returns True on success.
+def writeToFile(filename, data, frame):
+    try:
+        f = open(filename, "wb")
+
+        try:
+            f.write(data)
+        finally:
+            f.close()
+
+        return True
+    
+    except IOError, (errno, strerror):
+        wxMessageBox("Error writing file '%s': %s" % (filename, strerror),
+                     "Error", wxOK, frame)
+
+        return False

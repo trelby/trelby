@@ -130,6 +130,18 @@ class Config:
         # leave at least this many dialogue lines on the end of a page
         self.pbDialogueLines = 2
 
+        # PDF viewer program and args
+        if wxPlatform == "__WXGTK__":
+            self.pdfViewerPath = "/usr/local/Acrobat5/bin/acroread"
+            self.pdfViewerArgs = [ "-tempFile" ]
+        elif wxPlatform == "__WXMSW__":
+            self.pdfViewerPath = "C:\\Program Files\\Adobe\\Acrobat 6.0\\Reader\\AcroRd32.exe"
+            self.pdfViewerArgs = ["/p"]
+        else:
+            self.pdfViewerPath = "not set yet (unknown platform %s)"\
+                                 % wxPlatform
+            self.pdfViewerArgs = []
+        
         # construct reverse lookup tables
         for k, v in _text2lb.items():
             _lb2text[v] = k
