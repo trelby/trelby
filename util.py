@@ -324,19 +324,23 @@ class String:
 
         return self
 
-# load file, returning it as a string or None on errors.
-def loadFile(filename):
+# load at most maxSize (all if -1) bytes from 'filename', returning the
+# data as a string or None on errors. pops up message boxes with 'frame'
+# as parent on errors.
+def loadFile(filename, frame, maxSize = -1):
     ret = None
     
     try:
         f = open(filename, "rb")
 
         try:
-            ret = f.read()
+            ret = f.read(maxSize)
         finally:
             f.close()
 
-    except IOError:
+    except IOError, (errno, strerror):
+        wxMessageBox("Error loading file '%s': %s" % (filename, strerror),
+                     "Error", wxOK, frame)
         ret = None
 
     return ret

@@ -19,7 +19,7 @@ class SplashWindow(wxFrame):
             wxImage_AddHandler(wxJPEGHandler())
 
         fileName = "logo.jpg"
-        fileData = util.loadFile(fileName)
+        fileData = util.loadFile(fileName, parent)
 
         if not fileData or (len(fileData) != 120900) or \
                (md5.new(fileData).digest() != \
