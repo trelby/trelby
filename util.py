@@ -25,3 +25,12 @@ def reverseComboSelect(combo, clientData):
             return True
 
     return False
+
+# returns true if c, a single character, is either empty, not an
+# alphanumeric character, or more than one character.
+def isWordBoundary(c):
+    if len(c) != 1:
+        return True
+
+    if not c.isalnum():
+        return True

@@ -182,6 +182,7 @@ class Config:
         self.addColor("textColor", "Text foreground", 0, 0, 0)
         self.addColor("bgColor", "Text background", 204, 204, 204)
         self.addColor("selectedColor", "Selection", 128, 192, 192)
+        self.addColor("searchColor", "Search result", 255, 255, 0)
         self.addColor("cursorColor", "Cursor", 205, 0, 0)
         self.addColor("autoCompFgColor", "Auto-completion foreground",
                       0, 0, 0)
@@ -231,6 +232,9 @@ class ConfigGui:
 
         self.selectedBrush = wxBrush(cfg.selectedColor)
         self.selectedPen = wxPen(cfg.selectedColor)
+
+        self.searchBrush = wxBrush(cfg.searchColor)
+        self.searchPen = wxPen(cfg.searchColor)
 
         self.cursorBrush = wxBrush(cfg.cursorColor)
         self.cursorPen = wxPen(cfg.cursorColor)

@@ -150,6 +150,9 @@ class MyCtrl(wxControl):
         self.mark = -1
         self.autoComp = None
         self.autoCompSel = -1
+        self.searchLine = -1
+        self.searchColumn = -1
+        self.searchWidth = -1
         
     def createEmptySp(self):
         self.clearVars()
@@ -763,9 +766,14 @@ class MyCtrl(wxControl):
             self.updateScreen()
 
     def OnFind(self):
-        dlg = finddlg.FindDlg(mainFrame)
+        dlg = finddlg.FindDlg(mainFrame, self, cfg)
         dlg.ShowModal()
         dlg.Destroy()
+
+        self.searchLine = -1
+        self.searchColStart = -1
+        self.searchWidth = -1
+        self.updateScreen()
         
     def OnSave(self):
         if self.checkEval():
@@ -1059,7 +1067,7 @@ class MyCtrl(wxControl):
                 dc.SetPen(cfgGui.selectedPen)
                 dc.SetBrush(cfgGui.selectedBrush)
                 dc.DrawRectangle(0, y, size.width, cfg.fontYdelta)
-            
+
             # FIXME: debug code, make a hidden config-option
             if 0:
                 dc.SetPen(cfgGui.bluePen)
@@ -1084,6 +1092,13 @@ class MyCtrl(wxControl):
                 dc.SetBrush(cfgGui.cursorBrush)
                 dc.DrawRectangle(cfg.offsetX + (self.column + tcfg.indent)
                     * cfgGui.fontX, y, cfgGui.fontX, cfgGui.fontY)
+
+            if i == self.searchLine:
+                dc.SetPen(cfgGui.searchPen)
+                dc.SetBrush(cfgGui.searchBrush)
+                dc.DrawRectangle(cfg.offsetX + (tcfg.indent +
+                    self.searchColumn) * cfgGui.fontX, y,
+                    self.searchWidth * cfgGui.fontX, cfgGui.fontY)
 
             if l.type != prevType:
                 dc.SetFont(cfgGui.getType(l.type).font)
