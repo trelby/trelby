@@ -3602,8 +3602,9 @@ class MyApp(wxApp):
             if major < 5:
                 wxMessageBox("You seem to have a version of Windows\n"
                              "older than Windows 2000, which is the minimum\n"
-                             "requirement for this program.", "Error", wxOK)
-                sys.exit()
+                             "requirement for this program. There are no\n"
+                             "guarantees that this program will work\n"
+                             "correctly on this machine.", "Error", wxOK)
 
         os.chdir(misc.progPath)
         
