@@ -8,7 +8,7 @@ class DialogueChartDlg(wxDialog):
     def __init__(self, parent, ctrl):
         wxDialog.__init__(self, parent, -1, "Dialogue chart",
             pos = wxDefaultPosition, size = (1, 1),
-            style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+            style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER | wxMAXIMIZE_BOX)
 
         vsizer = wxBoxSizer(wxVERTICAL)
         self.SetSizer(vsizer)
@@ -36,7 +36,7 @@ class DialogueChartDlg(wxDialog):
         
         self.chart = MyDiagChart(self, ctrl)
         vsizer.Add(self.chart, 1, wxEXPAND)
-        
+
         self.Layout()
 
         EVT_COMBOBOX(self, self.sortCb.GetId(), self.OnSortCombo)
@@ -122,8 +122,13 @@ class MyDiagChart(wxWindow):
         for v in tmpMap.values():
             self.cinfo.append(v)
 
-        self.font = wxFont(12, wxMODERN, wxNORMAL, wxNORMAL)
-        self.smallFont = wxFont(10, wxMODERN, wxNORMAL, wxNORMAL)
+        # windows and linux have very different ideas about font sizes
+        if wxPlatform == "__WXGTK__":
+            self.font = wxFont(12, wxMODERN, wxNORMAL, wxNORMAL)
+            self.smallFont = wxFont(10, wxMODERN, wxNORMAL, wxNORMAL)
+        else:
+            self.font = wxFont(8, wxMODERN, wxNORMAL, wxNORMAL)
+            self.smallFont = wxFont(8, wxMODERN, wxNORMAL, wxNORMAL)
 
         # how many pixels for character names
         self.charPix = 125
@@ -151,9 +156,9 @@ class MyDiagChart(wxWindow):
         EVT_SIZE(self, self.OnSize)
 
         p = self.GetParent()
-        p.SetSize(wxSize(800, self.startY + self.chartHeight +
-                         self.margin * 2 + p.topStuffHeight))
-        
+        p.SetClientSize(wxSize(800, self.startY + self.chartHeight +
+                               self.margin * 2 + p.topStuffHeight))
+
     def OnSize(self, event):
         size = self.GetClientSize()
         self.screenBuf = wxEmptyBitmap(size.width, size.height)
@@ -258,9 +263,12 @@ class MyDiagChart(wxWindow):
                 dc.SetBrush(blackBr)
 
             if not misc.isEval:
-                dc.DrawText(ci.name, self.margin, y)
+                name = ci.name
             else:
-                dc.DrawText("BUY ME", self.margin, y)
+                name = "BUY ME"
+
+            util.drawText(dc, name, self.margin, y + self.yPix/2,
+                          valign = util.VALIGN_CENTER)
             
             for i in xrange(pageCnt):
                 m = self.pages[i]
