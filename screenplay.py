@@ -910,6 +910,10 @@ class Screenplay:
 
             line -= 1
 
+    # return total number of characters in script
+    def getCharCount(self):
+        return sum([len(ln.text) for ln in self.lines])
+        
     def paginate(self):
         #sfdlksjf = util.TimerDev("paginate")
         

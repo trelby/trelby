@@ -439,11 +439,18 @@ class MyCtrl(wxControl):
         self.sp.headers = newHeaders
         self.OnPaginate()
 
-    def checkEval(self):
-        if not misc.license:
-            wxMessageBox("This feature is not supported in the\n"
-                         "evaluation version.", "Notice",
-                         wxOK, mainFrame)
+    # if we have a valid license, or the script is shorter than ~20 pages,
+    # return False, otherwise True. in the latter case, also display a
+    # message box about this.
+    def checkEvalSave(self):
+
+        # slightly obscured 25000...
+        stackPtr = 18 * 14 * 16 * 6 + 80 * 11 - 72
+        
+        if not misc.license and (self.sp.getCharCount() > stackPtr):
+            wxMessageBox("The evaluation version of this program doesn't\n"
+                         "support saving scripts over 20 pages or so.",
+                         "Error", wxOK, mainFrame)
             return True
 
         return False
@@ -834,7 +841,7 @@ class MyCtrl(wxControl):
         self.updateScreen()
 
     def OnSave(self):
-        if self.checkEval():
+        if self.checkEvalSave():
             return
         
         if self.fileName:
@@ -843,7 +850,7 @@ class MyCtrl(wxControl):
             self.OnSaveAs()
 
     def OnSaveAs(self):
-        if self.checkEval():
+        if self.checkEvalSave():
             return
         
         dlg = wxFileDialog(mainFrame, "Filename to save as", misc.scriptDir,
