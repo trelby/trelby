@@ -119,6 +119,15 @@ def str2int(s, defVal, minVal = None, maxVal = None):
 
     return clamp(val, minVal, maxVal)
 
+# extract 'name' field from each item in 'seq', put it in a list, and
+# return that list.
+def listify(seq, name):
+    l = []
+    for it in seq:
+        l.append(getattr(it, name))
+
+    return l
+
 # for each character in 'flags', starting at beginning, checks if that
 # character is found in 's'. if so, appends True to a tuple, False
 # otherwise. returns that tuple, whose length is of course is len(flags).
@@ -206,6 +215,19 @@ def isWordBoundary(c):
         return True
 
     return False
+
+# split string 's' into words. word = alphanumeric characters or "-'".
+def splitToWords(s):
+    tmp = ""
+    
+    s = unicode(s, "ISO-8859-1")
+    for c in s:
+        if c.isalnum() or (c == "-") or (c == "'"):
+            tmp += c
+        else:
+            tmp += " "
+
+    return tmp.encode("ISO-8859-1").split()
 
 # DrawLine-wrapper that makes it easier when the end-point is just
 # offsetted from the starting point
