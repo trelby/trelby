@@ -20,11 +20,14 @@ OP_LINE = 1
 OP_RECT = 2
 OP_PDF = 3
 
-# text flags
+# text flags. don't change these unless you know what you're doing.
 NORMAL = 0
 BOLD   = 1
 ITALIC = 2
-UNDERLINED = 4
+COURIER = 0
+TIMES_ROMAN = 4
+HELVETICA = 8
+UNDERLINED = 16
 
 # A single document.
 class Document:
@@ -57,10 +60,13 @@ class DrawOp:
         self.type = type
 
 # Draw text string 'text', at position (x, y) mm from the upper left
-# corner of the page. Font used is 'size'-point Courier, with it possibly
-# being bold/italic/underlined as given by the flags.
+# corner of the page. Font used is 'size' points, and Courier / Times/
+# Helvetica as indicated by the flags, possibly being bold / italic /
+# underlined.
+#
+# FIXME: text alignment is only supported for Courier fonts for now.
 class TextOp(DrawOp):
-    def __init__(self, text, x, y, size, flags = NORMAL,
+    def __init__(self, text, x, y, size, flags = NORMAL | COURIER,
                  align = util.ALIGN_LEFT, valign = util.VALIGN_TOP):
         DrawOp.__init__(self, OP_TEXT)
 

@@ -5,7 +5,15 @@ import util
 def generate(doc):
     tmp = PDFExporter()
     return tmp.generate(doc)
-    
+
+# used for keeping track of used fonts
+class FontInfo:
+    def __init__(self, name):
+        self.name = name
+
+        # font number, or -1 if not used
+        self.number = -1
+
 class PDFExporter:
     def __init__(self):
         pass
@@ -14,6 +22,30 @@ class PDFExporter:
     # string containing the PDF data.
     def generate(self, doc):
         self.doc = doc
+
+        # fast lookup of font information
+        self.fonts = {
+            pml.COURIER : FontInfo("Courier"),
+            pml.COURIER | pml.BOLD: FontInfo("Courier-Bold"),
+            pml.COURIER | pml.ITALIC: FontInfo("Courier-Oblique"),
+            pml.COURIER | pml.BOLD | pml.ITALIC:
+              FontInfo("Courier-BoldOblique"),
+            
+            pml.HELVETICA : FontInfo("Helvetica"),
+            pml.HELVETICA | pml.BOLD: FontInfo("Helvetica-Bold"),
+            pml.HELVETICA | pml.ITALIC: FontInfo("Helvetica-Oblique"),
+            pml.HELVETICA | pml.BOLD | pml.ITALIC:
+              FontInfo("Helvetica-BoldOblique"),
+            
+            pml.TIMES_ROMAN : FontInfo("Times-Roman"),
+            pml.TIMES_ROMAN | pml.BOLD: FontInfo("Times-Bold"),
+            pml.TIMES_ROMAN | pml.ITALIC: FontInfo("Times-Italic"),
+            pml.TIMES_ROMAN | pml.BOLD | pml.ITALIC:
+              FontInfo("Times-BoldItalic"),
+            }
+
+        # number of fonts used
+        self.fontCnt = 0
         
         # the stupid 'f' thingy in the xref table is an object of some
         # kind or something...
@@ -26,35 +58,17 @@ class PDFExporter:
 
         # object numbers for various things
         catalogNr = 1
-        pagesNr = catalogNr + 1
-        firstPageNr = pagesNr + 1
+        firstPageNr = catalogNr + 1
         lastPageNr = firstPageNr + pages * 2 - 1
-        firstFontNr = lastPageNr + 1
+        pagesNr = lastPageNr + 1
+        firstFontNr = pagesNr + 1
 
-        kids = "["
-        for i in range(firstPageNr, lastPageNr, 2):
-            kids += "%d 0 R\n" % i
-        kids += "]"
-        
         self.addXref(65535, "f")
         self.data += "%PDF-1.4\n"
         
         self.addObj("<< /Type /Catalog\n"
                     "/Pages %d 0 R\n"
                     ">>" % pagesNr)
-
-        self.addObj("<< /Type /Pages\n"
-                    "/Kids %s\n"
-                    "/Count %d\n"
-                    "/MediaBox [0 0 %f %f]\n"
-                    "/Resources << /Font <<\n"
-                    "/F0 %d 0 R /F1 %d 0 R /F2 %d 0 R /F3 %d 0 R >> >>\n"
-                    ">>" % (kids, pages, self.mm2points(doc.w),
-                            self.mm2points(doc.h),
-                            firstFontNr,
-                            firstFontNr + 1,
-                            firstFontNr + 2,
-                            firstFontNr + 3))
 
         for i in range(pages):
             self.addObj("<< /Type /Page\n"
@@ -88,7 +102,7 @@ class PDFExporter:
                     x = self.x(op.x)
                     y = self.y(op.y) - 0.843 * op.size
 
-                    newFont = "F%d %d" % (op.flags & 3, op.size)
+                    newFont = "F%d %d" % (self.getFontNr(op.flags), op.size)
                     if newFont != currentFont:
                         cont += "/%s Tf\n" % newFont
                         currentFont = newFont
@@ -158,12 +172,34 @@ class PDFExporter:
 
             self.addStream(str(cont))
 
-        for s in ["", "-Bold", "-Oblique", "-BoldOblique"]:
-            self.addObj("<< /Type /Font\n"
-                        "/Subtype /Type1\n"
-                        "/BaseFont /Courier%s\n"
-                        "/Encoding /WinAnsiEncoding\n"
-                        ">>" % s)
+        kids = "["
+        for i in range(firstPageNr, lastPageNr, 2):
+            kids += "%d 0 R\n" % i
+        kids += "]"
+
+        i = 0
+        fontObjs = ""
+        for fi in self.fonts.itervalues():
+            if fi.number != -1:
+                fontObjs += "/F%d %d 0 R " % (fi.number, firstFontNr + i)
+                i += 1
+
+        self.addObj("<< /Type /Pages\n"
+                    "/Kids %s\n"
+                    "/Count %d\n"
+                    "/MediaBox [0 0 %f %f]\n"
+                    "/Resources << /Font <<\n"
+                    "%s >> >>\n"
+                    ">>" % (kids, pages, self.mm2points(doc.w),
+                            self.mm2points(doc.h), fontObjs))
+
+        for fi in self.fonts.itervalues():
+            if fi.number != -1:
+                self.addObj("<< /Type /Font\n"
+                            "/Subtype /Type1\n"
+                            "/BaseFont /%s\n"
+                            "/Encoding /WinAnsiEncoding\n"
+                            ">>" % fi.name)
 
         xrefPos = self.data.getPos()
 
@@ -208,6 +244,22 @@ class PDFExporter:
     def addXref(self, gen = 0, typ = "n"):
         self.xref += "%010d %05d %s \n" % (self.data.getPos(), gen, typ)
 
+    # get font number to use for given flags.
+    def getFontNr(self, flags):
+        # the "& 15" gets rid of the underline flag
+        fi = self.fonts.get(flags & 15)
+
+        if not fi:
+            print "PDF.getfontNr: invalid flags %d" % flags
+
+            return 0
+
+        if fi.number == -1:
+            fi.number = self.fontCnt
+            self.fontCnt += 1
+
+        return fi.number
+        
     # convert mm to points (1/72 inch).
     def mm2points(self, mm):
         # 2.834 = 72 / 25.4
