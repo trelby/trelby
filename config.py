@@ -124,7 +124,12 @@ class Type:
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
 
-            v.addInt("emptyLinesBefore", 0, "EmptyLinesBefore", 0, 5)
+            # these two are how much empty space to insert a) before the
+            # element b) between the element's lines, in units of line /
+            # 10.
+            v.addInt("beforeSpacing", 0, "BeforeSpacing", 0, 50)
+            v.addInt("intraSpacing", 0, "IntraSpacing", 0, 20)
+            
             v.addInt("indent", 0, "Indent", 0, 80)
             v.addInt("width", 5, "Width", 5, 80)
 
@@ -189,7 +194,7 @@ class Config:
         t = Type(self)
         t.lt = SCENE
         t.name = "Scene"
-        t.emptyLinesBefore = 1
+        t.beforeSpacing = 10
         t.indent = 0 
         t.width = 60
         t.screen.isCaps = True
@@ -205,7 +210,7 @@ class Config:
         t = Type(self)
         t.lt = ACTION
         t.name = "Action"
-        t.emptyLinesBefore = 1
+        t.beforeSpacing = 10
         t.indent = 0
         t.width = 60
         t.newTypeEnter = ACTION
@@ -217,7 +222,7 @@ class Config:
         t = Type(self)
         t.lt = CHARACTER
         t.name = "Character"
-        t.emptyLinesBefore = 1
+        t.beforeSpacing = 10
         t.indent = 22
         t.width = 38
         t.screen.isCaps = True
@@ -232,7 +237,6 @@ class Config:
         t = Type(self)
         t.lt = DIALOGUE
         t.name = "Dialogue"
-        t.emptyLinesBefore = 0
         t.indent = 10
         t.width = 35
         t.newTypeEnter = CHARACTER
@@ -244,7 +248,6 @@ class Config:
         t = Type(self)
         t.lt = PAREN
         t.name = "Parenthetical"
-        t.emptyLinesBefore = 0
         t.indent = 16
         t.width = 25
         t.newTypeEnter = DIALOGUE
@@ -256,7 +259,7 @@ class Config:
         t = Type(self)
         t.lt = TRANSITION
         t.name = "Transition"
-        t.emptyLinesBefore = 1
+        t.beforeSpacing = 10
         t.indent = 45
         t.width = 20
         t.screen.isCaps = True
@@ -279,7 +282,7 @@ class Config:
         t = Type(self)
         t.lt = SHOT
         t.name = "Shot"
-        t.emptyLinesBefore = 1
+        t.beforeSpacing = 10
         t.indent = 0
         t.width = 60
         t.screen.isCaps = True
@@ -293,7 +296,7 @@ class Config:
         t = Type(self)
         t.lt = NOTE
         t.name = "Note"
-        t.emptyLinesBefore = 1
+        t.beforeSpacing = 10
         t.indent = 5
         t.width = 55
         t.screen.isItalic = True

@@ -265,20 +265,31 @@ class ElementsPanel(wxPanel):
         
         vsizer.Add(hsizer, 0, wxBOTTOM, 10)
 
-        hsizer2 = wxBoxSizer(wxHORIZONTAL)
+        gsizer = wxFlexGridSizer(2, 2, 5, 0)
         
-        hsizer2.Add(wxStaticText(self, -1, "Empty lines before:"), 0,
+        gsizer.Add(wxStaticText(self, -1, "Empty lines / 10 before:"), 0,
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        tmp = wxSpinCtrl(self, -1)
+        tmp.SetRange(*self.cfg.getType(config.ACTION).cvars.getMinMax(
+            "beforeSpacing"))
+        EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(tmp, self.OnKillFocus)
+        gsizer.Add(tmp)
+        self.beforeSpacingEntry = tmp
         
-        self.emptyLinesEntry = wxSpinCtrl(self, -1)
-        self.emptyLinesEntry.SetRange(
-            *self.cfg.getType(config.ACTION).cvars.getMinMax(
-            "emptyLinesBefore"))
-        EVT_SPINCTRL(self, self.emptyLinesEntry.GetId(), self.OnMisc)
-        EVT_KILL_FOCUS(self.emptyLinesEntry, self.OnKillFocus)
-        hsizer2.Add(self.emptyLinesEntry, 0)
+        gsizer.Add(wxStaticText(self, -1, "Empty lines / 10 between:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        tmp = wxSpinCtrl(self, -1)
+        tmp.SetRange(*self.cfg.getType(config.ACTION).cvars.getMinMax(
+            "intraSpacing"))
+        EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(tmp, self.OnKillFocus)
+        gsizer.Add(tmp)
+        self.intraSpacingEntry = tmp
         
-        vsizer.Add(hsizer2, 0, wxBOTTOM, 20)
+        vsizer.Add(gsizer, 0, wxBOTTOM, 20)
         
         gsizer = wxFlexGridSizer(2, 3, 5, 0)
 
@@ -396,7 +407,8 @@ class ElementsPanel(wxPanel):
     def OnMisc(self, event = None):
         tcfg = self.cfg.types[self.lt]
 
-        tcfg.emptyLinesBefore = util.getSpinValue(self.emptyLinesEntry)
+        tcfg.beforeSpacing = util.getSpinValue(self.beforeSpacingEntry)
+        tcfg.intraSpacing = util.getSpinValue(self.intraSpacingEntry)
         tcfg.indent = util.getSpinValue(self.indentEntry)
         tcfg.width = util.getSpinValue(self.widthEntry)
 
@@ -424,10 +436,12 @@ class ElementsPanel(wxPanel):
 
         # stupid wxwindows/wxpython displays empty box if the initial
         # value is zero if we don't do this...
-        self.emptyLinesEntry.SetValue(5)
+        self.beforeSpacingEntry.SetValue(5)
+        self.intraSpacingEntry.SetValue(5)
         self.indentEntry.SetValue(5)
         
-        self.emptyLinesEntry.SetValue(tcfg.emptyLinesBefore)
+        self.beforeSpacingEntry.SetValue(tcfg.beforeSpacing)
+        self.intraSpacingEntry.SetValue(tcfg.intraSpacing)
         self.indentEntry.SetValue(tcfg.indent)
         self.widthEntry.SetValue(tcfg.width)
 

@@ -123,14 +123,16 @@ class Screenplay:
     def __ne__(self, other):
         return not self == other
     
-    def getEmptyLinesBefore(self, i):
+    def getSpacingBefore(self, i):
         if i == 0:
             return 0
+
+        tcfg = cfg.types[self.lines[i].lt]
         
         if self.lines[i - 1].lb == config.LB_LAST:
-            return cfg.types[self.lines[i].lt].emptyLinesBefore
+            return tcfg.beforeSpacing
         else:
-            return 0
+            return tcfg.intraSpacing
 
     def replace(self):
         for i in xrange(len(self.lines)):
@@ -495,7 +497,7 @@ class MyCtrl(wxControl):
                     text = line.text
 
                 if (i != 0) and (not doPages or (i != start)):
-                    output += sp.getEmptyLinesBefore(i) * "\n"
+                    output += (sp.getSpacingBefore(i) / 10) * "\n"
 
                 output += " " * tcfg.indent + text + "\n"
 
@@ -523,19 +525,19 @@ class MyCtrl(wxControl):
             pg = pml.Page(doc)
 
             # what line we're on, counted from first line after top
-            # margin
+            # margin, units = line / 10
             y = 0
 
             if p != 1:
                 sp.headers.generatePML(pg, str(p), cfg)
-                y += sp.headers.getNrOfLines()
+                y += sp.headers.getNrOfLines() * 10
 
                 if self.needsMore(start - 1):
                     pg.add(pml.TextOp(self.getPrevSpeaker(start) + " (cont'd)",
                         cfg.marginLeft + charIndent * ch_x,
-                        cfg.marginTop + y * ch_y, fs))
+                        cfg.marginTop + (y / 10.0) * ch_y, fs))
 
-                    y += 1
+                    y += 10
 
             for i in range(start, end + 1):
                 line = ls[i]
@@ -547,7 +549,7 @@ class MyCtrl(wxControl):
                     text = line.text
 
                 if i != start:
-                    y += sp.getEmptyLinesBefore(i)
+                    y += sp.getSpacingBefore(i)
 
                 typ = pml.NORMAL
                 if tcfg.export.isBold:
@@ -559,19 +561,19 @@ class MyCtrl(wxControl):
 
                 pg.add(pml.TextOp(text,
                     cfg.marginLeft + tcfg.indent * ch_x,
-                    cfg.marginTop + y * ch_y, fs, typ))
+                    cfg.marginTop + (y / 10.0) * ch_y, fs, typ))
 
                 if cfg.pdfShowLineNumbers:
-                    pg.add(pml.TextOp("%02d" % (y + 1),
+                    pg.add(pml.TextOp("%02d" % (i - start + 1),
                         cfg.marginLeft - 3 * ch_x,
-                        cfg.marginTop + y * ch_y, fs))
+                        cfg.marginTop + (y / 10.0) * ch_y, fs))
 
-                y += 1
+                y += 10
 
             if self.needsMore(end):
                 pg.add(pml.TextOp("(MORE)",
                         cfg.marginLeft + charIndent * ch_x,
-                        cfg.marginTop + y * ch_y, fs))
+                        cfg.marginTop + (y / 10.0) * ch_y, fs))
 
             if misc.isEval:
                 self.addDemoStamp(pg)
@@ -1028,7 +1030,7 @@ class MyCtrl(wxControl):
         y = cfg.offsetY
         i = self.topLine
         while (y < size.height) and (i < length):
-            y += self.sp.getEmptyLinesBefore(i) * cfg.fontYdelta
+            y += int((self.sp.getSpacingBefore(i) / 10.0) * cfg.fontYdelta)
 
             if (y + cfg.fontYdelta) > size.height:
                 break
@@ -1046,7 +1048,7 @@ class MyCtrl(wxControl):
         line = self.topLine
         y = cfg.offsetY
         while (y < size.height) and (line < (length -1)):
-            y += self.sp.getEmptyLinesBefore(line) * cfg.fontYdelta
+            y += int((self.sp.getSpacingBefore(line) / 10.0) * cfg.fontYdelta)
 
             if (y + cfg.fontYdelta) > size.height:
                 break
@@ -1523,37 +1525,39 @@ class MyCtrl(wxControl):
         
         i = 0
         while 1:
-            lp = cfg.linesOnPage
+            lp = cfg.linesOnPage * 10
 
             if i != 0:
-                lp -= hdrLines
+                lp -= hdrLines * 10
 
                 # decrease by 1 if we have to put a "WHOEVER (cont'd)" on
                 # top of this page.
                 if self.needsMore(i - 1):
-                    lp -= 1
+                    lp -= 10
 
             # just a safeguard
-            lp = max(5, lp)
+            lp = max(50, lp)
 
             pageLines = 0
             if i < length:
-                pageLines = 1
+                pageLines = 10
                 
                 # advance i until it points to the last line to put on
                 # this page (before adjustments)
                 
                 while i < (length - 1):
 
-                    pageLines += 1
+                    pageLines += 10
                     if ls[i].lb == lbl:
-                        pageLines += ct[ls[i + 1].lt].emptyLinesBefore
+                        pageLines += ct[ls[i + 1].lt].beforeSpacing
+                    else:
+                        pageLines += ct[ls[i + 1].lt].intraSpacing
 
                     if pageLines > lp:
                         break
 
                     i += 1
-
+                
             if i >= (length - 1):
                 if pageLines != 0:
                     self.pages.append(length - 1)
@@ -2681,7 +2685,7 @@ class MyCtrl(wxControl):
         ccfg = None
         i = self.topLine
         while (y < size.height) and (i < length):
-            y += self.sp.getEmptyLinesBefore(i) * cfg.fontYdelta
+            y += int((self.sp.getSpacingBefore(i) / 10.0) * cfg.fontYdelta)
 
             if y >= size.height:
                 break
