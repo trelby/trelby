@@ -553,7 +553,7 @@ class MyCtrl(wxControl):
             self.makeBackup()
 
     def importFile(self, fileName):
-        lines = myimport.importTextFile(fileName, mainFrame)
+        lines = myimport.importTextFile(fileName, mainFrame, cfg)
 
         if not lines:
             return
@@ -2163,7 +2163,6 @@ class MyCtrl(wxControl):
         oldCfg = cfg
 
         cfg = copy.deepcopy(newCfg)
-        config.currentCfg = cfg
 
         # if user has ventured from the old default directory, keep it as
         # the current one, otherwise set the new default as current.
@@ -4049,7 +4048,6 @@ class MyApp(wxApp):
         os.chdir(misc.progPath)
         
         cfg = config.Config()
-        config.currentCfg = cfg
 
         if util.fileExists(gd.confFilename):
             s = util.loadFile(gd.confFilename, None)

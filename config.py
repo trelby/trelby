@@ -70,9 +70,6 @@ PBI_REAL_AND_UNADJ = 2
 # for range checking above value
 PBI_FIRST, PBI_LAST = PBI_NONE, PBI_REAL_AND_UNADJ
 
-# current config.
-currentCfg = None
-
 
 # construct reverse lookup tables
 

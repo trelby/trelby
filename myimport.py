@@ -13,7 +13,7 @@ SCENE_ACTION = -2
 # import text file from fileName, return list of Line objects for the
 # screenplay or None if something went wrong. returned list always
 # contains at least one line.
-def importTextFile(fileName, frame):
+def importTextFile(fileName, frame, cfg):
 
     # the 1 MB limit is arbitrary, we just want to avoid getting a
     # MemoryError exception for /dev/zero etc.
@@ -106,7 +106,7 @@ def importTextFile(fileName, frame):
         if v.lt == -1:
             v.lt = config.ACTION
 
-    dlg = ImportDlg(frame, indDict.values())
+    dlg = ImportDlg(frame, indDict.values(), cfg)
 
     if dlg.ShowModal() != wxID_OK:
         dlg.Destroy()
@@ -212,7 +212,7 @@ class Indent:
 
 
 class ImportDlg(wxDialog):
-    def __init__(self, parent, indents):
+    def __init__(self, parent, indents, cfg):
         wxDialog.__init__(self, parent, -1, "Adjust styles",
                           style = wxDEFAULT_DIALOG_STYLE)
 
@@ -236,8 +236,6 @@ class ImportDlg(wxDialog):
                    wxALIGN_CENTER_VERTICAL)
         self.styleCombo = wxComboBox(self, -1, style = wxCB_READONLY)
 
-        cfg = config.currentCfg
-        
         self.styleCombo.Append("Scene / Action", SCENE_ACTION)
         for t in cfg.types.values():
             self.styleCombo.Append(t.name, t.lt)
