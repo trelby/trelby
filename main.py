@@ -509,37 +509,7 @@ class MyCtrl(wxControl):
                         cfg.marginTop + y * ch_y, fs))
 
             if misc.isEval:
-                # list of lines which together draw a "DEMO" in
-                # a 45-degree angle over the page. coordinates are
-                # percentages of page width/height.
-                dl = [
-                    # D
-                    [ (0.056, 0.286), (0.208, 0.156), (0.23, 0.31),
-                      (0.056, 0.286) ],
-
-                    # E
-                    [ (0.356, 0.542), (0.238, 0.42), (0.38, 0.302),
-                      (0.502, 0.4) ],
-                    [ (0.328, 0.368), (0.426, 0.452) ],
-
-                    # M
-                    [ (0.432, 0.592), (0.574, 0.466), (0.522, 0.650),
-                      (0.722, 0.62), (0.604, 0.72) ],
-
-                    # O
-                    [ (0.67, 0.772), (0.794, 0.678), (0.896, 0.766),
-                      (0.772, 0.858), (0.67, 0.772) ]
-                    ]
-
-                pg.add(pml.PDFOp("1 J 1 j"))
-
-                for path in dl:
-                    p = []
-                    for point in path:
-                        p.append((point[0] * cfg.paperWidth,
-                                  point[1] * cfg.paperHeight))
-
-                    pg.add(pml.LineOp(p, 10))
+                self.addDemoStamp(pg)
 
             if cfg.pdfShowMargins:
                 lx = cfg.marginLeft
@@ -553,6 +523,38 @@ class MyCtrl(wxControl):
             doc.add(pg)
 
         return pdf.generate(doc)
+
+    # add demo stamp to given pml.Page object. this modifies line join
+    # parameters, so should only be called when the page is otherwise
+    # ready.
+    def addDemoStamp(self, pg):
+        # list of lines which together draw a "DEMO" in a 45-degree angle
+        # over the page. coordinates are percentages of page width/height.
+        dl = [
+            # D
+            [ (0.056, 0.286), (0.208, 0.156), (0.23, 0.31), (0.056, 0.286) ],
+
+            # E
+            [ (0.356, 0.542), (0.238, 0.42), (0.38, 0.302), (0.502, 0.4) ],
+            [ (0.328, 0.368), (0.426, 0.452) ],
+
+            # M
+            [ (0.432, 0.592), (0.574, 0.466), (0.522, 0.650),
+              (0.722, 0.62), (0.604, 0.72) ],
+
+            # O
+            [ (0.67, 0.772), (0.794, 0.678), (0.896, 0.766),
+              (0.772, 0.858), (0.67, 0.772) ]
+            ]
+
+        pg.add(pml.PDFOp("1 J 1 j"))
+
+        for path in dl:
+            p = []
+            for point in path:
+                p.append((point[0] * pg.doc.w, point[1] * pg.doc.h))
+
+            pg.add(pml.LineOp(p, 10))
 
     def makeBackup(self):
         self.backup = copy.deepcopy(self.sp)
@@ -1584,8 +1586,14 @@ class MyCtrl(wxControl):
             i += 1
 
         if len(dlt) == 0:
-            wxMessageBox("The scripts are identical.", "Results", wxOK,
-                         mainFrame)
+            s = "The scripts are identical."
+            if misc.isEval:
+                s += "\n\nHowever, this is the evaluation version of the\n"\
+                     "program, which replaces some words in the\n"\
+                     "scripts before doing the comparison, which\n"\
+                     "might have affected the result."
+                
+            wxMessageBox(s, "Results", wxOK, mainFrame)
 
             return
         
@@ -1701,6 +1709,10 @@ class MyCtrl(wxControl):
 
         pg.ops.extend(textOps)
         doc.add(pg)
+
+        if misc.isEval:
+            for pg in doc.pages:
+                self.addDemoStamp(pg)
 
         tmp = pdf.generate(doc)
         util.showTempPDF(tmp, cfg, mainFrame)
@@ -2424,7 +2436,7 @@ class MyFrame(wxFrame):
         # here than in misc.pyo
         misc.isEval = False
         misc.licensedTo = "Evaluation copy."
-        misc.version = "0.7"
+        misc.version = "0.71"
 
         hsizer.Add(self.typeCb)
 
