@@ -2226,7 +2226,15 @@ class MyCtrl(wxControl):
         
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wxEmptyBitmap(size.width, size.height)
+
+        sb = wxEmptyBitmap(size.width, size.height)
+        old = getattr(self.__class__, "screenBuf", None)
+
+        if (old == None) or (old.GetDepth() != sb.GetDepth()) or \
+           (old.GetHeight() != sb.GetHeight()) or \
+           (old.GetWidth() != sb.GetWidth()):
+            self.__class__.screenBuf = sb
+        
         self.makeLineVisible(self.line)
     
     def OnLeftDown(self, event, mark = False):
