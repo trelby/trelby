@@ -1267,6 +1267,7 @@ class MyCtrl(wxControl):
         cfg.recalc()
         refreshGuiConfig()
         self.reformatAll()
+        self.paginate()
         self.updateScreen()
 
     def checkEval(self):

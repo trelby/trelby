@@ -40,6 +40,9 @@ class CfgDlg(wxDialog):
         p = FontPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Font")
 
+        p = PaginationPanel(self.notebook, -1, cfg)
+        self.notebook.AddPage(p, "Pagination")
+
         p = PaperPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Paper")
 
@@ -693,3 +696,74 @@ class AutoCompPanel(wxPanel):
 
         self.itemsEntry.Enable(tcfg.doAutoComp)
         self.itemsEntry.SetValue(string.join(tcfg.autoCompList, "\n"))
+
+class PaginationPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        panel = wxPanel(self, -1)
+        
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        vsizer.Add(wxStaticText(panel, -1,
+            "Leave at least this many lines at the end of a page when\n"
+            "breaking in the middle of an element:"), 0, wxBOTTOM, 5)
+        
+        gsizer = wxFlexGridSizer(2, 2, 5, 0)
+
+        self.addSpin("action", "Action:", panel, gsizer, 1, 30)
+        self.addSpin("dialogue", "Dialogue", panel, gsizer, 1, 30)
+
+        vsizer.Add(gsizer, 0, wxLEFT, 10)
+        
+        gsizer = wxFlexGridSizer(1, 2, 5, 0)
+        
+        self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
+                     " (0 = disable)", panel, gsizer, 0, 60)
+
+        vsizer.Add(gsizer, 0, wxTOP, 20)
+
+        panel.SetSizer(vsizer)
+
+        self.cfg2gui()
+        
+        vmsizer = wxBoxSizer(wxVERTICAL)
+        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
+        
+        self.SetSizer(vmsizer)
+
+    def addSpin(self, name, descr, panel, sizer, minR, maxR):
+        sizer.Add(wxStaticText(panel, -1, descr), 0,
+                  wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        entry = wxSpinCtrl(panel, -1)
+        entry.SetRange(minR, maxR)
+        EVT_SPINCTRL(self, entry.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(entry, self.OnKillFocus)
+        sizer.Add(entry, 0)
+
+        setattr(self, name + "Entry", entry)
+
+    def OnKillFocus(self, event):
+        self.OnMisc()
+
+        # if we don't call this, the spin entry on wxGTK gets stuck in
+        # some weird state
+        event.Skip()
+
+    def OnMisc(self, event = None):
+        self.cfg.pbActionLines = util.getSpinValue(self.actionEntry)
+        self.cfg.pbDialogueLines = util.getSpinValue(self.dialogueEntry)
+        self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
+        
+    def cfg2gui(self):
+        # stupid wxwindows/wxpython displays empty box if the initial
+        # value is zero if we don't do this...
+        self.actionEntry.SetValue(5)
+        self.dialogueEntry.SetValue(5)
+        self.paginateEntry.SetValue(5)
+        
+        self.actionEntry.SetValue(self.cfg.pbActionLines)
+        self.dialogueEntry.SetValue(self.cfg.pbDialogueLines)
+        self.paginateEntry.SetValue(self.cfg.paginateInterval)
