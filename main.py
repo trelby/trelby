@@ -1942,6 +1942,8 @@ class MyCtrl(wxControl):
             self.loadFile("default.nasp")
         elif (kc < 256) and (chr(kc) == "Å"):
             self.OnSettings()
+        elif (kc < 256) and (chr(kc) == "¤"):
+            pass
 
         elif util.isValidInputChar(kc):
             char = chr(kc)

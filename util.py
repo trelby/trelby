@@ -1,3 +1,5 @@
+import time
+
 from wxPython.wx import *
 
 # alignment values
@@ -206,3 +208,13 @@ def writeToFile(filename, data, frame):
                      "Error", wxOK, frame)
 
         return False
+
+# simple timer class for use during development only
+class TimerDev:
+    def __init__(self, msg = ""):
+        self.msg = msg
+        self.t = time.time()
+
+    def __del__(self):
+        self.t = time.time() - self.t
+        print "%s took %.4f seconds" % (self.msg, self.t)
