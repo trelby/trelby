@@ -17,12 +17,10 @@ import util
 
 import codecs
 import copy
-import glob
 import os.path
 import re
 import signal
 import sys
-import tempfile
 import time
 from wxPython.wx import *
 
@@ -1694,35 +1692,7 @@ class MyCtrl(wxControl):
             return
         
         pdf = self.generatePDF(sp)
-
-        try:
-            try:
-                prefix = "script-print-"
-
-                mainFrame.removeTempFiles()
-
-                fd, filename = tempfile.mkstemp(
-                    prefix = mainFrame.tmpPrefix + prefix,
-                    suffix = ".pdf")
-
-                try:
-                    os.write(fd, pdf)
-                finally:
-                    os.close(fd)
-
-                # on Windows, Acrobat complains about "invalid path" if we
-                # give the full path of the program as first arg, so give a
-                # dummy arg.
-                args = ["pdf"] + cfg.pdfViewerArgs + [filename]
-
-                os.spawnv(os.P_NOWAIT, cfg.pdfViewerPath, args)
-
-            except IOError, (errno, strerror):
-                raise MiscError("IOError: %s" % strerror)
-
-        except NaspError, e:
-            wxMessageBox("Error writing temporary PDF file: %s" % e,
-                         "Error", wxOK, mainFrame)
+        util.showTempPDF(pdf, cfg, mainFrame)
 
     def OnSettings(self):
         dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfg), self.applyCfg)
@@ -2211,10 +2181,7 @@ class MyFrame(wxFrame):
         self.clipboard = None
         self.showFormatting = False
 
-        # prefix used for temp files
-        self.tmpPrefix = "oskusoft-nasp-tmp-"
-
-        self.removeTempFiles()
+        util.removeTempFiles(cfg.tmpPrefix)
         
         fileMenu = wxMenu()
         fileMenu.Append(ID_FILE_NEW, "&New")
@@ -2377,17 +2344,6 @@ class MyFrame(wxFrame):
 
         return False
 
-    def removeTempFiles(self, prefix2 = "", ignore = None):
-        files = glob.glob(tempfile.gettempdir() +
-                             "/%s%s*" % (self.tmpPrefix, prefix2))
-
-        for fn in files:
-            if fn != ignore:
-                try:
-                    os.remove(fn)
-                except OSError:
-                    continue
-                
     def OnTimer(self, event):
         self.OnPaginate()
 
@@ -2517,7 +2473,7 @@ class MyFrame(wxFrame):
                 doExit = False
 
         if doExit:
-            self.removeTempFiles()
+            util.removeTempFiles(cfg.tmpPrefix)
             self.Destroy()
             myApp.ExitMainLoop()
         else:

@@ -1,3 +1,7 @@
+from error import *
+import glob
+import os
+import tempfile
 import time
 
 from wxPython.wx import *
@@ -218,6 +222,15 @@ def writeToFile(filename, data, frame):
 
         return False
 
+def removeTempFiles(prefix):
+    files = glob.glob(tempfile.gettempdir() + "/%s*" % prefix)
+
+    for fn in files:
+        try:
+            os.remove(fn)
+        except OSError:
+            continue
+
 # simple timer class for use during development only
 class TimerDev:
     def __init__(self, msg = ""):
@@ -227,3 +240,37 @@ class TimerDev:
     def __del__(self):
         self.t = time.time() - self.t
         print "%s took %.4f seconds" % (self.msg, self.t)
+
+# show PDF document 'pdf' in an external viewer program. writes out a
+# temporary file, first deleting all old temporary files, then opens PDF
+# viewer application. 'mainFrame' is needed as a parent for message boxes
+# in case there are any errors.
+def showTempPDF(pdf, cfg, mainFrame):
+    try:
+        try:
+            removeTempFiles(cfg.tmpPrefix)
+
+            fd, filename = tempfile.mkstemp(prefix = cfg.tmpPrefix,
+                                            suffix = ".pdf")
+
+            try:
+                os.write(fd, pdf)
+            finally:
+                os.close(fd)
+
+            # on Windows, Acrobat complains about "invalid path" if we
+            # give the full path of the program as first arg, so give a
+            # dummy arg.
+            args = ["pdf"] + cfg.pdfViewerArgs + [filename]
+
+            # FIXME: check with os.stat that pdf program exists and is
+            # an executable
+
+            os.spawnv(os.P_NOWAIT, cfg.pdfViewerPath, args)
+
+        except IOError, (errno, strerror):
+            raise MiscError("IOError: %s" % strerror)
+
+    except NaspError, e:
+        wxMessageBox("Error writing temporary PDF file: %s" % e,
+                     "Error", wxOK, mainFrame)

@@ -94,6 +94,9 @@ class Config:
         # color list, key = color description, value = attribute name
         self.colors = { }
         
+        # prefix used for temp files
+        self.tmpPrefix = "oskusoft-nasp-tmp-"
+
         # vertical distance between rows, in pixels
         self.fontYdelta = 18
 
