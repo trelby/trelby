@@ -650,8 +650,9 @@ def showTempPDF(pdfData, cfg, mainFrame):
     try:
         os.stat(cfg.pdfViewerPath)
     except OSError:
-        wxMessageBox("PDF viewer application not found.", "Error", wxOK,
-                     mainFrame)
+        wxMessageBox("PDF viewer application not found.\n\n"
+                     "You can change your PDF settings\n"
+                     "at File/Settings/PDF.", "Error", wxOK, mainFrame)
 
         return
     
