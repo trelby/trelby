@@ -147,7 +147,9 @@ def decrypt(s, e, n):
     return crypt(s, e, n)[1:]
 
 def main():
-    assert len(sys.argv) == 5
+    if len(sys.argv) != 5:
+        print "Usage: make_license.py year month day licensee"
+        sys.exit(0)
 
     a = sys.argv
     fib = License(License.STANDARD, datetime.date(int(a[1]), int(a[2]),
