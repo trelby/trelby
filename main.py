@@ -3366,6 +3366,14 @@ class MyApp(wxApp):
         misc.init()
         util.init()
 
+        if misc.isWindows:
+            major = sys.getwindowsversion()[0]
+            if major < 5:
+                wxMessageBox("You seem to have a version of Windows\n"
+                             "older than Windows 2000, which is the minimum\n"
+                             "requirement for this program.", "Error", wxOK)
+                sys.exit()
+
         os.chdir(misc.progPath)
         
         cfg = config.Config()
