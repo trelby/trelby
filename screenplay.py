@@ -1,6 +1,66 @@
 import config
+import titles
+import headers
 
+import copy
 import re
+
+# screenplay
+class Screenplay:
+    def __init__(self):
+        self.titles = titles.Titles()
+        self.headers = headers.Headers()
+        self.lines = []
+        
+    def __eq__(self, other):
+        if len(self.lines) != len(other.lines):
+            return False
+
+        if self.titles != other.titles:
+            return False
+        
+        if self.headers != other.headers:
+            return False
+        
+        for i in xrange(len(self.lines)):
+            if self.lines[i] != other.lines[i]:
+                return False
+
+        return True
+    
+    def __ne__(self, other):
+        return not self == other
+    
+    def getSpacingBefore(self, i, cfg):
+        if i == 0:
+            return 0
+
+        tcfg = cfg.types[self.lines[i].lt]
+        
+        if self.lines[i - 1].lb == config.LB_LAST:
+            return tcfg.beforeSpacing
+        else:
+            return tcfg.intraSpacing
+
+    def replace(self):
+        for i in xrange(len(self.lines)):
+            self.lines[i].replace()
+            
+    # this is ~8x faster than the generic deepcopy, which makes a
+    # noticeable difference at least on an Athlon 1.3GHz (0.06s versus
+    # 0.445s)
+    def __deepcopy__(self, memo):
+        sp = Screenplay()
+        l = sp.lines
+
+        sp.titles = copy.deepcopy(self.titles)
+        sp.headers = copy.deepcopy(self.headers)
+
+        for i in xrange(len(self.lines)):
+            ln = self.lines[i]
+            l.append(Line(ln.lb, ln.lt, ln.text))
+
+        return sp
 
 # one line in a screenplay
 class Line:

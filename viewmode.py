@@ -187,7 +187,7 @@ class ViewModeDraft(ViewMode):
         length = len(ls)
 
         while (y < height) and (i < length):
-            y += int((ctrl.sp.getSpacingBefore(i) / 10.0) * fyd)
+            y += int((ctrl.sp.getSpacingBefore(i, cfg) / 10.0) * fyd)
 
             if y >= height:
                 break

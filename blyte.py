@@ -170,62 +170,6 @@ class ClipData:
         # list of screenplay.Line objects
         self.lines = []
         
-class Screenplay:
-    def __init__(self):
-        self.titles = titles.Titles()
-        self.headers = headers.Headers()
-        self.lines = []
-        
-    def __eq__(self, other):
-        if len(self.lines) != len(other.lines):
-            return False
-
-        if self.titles != other.titles:
-            return False
-        
-        if self.headers != other.headers:
-            return False
-        
-        for i in xrange(len(self.lines)):
-            if self.lines[i] != other.lines[i]:
-                return False
-
-        return True
-    
-    def __ne__(self, other):
-        return not self == other
-    
-    def getSpacingBefore(self, i):
-        if i == 0:
-            return 0
-
-        tcfg = cfg.types[self.lines[i].lt]
-        
-        if self.lines[i - 1].lb == config.LB_LAST:
-            return tcfg.beforeSpacing
-        else:
-            return tcfg.intraSpacing
-
-    def replace(self):
-        for i in xrange(len(self.lines)):
-            self.lines[i].replace()
-
-    # this is ~8x faster than the generic deepcopy, which makes a
-    # noticeable difference at least on an Athlon 1.3GHz (0.06s versus
-    # 0.445s)
-    def __deepcopy__(self, memo):
-        sp = Screenplay()
-        l = sp.lines
-
-        sp.titles = copy.deepcopy(self.titles)
-        sp.headers = copy.deepcopy(self.headers)
-
-        for i in xrange(len(self.lines)):
-            ln = self.lines[i]
-            l.append(screenplay.Line(ln.lb, ln.lt, ln.text))
-
-        return sp
-
 # stuff we need for tracking how to handle commands (keyboard events).
 class CommandState:
 
@@ -313,7 +257,7 @@ class MyCtrl(wxControl):
         
     def createEmptySp(self):
         self.clearVars()
-        self.sp = Screenplay()
+        self.sp = screenplay.Screenplay()
         self.sp.titles.addDefaults()
         self.sp.headers.addDefaults()
         self.sp.lines.append(screenplay.Line(config.LB_LAST, config.SCENE))
@@ -346,7 +290,7 @@ class MyCtrl(wxControl):
             except IOError, (errno, strerror):
                 raise MiscError("IOError: %s" % strerror)
             
-            sp = Screenplay()
+            sp = screenplay.Screenplay()
 
             # used to keep track that element type only changes after a
             # LB_LAST line.
@@ -552,7 +496,7 @@ class MyCtrl(wxControl):
         if not lines:
             return
         
-        sp = Screenplay()
+        sp = screenplay.Screenplay()
         sp.lines = lines
 
         self.clearVars()
@@ -602,7 +546,7 @@ class MyCtrl(wxControl):
                     text = line.text
 
                 if (i != 0) and (not doPages or (i != start)):
-                    output += (sp.getSpacingBefore(i) // 10) * "\n"
+                    output += (sp.getSpacingBefore(i, cfg) // 10) * "\n"
 
                 output += " " * tcfg.indent + text + "\n"
 
@@ -711,7 +655,7 @@ class MyCtrl(wxControl):
             tcfg = cfg.getType(line.lt)
 
             if i != start:
-                y += sp.getSpacingBefore(i)
+                y += sp.getSpacingBefore(i, cfg)
 
             typ = pml.NORMAL
 
@@ -2383,7 +2327,7 @@ class MyCtrl(wxControl):
         if not cd:
             return
 
-        tmpSp = Screenplay()
+        tmpSp = screenplay.Screenplay()
         tmpSp.lines = cd.lines
 
         if not misc.license:
