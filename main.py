@@ -635,7 +635,7 @@ class MyCtrl(wxControl):
     
     def isLineVisible(self, line):
         bottom = self.topLine + self.getLinesOnScreen() - 1
-        if (self.line >= self.topLine) and (self.line <= bottom):
+        if (line >= self.topLine) and (line <= bottom):
             return True
         else:
             return False
@@ -644,8 +644,7 @@ class MyCtrl(wxControl):
         if self.isLineVisible(line):
             return
         
-        self.topLine = max(0, int(self.line - (self.getLinesOnScreen()
-                                               * 0.66)))
+        self.topLine = max(0, int(line - (self.getLinesOnScreen() * 0.66)))
         if not self.isLineVisible(line):
             self.topLine = line
             
