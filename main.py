@@ -331,16 +331,14 @@ class MyCtrl(wxControl):
         #t = time.time()
         line = 0
         while 1:
-            line += self.rewrap(startLine = line, toElemEnd = true)
+            line += self.rewrapPara(line)
             if line >= len(self.sp.lines):
                 break
 
-        self.column = 0
-        self.line = min(self.line, len(self.sp.lines) - 1)
-        self.topLine = min(self.topLine, len(self.sp.lines) - 1)
-        
-        #t = time.time() - t
-        #print "reformatted %d lines in %.2f seconds" % (line, t)
+        self.makeLineVisible(self.line)
+
+        t = time.time() - t
+        #print "took %.3f seconds" % t
 
     def fillAutoComp(self):
         ls = self.sp.lines
@@ -350,91 +348,106 @@ class MyCtrl(wxControl):
             self.autoComp = self.getMatchingText(ls[self.line].text,
                                                  ls[self.line].type)
             self.autoCompSel = 0
-        
+
+    # wraps a single line into however many lines are needed, according to
+    # the type's width. doesn't modify the input line, returns a list of
+    # new lines.
     def wrapLine(self, line):
         ret = []
         tcfg = cfg.getType(line.type)
 
-        firstWrap = True
+        # text remaining to be wrapped
+        text = line.text
+        
         while 1:
-            if len(line.text) <= tcfg.width:
-                ret.append(Line(line.lb, line.type, line.text))
+            if len(text) <= tcfg.width:
+                ret.append(Line(line.lb, line.type, text))
                 break
             else:
-                i = tcfg.width
-                while (i >= 0) and (line.text[i] != " "):
-                    i -= 1
+                i = text.rfind(" ", 0, tcfg.width + 1)
 
-                if firstWrap:
-                    if i != -1 and i < self.column:
-                        self.column = self.column - i - 1
-                        self.line += 1
-                    elif i == -1 and self.column > tcfg.width:
-                        self.column = 1
-                        self.line += 1
-
-                    firstWrap = False
-                
                 if i >= 0:
-                    #print "text: '%s'\n"\
-                    #      "       %si" % (line.text, " " * i)
-                    
                     ret.append(Line(config.LB_AUTO_SPACE, line.type,
-                                    line.text[0:i]))
-                    line.text = line.text[i + 1:]
+                                    text[0:i]))
+                    text = text[i + 1:]
                     
                 else:
                     ret.append(Line(config.LB_AUTO_NONE, line.type,
-                                    line.text[0:tcfg.width]))
-                    line.text = line.text[tcfg.width:]
+                                    text[0:tcfg.width]))
+                    text = text[tcfg.width:]
                     
         return ret
 
-    def rewrap(self, startLine = -1, toElemEnd = False):
+    # rewrap paragraph starting at given line. returns the number of lines
+    # in the wrapped paragraph. if startLine is -1, rewraps paragraph
+    # containing self.line. maintains cursor position correctness.
+    def rewrapPara(self, startLine = -1):
         ls = self.sp.lines
 
         if startLine == -1:
-            line1 = self.line
+            line1 = self.getParaFirstIndexFromLine(self.line)
         else:
             line1 = startLine
 
-        total = 0
-        while 1:
-            line2 = line1
+        line2 = line1
 
-            while ls[line2].lb not in (config.LB_FORCED, config.LB_LAST):
-                line2 += 1
+        while ls[line2].lb not in(config.LB_LAST, config.LB_FORCED):
+            line2 += 1
 
-            #print "rewrapping lines %d - %d" % (line1, line2)
-            
-            str = ls[line1].text
-            for i in range(line1 + 1, line2 + 1):
-                if ls[i - 1].lb == config.LB_AUTO_SPACE:
-                    str += " "
-                str += ls[i].text
+        # if cursor is in this paragraph, save its offset from the
+        # beginning of the paragraph
+        if (self.line >= line1) and (self.line <= line2):
+            cursorOffset = 0
 
-            ls[line1].text = str
-            ls[line1].lb = ls[line2].lb
-            del ls[line1 + 1:line2 + 1]
+            for i in range(line1, line2 + 1):
+                if i == self.line:
+                    cursorOffset += self.column
 
-            #print "wrap line: '%s'" % ls[line1].text
-            wrappedLines = self.wrapLine(ls[line1])
-            ls[line1:line1 + 1] = wrappedLines
-            total += len(wrappedLines)
-            line1 += len(wrappedLines)
-
-            if not toElemEnd:
-                break
-            else:
-                if (line1 >= len(ls)) or (ls[line1].lb == config.LB_LAST):
                     break
+                else:
+                    cursorOffset += len(ls[i].text)
+                    if ls[i].lb == config.LB_AUTO_SPACE:
+                        cursorOffset += 1
+        else:
+            cursorOffset = -1
+            
+        str = ls[line1].text
+        for i in range(line1 + 1, line2 + 1):
+            if ls[i - 1].lb == config.LB_AUTO_SPACE:
+                str += " "
+            str += ls[i].text
 
-        return total
+        ls[line1].text = str
+        ls[line1].lb = ls[line2].lb
+        del ls[line1 + 1:line2 + 1]
+
+        wrappedLines = self.wrapLine(ls[line1])
+        ls[line1:line1 + 1] = wrappedLines
+
+        # adjust cursor position
+        if cursorOffset != -1:
+            for i in range(line1, line1 + len(wrappedLines)):
+                if cursorOffset <= len(ls[i].text):
+                    self.line = i
+                    self.column = cursorOffset
+
+                    break
+                else:
+                    cursorOffset -= len(ls[i].text)
+                    if ls[i].lb == config.LB_AUTO_SPACE:
+                        cursorOffset -= 1
+        elif self.line >= line1:
+            # cursor position is below current paragraph, modify its
+            # linenumber appropriately
+            self.line += len(wrappedLines) - (line2 - line1 + 1)
+            
+        return len(wrappedLines)
         
     def convertCurrentTo(self, type):
         ls = self.sp.lines
         first, last = self.getElemIndexes()
 
+        # if changing away from PAREN containing only "()", remove it
         if (first == last) and (ls[first].type == config.PAREN) and\
            (ls[first].text == "()"):
             ls[first].text = ""
@@ -443,12 +456,18 @@ class MyCtrl(wxControl):
         for i in range(first, last + 1):
             ls[i].type = type
 
+        # if changing empty element to PAREN, add "()"
         if (first == last) and (ls[first].type == config.PAREN) and\
                (len(ls[first].text) == 0):
             ls[first].text = "()"
             self.column = 1
-            
-        self.rewrap(startLine = first, toElemEnd = True)
+
+        # rewrap whole element
+        line = first
+        while 1:
+            line += self.rewrapPara(line)
+            if ls[line - 1].lb == config.LB_LAST:
+                break
 
     # join lines 'line' and 'line + 1' and position cursor at the join
     # position.
@@ -484,15 +503,44 @@ class MyCtrl(wxControl):
             self.column = column
             self.line = line
 
-    def getElemFirstIndex(self):
-        return self.getElemFirstIndexFromLine(self.line)
-
-    def getElemFirstIndexFromLine(self, line):
+    # get first index of paragraph
+    def getParaFirstIndexFromLine(self, line):
+        ls = self.sp.lines
+        
         while 1:
             tmp = line - 1
             if tmp < 0:
                 break
-            if self.sp.lines[tmp].lb == config.LB_LAST:
+            if ls[tmp].lb in (config.LB_LAST, config.LB_FORCED):
+                break
+            line -= 1
+
+        return line
+
+    # get last index of paragraph
+    def getParaLastIndexFromLine(self, line):
+        ls = self.sp.lines
+
+        while 1:
+            if ls[line].lb in (config.LB_LAST, config.LB_FORCED):
+                break
+            if (line + 1) >= len(ls):
+                break
+            line += 1
+
+        return line
+
+    def getElemFirstIndex(self):
+        return self.getElemFirstIndexFromLine(self.line)
+
+    def getElemFirstIndexFromLine(self, line):
+        ls = self.sp.lines
+        
+        while 1:
+            tmp = line - 1
+            if tmp < 0:
+                break
+            if ls[tmp].lb == config.LB_LAST:
                 break
             line -= 1
 
@@ -1302,7 +1350,7 @@ class MyCtrl(wxControl):
             if ev.ShiftDown() or ev.ControlDown():
                 self.splitLine()
                 
-                self.rewrap()
+                self.rewrapPara()
             else:
                 if not self.autoComp:
                     if self.isLastLineOfElem(self.line) and\
@@ -1328,17 +1376,20 @@ class MyCtrl(wxControl):
                     ls[self.line - 1].lb = config.LB_LAST
                     ls[self.line].type = tcfg.nextType
                     
-                self.rewrap()
+                self.rewrapPara()
 
         elif kc == WXK_BACK:
             if self.column == 0:
                 if (self.line != 0):
+                    if ls[self.line - 1].lb == config.LB_AUTO_NONE:
+                        self.deleteChar(self.line - 1,
+                            len(ls[self.line - 1].text) - 1, False)
                     self.joinLines(self.line - 1)
             else:
                 self.deleteChar(self.line, self.column - 1)
                 doAutoComp = AC_REDO
 
-            self.rewrap()
+            self.rewrapPara()
             
         elif kc == WXK_DELETE:
             if self.column == len(ls[self.line].text):
@@ -1350,7 +1401,7 @@ class MyCtrl(wxControl):
                 self.deleteChar(self.line, self.column)
                 doAutoComp = AC_REDO
 
-            self.rewrap()
+            self.rewrapPara()
 
         elif ev.ControlDown():
             if kc == WXK_SPACE:
@@ -1500,8 +1551,13 @@ class MyCtrl(wxControl):
                  self.isOnlyLineOfElem(self.line):
                 ls[self.line].type = config.PAREN
                 ls[self.line].text = "()"
-                
-            self.rewrap()
+
+            # no need to wrap if we're adding a character to the end of
+            # the line and line length is <= tcfg.width
+            if (self.column != len(ls[self.line].text)) or\
+                   (self.column > tcfg.width):
+                self.rewrapPara()
+
             doAutoComp = AC_REDO
 
         else:
