@@ -2,7 +2,7 @@
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
-import cfg
+import config
 from cfgdlg import CfgDlg
 from commandsdlg import CommandsDlg
 
@@ -45,7 +45,7 @@ def clamp(val, min, max):
         return val
 
 class Line:
-    def __init__(self, lb = cfg.LB_LAST, type = cfg.ACTION, text = ""):
+    def __init__(self, lb = config.LB_LAST, type = config.ACTION, text = ""):
         self.lb = lb
         self.type = type
         self.text = text
@@ -58,7 +58,8 @@ class Line:
         return not self == other
         
     def __str__(self):
-        return cfg.lb2text(self.lb) + cfg.linetype2text(self.type) + self.text
+        return config.lb2text(self.lb) + config.linetype2text(self.type)\
+               + self.text
 
 class Screenplay:
     def __init__(self):
@@ -81,7 +82,7 @@ class Screenplay:
         if i == 0:
             return 0
         
-        if self.lines[i - 1].lb == cfg.LB_LAST:
+        if self.lines[i - 1].lb == config.LB_LAST:
             return cfg.getTypeCfg(self.lines[i].type).emptyLinesBefore
         else:
             return 0
@@ -135,7 +136,7 @@ class MyCtrl(wxControl):
     def createEmptySp(self):
         self.clearVars()
         self.sp = Screenplay()
-        self.sp.lines.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
+        self.sp.lines.append(Line(config.LB_LAST, config.SCENE, ""))
         self.setFile(None)
         self.makeBackup()
         
@@ -164,8 +165,8 @@ class MyCtrl(wxControl):
                 if len(str) < 2:
                     raise MiscError("line %d is invalid" % (i + 1))
 
-                lb = cfg.text2lb(str[0])
-                type = cfg.text2linetype(str[1])
+                lb = config.text2lb(str[0])
+                type = config.text2linetype(str[1])
                 text = str[2:]
 
                 line = Line(lb, type, text)
@@ -250,7 +251,8 @@ class MyCtrl(wxControl):
     def fillAutoComp(self):
         ls = self.sp.lines
         
-        if ls[self.line].type in (cfg.SCENE, cfg.CHARACTER, cfg.TRANSITION):
+        if ls[self.line].type in (config.SCENE, config.CHARACTER,
+                                  config.TRANSITION):
             self.autoComp = self.getMatchingText(ls[self.line].text,
                                                  ls[self.line].type)
             self.autoCompSel = 0
@@ -283,12 +285,12 @@ class MyCtrl(wxControl):
                     #print "text: '%s'\n"\
                     #      "       %si" % (line.text, " " * i)
                     
-                    ret.append(Line(cfg.LB_AUTO_SPACE, line.type,
+                    ret.append(Line(config.LB_AUTO_SPACE, line.type,
                                     line.text[0:i]))
                     line.text = line.text[i + 1:]
                     
                 else:
-                    ret.append(Line(cfg.LB_AUTO_NONE, line.type,
+                    ret.append(Line(config.LB_AUTO_NONE, line.type,
                                     line.text[0:tcfg.width]))
                     line.text = line.text[tcfg.width:]
                     
@@ -307,14 +309,14 @@ class MyCtrl(wxControl):
         while 1:
             line2 = line1
 
-            while ls[line2].lb not in (cfg.LB_FORCED, cfg.LB_LAST):
+            while ls[line2].lb not in (config.LB_FORCED, config.LB_LAST):
                 line2 += 1
 
             #print "rewrapping lines %d - %d" % (line1, line2)
             
             str = ls[line1].text
             for i in range(line1 + 1, line2 + 1):
-                if ls[i - 1].lb == cfg.LB_AUTO_SPACE:
+                if ls[i - 1].lb == config.LB_AUTO_SPACE:
                     str += " "
                 str += ls[i].text
 
@@ -331,7 +333,7 @@ class MyCtrl(wxControl):
             if not toElemEnd:
                 break
             else:
-                if (line1 >= len(ls)) or (ls[line1].lb == cfg.LB_LAST):
+                if (line1 >= len(ls)) or (ls[line1].lb == config.LB_LAST):
                     break
 
         return total
@@ -340,7 +342,7 @@ class MyCtrl(wxControl):
         ls = self.sp.lines
         first, last = self.getElemIndexes()
 
-        if (first == last) and (ls[first].type == cfg.PAREN) and\
+        if (first == last) and (ls[first].type == config.PAREN) and\
            (ls[first].text == "()"):
             ls[first].text = ""
             self.column = 0
@@ -348,7 +350,7 @@ class MyCtrl(wxControl):
         for i in range(first, last + 1):
             ls[i].type = type
 
-        if (first == last) and (ls[first].type == cfg.PAREN) and\
+        if (first == last) and (ls[first].type == config.PAREN) and\
                (len(ls[first].text) == 0):
             ls[first].text = "()"
             self.column = 1
@@ -374,7 +376,7 @@ class MyCtrl(wxControl):
         postStr = str[self.column:]
         newLine = Line(ln.lb, ln.type, postStr)
         ln.text = preStr
-        ln.lb = cfg.LB_FORCED
+        ln.lb = config.LB_FORCED
         self.sp.lines.insert(self.line + 1, newLine)
         self.line += 1
         self.column = 0
@@ -397,7 +399,7 @@ class MyCtrl(wxControl):
             tmp = line - 1
             if tmp < 0:
                 break
-            if self.sp.lines[tmp].lb == cfg.LB_LAST:
+            if self.sp.lines[tmp].lb == config.LB_LAST:
                 break
             line -= 1
 
@@ -410,7 +412,7 @@ class MyCtrl(wxControl):
         ls = self.sp.lines
 
         while 1:
-            if ls[line].lb == cfg.LB_LAST:
+            if ls[line].lb == config.LB_LAST:
                 break
             if (line + 1) >= len(ls):
                 break
@@ -506,7 +508,7 @@ class MyCtrl(wxControl):
         last = None
         
         for i in range(0, len(ls)):
-            if (ls[i].type == type) and (ls[i].lb == cfg.LB_LAST):
+            if (ls[i].type == type) and (ls[i].lb == config.LB_LAST):
                 if i != self.line and ls[i].text.upper().\
                        startswith(text):
                     matches[ls[i].text.upper()] = None
@@ -657,11 +659,11 @@ class MyCtrl(wxControl):
             del ls[marked[0] : marked[1] + 1]
             
             if len(ls) == 0:
-                ls.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
+                ls.append(Line(config.LB_LAST, config.SCENE, ""))
 
             if (marked[0] != 0) and (marked[0] < len(ls)) and\
                    (ls[marked[0] - 1].type != ls[marked[0]].type):
-                ls[marked[0] - 1].lb = cfg.LB_LAST
+                ls[marked[0] - 1].lb = config.LB_LAST
 
             if marked[0] < len(ls):
                 self.line = marked[0]
@@ -697,11 +699,11 @@ class MyCtrl(wxControl):
 
             if insertPos != 0:
                 if ls[insertPos - 1].type != ls[insertPos].type:
-                    ls[insertPos - 1].lb = cfg.LB_LAST
+                    ls[insertPos - 1].lb = config.LB_LAST
 
             if (self.line + 1) < len(ls):
                 if ls[self.line].type != ls[self.line + 1].type:
-                    ls[self.line].lb = cfg.LB_LAST
+                    ls[self.line].lb = config.LB_LAST
 
             self.mark = -1
             self.makeLineVisible(self.line)
@@ -769,18 +771,18 @@ class MyCtrl(wxControl):
             else:
                 if not self.autoComp:
                     if self.isLastLineOfElem(self.line) and\
-                       (ls[self.line].type == cfg.PAREN) and\
+                       (ls[self.line].type == config.PAREN) and\
                        (ls[self.line].text[self.column:] == ")"):
                         self.column += 1
 
                     self.splitLine()
-                    ls[self.line - 1].lb = cfg.LB_LAST
+                    ls[self.line - 1].lb = config.LB_LAST
 
                     newType = cfg.getNextType(ls[self.line].type)
                     i = self.line
                     while 1:
                         ls[i].type = newType
-                        if ls[i].lb == cfg.LB_LAST:
+                        if ls[i].lb == config.LB_LAST:
                             break
                         i += 1
                 else:
@@ -788,7 +790,7 @@ class MyCtrl(wxControl):
                     self.column = len(ls[self.line].text)
 
                     self.splitLine()
-                    ls[self.line - 1].lb = cfg.LB_LAST
+                    ls[self.line - 1].lb = config.LB_LAST
                     ls[self.line].type = cfg.getNextType(ls[self.line].type)
                     
                 self.rewrap()
@@ -806,7 +808,7 @@ class MyCtrl(wxControl):
         elif kc == WXK_DELETE:
             if self.column == len(ls[self.line].text):
                 if self.line != (len(ls) - 1):
-                    if ls[self.line].lb == cfg.LB_AUTO_NONE:
+                    if ls[self.line].lb == config.LB_AUTO_NONE:
                         self.deleteChar(self.line + 1, 0, False)
                     self.joinLines(self.line)
             else:
@@ -889,17 +891,17 @@ class MyCtrl(wxControl):
             ch = string.upper(chr(kc))
             type = None
             if ch == "S":
-                type = cfg.SCENE
+                type = config.SCENE
             elif ch == "A":
-                type = cfg.ACTION
+                type = config.ACTION
             elif ch == "C":
-                type = cfg.CHARACTER
+                type = config.CHARACTER
             elif ch == "D":
-                type = cfg.DIALOGUE
+                type = config.DIALOGUE
             elif ch == "P":
-                type = cfg.PAREN
+                type = config.PAREN
             elif ch == "T":
-                type = cfg.TRANSITION
+                type = config.TRANSITION
 
             if type != None:
                 self.convertCurrentTo(type)
@@ -935,11 +937,11 @@ class MyCtrl(wxControl):
             tmp = str.upper()
             if (tmp == "EXT.") or (tmp == "INT."):
                 if self.isOnlyLineOfElem(self.line):
-                    ls[self.line].type = cfg.SCENE
+                    ls[self.line].type = config.SCENE
             elif (tmp == "(") and\
-                 ls[self.line].type in (cfg.DIALOGUE, cfg.CHARACTER) and\
+                 ls[self.line].type in (config.DIALOGUE, config.CHARACTER) and\
                  self.isOnlyLineOfElem(self.line):
-                ls[self.line].type = cfg.PAREN
+                ls[self.line].type = config.PAREN
                 ls[self.line].text = "()"
                 
             self.rewrap()
@@ -1007,7 +1009,7 @@ class MyCtrl(wxControl):
                     * cfg.fontX, y, cfg.offsetX + (tcfg.indent + tcfg.width)
                     * cfg.fontX, y + cfg.fontYdelta)
                 dc.SetTextForeground(cfg.redColor)
-                dc.DrawText(cfg.lb2text(l.lb), 0, y)
+                dc.DrawText(config.lb2text(l.lb), 0, y)
                 dc.SetTextForeground(cfg.blackColor)
 
             if (i != 0) and (self.line2page(i - 1) != self.line2page(i)):
@@ -1023,7 +1025,7 @@ class MyCtrl(wxControl):
                     * cfg.fontX, y, cfg.fontX, cfg.fontY)
                 
             savedFont = False
-            if l.type == cfg.SCENE:
+            if l.type == config.SCENE:
                 savedFont = True
                 dc.SetFont(cfg.sceneFont)
 
@@ -1160,12 +1162,12 @@ class MyFrame(wxFrame):
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
         self.typeCb = wxComboBox(self, -1, style = wxCB_READONLY)
-        self.typeCb.Append("Action", cfg.ACTION)
-        self.typeCb.Append("Character", cfg.CHARACTER)
-        self.typeCb.Append("Dialogue", cfg.DIALOGUE)
-        self.typeCb.Append("Paren", cfg.PAREN)
-        self.typeCb.Append("Scene", cfg.SCENE)
-        self.typeCb.Append("Transition", cfg.TRANSITION)
+        self.typeCb.Append("Action", config.ACTION)
+        self.typeCb.Append("Character", config.CHARACTER)
+        self.typeCb.Append("Dialogue", config.DIALOGUE)
+        self.typeCb.Append("Paren", config.PAREN)
+        self.typeCb.Append("Scene", config.SCENE)
+        self.typeCb.Append("Transition", config.TRANSITION)
 
         hsizer.Add(self.typeCb)
 
@@ -1326,10 +1328,10 @@ class MyFrame(wxFrame):
 class MyApp(wxApp):
 
     def OnInit(self):
+        global cfg, mainFrame
 
-        global mainFrame
-
-        cfg.init()
+        cfg = config.Config()
+        
         mainFrame = MyFrame(NULL, -1, "Nasp")
         mainFrame.init()
         mainFrame.Show(True)

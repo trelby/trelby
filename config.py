@@ -64,24 +64,6 @@ _nextTypeTab = {
     TRANSITION : SCENE
     }
 
-# type configs, key = line type, value = Type
-_types = { }
-
-
-# various non-user configurable (for now anyway) settings
-
-# font size values in pixels
-fontY = 14
-fontX = 9
-
-# vertical distance between rows, in pixels
-fontYdelta = 18
-
-# offsets from upper left corner of main widget, ie. this much empty
-# space is left on the top and left sides.
-offsetY = 10
-offsetX = 10
-
 class Type:
     def __init__(self):
         self.linetype = None
@@ -90,101 +72,126 @@ class Type:
         self.width = 0
         self.isCaps = False
 
-def init():
-    for k, v in _text2lb.items():
-        _lb2text[v] = k
+class Config:
+    def __init__(self):
 
-    for k, v in _text2linetype.items():
-        _linetype2text[v] = k
+        # type configs, key = line type, value = Type
+        self.types = { }
+        
+        # various non-user configurable (for now anyway) settings
 
-    t = Type()
-    t.linetype = SCENE
-    t.emptyLinesBefore = 1
-    t.indent = 0 
-    t.width = 60
-    t.isCaps = True
-    _types[t.linetype] = t
+        # font size values in pixels
+        self.fontY = 14
+        self.fontX = 9
+
+        # vertical distance between rows, in pixels
+        self.fontYdelta = 18
+
+        # offsets from upper left corner of main widget, ie. this much empty
+        # space is left on the top and left sides.
+        self.offsetY = 10
+        self.offsetX = 10
+
+        
+        # construct reverse lookup tables
+        for k, v in _text2lb.items():
+            _lb2text[v] = k
+
+        for k, v in _text2linetype.items():
+            _linetype2text[v] = k
+
+        # element types
+        t = Type()
+        t.linetype = SCENE
+        t.emptyLinesBefore = 1
+        t.indent = 0 
+        t.width = 60
+        t.isCaps = True
+        self.types[t.linetype] = t
+
+        t = Type()
+        t.linetype = ACTION
+        t.emptyLinesBefore = 1
+        t.indent = 0
+        t.width = 60
+        self.types[t.linetype] = t
+
+        t = Type()
+        t.linetype = CHARACTER
+        t.emptyLinesBefore = 1
+        t.indent = 25
+        t.width = 20
+        t.isCaps = True
+        self.types[t.linetype] = t
+
+        t = Type()
+        t.linetype = DIALOGUE
+        t.emptyLinesBefore = 0
+        t.indent = 10
+        t.width = 35
+        self.types[t.linetype] = t
+
+        t = Type()
+        t.linetype = PAREN
+        t.emptyLinesBefore = 0
+        t.indent = 20
+        t.width = 25
+        self.types[t.linetype] = t
+
+        t = Type()
+        t.linetype = TRANSITION
+        t.emptyLinesBefore = 1
+        t.indent = 55
+        t.width = 15
+        t.isCaps = True
+        self.types[t.linetype] = t
+
+        # wxWindows stuff
+        self.baseFont = wxFont(self.fontY, wxMODERN, wxNORMAL, wxNORMAL)
+        self.sceneFont = wxFont(self.fontY, wxMODERN, wxNORMAL, wxBOLD)
+
+        self.bluePen = wxPen(wxColour(0, 0, 255))
+        self.redColor = wxColour(255, 0, 0)
+        self.blackColor = wxColour(0, 0, 0)
+
+        self.bgColor = wxColour(204, 204, 204)
+        self.bgBrush = wxBrush(self.bgColor)
+        self.bgPen = wxPen(self.bgColor)
+
+        self.selectedColor = wxColour(128, 192, 192)
+        self.selectedBrush = wxBrush(self.selectedColor)
+        self.selectedPen = wxPen(self.selectedColor)
+
+        self.cursorColor = wxColour(205, 0, 0)
+        self.cursorBrush = wxBrush(self.cursorColor)
+        self.cursorPen = wxPen(self.cursorColor)
+
+        self.autoCompFgColor = wxColour(0, 0, 0)
+        self.autoCompBgColor = wxColor(249, 222, 99)
+        self.autoCompPen = wxPen(self.autoCompFgColor)
+        self.autoCompBrush = wxBrush(self.autoCompBgColor)
+        self.autoCompRevPen = wxPen(self.autoCompBgColor)
+        self.autoCompRevBrush = wxBrush(self.autoCompFgColor)
+
+        self.pagebreakPen = wxPen(wxColour(128, 128, 128),
+                                  style = wxSHORT_DASH)
+
+    def getTypeCfg(self, type):
+        return self.types[type]
+
+    def getNextType(self, type):
+        return _conv(_nextType, type)
     
-    t = Type()
-    t.linetype = ACTION
-    t.emptyLinesBefore = 1
-    t.indent = 0
-    t.width = 60
-    _types[t.linetype] = t
-    
-    t = Type()
-    t.linetype = CHARACTER
-    t.emptyLinesBefore = 1
-    t.indent = 25
-    t.width = 20
-    t.isCaps = True
-    _types[t.linetype] = t
-    
-    t = Type()
-    t.linetype = DIALOGUE
-    t.emptyLinesBefore = 0
-    t.indent = 10
-    t.width = 35
-    _types[t.linetype] = t
-    
-    t = Type()
-    t.linetype = PAREN
-    t.emptyLinesBefore = 0
-    t.indent = 20
-    t.width = 25
-    _types[t.linetype] = t
-    
-    t = Type()
-    t.linetype = TRANSITION
-    t.emptyLinesBefore = 1
-    t.indent = 55
-    t.width = 15
-    t.isCaps = True
-    _types[t.linetype] = t
+    def getNextTypeTab(self, type):
+        return _conv(_nextTypeTab, type)
 
-    # TODO: world's ugliest hack, but it'll do for now
-    global baseFont, sceneFont, \
-           redColor, blackColor, bluePen, \
-           bgColor, bgBrush, bgPen, \
-           selectedColor, selectedBrush, selectedPen, \
-           cursorColor, cursorBrush, cursorPen, \
-           autoCompFgColor, autoCompBgColor, \
-           autoCompPen, autoCompBrush, \
-           autoCompRevPen, autoCompRevBrush, \
-           pagebreakPen
-    
-    baseFont = wxFont(fontY, wxMODERN, wxNORMAL, wxNORMAL)
-    sceneFont = wxFont(fontY, wxMODERN, wxNORMAL, wxBOLD)
-
-    bluePen = wxPen(wxColour(0, 0, 255))
-    redColor = wxColour(255, 0, 0)
-    blackColor = wxColour(0, 0, 0)
-
-    bgColor = wxColour(204, 204, 204)
-    bgBrush = wxBrush(bgColor)
-    bgPen = wxPen(bgColor)
-
-    selectedColor = wxColour(128, 192, 192)
-    selectedBrush = wxBrush(selectedColor)
-    selectedPen = wxPen(selectedColor)
-
-    cursorColor = wxColour(205, 0, 0)
-    cursorBrush = wxBrush(cursorColor)
-    cursorPen = wxPen(cursorColor)
-
-    autoCompFgColor = wxColour(0, 0, 0)
-    autoCompBgColor = wxColor(249, 222, 99)
-    autoCompPen = wxPen(autoCompFgColor)
-    autoCompBrush = wxBrush(autoCompBgColor)
-    autoCompRevPen = wxPen(autoCompBgColor)
-    autoCompRevBrush = wxBrush(autoCompFgColor)
-    
-    pagebreakPen = wxPen(wxColour(128, 128, 128), style = wxSHORT_DASH)
+    def getPrevTypeTab(self, type):
+        return _convPrev(_nextTypeTab, type)
 
 def _conv(dict, key):
     val = dict.get(key)
     if val == None:
-        raise CfgError("key '%s' not found from '%s'" % (key, dict))
+        raise ConfigError("key '%s' not found from '%s'" % (key, dict))
     
     return val
 
@@ -193,7 +200,7 @@ def _convPrev(dict, value):
         if v == value:
             return k
 
-    raise CfgError("value '%s' not found from '%s'" % (value, dict))
+    raise ConfigError("value '%s' not found from '%s'" % (value, dict))
     
 def text2lb(str):
     return _conv(_text2lb, str)
@@ -206,15 +213,3 @@ def text2linetype(str):
 
 def linetype2text(type):
     return _conv(_linetype2text, type)
-
-def getTypeCfg(type):
-    return _types[type]
-
-def getNextType(type):
-    return _conv(_nextType, type)
-
-def getNextTypeTab(type):
-    return _conv(_nextTypeTab, type)
-
-def getPrevTypeTab(type):
-    return _convPrev(_nextTypeTab, type)
