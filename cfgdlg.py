@@ -55,13 +55,13 @@ class CfgDlg(wxDialog):
 
         self.AddPage(AutoCompPanel, "Auto-completion")
         self.AddPage(ColorsPanel, "Colors")
+        self.AddPage(DisplayPanel, "Display")
         self.AddPage(ElementsPanel, "Elements")
-        self.AddPage(FontPanel, "Font")
         self.AddPage(MiscPanel, "Misc")
         self.AddPage(PaginationPanel, "Pagination")
         self.AddPage(PaperPanel, "Paper")
 
-        self.listbook.SetSelection(2)
+        self.listbook.SetSelection(3)
 
         # it's unclear whether SetSelection sends an event on all
         # platforms or not, so force correct action.
@@ -105,7 +105,7 @@ class CfgDlg(wxDialog):
     def OnCancel(self, event):
         self.EndModal(wxID_CANCEL)
 
-class FontPanel(wxPanel):
+class DisplayPanel(wxPanel):
     def __init__(self, parent, id, cfg):
         wxPanel.__init__(self, parent, id)
         self.cfg = cfg
@@ -133,7 +133,7 @@ class FontPanel(wxPanel):
 
         self.spacingEntry = wxSpinCtrl(panel, -1)
         self.spacingEntry.SetRange(4, 125)
-        EVT_SPINCTRL(self, self.spacingEntry.GetId(), self.OnSpacing)
+        EVT_SPINCTRL(self, self.spacingEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.spacingEntry, self.OnKillFocus)
         hsizer.Add(self.spacingEntry, 0)
 
@@ -144,8 +144,13 @@ class FontPanel(wxPanel):
 
         vsizer.Add(wxStaticText(panel, -1, "This font is only used for"
             " display on screen, printing always"))
-        vsizer.Add(wxStaticText(panel, -1, "uses 12-point Courier."))
-                
+        vsizer.Add(wxStaticText(panel, -1, "uses Courier."))
+
+        self.pbRb = wxRadioBox(panel, -1, "Page break lines to show",
+            style = wxRA_SPECIFY_COLS, majorDimension = 1,
+            choices = [ "None", "Normal", "Normal + unadjusted   " ])
+        vsizer.Add(self.pbRb, 0, wxTOP, 10)
+
         panel.SetSizer(vsizer)
 
         self.cfg2gui()
@@ -155,8 +160,10 @@ class FontPanel(wxPanel):
         
         self.SetSizer(vmsizer)
 
+        EVT_RADIOBOX(self, self.pbRb.GetId(), self.OnMisc)
+
     def OnKillFocus(self, event):
-        self.OnSpacing()
+        self.OnMisc()
 
         # if we don't call this, the spin entry on wxGTK gets stuck in
         # some weird state
@@ -188,9 +195,10 @@ class FontPanel(wxPanel):
 
         dlg.Destroy()
 
-    def OnSpacing(self, event = None):
+    def OnMisc(self, event = None):
         self.cfg.fontYdelta = util.getSpinValue(self.spacingEntry)
-        
+        self.cfg.pbi = self.pbRb.GetSelection()
+
     def cfg2gui(self):
         nfi = wxNativeFontInfo()
         nfi.FromString(self.cfg.nativeFont)
@@ -203,6 +211,7 @@ class FontPanel(wxPanel):
                                 (nfi.GetFaceName(), ps))
 
         self.spacingEntry.SetValue(self.cfg.fontYdelta)
+        self.pbRb.SetSelection(self.cfg.pbi)
         
 class ElementsPanel(wxPanel):
     def __init__(self, parent, id, cfg):
@@ -834,10 +843,6 @@ class MiscPanel(wxPanel):
         wxPanel.__init__(self, parent, id)
         self.cfg = cfg
 
-        #-auto-capitalize sentences
-        #-lines to scroll for one mouse wheel event
-        #-page break indicators: none, normal, normal + unadjusted
-
         panel = wxPanel(self, -1)
         
         vsizer = wxBoxSizer(wxVERTICAL)
@@ -861,19 +866,12 @@ class MiscPanel(wxPanel):
         
         vsizer.Add(hsizer, 0, wxBOTTOM, 10)
         
-        self.pbRb = wxRadioBox(panel, -1, "Page break lines to show",
-            style = wxRA_SPECIFY_COLS, majorDimension = 1,
-            choices = [ "None", "Normal", "Normal + unadjusted   " ])
-        vsizer.Add(self.pbRb)
-
         panel.SetSizer(vsizer)
 
         vmsizer = wxBoxSizer(wxVERTICAL)
         vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
         
         self.SetSizer(vmsizer)
-
-        EVT_RADIOBOX(self, self.pbRb.GetId(), self.OnMisc)
 
         self.cfg2gui()
         
@@ -887,10 +885,7 @@ class MiscPanel(wxPanel):
     def OnMisc(self, event = None):
         self.cfg.capitalize = self.autoCapSentences.GetValue()
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
-        self.cfg.pbi = self.pbRb.GetSelection()
             
     def cfg2gui(self):
         self.autoCapSentences.SetValue(self.cfg.capitalize)
-
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
-        self.pbRb.SetSelection(self.cfg.pbi)
