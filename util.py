@@ -278,6 +278,11 @@ class MyKeyEvent:
         self.altDown = False
         self.shiftDown = False
 
+        # if True, means processing this key event shouldn't do expensive
+        # screen updating stuff as there will be more key events coming
+        # in.
+        self.noUpdate = False
+
     def GetKeyCode(self):
         return self.kc
     

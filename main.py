@@ -45,6 +45,7 @@ ID_EDIT_CUT,\
 ID_EDIT_DELETE_ELEMENTS,\
 ID_EDIT_FIND,\
 ID_EDIT_PASTE,\
+ID_EDIT_PASTE_FROM_CB,\
 ID_EDIT_SELECT_SCENE,\
 ID_EDIT_SHOW_FORMATTING,\
 ID_FILE_CLOSE,\
@@ -69,7 +70,7 @@ ID_SCRIPT_TITLES,\
 ID_TOOLS_CHARMAP,\
 ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
-= range(29)
+= range(30)
 
 def refreshGuiConfig():
     global cfgGui
@@ -1894,6 +1895,72 @@ class MyCtrl(wxControl):
             self.makeLineVisible(self.line)
             self.updateScreen()
 
+    def OnPasteCb(self):
+        s = ""
+        
+        if wxTheClipboard.Open():
+            wxTheClipboard.UsePrimarySelection(True)
+            
+            df = wxDataFormat(wxDF_TEXT)
+            
+            if wxTheClipboard.IsSupported(df):
+                data = wxTextDataObject()
+                wxTheClipboard.GetData(data)
+                s = data.GetText()
+                
+            wxTheClipboard.Close()
+
+        s = util.fixNL(s)
+        
+        if len(s) == 0:
+            return
+
+        inLines = s.split("\n")
+
+        # shouldn't be possible, but...
+        if len(inLines) == 0:
+            return
+
+        ev = util.MyKeyEvent(0)
+        ev.noUpdate = True
+        
+        # first line is added normally
+        for ch in inLines[0]:
+            kc = ord(ch)
+            if util.isValidInputChar(kc):
+                ev.kc = kc
+                self.OnKeyChar(ev)
+
+        if len(inLines) == 1:
+            self.makeLineVisible(self.line)
+            self.updateScreen()
+            
+            return
+
+        # now, force new element
+        ev.kc = 10
+        self.OnKeyChar(ev)
+
+        # finished, wrapped lines to add
+        lines = []
+
+        lt = self.sp.lines[self.line].lt
+        
+        for i in range(1, len(inLines)):
+            s = util.toInputStr(inLines[i])
+
+            if len(s) != 0:
+                lines.extend(self.wrapLine(Line(config.LB_LAST, lt, s)))
+                lt = cfg.getType(lt).newTypeEnter
+
+        self.sp.lines[self.line:self.line] = lines
+
+        self.line += len(lines)
+        self.column = 0
+        
+        self.makeLineVisible(self.line)
+        self.updateScreen()
+        
     def OnSelectScene(self):
         self.mark, self.line = self.getSceneIndexes()
         self.column = 0
@@ -2047,7 +2114,11 @@ class MyCtrl(wxControl):
         AC_KEEP = 2
 
         doAutoComp = AC_DEL
+        doUpdate = True
 
+        if isinstance(ev, util.MyKeyEvent) and (ev.noUpdate):
+            doUpdate = False
+        
         # 10 == CTRL+Enter under wxMSW
         if (kc == WXK_RETURN) or (kc == 10):
             if ev.ShiftDown() or ev.ControlDown():
@@ -2284,8 +2355,9 @@ class MyCtrl(wxControl):
         else:
             print "unknown value of doAutoComp: %s" % doAutoComp
 
-        self.makeLineVisible(self.line)
-        self.updateScreen()
+        if doUpdate:
+            self.makeLineVisible(self.line)
+            self.updateScreen()
 
     def OnPaint(self, event):
         ls = self.sp.lines
@@ -2521,6 +2593,7 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_CUT, "Cu&t\tCTRL-X")
         editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
         editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
+        editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste from clipboard")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene\tCTRL-A")
         editMenu.AppendSeparator()
@@ -2616,6 +2689,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
+        EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteCb)
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_EDIT_DELETE_ELEMENTS, self.OnDeleteElements)
@@ -2760,6 +2834,9 @@ class MyFrame(wxFrame):
 
     def OnPaste(self, event):
         self.panel.ctrl.OnPaste()
+
+    def OnPasteCb(self, event):
+        self.panel.ctrl.OnPasteCb()
 
     def OnSelectScene(self, event):
         self.panel.ctrl.OnSelectScene()
