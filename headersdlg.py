@@ -7,12 +7,13 @@ import util
 from wxPython.wx import *
 
 class HeadersDlg(wxDialog):
-    def __init__(self, parent, headers, cfg):
+    def __init__(self, parent, headers, cfg, applyFunc):
         wxDialog.__init__(self, parent, -1, "Headers",
                           style = wxDEFAULT_DIALOG_STYLE)
 
         self.headers = headers
         self.cfg = cfg
+        self.applyFunc = applyFunc
 
         # whether some events are blocked
         self.block = False
@@ -132,8 +133,11 @@ class HeadersDlg(wxDialog):
 
         hsizer.Add(1, 1, 1)
         
-        self.previewBtn = wxButton(self, -1, "Preview")
-        hsizer.Add(self.previewBtn)
+        previewBtn = wxButton(self, -1, "Preview")
+        hsizer.Add(previewBtn)
+
+        applyBtn = wxButton(self, -1, "Apply")
+        hsizer.Add(applyBtn, 0, wxLEFT, 10)
 
         cancelBtn = wxButton(self, -1, "Cancel")
         hsizer.Add(cancelBtn, 0, wxLEFT, 10)
@@ -145,7 +149,8 @@ class HeadersDlg(wxDialog):
 
         util.finishWindow(self, vsizer)
 
-        EVT_BUTTON(self, self.previewBtn.GetId(), self.OnPreview)
+        EVT_BUTTON(self, previewBtn.GetId(), self.OnPreview)
+        EVT_BUTTON(self, applyBtn.GetId(), self.OnApply)
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
         EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
@@ -171,6 +176,9 @@ class HeadersDlg(wxDialog):
 
     def OnCancel(self, event):
         self.EndModal(wxID_CANCEL)
+
+    def OnApply(self, event):
+        self.applyFunc(self.headers)
 
     def OnPreview(self, event):
         doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight)

@@ -1920,7 +1920,7 @@ class MyCtrl(wxControl):
             s = "%s" % cfg.getType(cur.newTypeTab).name
         else:
             s = "%s [change]" % cfg.getType(cur.nextTypeTab).name
-
+            
         sb.SetStatusText("Tab: %s" % s, 1)
         
     def applyCfg(self, newCfg, writeCfg = True):
@@ -1948,7 +1948,11 @@ class MyCtrl(wxControl):
 
         if writeCfg:
             util.writeToFile(gd.confFilename, cfg.save(), mainFrame)
-        
+
+    def applyHeaders(self, newHeaders):
+        self.sp.headers = newHeaders
+        self.OnPaginate()
+
     def checkEval(self):
         if not misc.license:
             wxMessageBox("This feature is not supported in the\n"
@@ -2034,6 +2038,7 @@ class MyCtrl(wxControl):
 
     def OnPaginate(self):
         self.paginate()
+        self.makeLineVisible(self.line)
         self.updateScreen()
 
     def OnTitles(self):
@@ -2046,11 +2051,11 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnHeaders(self):
-        dlg = headersdlg.HeadersDlg(mainFrame, copy.deepcopy(self.sp.headers),
-                                    cfg)
+        dlg = headersdlg.HeadersDlg(mainFrame,
+            copy.deepcopy(self.sp.headers), cfg, self.applyHeaders)
 
         if dlg.ShowModal() == wxID_OK:
-            self.sp.headers = dlg.headers
+            self.applyHeaders(dlg.headers)
 
         dlg.Destroy()
         
