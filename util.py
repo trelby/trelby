@@ -495,7 +495,7 @@ def showTempPDF(pdfData, cfg, mainFrame):
             # on Windows, Acrobat complains about "invalid path" if we
             # give the full path of the program as first arg, so give a
             # dummy arg.
-            args = ["pdf"] + cfg.pdfViewerArgs + [filename]
+            args = ["pdf"] + cfg.pdfViewerArgs.split() + [filename]
 
             os.spawnv(os.P_NOWAIT, cfg.pdfViewerPath, args)
 

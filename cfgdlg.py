@@ -444,10 +444,11 @@ class ColorsPanel(wxPanel):
 
         self.colorsLb = wxListBox(self, -1, size = (300, 250))
 
-        keys = self.cfg.colors.keys()
-        keys.sort()
-        for k in keys:
-            self.colorsLb.Append(k, self.cfg.colors[k])
+        tmp = self.cfg.colorVars.values()
+        tmp.sort(lambda c1, c2: cmp(c1.descr, c2.descr))
+        
+        for it in tmp:
+            self.colorsLb.Append(it.descr, it.name)
 
         hsizer.Add(self.colorsLb, 1)
 
@@ -1006,7 +1007,7 @@ class PDFPanel(wxPanel):
     
     def OnMisc(self, event = None):
         self.cfg.pdfViewerPath = self.progEntry.GetValue()
-        self.cfg.pdfViewerArgs = self.argsEntry.GetValue().split()
+        self.cfg.pdfViewerArgs = self.argsEntry.GetValue()
         self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
         self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
         self.cfg.pdfShowMargins = self.marginsCb.GetValue()
@@ -1014,7 +1015,7 @@ class PDFPanel(wxPanel):
         
     def cfg2gui(self):
         self.progEntry.SetValue(self.cfg.pdfViewerPath)
-        self.argsEntry.SetValue(" ".join(self.cfg.pdfViewerArgs))
+        self.argsEntry.SetValue(self.cfg.pdfViewerArgs)
         self.fontSizeEntry.SetValue(self.cfg.fontSize)
         self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
         self.marginsCb.SetValue(self.cfg.pdfShowMargins)

@@ -60,10 +60,14 @@ _text2lt = {
 # reverse to above
 _lt2text = {}
 
-# page break indicators
+# page break indicators. do not change these values as they're saved to
+# the config file.
 PBI_NONE = 0
 PBI_REAL = 1
 PBI_REAL_AND_UNADJ = 2
+
+# for range checking above value
+PBI_FIRST, PBI_LAST = PBI_NONE, PBI_REAL_AND_UNADJ
 
 # current config.
 currentCfg = None
@@ -79,6 +83,42 @@ for k, v in _text2lt.items():
 
 del k, v
 
+class ConfVar:
+    # name2 is the name to use while saving/loading the variable. if it's
+    # empty, the variable is not loaded/saved, i.e. is used only
+    # internally.
+    def __init__(self, name, defVal, name2):
+        self.name = name
+        self.defVal = defVal
+        self.name2 = name2
+
+class BoolVar(ConfVar):
+    def __init__(self, name, defVal, name2):
+        ConfVar.__init__(self, name, defVal, name2)
+
+class ColorVar(ConfVar):
+    def __init__(self, name, defVal, name2, descr):
+        ConfVar.__init__(self, name, defVal, name2)
+        self.descr = descr
+        
+class NumericVar(ConfVar):
+    def __init__(self, name, defVal, name2, minVal, maxVal):
+        ConfVar.__init__(self, name, defVal, name2)
+        self.minVal = minVal
+        self.maxVal = maxVal
+
+class FloatVar(NumericVar):
+    def __init__(self, name, defVal, name2, minVal, maxVal):
+        NumericVar.__init__(self, name, defVal, name2, minVal, maxVal)
+        
+class IntVar(NumericVar):
+    def __init__(self, name, defVal, name2, minVal, maxVal):
+        NumericVar.__init__(self, name, defVal, name2, minVal, maxVal)
+        
+class StrVar(ConfVar):
+    def __init__(self, name, defVal, name2):
+        ConfVar.__init__(self, name, defVal, name2)
+        
 class TextType:
     def __init__(self):
         self.isCaps = False
@@ -127,91 +167,119 @@ class Config:
         # type configs, key = line type, value = Type
         self.types = { }
 
-        # color list, key = color description, value = attribute name
-        self.colors = { }
-        
         # offsets from upper left corner of main widget, ie. this much empty
         # space is left on the top and left sides.
         self.offsetY = 10
         self.offsetX = 10
 
-        # integer/floating-point variables, with default, minimum and
-        # maximum values
-        self.numberVars = {
+        # list of subclassed ConfVar objects
+        self.vars = []
+        
+        # confirm non-undoable delete operations that would delete at
+        # least this many lines. (0 = disabled)
+        self.addInt("confirmDeletes", 2, "ConfirmDeletes", 0, 500)
 
-            # confirm non-undoable delete operations that would delete at
-            # least this many lines. (0 = disabled)
-            "confirmDeletes" : (2, 0, 500),
-            
-            # not used perse, but listed here so that we can easily query
-            # min/max values for these in various places
-            "elementEmptyLinesBefore" : (0, 0, 5),
-            "elementIndent" : (0, 0, 80),
-            "elementWidth" : (5, 5, 80),
+        # not used perse, but listed here so that we can easily query
+        # min/max values for these in various places
+        self.addInt("elementEmptyLinesBefore", 0, "", 0, 5)
+        self.addInt("elementIndent", 0, "", 0, 80)
+        self.addInt("elementWidth", 5, "", 5, 80)
 
-            # vertical distance between rows, in pixels
-            "fontYdelta" : (18, 4, 125),
-            
-            # font size used for PDF generation, in points
-            "fontSize" : (12, 4, 72),
+        # vertical distance between rows, in pixels
+        self.addInt("fontYdelta", 18, "FontYDelta", 4, 125)
 
-            # margins
-            "marginBottom" : (25.4, 0.0, 900.0),
-            "marginLeft" : (38.1, 0.0, 900.0),
-            "marginRight" : (25.4, 0.0, 900.0),
-            "marginTop" : (12.7, 0.0, 900.0),
-            
-            # how many lines to scroll per mouse wheel event
-            "mouseWheelLines" : (4, 1, 50),
-            
-            # interval in seconds between automatic pagination (0 = disabled)
-            # TODO: change this to 5 or something
-            "paginateInterval" : (0, 0, 60),
+        # font size used for PDF generation, in points
+        self.addInt("fontSize", 12, "PDF/FontSize", 4, 72)
 
-            # paper size
-            "paperHeight" : (297.0, 100.0, 1000.0),
-            "paperWidth" : (210.0, 50.0, 1000.0),
-            
-            # leave at least this many action lines on the end of a page
-            "pbActionLines" : (2, 1, 30),
-            
-            # leave at least this many dialogue lines on the end of a page
-            "pbDialogueLines" : (2, 1, 30),
-            }
+        # margins
+        self.addFloat("marginBottom", 25.4, "Margin/Bottom", 0.0, 900.0)
+        self.addFloat("marginLeft", 38.1, "Margin/Left", 0.0, 900.0)
+        self.addFloat("marginRight", 25.4, "Margin/Right", 0.0, 900.0)
+        self.addFloat("marginTop", 12.7, "Margin/Top", 0.0, 900.0)
 
-        for k, v in self.numberVars.iteritems():
-            setattr(self, k, v[0])
-            
+        # how many lines to scroll per mouse wheel event
+        self.addInt("mouseWheelLines", 4, "MouseWheelLines", 1, 50)
+
+        # interval in seconds between automatic pagination (0 = disabled)
+        # TODO: change this to 5 or something
+        self.addInt("paginateInterval", 0, "PaginateInterval", 0, 60)
+
+        # paper size
+        self.addFloat("paperHeight", 297.0, "Paper/Height", 100.0, 1000.0)
+        self.addFloat("paperWidth", 210.0, "Paper/Width", 50.0, 1000.0)
+
+        # leave at least this many action lines on the end of a page
+        self.addInt("pbActionLines", 2, "PageBreakActionLines", 1, 30)
+
+        # leave at least this many dialogue lines on the end of a page
+        self.addInt("pbDialogueLines", 2, "PageBreakDialogueLines", 1, 30)
+
         # whether to check script for errors before export / print
-        self.checkOnExport = True
+        self.addBool("checkOnExport", True, "CheckScriptForErrors")
         
         # whether to auto-capitalize start of sentences
-        self.capitalize = True
+        self.addBool("capitalize", True, "CapitalizeSentences")
 
         # page break indicators to show
-        self.pbi = PBI_REAL
+        self.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,
+                    PBI_LAST)
         
         # PDF viewer program and args
         if misc.isUnix:
-            self.pdfViewerPath = "/usr/local/Acrobat5/bin/acroread"
-            self.pdfViewerArgs = [ "-tempFile" ]
+            s1 = "/usr/local/Acrobat5/bin/acroread"
+            s2 = "-tempFile"
         elif misc.isWindows:
-            self.pdfViewerPath = r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe"
-            self.pdfViewerArgs = [""]
+            s1 = r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe"
+            s2 = ""
         else:
-            self.pdfViewerPath = "not set yet (unknown platform %s)"\
+            s1 = "not set yet (unknown platform %s)"\
                                  % wxPlatform
-            self.pdfViewerArgs = []
+            s2 = ""
 
+        self.addStr("pdfViewerPath", s1, "PDF/ViewerPath")
+        self.addStr("pdfViewerArgs", s2, "PDF/ViewerArguments")
+
+        # font
+        if misc.isUnix:
+            s1 = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
+        elif misc.isWindows:
+            s1 = "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
+        else:
+            s1 = ""
+            
+        self.addStr("nativeFont", s1, "FontInfo")
+        
         # default script directory
-        self.scriptDir = misc.progPath
+        self.addStr("scriptDir", misc.progPath, "DefaultScriptDirectory")
         
         # whether to draw rectangle showing margins
-        self.pdfShowMargins = False
+        self.addBool("pdfShowMargins", False, "PDF/ShowMargins")
 
         # whether to show line numbers next to each line
-        self.pdfShowLineNumbers = False
+        self.addBool("pdfShowLineNumbers", False, "PDF/ShowLineNumbers")
+
+        # colors
+        self.addColor("text", 0, 0, 0, "TextFG", "Text foreground")
+        self.addColor("bg", 204, 204, 204, "TextBG", "Text background")
+        self.addColor("selected", 128, 192, 192, "Selected", "Selection")
+        self.addColor("search", 255, 127, 0, "SearchResult", "Search result")
+        self.addColor("cursor", 205, 0, 0, "Cursor", "Cursor")
+        self.addColor("autoCompFg", 0, 0, 0, "AutoCompletionFG",
+                      "Auto-completion foreground")
+        self.addColor("autoCompBg", 249, 222, 99, "AutoCompletionBG",
+                      "Auto-completion background")
+        self.addColor("note", 255, 255, 0, "ScriptNote", "Script note")
+        self.addColor("pagebreak", 128, 128, 128, "PageBreakLine",
+                      "Page-break line")
+        self.addColor("pagebreakNoAdjust", 128, 128, 128,
+                      "PageBreakNoAdjustLine",
+                      "Page-break (original, not adjusted) line")
         
+        # make various dictionaries pointing to the config variables.
+        self.allVars = self.genDict()
+        self.colorVars = self.genDict(ColorVar)
+        self.numericVars = self.genDict(NumericVar)
+
         # element types
         t = Type()
         t.lt = SCENE
@@ -331,44 +399,49 @@ class Config:
         t.prevTypeTab = CHARACTER
         self.types[t.lt] = t
 
-        if misc.isUnix:
-            self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
-        elif misc.isWindows:
-            self.nativeFont = "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
-        else:
-            self.nativeFont = ""
-
-        self.addColor("textColor", "Text foreground", 0, 0, 0)
-        self.addColor("bgColor", "Text background", 204, 204, 204)
-        self.addColor("selectedColor", "Selection", 128, 192, 192)
-        self.addColor("searchColor", "Search result", 255, 127, 0)
-        self.addColor("cursorColor", "Cursor", 205, 0, 0)
-        self.addColor("autoCompFgColor", "Auto-completion foreground",
-                      0, 0, 0)
-        self.addColor("autoCompBgColor", "Auto-completion background",
-                      249, 222, 99)
-        self.addColor("noteColor", "Script note", 255, 255, 0)
-        self.addColor("pagebreakColor", "Page-break line", 128, 128, 128)
-        self.addColor("pagebreakNoAdjustColor",
-            "Page-break (original, not adjusted) line", 128, 128, 128)
-
         self.recalc()
 
-    def addColor(self, name, descr, r, g, b):
-        setattr(self, name, wxColour(r, g, b))
-        self.colors[descr] = name
+    def addVar(self, var):
+        setattr(self, var.name, var.defVal)
+        self.vars.append(var)
         
-    # get default value of a numeric setting
+    def addBool(self, *params):
+        self.addVar(BoolVar(*params))
+
+    def addColor(self, name, r, g, b, name2, descr):
+        self.addVar(ColorVar(name + "Color", wxColour(r, g, b),
+                             "Color/" + name2, descr))
+        
+    def addFloat(self, *params):
+        self.addVar(FloatVar(*params))
+        
+    def addInt(self, *params):
+        self.addVar(IntVar(*params))
+        
+    def addStr(self, *params):
+        self.addVar(StrVar(*params))
+
+    # return dictionary containing given type of variable objects, or all
+    # if typeObj is None.
+    def genDict(self, typeObj = None):
+        tmp = {}
+        for it in self.vars:
+            if not typeObj or isinstance(it, typeObj):
+                tmp[it.name] = it
+
+        return tmp
+
+    # get default value of a setting
     def getDefault(self, name):
-        return self.numberVars[name][0]
+        return self.allVars[name].defVal
         
     # get minimum value of a numeric setting
     def getMin(self, name):
-        return self.numberVars[name][1]
+        return self.numericVars[name].minVal
         
     # get maximum value of a numeric setting
     def getMax(self, name):
-        return self.numberVars[name][2]
+        return self.numericVars[name].maxVal
         
     # get minimum and maximum value of a numeric setting as a (min,max)
     # tuple.
@@ -385,8 +458,8 @@ class Config:
     # box, thus getting the minimum value), which would then possibly
     # modify the value of other variables which is not what we want.
     def recalc(self, doAll = True):
-        for k, v in self.numberVars.iteritems():
-            util.clampObj(self, k, v[1], v[2])
+        for it in self.numericVars.itervalues():
+            util.clampObj(self, it.name, it.minVal, it.maxVal)
 
         for el in self.types.itervalues():
             util.clampObj(el, "emptyLinesBefore",
