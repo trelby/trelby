@@ -6,3 +6,4 @@ copy names.dat dist
 copy sample.blyte dist
 copy default.blyte dist
 copy manual.pdf dist
+copy fileformat.txt dist
