@@ -2995,8 +2995,8 @@ class MyCtrl(wxControl):
                 self.maybeMark(ev.ShiftDown())
                 
             self.column = len(ls[self.line].text)
-                
-        elif kc == WXK_PRIOR:
+
+        elif kc in (WXK_PRIOR, WXK_PAGEUP):
             if not self.autoComp:
                 self.maybeMark(ev.ShiftDown())
 
@@ -3038,7 +3038,7 @@ class MyCtrl(wxControl):
                 
                 doAutoComp = AC_KEEP
             
-        elif kc == WXK_NEXT:
+        elif kc in (WXK_NEXT, WXK_PAGEDOWN):
             if not self.autoComp:
                 self.maybeMark(ev.ShiftDown())
                 
