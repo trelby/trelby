@@ -67,6 +67,7 @@ ID_FILE_PRINT = 23
 ID_TOOLS_COMPARE_SCRIPTS = 24
 ID_SCRIPT_TITLES = 25
 ID_SCRIPT_HEADERS = 26
+ID_REPORTS_CHARACTER_REP = 27
 
 def refreshGuiConfig():
     global cfgGui
@@ -1616,7 +1617,10 @@ class MyCtrl(wxControl):
         
     def OnDialogueChart(self):
         self.paginate()
-        #dialoguechart.show(mainFrame, self, cfg)
+        dialoguechart.show(mainFrame, self, cfg)
+
+    def OnCharacterReport(self):
+        self.paginate()
         report.genCharacterReport(mainFrame, self, cfg)
 
     def OnCharMap(self):
@@ -2497,6 +2501,7 @@ class MyFrame(wxFrame):
 
         reportsMenu = wxMenu()
         reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart")
+        reportsMenu.Append(ID_REPORTS_CHARACTER_REP, "&Character report...")
         
         toolsMenu = wxMenu()
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
@@ -2577,6 +2582,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitles)
         EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeaders)
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnDialogueChart)
+        EVT_MENU(self, ID_REPORTS_CHARACTER_REP, self.OnCharacterReport)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharMap)
         EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
@@ -2733,6 +2739,9 @@ class MyFrame(wxFrame):
 
     def OnDialogueChart(self, event):
         self.panel.ctrl.OnDialogueChart()
+
+    def OnCharacterReport(self, event):
+        self.panel.ctrl.OnCharacterReport()
 
     def OnNameDb(self, event):
         if not hasattr(self, "names"):
