@@ -61,7 +61,7 @@ class Screenplay:
 class MyCtrl(wxControl):
 
     def __init__(self, parent, id):
-        wxControl.__init__(self, parent, id)#, style=wxWANTS_CHARS)
+        wxControl.__init__(self, parent, id, style=wxWANTS_CHARS)
 
         EVT_SIZE(self, self.OnSize)
         EVT_PAINT(self, self.OnPaint)
