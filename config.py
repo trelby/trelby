@@ -61,9 +61,9 @@ class Type:
         self.isItalic = False
         self.isUnderlined = False
 
-        # what's the next type from this type. used in figuring out what
-        # type of element to insert when user presses enter.
-        self.nextType = None
+        # what type of element to insert when user presses enter or tab.
+        self.newTypeEnter = None
+        self.newTypeTab = None
 
         # what element to switch to when user hits tab / shift-tab.
         self.nextTypeTab = None
@@ -142,7 +142,8 @@ class Config:
         t.width = 60
         t.isCaps = True
         t.isBold = True
-        t.nextType = ACTION
+        t.newTypeEnter = ACTION
+        t.newTypeTab = CHARACTER
         t.nextTypeTab = ACTION
         t.prevTypeTab = TRANSITION
         t.doAutoComp = True
@@ -154,7 +155,8 @@ class Config:
         t.emptyLinesBefore = 1
         t.indent = 0
         t.width = 60
-        t.nextType = ACTION
+        t.newTypeEnter = ACTION
+        t.newTypeTab = CHARACTER
         t.nextTypeTab = CHARACTER
         t.prevTypeTab = CHARACTER
         self.types[t.type] = t
@@ -166,7 +168,8 @@ class Config:
         t.indent = 25
         t.width = 20
         t.isCaps = True
-        t.nextType = DIALOGUE
+        t.newTypeEnter = DIALOGUE
+        t.newTypeTab = PAREN
         t.nextTypeTab = ACTION
         t.prevTypeTab = ACTION
         t.doAutoComp = True
@@ -178,7 +181,8 @@ class Config:
         t.emptyLinesBefore = 0
         t.indent = 10
         t.width = 35
-        t.nextType = CHARACTER
+        t.newTypeEnter = CHARACTER
+        t.newTypeTab = ACTION
         t.nextTypeTab = PAREN
         t.prevTypeTab = ACTION
         self.types[t.type] = t
@@ -189,7 +193,8 @@ class Config:
         t.emptyLinesBefore = 0
         t.indent = 20
         t.width = 25
-        t.nextType = DIALOGUE
+        t.newTypeEnter = DIALOGUE
+        t.newTypeTab = ACTION
         t.nextTypeTab = CHARACTER
         t.prevTypeTab = DIALOGUE
         self.types[t.type] = t
@@ -201,7 +206,8 @@ class Config:
         t.indent = 55
         t.width = 15
         t.isCaps = True
-        t.nextType = SCENE
+        t.newTypeEnter = SCENE
+        t.newTypeTab = TRANSITION
         t.nextTypeTab = SCENE
         t.prevTypeTab = CHARACTER
         t.doAutoComp = True

@@ -525,6 +525,16 @@ class MyCtrl(wxControl):
             self.line += len(wrappedLines) - (line2 - line1 + 1)
             
         return len(wrappedLines)
+
+    # rewraps paragraph previous to current one.
+    def rewrapPrevPara(self):
+        line = self.getParaFirstIndexFromLine(self.line)
+
+        if line == 0:
+            return
+        
+        line = self.getParaFirstIndexFromLine(line - 1)
+        self.rewrapPara(line)
         
     def convertCurrentTo(self, type):
         ls = self.sp.lines
@@ -575,7 +585,27 @@ class MyCtrl(wxControl):
         self.sp.lines.insert(self.line + 1, newLine)
         self.line += 1
         self.column = 0
-    
+
+    # split element at current position. newType is type to give to the
+    # new element.
+    def splitElement(self, newType):
+        ls = self.sp.lines
+        
+        if not self.autoComp:
+            if self.isAtEndOfParen():
+                self.column += 1
+        else:
+            ls[self.line].text = self.autoComp[self.autoCompSel]
+            self.column = len(ls[self.line].text)
+
+        self.splitLine()
+        ls[self.line - 1].lb = config.LB_LAST
+
+        self.convertCurrentTo(newType)
+        
+        self.rewrapPara()
+        self.rewrapPrevPara()
+
     # delete character at given position and optionally position
     # cursor there.
     def deleteChar(self, line, column, posCursor = True):
@@ -763,7 +793,32 @@ class MyCtrl(wxControl):
                 lo = mid + 1
 
         return lo
-    
+
+    # returns True if we're at second-to-last character of PAREN element,
+    # and last character is ")"
+    def isAtEndOfParen(self):
+        ls = self.sp.lines
+        
+        return self.isLastLineOfElem(self.line) and\
+           (ls[self.line].type == config.PAREN) and\
+           (ls[self.line].text[self.column:] == ")")
+
+    # returns True if pressing TAB at current position would make a new
+    # element, False if it would just change element's type.
+    def tabMakesNew(self):
+        l = self.sp.lines[self.line]
+
+        if self.isAtEndOfParen():
+            return True
+        
+        if (l.lb != config.LB_LAST) or (self.column != len(l.text)):
+            return False
+
+        if (len(l.text) == 0) and self.isOnlyLineOfElem(self.line):
+            return False
+
+        return True
+        
     def isLineVisible(self, line):
         bottom = self.topLine + self.getLinesOnScreen() - 1
         if (line >= self.topLine) and (line <= bottom):
@@ -1186,10 +1241,23 @@ class MyCtrl(wxControl):
     # update GUI elements shared by all scripts, like statusbar etc
     def updateCommon(self):
         self.updateTypeCb()
-        mainFrame.statusBar.SetStatusText("Page: %3d / %3d (line %d)" %
-            (self.line2page(self.line),
-             self.line2page(len(self.sp.lines) - 1), self.line + 1), 0)
 
+        sb = mainFrame.statusBar
+        
+        sb.SetStatusText("Page: %3d / %3d" % (self.line2page(self.line),
+            self.line2page(len(self.sp.lines) - 1)), 2)
+
+        cur = cfg.getType(self.sp.lines[self.line].type)
+        
+        sb.SetStatusText("Enter: %s" % cfg.getType(cur.newTypeEnter).name, 0)
+
+        if self.tabMakesNew():
+            s = "%s" % cfg.getType(cur.newTypeTab).name
+        else:
+            s = "%s [change]" % cfg.getType(cur.nextTypeTab).name
+
+        sb.SetStatusText("Tab: %s" % s, 1)
+        
     def applyCfg(self, newCfg):
         global cfg
         
@@ -1460,32 +1528,9 @@ class MyCtrl(wxControl):
                 self.splitLine()
                 
                 self.rewrapPara()
+                self.rewrapPrevPara()
             else:
-                if not self.autoComp:
-                    if self.isLastLineOfElem(self.line) and\
-                       (ls[self.line].type == config.PAREN) and\
-                       (ls[self.line].text[self.column:] == ")"):
-                        self.column += 1
-
-                    self.splitLine()
-                    ls[self.line - 1].lb = config.LB_LAST
-
-                    newType = tcfg.nextType
-                    i = self.line
-                    while 1:
-                        ls[i].type = newType
-                        if ls[i].lb == config.LB_LAST:
-                            break
-                        i += 1
-                else:
-                    ls[self.line].text = self.autoComp[self.autoCompSel]
-                    self.column = len(ls[self.line].text)
-
-                    self.splitLine()
-                    ls[self.line - 1].lb = config.LB_LAST
-                    ls[self.line].type = tcfg.nextType
-                    
-                self.rewrapPara()
+                self.splitElement(tcfg.newTypeEnter)
 
         elif kc == WXK_BACK:
             if self.column == 0:
@@ -1642,12 +1687,15 @@ class MyCtrl(wxControl):
                 return
             
         elif kc == WXK_TAB:
-            if not ev.ShiftDown():
-                type = tcfg.nextTypeTab
+            if self.tabMakesNew():
+                self.splitElement(tcfg.newTypeTab)
             else:
-                type = tcfg.prevTypeTab
-                
-            self.convertCurrentTo(type)
+                if not ev.ShiftDown():
+                    type = tcfg.nextTypeTab
+                else:
+                    type = tcfg.prevTypeTab
+
+                self.convertCurrentTo(type)
 
         elif kc == WXK_ESCAPE:
             self.mark = -1
@@ -1986,8 +2034,8 @@ class MyFrame(wxFrame):
         vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND)
 
         self.statusBar = wxStatusBar(self)
-        self.statusBar.SetFieldsCount(2)
-        self.statusBar.SetStatusWidths([-1, -1])
+        self.statusBar.SetFieldsCount(3)
+        self.statusBar.SetStatusWidths([-2, -2, -1])
         self.SetStatusBar(self.statusBar)
 
         EVT_NOTEBOOK_PAGE_CHANGED(self, self.notebook.GetId(),
