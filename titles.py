@@ -81,9 +81,7 @@ class TitleString:
         # font
         self.font = font
 
-    def generatePML(self, page):
-        x = self.x
-
+    def getStyle(self):
         fl = self.font
 
         if self.isBold:
@@ -95,13 +93,19 @@ class TitleString:
         if self.isUnderlined:
             fl |= pml.UNDERLINED
 
+        return fl
+    
+    def generatePML(self, page):
+        x = self.x
+
         align = util.ALIGN_LEFT
 
         if self.isCentered:
             x = page.doc.w / 2
             align = util.ALIGN_CENTER
 
-        page.add(pml.TextOp(self.text, x, self.y, self.size, fl, align))
+        page.add(pml.TextOp(self.text, x, self.y, self.size,
+                            self.getStyle(), align))
 
     # parse information from s, which must be a string created by __str__,
     # and set object state accordingly. keeps default settings on any

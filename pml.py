@@ -66,8 +66,6 @@ class DrawOp:
 # corner of the page. Font used is 'size' points, and Courier / Times/
 # Helvetica as indicated by the flags, possibly being bold / italic /
 # underlined.
-#
-# FIXME: text alignment is only supported for Courier fonts for now.
 class TextOp(DrawOp):
     def __init__(self, text, x, y, size, flags = NORMAL | COURIER,
                  align = util.ALIGN_LEFT, valign = util.VALIGN_TOP):
@@ -80,7 +78,7 @@ class TextOp(DrawOp):
         self.flags = flags
 
         if align != util.ALIGN_LEFT:
-            w = util.points2x(size) * len(text)
+            w = util.getTextWidth(text, flags, size)
 
             if align == util.ALIGN_CENTER:
                 self.x -= w / 2
@@ -88,7 +86,7 @@ class TextOp(DrawOp):
                 self.x -= w
 
         if valign != util.VALIGN_TOP:
-            h = util.points2y(size)
+            h = util.getTextHeight(size)
             
             if valign == util.VALIGN_CENTER:
                 self.y -= h / 2

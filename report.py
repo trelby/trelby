@@ -128,7 +128,7 @@ class CharacterReport:
         self.fontSize = 12
 
         charsToLine = int((self.cfg.paperWidth - self.margin * 2.0) /
-                          util.points2x(self.fontSize))
+                          util.getTextWidth(" ", pml.COURIER, self.fontSize))
         
         # character name font
         nameFs = 14
@@ -189,7 +189,7 @@ class CharacterReport:
         if fs == None:
             fs = self.fontSize
 
-        yd = util.points2y(fs)
+        yd = util.getTextHeight(fs)
 
         if (self.y + yd) > (self.cfg.paperHeight - self.margin):
             self.doc.add(self.pg)

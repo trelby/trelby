@@ -194,7 +194,7 @@ class HeadersDlg(wxDialog):
         self.headers.generatePML(pg, "42", self.cfg)
 
         fs = self.cfg.fontSize
-        ch_y = util.points2y(fs)
+        ch_y = util.getTextHeight(fs)
         
         y = self.cfg.marginTop + self.headers.getNrOfLines() * ch_y
         

@@ -294,7 +294,7 @@ class TitlesDlg(wxDialog):
 
         if self.tsIndex != -1:
             ts = copy.deepcopy(self.titles.pages[self.pageIndex][self.tsIndex])
-            ts.y += util.points2y(ts.size)
+            ts.y += util.getTextHeight(ts.size)
         else:
             ts = titles.TitleString("new string", 0.0, 100.0)
 
@@ -470,13 +470,12 @@ class TitlesPreview(wxWindow):
                 if len(ts.text) == 0:
                     continue
 
-                ch_x = util.points2x(ts.size)
-                ch_y = util.points2y(ts.size)
-
-                textW = int(((len(ts.text) * ch_x) / self.cfg.paperWidth) * w)
+                textW = int((util.getTextWidth(ts.text, ts.getStyle(),
+                    ts.size) / self.cfg.paperWidth) * w)
                 textW = max(1, textW)
                 
-                textH = int((ch_y / self.cfg.paperHeight) * h)
+                textH = int((util.getTextHeight(ts.size) /
+                             self.cfg.paperHeight) * h)
                 textH = max(1, textH)
                 
                 if ts.isCentered:

@@ -1,4 +1,5 @@
 from error import *
+
 import glob
 import os
 import tempfile
@@ -13,6 +14,10 @@ ALIGN_RIGHT   = 2
 VALIGN_TOP    = 1
 VALIGN_CENTER = 2
 VALIGN_BOTTOM = 3
+
+# this has to be below the ALIGN stuff, otherwise things break due to
+# circular dependencies
+import fontinfo
 
 # mappings from lowercase to uppercase letters for different charsets
 _iso_8859_1_map = {
@@ -183,14 +188,13 @@ def isFixedWidth(font):
     
     return w1 == w2
 
-# return how many mm tall 'points' size font is
-def points2y(points):
-    return (points / 72.0) * 25.4
+# return how many mm tall given font size is.
+def getTextHeight(size):
+    return (size / 72.0) * 25.4
 
-# return how many mm wide 'points' size font is. this assumes standard PDF
-# Courier font, which has a width of 0.6 units for each character.
-def points2x(points):
-    return ((points * 0.6) / 72.0) * 25.4
+# return how many mm wide given text is at given style with given size.
+def getTextWidth(text, style, size):
+    return (fontinfo.getTextWidth(text, style, size) / 72.0) * 25.4
     
 def reverseComboSelect(combo, clientData):
     for i in range(combo.GetCount()):

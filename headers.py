@@ -94,9 +94,9 @@ class HeaderString:
         fs = cfg.fontSize
         
         if self.xoff != 0:
-            x += util.points2x(fs) * self.xoff
+            x += util.getTextWidth(" ", pml.COURIER, fs) * self.xoff
 
-        y = cfg.marginTop + (self.line - 1) * util.points2y(fs)
+        y = cfg.marginTop + (self.line - 1) * util.getTextHeight(fs)
 
         text = self.text.replace("${PAGE}", pageNr)
         

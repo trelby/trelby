@@ -139,7 +139,7 @@ class DialogueChart:
             self.charFs = size
         
             # how many mm in Y direction for each character
-            self.charY = util.points2y(self.charFs)
+            self.charY = util.getTextHeight(self.charFs)
 
             # height of chart
             self.chartHeight = len(self.cinfo) * self.charY
@@ -161,7 +161,7 @@ class DialogueChart:
             maxLen = max(maxLen, len(ci.name))
         maxLen = max(10, maxLen)
         
-        charX = util.points2x(self.charFs)
+        charX = util.getTextWidth(" ", pml.COURIER, self.charFs)
 
         # chart X pos
         self.chartX = self.margin + maxLen * charX + 3

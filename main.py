@@ -483,8 +483,8 @@ class MyCtrl(wxControl):
 
         sp.titles.generatePages(doc)
         
-        ch_x = util.points2x(fs)
-        ch_y = util.points2y(fs)
+        ch_x = util.getTextWidth(" ", pml.COURIER, fs)
+        ch_y = util.getTextHeight(fs)
         
         # used in several places, so keep around
         charIndent = cfg.getType(config.CHARACTER).indent
@@ -1770,7 +1770,7 @@ class MyCtrl(wxControl):
         dlt = tmp
         
         fs = cfg.fontSize
-        ch_y = util.points2y(fs)
+        ch_y = util.getTextHeight(fs)
         
         doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
                            cfg.paperType)

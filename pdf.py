@@ -1,3 +1,4 @@
+import fontinfo
 import pml
 import util
 
@@ -113,14 +114,13 @@ class PDFExporter:
                             "ET\n" % (x, y, s)
 
                     if op.flags & pml.UNDERLINED:
+                        
+                        undLen = fontinfo.getTextWidth(op.text, op.flags,
+                                                       op.size)
 
-                        # AFM says Courier fonts have a width of 600 units
-                        ch_x = 0.6 * op.size
-
-                        # AFM says Courier has the underline line 100
-                        # units below baseline with a thickness of 50
+                        # all standard PDF fonts have the underline line
+                        # 100 units below baseline with a thickness of 50
                         undY = y - 0.1 * op.size
-                        undLen = len(op.text) * ch_x
 
                         cont += "%f w\n"\
                                 "%f %f m\n"\

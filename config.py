@@ -375,7 +375,7 @@ class Config:
         h = self.paperHeight - self.marginTop - self.marginBottom
 
         # how many lines on a page
-        self.linesOnPage = int(h / util.points2y(self.fontSize))
+        self.linesOnPage = int(h / util.getTextHeight(self.fontSize))
 
     def getType(self, lt):
         return self.types[lt]
