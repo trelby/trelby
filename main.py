@@ -2557,6 +2557,8 @@ class MyFrame(wxFrame):
         self.statusBar.SetStatusWidths([-2, -2, -1])
         self.SetStatusBar(self.statusBar)
 
+        EVT_MENU_HIGHLIGHT_ALL(self, self.OnMenuHighlight)
+        
         EVT_NOTEBOOK_PAGE_CHANGED(self, self.notebook.GetId(),
                                   self.OnPageChange)
         
@@ -2652,6 +2654,11 @@ class MyFrame(wxFrame):
 
     def OnTimer(self, event):
         self.OnPaginate()
+
+    def OnMenuHighlight(self, event):
+        # default implementation modifies status bar, so we need to
+        # override it and do nothing
+        pass
 
     def OnPageChange(self, event):
         newPage = event.GetSelection()
@@ -2752,7 +2759,7 @@ class MyFrame(wxFrame):
             wxBeginBusyCursor()
             self.names = decode.readNames("names.dat")
             wxEndBusyCursor()
-            self.statusBar.SetStatusText("", 1)
+            self.panel.ctrl.updateCommon()
 
             if self.names.count == 0:
                 wxMessageBox("Error opening name database", "Error",
