@@ -99,13 +99,22 @@ class CharacterReport:
         for v in chars.values():
             self.cinfo.append(v)
 
-        self.cinfo.sort(cmpSpeech)
+        self.cinfo.sort(cmpLines)
+
+        self.totalSpeechCnt = self.sum("speechCnt")
+        self.totalLineCnt = self.sum("lineCnt")
+        self.totalWordCnt = self.sum("wordCnt")
+        self.totalWordCharCnt = self.sum("wordCharCnt")
 
         # information types and what to include
         self.INF_BASIC, self.INF_PAGES, self.INF_LOCATIONS = range(3)
         self.infList = ["Basic information", "Page list", "Location list"]
         self.inf = [True] * len(self.infList)
 
+    # calculate total sum of self.cinfo.{name} and return it.
+    def sum(self, name):
+        return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
+        
     def generate(self):
         self.doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight,
                            self.cfg.paperType)
@@ -133,8 +142,10 @@ class CharacterReport:
                          style = pml.BOLD | pml.UNDERLINED)
 
             if self.inf[self.INF_BASIC]:
-                self.addText("Speeches: %d, Lines: %d, per speech: %.2f" %
+                self.addText("Speeches: %d, Lines: %d (%.2f%%),"
+                             " per speech: %.2f" %
                              (ci.speechCnt, ci.lineCnt,
+                              (ci.lineCnt * 100.0) / self.totalLineCnt,
                               ci.lineCnt / float(ci.speechCnt)))
                 self.addText("Words: %d, per speech: %.2f,"
                              " characters per: %.2f"
@@ -186,7 +197,7 @@ class CharacterReport:
         self.pg.add(pml.TextOp(text, x, self.y, fs, style))
 
         self.y += yd
-            
+
 # information about one character
 class CharInfo:
     def __init__(self, name):
@@ -249,14 +260,6 @@ class CharInfo:
                 i += 1
             
         return s
-
-def cmpSpeech(c1, c2):
-    ret = cmp(c2.speechCnt, c1.speechCnt)
-
-    if ret != 0:
-        return ret
-    else:
-        return cmpLines(c1, c2)
 
 def cmpLines(c1, c2):
     ret = cmp(c2.lineCnt, c1.lineCnt)

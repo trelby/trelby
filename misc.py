@@ -147,7 +147,7 @@ class CheckBoxDlg(wxDialog):
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
         EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
-        self.list1.SetFocus()
+        okBtn.SetFocus()
         
     def addList(self, descr, panel, sizer, items, doBtns, portion, isFirst,
                 pad = 0):
