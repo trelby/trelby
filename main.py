@@ -14,6 +14,7 @@ import pdf
 import pml
 import splash
 import titles
+import titlesdlg
 import util
 
 import codecs
@@ -61,6 +62,7 @@ ID_REPORTS_DIALOGUE_CHART = 21
 ID_TOOLS_CHARMAP = 22
 ID_FILE_PRINT = 23
 ID_TOOLS_COMPARE_SCRIPTS = 24
+ID_SCRIPT_TITLES = 25
 
 def refreshGuiConfig():
     global cfgGui
@@ -1542,6 +1544,15 @@ class MyCtrl(wxControl):
         self.paginate()
         self.updateScreen()
 
+    def OnTitles(self):
+        dlg = titlesdlg.TitlesDlg(mainFrame, copy.deepcopy(self.sp.titles),
+                                  cfg)
+
+        if dlg.ShowModal() == wxID_OK:
+            self.sp.titles = dlg.titles
+
+        dlg.Destroy()
+        
     def OnDialogueChart(self):
         self.paginate()
         dialoguechart.show(mainFrame, self, cfg)
@@ -2413,14 +2424,18 @@ class MyFrame(wxFrame):
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene\tCTRL-A")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_FIND, "&Find && Replace\tCTRL-F")
+        editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
         editMenu.AppendSeparator()
         editMenu.AppendCheckItem(ID_EDIT_SHOW_FORMATTING, "S&how formatting")
         
         scriptMenu = wxMenu()
         scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error\tCTRL-E")
-        scriptMenu.Append(ID_SCRIPT_REFORMAT, "&Reformat all")
+
+        # TODO: remove permanently if this is not needed anymore
+        #scriptMenu.Append(ID_SCRIPT_REFORMAT, "&Reformat all")
+        
         scriptMenu.Append(ID_SCRIPT_PAGINATE, "&Paginate")
+        scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
 
         reportsMenu = wxMenu()
         reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart")
@@ -2433,7 +2448,7 @@ class MyFrame(wxFrame):
         helpMenu = wxMenu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
         helpMenu.AppendSeparator()
-        helpMenu.Append(ID_HELP_ABOUT, "&About")
+        helpMenu.Append(ID_HELP_ABOUT, "&About...")
         
         self.menuBar = wxMenuBar()
         self.menuBar.Append(fileMenu, "&File")
@@ -2501,6 +2516,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindError)
         EVT_MENU(self, ID_SCRIPT_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
+        EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitles)
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnDialogueChart)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharMap)
@@ -2648,6 +2664,9 @@ class MyFrame(wxFrame):
 
     def OnPaginate(self, event = None):
         self.panel.ctrl.OnPaginate()
+
+    def OnTitles(self, event):
+        self.panel.ctrl.OnTitles()
 
     def OnDialogueChart(self, event):
         self.panel.ctrl.OnDialogueChart()
