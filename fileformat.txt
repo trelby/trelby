@@ -13,6 +13,34 @@ Config values:
 "Version". Required. Value: (digit)+. The fileformat version that the file
 uses. Currently only version 1 exists.
 
+"Title-Page". Value: None. Starts a new title page.
+
+"Title-String". Adds a new string to the current title page. If no title
+pages exist yet, creates one. Example:
+
+ 0.000000,70.000000,24,cb,Helvetica,text here
+
+ Format is: xpos,ypos,fontsize,style-flags,font,text
+
+  'xpos' and 'ypos' are floating point values, giving the offset in
+  millimeters of the upper-left corner of the text string from the
+  upper-left corner of the page.
+
+  'fontsize' is font size in points, e.g. 1/72 inch units.
+
+  'style-flags' can contain any combination of the following characters:
+
+   c: Text is centered horizontally on the page. In this case xpos is not
+   used for anything.
+
+   b, i, u: Text is bold / italic / underlined.
+
+  'font' is the font name. Currently supported are Courier, Helvetica and
+  Times (Times-Roman).
+
+  'text' is simply the text string.
+
+
 Normal lines:
 
 Each normal line has two bytes at the beginning that signal the type of

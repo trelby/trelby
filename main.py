@@ -203,6 +203,7 @@ class MyCtrl(wxControl):
     def createEmptySp(self):
         self.clearVars()
         self.sp = Screenplay()
+        self.sp.titles.addDefaults()
         self.sp.lines.append(Line(config.LB_LAST, config.SCENE, ""))
         self.setFile(None)
         self.makeBackup()
@@ -284,7 +285,7 @@ class MyCtrl(wxControl):
 
             # did we encounter unknown element types
             unknownTypes = False
-            
+
             for i in range(1, len(lines)):
                 s = lines[i]
 
@@ -296,9 +297,18 @@ class MyCtrl(wxControl):
                     if not key:
                         raise MiscError("Line %d has invalid syntax for"
                             " config line." % (i + 1))
-                    
-                    # TODO: handle different config values once we have some
-                    
+
+                    if key == "Title-Page":
+                        sp.titles.pages.append([])
+                        
+                    elif key == "Title-String":
+                        if len(sp.titles.pages) == 0:
+                            sp.titles.pages.append([])
+
+                        tmp = titles.TitleString()
+                        tmp.load(val)
+                        sp.titles.pages[-1].append(tmp)
+
                 else:
                     lb = config.text2lb(s[0], False)
                     lt = config.text2lt(s[1], False)
@@ -373,9 +383,16 @@ class MyCtrl(wxControl):
         output += codecs.BOM_UTF8
         output += "#Version 1\n"
 
+        pgs = self.sp.titles.pages
+        for pg in range(len(pgs)):
+            if pg != 0:
+                output += "#Title-Page \n"
+
+            for i in xrange(len(pgs[pg])):
+                output += "#Title-String %s\n" % util.toUTF8(str(pgs[pg][i]))
+
         for i in range(0, len(ls)):
-            output += unicode(str(ls[i]) + "\n",
-                              "ISO-8859-1").encode("UTF-8")
+            output += util.toUTF8(str(ls[i]) + "\n")
 
         if util.writeToFile(fileName, str(output), mainFrame):
             self.setFile(fileName)
@@ -418,8 +435,6 @@ class MyCtrl(wxControl):
         ls = sp.lines
         fs = cfg.fontSize
 
-        tttt = util.TimerDev()
-        
         doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
                            cfg.paperType)
 

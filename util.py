@@ -63,6 +63,11 @@ def upper(s):
 def lower(s):
     return s.translate(_to_lower)
 
+# return 's', which must be a string of ISO-8859-1 characters, converted
+# to UTF-8.
+def toUTF8(s):
+    return unicode(s, "ISO-8859-1").encode("UTF-8")
+
 # returns True if kc (key-code) is a valid character to add to the script.
 def isValidInputChar(kc):
     # [0x80, 0x9F] = unspecified control characters in ISO-8859-1, added
@@ -76,14 +81,73 @@ def isValidInputChar(kc):
 def fixNL(s):
     return s.replace("\r\n", "\n").replace("\r", "\n")
 
-def clamp(val, min, max):
-    if val < min:
-        return min
-    elif val > max:
-        return max
-    else:
-        return val
+# clamps the given value to a specific range. both limits are optional.
+def clamp(val, minVal = None, maxVal = None):
+    ret = val
+    
+    if minVal != None:
+        ret = max(ret, minVal)
 
+    if maxVal != None:
+        ret = min(ret, maxVal)
+
+    return ret
+
+# convert given string to float, clamping it to the given range
+# (optional). never throws any exceptions, return defVal (possibly clamped
+# as well) on any errors.
+def str2float(s, defVal, minVal = None, maxVal = None):
+    val = defVal
+    
+    try:
+        val = float(s)
+    except ValueError:
+        pass
+    except OverflowError:
+        pass
+
+    return clamp(val, minVal, maxVal)
+
+# like str2float, but for ints.
+def str2int(s, defVal, minVal = None, maxVal = None):
+    val = defVal
+    
+    try:
+        val = int(s)
+    except ValueError:
+        pass
+
+    return clamp(val, minVal, maxVal)
+
+# for each character in 'flags', starting at beginning, checks if that
+# character is found in 's'. if so, appends True to a tuple, False
+# otherwise. returns that tuple, whose length is of course is len(flags).
+def flags2bools(s, flags):
+    b = ()
+
+    for f in flags:
+        if s.find(f) != -1:
+            b += (True,)
+        else:
+            b += (False,)
+
+    return b
+
+# reverse of flags2bools. is given a number of objects, if each object
+# evaluates to true, chars[i] is appended to the return string. len(chars)
+# == len(bools) must be true.
+def bools2flags(chars, *bools):
+    s = ""
+
+    if len(chars) != len(bools):
+        raise TypeError("bools2flags: chars and bools are not equal length")
+
+    for i in range(len(chars)):
+        if bools[i]:
+            s += chars[i]
+
+    return s
+    
 def isFixedWidth(font):
     dc = wxMemoryDC()
     dc.SetFont(font)

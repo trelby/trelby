@@ -8,6 +8,8 @@ class Titles:
         # list of lists of TitleString objects
         self.pages = []
 
+    # create semi-standard title page
+    def addDefaults(self):
         a = []
 
         y = 70.0
@@ -65,11 +67,11 @@ class TitleString:
         self.x = x
         self.y = y
 
-        # whether this is centered in the horizontal direction
-        self.isCentered = isCentered
-
         # size in points
         self.size = size
+
+        # whether this is centered in the horizontal direction
+        self.isCentered = isCentered
 
         # style flags
         self.isBold = isBold
@@ -100,6 +102,50 @@ class TitleString:
             align = util.ALIGN_CENTER
 
         page.add(pml.TextOp(self.text, x, self.y, self.size, fl, align))
+
+    # parse information from s, which must be a string created by __str__,
+    # and set object state accordingly. keeps default settings on any
+    # errors, does not throw any exceptions.
+    #
+    # sample of the format: '0.000000,70.000000,24,cb,Helvetica,text here'
+    def load(self, s):
+        a = s.split(",", 5)
+
+        if len(a) != 6:
+            return
+        
+        self.x = util.str2float(a[0], 0.0)
+        self.y = util.str2float(a[1], 0.0)
+        self.size = util.str2int(a[2], 12, 4, 288)
+
+        self.isCentered, self.isBold, self.isItalic, self.isUnderlined = \
+            util.flags2bools(a[3], "cbiu")
+
+        tmp = { "Courier" : pml.COURIER,
+                "Helvetica" : pml.HELVETICA,
+                "Times" : pml.TIMES_ROMAN }
+
+        self.font = tmp.get(a[4], pml.COURIER)
+
+        self.text = a[5]
+                       
+    def __str__(self):
+        s = "%f,%f,%d," % (self.x, self.y, self.size)
+
+        s += util.bools2flags("cbiu", self.isCentered, self.isBold,
+                               self.isItalic, self.isUnderlined)
+        s += ","
+        
+        if self.font == pml.COURIER:
+            s += "Courier"
+        elif self.font == pml.HELVETICA:
+            s += "Helvetica"
+        else:
+            s += "Times"
+
+        s += ",%s" % self.text
+
+        return s
 
     def __eq__(self, other):
         for k in self.__dict__.iterkeys():
