@@ -1236,9 +1236,18 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnExport(self):
+        line, msg = self.findError(0)
+
+        if line != -1:
+            if wxMessageBox("The script seems to contain errors.\n"
+                            "Are you sure you want to export it?", "Confirm",
+                            wxYES_NO | wxNO_DEFAULT, mainFrame) == wxNO:
+                return
+        
         dlg = wxFileDialog(mainFrame, "Filename to export as",
                            wildcard = "Text files (*.txt)|*.txt|All files|*",
                            style = wxSAVE | wxOVERWRITE_PROMPT)
+
         if dlg.ShowModal() == wxID_OK:
             sp = copy.deepcopy(self.sp)
             if misc.isEval:
