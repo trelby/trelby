@@ -7,3 +7,4 @@ copy sample.blyte dist
 copy default.blyte dist
 copy manual.pdf dist
 copy fileformat.txt dist
+copy license.txt dist

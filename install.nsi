@@ -111,6 +111,7 @@ Section Uninstall
   Delete "$INSTDIR\_winreg.pyd"
   Delete "$INSTDIR\manual.pdf"
   Delete "$INSTDIR\fileformat.txt"
+  Delete "$INSTDIR\license.txt"
 
   Delete "$SMPROGRAMS\Blyte\Uninstall.lnk"
   Delete "$SMPROGRAMS\Blyte\Website.lnk"
