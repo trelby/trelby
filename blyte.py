@@ -1102,17 +1102,18 @@ class MyCtrl(wxControl):
         return line
 
     def isFirstLineOfElem(self, line):
-        # TODO: can be done faster by custom code
-        return self.getElemFirstIndexFromLine(line) == line
+        return (line == 0) or (self.sp.lines[line - 1].lb == config.LB_LAST)
 
     def isLastLineOfElem(self, line):
-        # TODO: can be done faster by custom code
-        return self.getElemLastIndexFromLine(line) == line
+        return self.sp.lines[line].lb == config.LB_LAST
 
     def isOnlyLineOfElem(self, line):
-        # TODO: can be done faster by custom code
-        return self.isLastLineOfElem(line) and self.isFirstLineOfElem(line)
-        
+        # this is just "isLastLineOfElem(line) and isFirstLineOfElem(line)"
+        # inlined here, since it's 130% faster this way.
+        return (self.sp.lines[line].lb == config.LB_LAST) and \
+               ((line == 0) or (self.sp.lines[line - 1].lb ==
+                                config.LB_LAST))
+
     def getElemIndexes(self):
         return self.getElemIndexesFromLine(self.line)
 
