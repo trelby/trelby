@@ -1,6 +1,7 @@
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
+import bugreport
 import cfgdlg
 import charmapdlg
 import commandsdlg
@@ -2958,6 +2959,7 @@ class MyFrame(wxFrame):
         # here than in misc.pyo
         misc.isEval = False
         misc.licensedTo = "Evaluation copy."
+        misc.license = ("x" * 513).encode("base64")
         misc.version = "0.8"
 
         hsizer.Add(self.typeCb)
@@ -3301,6 +3303,7 @@ class MyApp(wxApp):
         misc.scriptDir = cfg.scriptDir
         
         mainFrame = MyFrame(NULL, -1, "Blyte")
+        bugreport.mainFrame = mainFrame
         mainFrame.init()
         mainFrame.Show(True)
 
@@ -3318,6 +3321,11 @@ class MyApp(wxApp):
 
 def main():
     global myApp
+
+    if "--test" not in sys.argv:
+        brh = bugreport.BugReportHandler()
+        sys.stdout = brh
+        sys.stderr = brh
     
     myApp = MyApp(0)
     myApp.MainLoop()
