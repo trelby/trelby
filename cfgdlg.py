@@ -996,8 +996,11 @@ class PDFPanel(wxPanel):
         EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
         vsizer.Add(self.checkErrorsCb, 0, wxTOP, 10)
 
-        self.marginsCb = wxCheckBox(self, -1,
-            "Show margins (debug)")
+        self.scenesCb = wxCheckBox(self, -1, "Include scene numbers")
+        EVT_CHECKBOX(self, self.scenesCb.GetId(), self.OnMisc)
+        vsizer.Add(self.scenesCb, 0, wxTOP, 5)
+
+        self.marginsCb = wxCheckBox(self, -1, "Show margins (debug)")
         EVT_CHECKBOX(self, self.marginsCb.GetId(), self.OnMisc)
         vsizer.Add(self.marginsCb, 0, wxTOP, 10)
 
@@ -1034,6 +1037,7 @@ class PDFPanel(wxPanel):
         self.cfg.pdfViewerArgs = self.argsEntry.GetValue()
         self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
         self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
+        self.cfg.pdfShowSceneNumbers = self.scenesCb.GetValue()
         self.cfg.pdfShowMargins = self.marginsCb.GetValue()
         self.cfg.pdfShowLineNumbers = self.lineNumbersCb.GetValue()
         
@@ -1042,5 +1046,6 @@ class PDFPanel(wxPanel):
         self.argsEntry.SetValue(self.cfg.pdfViewerArgs)
         self.fontSizeEntry.SetValue(self.cfg.fontSize)
         self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
+        self.scenesCb.SetValue(self.cfg.pdfShowSceneNumbers)
         self.marginsCb.SetValue(self.cfg.pdfShowMargins)
         self.lineNumbersCb.SetValue(self.cfg.pdfShowLineNumbers)

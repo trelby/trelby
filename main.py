@@ -527,6 +527,8 @@ class MyCtrl(wxControl):
         # used in several places, so keep around
         charIndent = cfg.getType(config.CHARACTER).indent
 
+        scene = 0
+        
         for p in range(1, len(self.pages)):
             start = self.pages[p - 1] + 1
             end = self.pages[p]
@@ -572,6 +574,16 @@ class MyCtrl(wxControl):
                     cfg.marginLeft + tcfg.indent * ch_x,
                     cfg.marginTop + (y / 10.0) * ch_y, fs, typ))
 
+                if (tcfg.lt == config.SCENE) and cfg.pdfShowSceneNumbers and\
+                   self.isFirstLineOfElem(i):
+                    scene += 1
+                    pg.add(pml.TextOp("%d" % scene,
+                        cfg.marginLeft - 6 * ch_x,
+                        cfg.marginTop + (y / 10.0) * ch_y, fs))
+                    pg.add(pml.TextOp("%d" % scene,
+                        cfg.marginLeft + (tcfg.width + 1) * ch_x,
+                        cfg.marginTop + (y / 10.0) * ch_y, fs))
+                    
                 if cfg.pdfShowLineNumbers:
                     pg.add(pml.TextOp("%02d" % (i - start + 1),
                         cfg.marginLeft - 3 * ch_x,

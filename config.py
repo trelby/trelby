@@ -392,6 +392,9 @@ class Config:
         # default script directory
         v.addStr("scriptDir", misc.progPath, "DefaultScriptDirectory")
         
+        # whether to include scene numbers
+        v.addBool("pdfShowSceneNumbers", False, "PDF/ShowSceneNumbers")
+
         # whether to draw rectangle showing margins
         v.addBool("pdfShowMargins", False, "PDF/ShowMargins")
 
