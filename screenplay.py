@@ -89,10 +89,10 @@ class Line:
     # replace some words, rendering the script useless except for
     # evaluation purposes
     def replace(self):
-        self.text = re.sub(r"\b(\w){3}\b", "BUY", self.text)
-        self.text = re.sub(r"\b(\w){4}\b", "DEMO", self.text)
-        self.text = re.sub(r"\b(\w){5}\b", "TRIAL", self.text)
-        self.text = re.sub(r"\b(\w){6}\b", "*TEST*", self.text)
-        self.text = re.sub(r"\b(\w){7}\b", "LIMITED", self.text)
-        self.text = re.sub(r"\b(\w){10}\b", "EVALUATION", self.text)
+        ch = "x"
+        
+        self.text = re.sub(r"\b(\w){5}\b", ch * 5, self.text)
+        self.text = re.sub(r"\b(\w){6}\b", ch * 6, self.text)
+        self.text = re.sub(r"\b(\w){7}\b", ch * 7, self.text)
+        self.text = re.sub(r"\b(\w){10}\b", ch * 10, self.text)
         
