@@ -778,7 +778,7 @@ class MyCtrl(wxControl):
                     self.splitLine()
                     ls[self.line - 1].lb = config.LB_LAST
 
-                    newType = cfg.getNextType(ls[self.line].type)
+                    newType = tcfg.nextType
                     i = self.line
                     while 1:
                         ls[i].type = newType
@@ -791,7 +791,7 @@ class MyCtrl(wxControl):
 
                     self.splitLine()
                     ls[self.line - 1].lb = config.LB_LAST
-                    ls[self.line].type = cfg.getNextType(ls[self.line].type)
+                    ls[self.line].type = tcfg.nextType
                     
                 self.rewrap()
 
@@ -910,12 +910,10 @@ class MyCtrl(wxControl):
                 return
             
         elif kc == WXK_TAB:
-            type = ls[self.line].type
-
             if not ev.ShiftDown():
-                type = cfg.getNextTypeTab(type)
+                type = tcfg.nextTypeTab
             else:
-                type = cfg.getPrevTypeTab(type)
+                type = tcfg.prevTypeTab
                 
             self.convertCurrentTo(type)
 

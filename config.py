@@ -42,36 +42,27 @@ _text2linetype = {
 # reverse to above, filled in init
 _linetype2text = { }
 
-# what's the next type from this type. used in figuring out what type
-# of element to insert when user presses enter.
-_nextType = {
-    SCENE : ACTION,
-    ACTION : ACTION,
-    CHARACTER : DIALOGUE,
-    DIALOGUE : CHARACTER,
-    PAREN : DIALOGUE,
-    TRANSITION : SCENE
-    }
-
-# what's next in physical position when using normal margins. used for
-# figuring out next element when user hits tab.
-_nextTypeTab = {
-    SCENE : ACTION,
-    ACTION : DIALOGUE,
-    DIALOGUE : PAREN,
-    PAREN : CHARACTER,
-    CHARACTER : TRANSITION,
-    TRANSITION : SCENE
-    }
-
 class Type:
     def __init__(self):
         self.linetype = None
         self.emptyLinesBefore = 0
+
         self.indent = 0
         self.width = 0
-        self.isCaps = False
 
+        self.isCaps = False
+        self.isBold = False
+        self.isItalic = False
+        self.isUnderlined = False
+
+        # what's the next type from this type. used in figuring out what
+        # type of element to insert when user presses enter.
+        self.nextType = None
+
+        # what element to switch to when user hits tab / shift-tab.
+        self.nextTypeTab = None
+        self.prevTypeTab = None
+        
 class Config:
     def __init__(self):
 
@@ -107,6 +98,10 @@ class Config:
         t.indent = 0 
         t.width = 60
         t.isCaps = True
+        t.isBold = True
+        t.nextType = ACTION
+        t.nextTypeTab = ACTION
+        t.prevTypeTab = TRANSITION
         self.types[t.linetype] = t
 
         t = Type()
@@ -114,6 +109,9 @@ class Config:
         t.emptyLinesBefore = 1
         t.indent = 0
         t.width = 60
+        t.nextType = ACTION
+        t.nextTypeTab = CHARACTER
+        t.prevTypeTab = CHARACTER
         self.types[t.linetype] = t
 
         t = Type()
@@ -122,6 +120,9 @@ class Config:
         t.indent = 25
         t.width = 20
         t.isCaps = True
+        t.nextType = DIALOGUE
+        t.nextTypeTab = ACTION
+        t.prevTypeTab = ACTION
         self.types[t.linetype] = t
 
         t = Type()
@@ -129,6 +130,9 @@ class Config:
         t.emptyLinesBefore = 0
         t.indent = 10
         t.width = 35
+        t.nextType = CHARACTER
+        t.nextTypeTab = PAREN
+        t.prevTypeTab = ACTION
         self.types[t.linetype] = t
 
         t = Type()
@@ -136,6 +140,9 @@ class Config:
         t.emptyLinesBefore = 0
         t.indent = 20
         t.width = 25
+        t.nextType = DIALOGUE
+        t.nextTypeTab = CHARACTER
+        t.prevTypeTab = DIALOGUE
         self.types[t.linetype] = t
 
         t = Type()
@@ -144,6 +151,9 @@ class Config:
         t.indent = 55
         t.width = 15
         t.isCaps = True
+        t.nextType = SCENE
+        t.nextTypeTab = SCENE
+        t.prevTypeTab = CHARACTER
         self.types[t.linetype] = t
 
         # wxWindows stuff
@@ -179,15 +189,6 @@ class Config:
     def getTypeCfg(self, type):
         return self.types[type]
 
-    def getNextType(self, type):
-        return _conv(_nextType, type)
-    
-    def getNextTypeTab(self, type):
-        return _conv(_nextTypeTab, type)
-
-    def getPrevTypeTab(self, type):
-        return _convPrev(_nextTypeTab, type)
-
 def _conv(dict, key):
     val = dict.get(key)
     if val == None:
@@ -195,13 +196,6 @@ def _conv(dict, key):
     
     return val
 
-def _convPrev(dict, value):
-    for (k,v) in dict.iteritems():
-        if v == value:
-            return k
-
-    raise ConfigError("value '%s' not found from '%s'" % (value, dict))
-    
 def text2lb(str):
     return _conv(_text2lb, str)
 
