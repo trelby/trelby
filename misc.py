@@ -1,3 +1,5 @@
+import util
+
 from wxPython.wx import *
 
 class MyColorSample(wxWindow):
@@ -22,7 +24,7 @@ class ScriptChooserDlg(wxDialog):
         wxDialog.__init__(self, parent, -1, "Choose scripts",
                           style = wxDEFAULT_DIALOG_STYLE)
 
-        self.SetClientSizeWH(225, 115);
+        self.SetClientSizeWH(325, 115);
         self.Center()
         
         panel = wxPanel(self, -1)
@@ -66,7 +68,8 @@ class ScriptChooserDlg(wxDialog):
         sizer.Add(wxStaticText(panel, -1, descr), 0, al, 10)
         
         combo = wxComboBox(panel, -1, style = wxCB_READONLY)
-
+        util.setWH(combo, w = 200)
+        
         for s in items:
             combo.Append(s)
 
