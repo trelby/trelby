@@ -595,9 +595,8 @@ class MyCtrl(wxControl):
 
             tmp = str.upper()
             if (tmp == "EXT.") or (tmp == "INT."):
-                if (ls[self.line].lb == cfg.LB_LAST) and \
-                   (ls[self.line].type == cfg.ACTION) and\
-                   self.isFirstLineOfElem(self.line):
+                if (ls[self.line].lb == cfg.LB_LAST) and\
+                       self.isFirstLineOfElem(self.line):
                     ls[self.line].type = cfg.SCENE
 
             self.rewrap()
