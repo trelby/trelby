@@ -45,6 +45,7 @@ ID_HELP_ABOUT = 13
 ID_FILE_EXPORT = 14
 ID_EDIT_FIND = 15
 ID_EDIT_SELECT_SCENE = 16
+ID_EDIT_FIND_ERROR = 17
 
 def refreshGuiConfig():
     global cfgGui
@@ -469,10 +470,10 @@ class MyCtrl(wxControl):
         return line
 
     def isFirstLineOfElem(self, line):
-        return self.getElemFirstIndexFromLine(line) == self.line
+        return self.getElemFirstIndexFromLine(line) == line
 
     def isLastLineOfElem(self, line):
-        return self.getElemLastIndexFromLine(line) == self.line
+        return self.getElemLastIndexFromLine(line) == line
 
     def isOnlyLineOfElem(self, line):
         return self.isLastLineOfElem(line) and self.isFirstLineOfElem(line)
@@ -486,6 +487,22 @@ class MyCtrl(wxControl):
 
     def getSceneIndexes(self):
         return self.getSceneIndexesFromLine(self.line)
+
+    def getTypeOfPrevElem(self, line):
+        line = self.getElemFirstIndexFromLine(line)
+        line -= 1
+        if line < 0:
+            return None
+
+        return self.sp.lines[line].type
+
+    def getTypeOfNextElem(self, line):
+        line = self.getElemLastIndexFromLine(line)
+        line += 1
+        if line >= len(self.sp.lines):
+            return None
+
+        return self.sp.lines[line].type
     
     def getSceneIndexesFromLine(self, line):
         top, bottom = self.getElemIndexesFromLine(line)
@@ -644,6 +661,68 @@ class MyCtrl(wxControl):
     # backing yet
     def isModified(self):
         return self.sp != self.backup
+
+    # find next error in screenplay, starting at given line. returns
+    # (line, msg) tuple, where line is -1 if no error was found and the
+    # line number otherwise where the error is, and msg is a description
+    # of the error
+    def findError(self, line):
+        ls = self.sp.lines
+
+        msg = None
+        while 1:
+            if line >= len(ls):
+                break
+
+            l = ls[line]
+
+            isFirst = self.isFirstLineOfElem(line)
+            isLast = self.isLastLineOfElem(line)
+            isOnly = isFirst and isLast
+
+            prev = self.getTypeOfPrevElem(line)
+            next = self.getTypeOfNextElem(line)
+            
+            if len(l.text) == 0:
+                msg = "Empty line."
+                break
+
+            if len(l.text.strip()) == 0:
+                msg = "Empty line (contains only whitespace)."
+                break
+
+            if (l.type == config.PAREN) and isOnly and (l.text == "()"):
+                msg = "Empty parenthetical."
+                break
+
+            if l.type == config.CHARACTER:
+                if isLast and next and next not in\
+                       (config.PAREN, config.DIALOGUE):
+                    msg = "Element type '%s' can not follow type '%s'." %\
+                          (cfg.getType(next).name,
+                           cfg.getType(l.type).name)
+                    break
+
+            if l.type == config.PAREN:
+                if isFirst and prev and prev not in\
+                       (config.CHARACTER, config.DIALOGUE):
+                    msg = "Element type '%s' can not follow type '%s'." %\
+                          (cfg.getType(l.type).name, cfg.getType(prev).name)
+                    break
+
+            if l.type == config.DIALOGUE:
+                if isFirst and prev and prev not in\
+                       (config.CHARACTER, config.PAREN):
+                    msg = "Element type '%s' can not follow type '%s'." %\
+                          (cfg.getType(l.type).name, cfg.getType(prev).name)
+                    break
+
+            line += 1
+            
+        if not msg:
+            line = -1
+
+        return (line, msg)
         
     def updateScreen(self, redraw = True, setCommon = True):
         self.adjustScrollBar()
@@ -805,6 +884,21 @@ class MyCtrl(wxControl):
 
         self.makeLineVisible(self.line)
         self.updateScreen()
+
+    def OnFindError(self):
+        line, msg = self.findError(self.line)
+
+        if line != -1:
+            self.line = line
+            self.column = 0
+            
+            self.makeLineVisible(self.line)
+            self.updateScreen()
+            
+        else:
+            msg = "No errors found."
+            
+        wxMessageBox(msg, "Results", wxOK, self)
         
     def OnFind(self):
         dlg = finddlg.FindDlg(mainFrame, self, cfg)
@@ -1284,6 +1378,7 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene\tCTRL-A")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace\tCTRL-F")
+        editMenu.Append(ID_EDIT_FIND_ERROR, "Find next &error\tCTRL-E")
         
         formatMenu = wxMenu()
         formatMenu.Append(ID_REFORMAT, "&Reformat all")
@@ -1345,6 +1440,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
+        EVT_MENU(self, ID_EDIT_FIND_ERROR, self.OnFindError)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
@@ -1448,6 +1544,9 @@ class MyFrame(wxFrame):
 
     def OnSelectScene(self, event):
         self.panel.ctrl.OnSelectScene()
+
+    def OnFindError(self, event):
+        self.panel.ctrl.OnFindError()
 
     def OnFind(self, event):
         self.panel.ctrl.OnFind()
