@@ -738,7 +738,8 @@ class MyCtrl(wxControl):
     def updateCommon(self):
         self.updateTypeCb()
         mainFrame.statusBar.SetStatusText("Page: %3d / %3d" %
-            (self.line / 55 + 1, len(self.sp.lines)/55 + 1), 0)
+            (self.line2page(self.line),
+             self.line2page(len(self.sp.lines) - 1)), 0)
 
     def applyCfg(self, newCfg):
         global cfg
