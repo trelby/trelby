@@ -41,6 +41,7 @@ ID_EDIT_COPY = 10
 ID_EDIT_PASTE = 11
 ID_HELP_COMMANDS = 12
 ID_HELP_ABOUT = 13
+ID_FILE_EXPORT = 14
 
 def refreshGuiConfig():
     global cfgGui
@@ -221,6 +222,31 @@ class MyCtrl(wxControl):
                 self.setFile(fileName)
                 self.makeBackup()
                 
+            except IOError, (errno, strerror):
+                raise MiscError("IOError: %s" % strerror)
+                
+        except NaspError, e:
+            wxMessageBox("Error saving file: %s" % e, "Error",
+                         wxOK, self)
+
+    def export(self, fileName):
+        try:
+            output = []
+            ls = self.sp.lines
+            for i in range(0, len(ls)):
+                line = ls[i]
+                tcfg = cfg.getType(line.type)
+                output.append(self.sp.getEmptyLinesBefore(i) * "\n" +
+                              " " * tcfg.indent + line.text + "\n")
+        
+            try:
+                f = open(fileName, "wt")
+
+                try:
+                    f.writelines(output)
+                finally:
+                    f.close()
+                    
             except IOError, (errno, strerror):
                 raise MiscError("IOError: %s" % strerror)
                 
@@ -750,6 +776,15 @@ class MyCtrl(wxControl):
 
         dlg.Destroy()
 
+    def OnExport(self):
+        dlg = wxFileDialog(self, "Filename to export as",
+                           wildcard = "Text files (*.txt)|*.txt|All files|*",
+                           style = wxSAVE | wxOVERWRITE_PROMPT)
+        if dlg.ShowModal() == wxID_OK:
+            self.export(dlg.GetPath())
+
+        dlg.Destroy()
+
     def OnSettings(self):
         dlg = CfgDlg(self, copy.deepcopy(cfg), self.applyCfg)
         if dlg.ShowModal() == wxID_OK:
@@ -928,9 +963,9 @@ class MyCtrl(wxControl):
                 
             self.convertCurrentTo(type)
 
-        elif (kc == WXK_ESCAPE):
+        elif kc == WXK_ESCAPE:
             self.mark = -1
-            
+
         # FIXME: debug stuff
         elif (chr(kc) == "å"):
             self.loadFile("default.nasp")
@@ -1138,6 +1173,7 @@ class MyFrame(wxFrame):
         fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
         fileMenu.Append(ID_FILE_SAVE, "&Save\tCTRL-S")
         fileMenu.Append(ID_FILE_SAVE_AS, "Save &As...")
+        fileMenu.Append(ID_FILE_EXPORT, "&Export...")
         fileMenu.Append(ID_FILE_CLOSE, "&Close")
         fileMenu.Append(ID_FILE_REVERT, "&Revert")
         fileMenu.AppendSeparator()
@@ -1201,6 +1237,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FILE_OPEN, self.OnOpen)
         EVT_MENU(self, ID_FILE_SAVE, self.OnSave)
         EVT_MENU(self, ID_FILE_SAVE_AS, self.OnSaveAs)
+        EVT_MENU(self, ID_FILE_EXPORT, self.OnExport)
         EVT_MENU(self, ID_FILE_CLOSE, self.OnClose)
         EVT_MENU(self, ID_FILE_REVERT, self.OnRevert)
         EVT_MENU(self, ID_FILE_SETTINGS, self.OnSettings)
@@ -1279,6 +1316,9 @@ class MyFrame(wxFrame):
 
     def OnSaveAs(self, event):
         self.panel.ctrl.OnSaveAs()
+
+    def OnExport(self, event):
+        self.panel.ctrl.OnExport()
 
     def OnClose(self, event = None):
         if not self.panel.ctrl.canBeClosed():
