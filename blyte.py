@@ -76,6 +76,7 @@ ID_FILE_CFG_SAVE_AS,\
 ID_HELP_ABOUT,\
 ID_HELP_COMMANDS,\
 ID_HELP_LICENSE,\
+ID_HELP_MANUAL,\
 ID_LICENSE_INFO,\
 ID_LICENSE_RELEASE,\
 ID_LICENSE_UPDATE,\
@@ -89,7 +90,7 @@ ID_SCRIPT_TITLES,\
 ID_TOOLS_CHARMAP,\
 ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
-= range(38)
+= range(39)
 
 def refreshGuiConfig():
     global cfgGui
@@ -3114,6 +3115,7 @@ class MyFrame(wxFrame):
 
         helpMenu = wxMenu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
+        helpMenu.Append(ID_HELP_MANUAL, "&Manual")
         helpMenu.AppendSeparator()
 
         tmp = wxMenu()
@@ -3212,6 +3214,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharMap)
         EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
+        EVT_MENU(self, ID_HELP_MANUAL, self.OnHelpManual)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
         EVT_MENU(self, ID_LICENSE_INFO, self.OnLicenseInfo)
         EVT_MENU(self, ID_LICENSE_UPDATE, self.OnLicenseUpdate)
@@ -3500,6 +3503,9 @@ class MyFrame(wxFrame):
         dlg = commandsdlg.CommandsDlg(self)
         dlg.Show()
 
+    def OnHelpManual(self, event):
+        util.showPDF(misc.progPath + "/manual.pdf", cfg, self)
+        
     def OnAbout(self, event):
         win = splash.SplashWindow(self, -1)
         win.Show()

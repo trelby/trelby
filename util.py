@@ -648,15 +648,6 @@ class TimerDev:
 def showTempPDF(pdfData, cfg, mainFrame):
 
     try:
-        os.stat(cfg.pdfViewerPath)
-    except OSError:
-        wxMessageBox("PDF viewer application not found.\n\n"
-                     "You can change your PDF settings\n"
-                     "at File/Settings/PDF.", "Error", wxOK, mainFrame)
-
-        return
-    
-    try:
         try:
             removeTempFiles(misc.tmpPrefix)
 
@@ -668,12 +659,7 @@ def showTempPDF(pdfData, cfg, mainFrame):
             finally:
                 os.close(fd)
 
-            # on Windows, Acrobat complains about "invalid path" if we
-            # give the full path of the program as first arg, so give a
-            # dummy arg.
-            args = ["pdf"] + cfg.pdfViewerArgs.split() + [filename]
-
-            os.spawnv(os.P_NOWAIT, cfg.pdfViewerPath, args)
+            showPDF(filename, cfg, mainFrame)
 
         except IOError, (errno, strerror):
             raise MiscError("IOError: %s" % strerror)
@@ -681,3 +667,21 @@ def showTempPDF(pdfData, cfg, mainFrame):
     except BlyteError, e:
         wxMessageBox("Error writing temporary PDF file: %s" % e,
                      "Error", wxOK, mainFrame)
+
+# show PDF file.
+def showPDF(filename, cfg, frame):
+    try:
+        os.stat(cfg.pdfViewerPath)
+    except OSError:
+        wxMessageBox("PDF viewer application not found.\n\n"
+                     "You can change your PDF settings\n"
+                     "at File/Settings/PDF.", "Error", wxOK, frame)
+
+        return
+    
+    # on Windows, Acrobat complains about "invalid path" if we
+    # give the full path of the program as first arg, so give a
+    # dummy arg.
+    args = ["pdf"] + cfg.pdfViewerArgs.split() + [filename]
+    
+    os.spawnv(os.P_NOWAIT, cfg.pdfViewerPath, args)

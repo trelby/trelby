@@ -55,7 +55,6 @@ Section "MainSection" SEC01
   CreateDirectory "$SMPROGRAMS\Blyte"
   CreateShortCut "$SMPROGRAMS\Blyte\Blyte.lnk" "$INSTDIR\blyte.exe"
   CreateShortCut "$DESKTOP\Blyte.lnk" "$INSTDIR\blyte.exe"
-  CreateShortCut "$DESKTOP\BlyteManual.lnk" "$INSTDIR\manual.pdf"
 SectionEnd
 
 Section -AdditionalIcons
@@ -116,6 +115,7 @@ Section Uninstall
   Delete "$SMPROGRAMS\Blyte\Website.lnk"
   Delete "$DESKTOP\Blyte.lnk"
   Delete "$SMPROGRAMS\Blyte\Blyte.lnk"
+  Delete "$SMPROGRAMS\Blyte\Manual.lnk"
 
   RMDir "$SMPROGRAMS\Blyte"
   RMDir "$INSTDIR"

@@ -49,4 +49,4 @@ target = { "script" : "blyte.py",
                                  manifest_template % dict(prog="blyte"))]
            }
 
-setup(options = options, zipfile="wxc2.pyd", console=[target])
+setup(options = options, zipfile="wxc2.pyd", windows=[target])
