@@ -408,13 +408,7 @@ class Config:
     # load config from string 's'. does not throw any exceptions, silently
     # ignores any errors, and always leaves config in an ok state.
     def load(self, s):
-        tmp = util.fixNL(s).split("\n")
-
-        vals = {}
-        for it in tmp:
-            if it.find(":") != -1:
-                name, v = it.split(":", 1)
-                vals[name] = v
+        vals = self.cvars.makeVals(s)
 
         self.cvars.load(vals, "", self)
 

@@ -55,7 +55,20 @@ class Vars:
     def setDefaults(self, obj):
         for it in self.cvars:
             setattr(obj, it.name, copy.deepcopy(it.defVal))
-                
+
+    # transform string 's' (loaded from file) into a form suitable for
+    # load() to take.
+    def makeVals(self, s):
+        tmp = util.fixNL(s).split("\n")
+
+        vals = {}
+        for it in tmp:
+            if it.find(":") != -1:
+                name, v = it.split(":", 1)
+                vals[name] = v
+
+        return vals
+    
     def save(self, prefix, obj):
         global currentObj
         currentObj = obj
