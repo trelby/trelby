@@ -704,6 +704,73 @@ class MyCtrl(wxControl):
     def isModified(self):
         return self.sp != self.backup
 
+    # returns true if a character, inserted at current position, would
+    # need to be capitalized as a start of a sentence.
+    def capitalizeNeeded(self):
+        if not cfg.capitalize:
+            return False
+        
+        ls = self.sp.lines
+        line = self.line
+        column = self.column
+
+        text = ls[line].text
+        if (column < len(text)) and (text[column] != " "):
+            return False
+            
+        # go backwards at most 4 characters, looking for "!?.", and
+        # breaking on anything other than space or ".
+        
+        cnt = 1
+        while 1:
+            column -= 1
+
+            char = None
+            
+            if column < 0:
+                line -= 1
+
+                if line < 0:
+                    return True
+
+                lb = ls[line].lb
+
+                if lb == config.LB_LAST:
+                    # start of an element
+                    return True
+
+                elif lb == config.LB_AUTO_SPACE:
+                    char = " "
+                    column = len(ls[line].text)
+
+                else:
+                    text = ls[line].text
+                    column = len(text) - 1
+                    if column < 0:
+                        return True
+            else:
+                text = ls[line].text
+
+            if not char:
+                char = text[column]
+            
+            if cnt == 1:
+                # must be preceded by a space
+                if char != " ":
+                    return False
+            else:
+                if char in (".", "?", "!"):
+                    return True
+                elif char not in (" ", "\""):
+                    return False
+
+            cnt += 1
+
+            if cnt > 4:
+                break
+        
+        return False
+        
     # find next error in screenplay, starting at given line. returns
     # (line, msg) tuple, where line is -1 if no error was found and the
     # line number otherwise where the error is, and msg is a description
@@ -1387,8 +1454,13 @@ class MyCtrl(wxControl):
             self.OnSettings()
         
         elif (kc == WXK_SPACE) or (kc > 32) and (kc < 256):
+            char = chr(kc)
+
+            if self.capitalizeNeeded():
+                char = char.upper()
+            
             str = ls[self.line].text
-            str = str[:self.column] + chr(kc) + str[self.column:]
+            str = str[:self.column] + char + str[self.column:]
             ls[self.line].text = str
             self.column += 1
                 

@@ -103,6 +103,9 @@ class Config:
         self.marginLeft = 38.1
         self.marginRight = 25.4
 
+        # whether to auto-capitalize start of sentences
+        self.capitalize = True
+        
         # page break stuff
 
         # page break indicators to show
