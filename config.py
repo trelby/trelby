@@ -3,6 +3,7 @@
 
 from error import *
 import misc
+import mypickle
 import util
 
 from wxPython.wx import *
@@ -83,77 +84,70 @@ for k, v in _text2lt.items():
 
 del k, v
 
-class ConfVar:
-    # name2 is the name to use while saving/loading the variable. if it's
-    # empty, the variable is not loaded/saved, i.e. is used only
-    # internally.
-    def __init__(self, name, defVal, name2):
-        self.name = name
-        self.defVal = defVal
-        self.name2 = name2
-
-class BoolVar(ConfVar):
-    def __init__(self, name, defVal, name2):
-        ConfVar.__init__(self, name, defVal, name2)
-
-class ColorVar(ConfVar):
-    def __init__(self, name, defVal, name2, descr):
-        ConfVar.__init__(self, name, defVal, name2)
-        self.descr = descr
-        
-class NumericVar(ConfVar):
-    def __init__(self, name, defVal, name2, minVal, maxVal):
-        ConfVar.__init__(self, name, defVal, name2)
-        self.minVal = minVal
-        self.maxVal = maxVal
-
-class FloatVar(NumericVar):
-    def __init__(self, name, defVal, name2, minVal, maxVal):
-        NumericVar.__init__(self, name, defVal, name2, minVal, maxVal)
-        
-class IntVar(NumericVar):
-    def __init__(self, name, defVal, name2, minVal, maxVal):
-        NumericVar.__init__(self, name, defVal, name2, minVal, maxVal)
-        
-class StrVar(ConfVar):
-    def __init__(self, name, defVal, name2):
-        ConfVar.__init__(self, name, defVal, name2)
-        
 class TextType:
+    cvars = None
+    
     def __init__(self):
-        self.isCaps = False
-        self.isBold = False
-        self.isItalic = False
-        self.isUnderlined = False
+        if not self.__class__.cvars:
+            v = self.__class__.cvars = mypickle.Vars()
+
+            v.addBool("isCaps", False, "AllCaps")
+            v.addBool("isBold", False, "Bold")
+            v.addBool("isItalic", False, "Italic")
+            v.addBool("isUnderlined", False, "Underlined")
+
+        self.__class__.cvars.setDefaults(self)
+
+    def save(self, prefix):
+        return self.cvars.save(prefix, self)
 
 class Type:
-    def __init__(self):
+    cvars = None
+
+    def __init__(self, cfg):
+        self.cfg = cfg
+        
         # line type
         self.lt = None
 
-        # textual description
+        # textual description. this is saved into the config file, so
+        # don't change these.
         self.name = None
-
-        self.emptyLinesBefore = 0
-
-        self.indent = 0
-        self.width = 0
 
         # text types, one for screen and one for export
         self.screen = TextType()
         self.export = TextType()
         
-        # what type of element to insert when user presses enter or tab.
-        self.newTypeEnter = None
-        self.newTypeTab = None
+        if not self.__class__.cvars:
+            v = self.__class__.cvars = mypickle.Vars()
 
-        # what element to switch to when user hits tab / shift-tab.
-        self.nextTypeTab = None
-        self.prevTypeTab = None
+            v.addInt("emptyLinesBefore", 0, "EmptyLinesBefore", 0, 0)
+            v.addInt("indent", 0, "Indent", 0, 0)
+            v.addInt("width", 0, "Width", 0, 0)
 
-        # auto-completion stuff, only used for some element types
-        self.doAutoComp = False
-        self.autoCompList = []
+            # what type of element to insert when user presses enter or tab.
+            v.addElemName("newTypeEnter", None, "NewTypeEnter")
+            v.addElemName("newTypeTab", None, "NewTypeTab")
+
+            # what element to switch to when user hits tab / shift-tab.
+            v.addElemName("nextTypeTab", None, "NextTypeTab")
+            v.addElemName("prevTypeTab", None, "PrevTypeTab")
+            
+            # auto-completion stuff, only used for some element types
+            v.addBool("doAutoComp", False, "AutoCompletion")
+            v.addList("autoCompList", [], "AutoCompletionList",
+                      mypickle.StrVar("", "", ""))
+
+        self.__class__.cvars.setDefaults(self)
+            
+    def save(self, prefix):
+        prefix += "%s/" % self.name
+
+        s = self.cvars.save(prefix, self)
+        s += self.screen.save(prefix + "Screen/")
+        s += self.export.save(prefix + "Export/")
+
+        return s
 
 # type-specific stuff that are wxwindows objects, so can't be in normal
 # Type (deepcopy dies)
@@ -162,126 +156,25 @@ class TypeGui:
         self.font = None
 
 class Config:
+    cvars = None
+    
     def __init__(self):
-
-        # type configs, key = line type, value = Type
-        self.types = { }
 
         # offsets from upper left corner of main widget, ie. this much empty
         # space is left on the top and left sides.
         self.offsetY = 10
         self.offsetX = 10
 
-        # list of subclassed ConfVar objects
-        self.vars = []
-        
-        # confirm non-undoable delete operations that would delete at
-        # least this many lines. (0 = disabled)
-        self.addInt("confirmDeletes", 2, "ConfirmDeletes", 0, 500)
+        if not self.__class__.cvars:
+            self.setupVars()
 
-        # not used perse, but listed here so that we can easily query
-        # min/max values for these in various places
-        self.addInt("elementEmptyLinesBefore", 0, "", 0, 5)
-        self.addInt("elementIndent", 0, "", 0, 80)
-        self.addInt("elementWidth", 5, "", 5, 80)
+        self.__class__.cvars.setDefaults(self)
 
-        # vertical distance between rows, in pixels
-        self.addInt("fontYdelta", 18, "FontYDelta", 4, 125)
-
-        # font size used for PDF generation, in points
-        self.addInt("fontSize", 12, "PDF/FontSize", 4, 72)
-
-        # margins
-        self.addFloat("marginBottom", 25.4, "Margin/Bottom", 0.0, 900.0)
-        self.addFloat("marginLeft", 38.1, "Margin/Left", 0.0, 900.0)
-        self.addFloat("marginRight", 25.4, "Margin/Right", 0.0, 900.0)
-        self.addFloat("marginTop", 12.7, "Margin/Top", 0.0, 900.0)
-
-        # how many lines to scroll per mouse wheel event
-        self.addInt("mouseWheelLines", 4, "MouseWheelLines", 1, 50)
-
-        # interval in seconds between automatic pagination (0 = disabled)
-        # TODO: change this to 5 or something
-        self.addInt("paginateInterval", 0, "PaginateInterval", 0, 60)
-
-        # paper size
-        self.addFloat("paperHeight", 297.0, "Paper/Height", 100.0, 1000.0)
-        self.addFloat("paperWidth", 210.0, "Paper/Width", 50.0, 1000.0)
-
-        # leave at least this many action lines on the end of a page
-        self.addInt("pbActionLines", 2, "PageBreakActionLines", 1, 30)
-
-        # leave at least this many dialogue lines on the end of a page
-        self.addInt("pbDialogueLines", 2, "PageBreakDialogueLines", 1, 30)
-
-        # whether to check script for errors before export / print
-        self.addBool("checkOnExport", True, "CheckScriptForErrors")
-        
-        # whether to auto-capitalize start of sentences
-        self.addBool("capitalize", True, "CapitalizeSentences")
-
-        # page break indicators to show
-        self.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,
-                    PBI_LAST)
-        
-        # PDF viewer program and args
-        if misc.isUnix:
-            s1 = "/usr/local/Acrobat5/bin/acroread"
-            s2 = "-tempFile"
-        elif misc.isWindows:
-            s1 = r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe"
-            s2 = ""
-        else:
-            s1 = "not set yet (unknown platform %s)"\
-                                 % wxPlatform
-            s2 = ""
-
-        self.addStr("pdfViewerPath", s1, "PDF/ViewerPath")
-        self.addStr("pdfViewerArgs", s2, "PDF/ViewerArguments")
-
-        # font
-        if misc.isUnix:
-            s1 = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
-        elif misc.isWindows:
-            s1 = "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
-        else:
-            s1 = ""
-            
-        self.addStr("nativeFont", s1, "FontInfo")
-        
-        # default script directory
-        self.addStr("scriptDir", misc.progPath, "DefaultScriptDirectory")
-        
-        # whether to draw rectangle showing margins
-        self.addBool("pdfShowMargins", False, "PDF/ShowMargins")
-
-        # whether to show line numbers next to each line
-        self.addBool("pdfShowLineNumbers", False, "PDF/ShowLineNumbers")
-
-        # colors
-        self.addColor("text", 0, 0, 0, "TextFG", "Text foreground")
-        self.addColor("bg", 204, 204, 204, "TextBG", "Text background")
-        self.addColor("selected", 128, 192, 192, "Selected", "Selection")
-        self.addColor("search", 255, 127, 0, "SearchResult", "Search result")
-        self.addColor("cursor", 205, 0, 0, "Cursor", "Cursor")
-        self.addColor("autoCompFg", 0, 0, 0, "AutoCompletionFG",
-                      "Auto-completion foreground")
-        self.addColor("autoCompBg", 249, 222, 99, "AutoCompletionBG",
-                      "Auto-completion background")
-        self.addColor("note", 255, 255, 0, "ScriptNote", "Script note")
-        self.addColor("pagebreak", 128, 128, 128, "PageBreakLine",
-                      "Page-break line")
-        self.addColor("pagebreakNoAdjust", 128, 128, 128,
-                      "PageBreakNoAdjustLine",
-                      "Page-break (original, not adjusted) line")
-        
-        # make various dictionaries pointing to the config variables.
-        self.allVars = self.genDict()
-        self.colorVars = self.genDict(ColorVar)
-        self.numericVars = self.genDict(NumericVar)
+        # type configs, key = line type, value = Type
+        self.types = { }
 
         # element types
-        t = Type()
+        t = Type(self)
         t.lt = SCENE
         t.name = "Scene"
         t.emptyLinesBefore = 1
@@ -297,7 +190,7 @@ class Config:
         t.doAutoComp = True
         self.types[t.lt] = t
 
-        t = Type()
+        t = Type(self)
         t.lt = ACTION
         t.name = "Action"
         t.emptyLinesBefore = 1
@@ -309,7 +202,7 @@ class Config:
         t.prevTypeTab = CHARACTER
         self.types[t.lt] = t
 
-        t = Type()
+        t = Type(self)
         t.lt = CHARACTER
         t.name = "Character"
         t.emptyLinesBefore = 1
@@ -324,7 +217,7 @@ class Config:
         t.doAutoComp = True
         self.types[t.lt] = t
 
-        t = Type()
+        t = Type(self)
         t.lt = DIALOGUE
         t.name = "Dialogue"
         t.emptyLinesBefore = 0
@@ -336,7 +229,7 @@ class Config:
         t.prevTypeTab = ACTION
         self.types[t.lt] = t
 
-        t = Type()
+        t = Type(self)
         t.lt = PAREN
         t.name = "Parenthetical"
         t.emptyLinesBefore = 0
@@ -348,7 +241,7 @@ class Config:
         t.prevTypeTab = DIALOGUE
         self.types[t.lt] = t
 
-        t = Type()
+        t = Type(self)
         t.lt = TRANSITION
         t.name = "Transition"
         t.emptyLinesBefore = 1
@@ -371,7 +264,7 @@ class Config:
             ]
         self.types[t.lt] = t
 
-        t = Type()
+        t = Type(self)
         t.lt = SHOT
         t.name = "Shot"
         t.emptyLinesBefore = 1
@@ -385,7 +278,7 @@ class Config:
         t.prevTypeTab = SCENE
         self.types[t.lt] = t
         
-        t = Type()
+        t = Type(self)
         t.lt = NOTE
         t.name = "Note"
         t.emptyLinesBefore = 1
@@ -401,35 +294,113 @@ class Config:
 
         self.recalc()
 
-    def addVar(self, var):
-        setattr(self, var.name, var.defVal)
-        self.vars.append(var)
+    def setupVars(self):
+        v = self.__class__.cvars = mypickle.Vars()
         
-    def addBool(self, *params):
-        self.addVar(BoolVar(*params))
+        # confirm non-undoable delete operations that would delete at
+        # least this many lines. (0 = disabled)
+        v.addInt("confirmDeletes", 2, "ConfirmDeletes", 0, 500)
 
-    def addColor(self, name, r, g, b, name2, descr):
-        self.addVar(ColorVar(name + "Color", wxColour(r, g, b),
-                             "Color/" + name2, descr))
-        
-    def addFloat(self, *params):
-        self.addVar(FloatVar(*params))
-        
-    def addInt(self, *params):
-        self.addVar(IntVar(*params))
-        
-    def addStr(self, *params):
-        self.addVar(StrVar(*params))
+        # not used perse, but listed here so that we can easily query
+        # min/max values for these in various places
+        v.addInt("elementEmptyLinesBefore", 0, "", 0, 5)
+        v.addInt("elementIndent", 0, "", 0, 80)
+        v.addInt("elementWidth", 5, "", 5, 80)
 
-    # return dictionary containing given type of variable objects, or all
-    # if typeObj is None.
-    def genDict(self, typeObj = None):
-        tmp = {}
-        for it in self.vars:
-            if not typeObj or isinstance(it, typeObj):
-                tmp[it.name] = it
+        # vertical distance between rows, in pixels
+        v.addInt("fontYdelta", 18, "FontYDelta", 4, 125)
 
-        return tmp
+        # font size used for PDF generation, in points
+        v.addInt("fontSize", 12, "PDF/FontSize", 4, 72)
+
+        # margins
+        v.addFloat("marginBottom", 25.4, "Margin/Bottom", 0.0, 900.0)
+        v.addFloat("marginLeft", 38.1, "Margin/Left", 0.0, 900.0)
+        v.addFloat("marginRight", 25.4, "Margin/Right", 0.0, 900.0)
+        v.addFloat("marginTop", 12.7, "Margin/Top", 0.0, 900.0)
+
+        # how many lines to scroll per mouse wheel event
+        v.addInt("mouseWheelLines", 4, "MouseWheelLines", 1, 50)
+
+        # interval in seconds between automatic pagination (0 = disabled)
+        # TODO: change this to 5 or something
+        v.addInt("paginateInterval", 0, "PaginateInterval", 0, 60)
+
+        # paper size
+        v.addFloat("paperHeight", 297.0, "Paper/Height", 100.0, 1000.0)
+        v.addFloat("paperWidth", 210.0, "Paper/Width", 50.0, 1000.0)
+
+        # leave at least this many action lines on the end of a page
+        v.addInt("pbActionLines", 2, "PageBreakActionLines", 1, 30)
+
+        # leave at least this many dialogue lines on the end of a page
+        v.addInt("pbDialogueLines", 2, "PageBreakDialogueLines", 1, 30)
+
+        # whether to check script for errors before export / print
+        v.addBool("checkOnExport", True, "CheckScriptForErrors")
+        
+        # whether to auto-capitalize start of sentences
+        v.addBool("capitalize", True, "CapitalizeSentences")
+
+        # page break indicators to show
+        v.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,
+                    PBI_LAST)
+        
+        # PDF viewer program and args
+        if misc.isUnix:
+            s1 = "/usr/local/Acrobat5/bin/acroread"
+            s2 = "-tempFile"
+        elif misc.isWindows:
+            s1 = r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe"
+            s2 = ""
+        else:
+            s1 = "not set yet (unknown platform %s)"\
+                                 % wxPlatform
+            s2 = ""
+
+        v.addStr("pdfViewerPath", s1, "PDF/ViewerPath")
+        v.addStr("pdfViewerArgs", s2, "PDF/ViewerArguments")
+
+        # font
+        if misc.isUnix:
+            s1 = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
+        elif misc.isWindows:
+            s1 = "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
+        else:
+            s1 = ""
+            
+        v.addStr("nativeFont", s1, "FontInfo")
+        
+        # default script directory
+        v.addStr("scriptDir", misc.progPath, "DefaultScriptDirectory")
+        
+        # whether to draw rectangle showing margins
+        v.addBool("pdfShowMargins", False, "PDF/ShowMargins")
+
+        # whether to show line numbers next to each line
+        v.addBool("pdfShowLineNumbers", False, "PDF/ShowLineNumbers")
+
+        # colors
+        v.addColor("text", 0, 0, 0, "TextFG", "Text foreground")
+        v.addColor("bg", 204, 204, 204, "TextBG", "Text background")
+        v.addColor("selected", 128, 192, 192, "Selected", "Selection")
+        v.addColor("search", 255, 127, 0, "SearchResult", "Search result")
+        v.addColor("cursor", 205, 0, 0, "Cursor", "Cursor")
+        v.addColor("autoCompFg", 0, 0, 0, "AutoCompletionFG",
+                   "Auto-completion foreground")
+        v.addColor("autoCompBg", 249, 222, 99, "AutoCompletionBG",
+                   "Auto-completion background")
+        v.addColor("note", 255, 255, 0, "ScriptNote", "Script note")
+        v.addColor("pagebreak", 128, 128, 128, "PageBreakLine",
+                   "Page-break line")
+        v.addColor("pagebreakNoAdjust", 128, 128, 128,
+                   "PageBreakNoAdjustLine",
+                   "Page-break (original, not adjusted) line")
+        
+        # make various dictionaries pointing to the config variables.
+        self.allVars = v.getDict()
+        self.colorVars = v.getDict(mypickle.ColorVar)
+        self.numericVars = v.getDict(mypickle.NumericVar)
 
     # get default value of a setting
     def getDefault(self, name):
@@ -447,7 +418,21 @@ class Config:
     # tuple.
     def getMinMax(self, name):
         return (self.getMin(name), self.getMax(name))
-        
+
+    # load config from string 's'. does not throw any exceptions, silently
+    # ignores any errors, and always leaves config in an ok state.
+    def load(self, s):
+        pass
+
+    # save config into a string and return that.
+    def save(self):
+        s = self.cvars.save("", self)
+
+        for t in self.types.itervalues():
+            s += t.save("Element/")
+            
+        return s
+            
     # fix up all invalid config values and recalculate all variables
     # dependent on other variables.
     #
@@ -461,6 +446,8 @@ class Config:
         for it in self.numericVars.itervalues():
             util.clampObj(self, it.name, it.minVal, it.maxVal)
 
+        # FIXME: check that required string vars are valid input text
+        
         for el in self.types.itervalues():
             util.clampObj(el, "emptyLinesBefore",
                           *self.getMinMax("elementEmptyLinesBefore"))

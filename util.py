@@ -3,6 +3,7 @@ import misc
 
 import glob
 import os
+import re
 import tempfile
 import time
 
@@ -125,19 +126,17 @@ def str2float(s, defVal, minVal = None, maxVal = None):
     
     try:
         val = float(s)
-    except ValueError:
-        pass
-    except OverflowError:
+    except (ValueError, OverflowError):
         pass
 
     return clamp(val, minVal, maxVal)
 
 # like str2float, but for ints.
-def str2int(s, defVal, minVal = None, maxVal = None):
+def str2int(s, defVal, minVal = None, maxVal = None, radix = 10):
     val = defVal
     
     try:
-        val = int(s)
+        val = int(s, radix)
     except ValueError:
         pass
 
@@ -180,6 +179,38 @@ def bools2flags(chars, *bools):
             s += chars[i]
 
     return s
+
+# return s encoded so that all characters outside the range [32,126] (and
+# "\\") are escaped.
+def encodeStr(s):
+    ret = ""
+    
+    for ch in s:
+        c = ord(ch)
+
+        # ord("\\") == 92 == 0x5C
+        if c == 92:
+            ret += "\\5C"
+        elif (c >= 32) and (c <= 126):
+            ret += ch
+        else:
+            ret += "\\%02X" % c
+
+    return ret
+
+# reverse of encodeStr. if string contains invalid escapes, they're
+# silently and arbitrarily replaced by something.
+def decodeStr(s):
+    return re.sub(r"\\..", _decodeRepl, s)
+
+# converts "\A4" style matches to their character values.
+def _decodeRepl(mo):
+    val = str2int(mo.group(0)[1:], 256, 0, 256, 16)
+
+    if val != 256:
+        return chr(val)
+    else:
+        return ""
     
 def isFixedWidth(font):
     dc = wxMemoryDC()
