@@ -44,6 +44,13 @@ ESCAPE                 Unselect
 
 CTRL + F               Find / Replace
 
+ (in Find/Replace dialog):
+
+ F                     Find
+ R                     Replace
+
+CTRL + E               Find next error in screenplay
+
 Alt + S                Change element to scene heading
 Alt + A                Change element to action
 Alt + C                Change element to character
