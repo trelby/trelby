@@ -256,7 +256,20 @@ class Screenplay:
             l.append(screenplay.Line(ln.lb, ln.lt, ln.text))
 
         return sp
-            
+
+# stuff we need for tracking how to handle commands (keyboard events).
+class CommandState:
+
+    # what to do about auto-completion
+    AC_DEL, AC_REDO, AC_KEEP = (0, 1, 2)
+    
+    def __init__(self):
+
+        self.doAutoComp = self.AC_DEL
+
+        # whether to update the screen etc
+        self.doUpdate = True
+
 class MyPanel(wxPanel):
 
     def __init__(self, parent, id):
@@ -2845,16 +2858,10 @@ class MyCtrl(wxControl):
 
         # TODO: call ensureCorrectLine()?
 
-        # what to do about auto-completion
-        AC_DEL = 0
-        AC_REDO = 1
-        AC_KEEP = 2
-
-        doAutoComp = AC_DEL
-        doUpdate = True
+        cs = CommandState()
 
         if isinstance(ev, util.MyKeyEvent) and (ev.noUpdate):
-            doUpdate = False
+            cs.doUpdate = False
         
         # 10 == CTRL+Enter under wxMSW
         if (kc == WXK_RETURN) or (kc == 10):
@@ -2881,7 +2888,7 @@ class MyCtrl(wxControl):
                         self.joinLines(self.line - 1)
             else:
                 self.deleteChar(self.line, self.column - 1)
-                doAutoComp = AC_REDO
+                cs.doAutoComp = cs.AC_REDO
 
             self.rewrapPara()
             
@@ -2900,7 +2907,7 @@ class MyCtrl(wxControl):
                             self.joinLines(self.line)
                 else:
                     self.deleteChar(self.line, self.column)
-                    doAutoComp = AC_REDO
+                    cs.doAutoComp = cs.AC_REDO
 
                 self.rewrapPara()
             else:
@@ -2968,7 +2975,7 @@ class MyCtrl(wxControl):
 
             else:
                 self.autoCompSel = (self.autoCompSel + 1) % len(self.autoComp)
-                doAutoComp = AC_KEEP
+                cs.doAutoComp = cs.AC_KEEP
                         
         elif kc == WXK_UP:
             if not self.autoComp:
@@ -2981,7 +2988,7 @@ class MyCtrl(wxControl):
                 self.autoCompSel = self.autoCompSel - 1
                 if self.autoCompSel < 0:
                     self.autoCompSel = len(self.autoComp) - 1
-                doAutoComp = AC_KEEP
+                cs.doAutoComp = cs.AC_KEEP
                     
         elif kc == WXK_HOME:
             self.maybeMark(ev.ShiftDown())
@@ -3036,7 +3043,7 @@ class MyCtrl(wxControl):
                     if self.autoCompSel < 0:
                         self.autoCompSel = len(self.autoComp) - 1
                 
-                doAutoComp = AC_KEEP
+                cs.doAutoComp = cs.AC_KEEP
             
         elif kc in (WXK_NEXT, WXK_PAGEDOWN):
             if not self.autoComp:
@@ -3059,7 +3066,7 @@ class MyCtrl(wxControl):
                     self.autoCompSel = (self.autoCompSel +
                         self.maxAutoCompItems) % len(self.autoComp)
                 
-                doAutoComp = AC_KEEP
+                cs.doAutoComp = cs.AC_KEEP
             
         elif ev.AltDown() and (kc < 256):
             ch = chr(kc).upper()
@@ -3128,7 +3135,7 @@ class MyCtrl(wxControl):
 
             self.rewrapPara()
 
-            doAutoComp = AC_REDO
+            cs.doAutoComp = cs.AC_REDO
 
         else:
             ev.Skip()
@@ -3137,12 +3144,12 @@ class MyCtrl(wxControl):
         # TODO: call ensureCorrectLine()?
         self.column = min(self.column, len(ls[self.line].text))
 
-        if doAutoComp == AC_DEL:
+        if cs.doAutoComp == cs.AC_DEL:
             self.autoComp = None
-        elif doAutoComp == AC_REDO:
+        elif cs.doAutoComp == cs.AC_REDO:
             self.fillAutoComp()
 
-        if doUpdate:
+        if cs.doUpdate:
             if cfg.paginateInterval > 0:
                 now = time.time()
                 if (now - self.lastPaginated) >= cfg.paginateInterval:
