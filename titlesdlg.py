@@ -9,12 +9,13 @@ import copy
 from wxPython.wx import *
 
 class TitlesDlg(wxDialog):
-    def __init__(self, parent, titles, cfg):
+    def __init__(self, parent, titles, cfg, cfgGl):
         wxDialog.__init__(self, parent, -1, "Title pages",
                           style = wxDEFAULT_DIALOG_STYLE)
 
         self.titles = titles
         self.cfg = cfg
+        self.cfgGl = cfgGl
 
         # whether some events are blocked
         self.block = False
@@ -214,7 +215,7 @@ class TitlesDlg(wxDialog):
 
         self.titles.generatePages(doc)
         tmp = pdf.generate(doc)
-        util.showTempPDF(tmp, self.cfg, self)
+        util.showTempPDF(tmp, self.cfgGl, self)
 
     # set given page. 'page' can be an invalid value.
     def setPage(self, page):

@@ -1,17 +1,89 @@
 The screenplay is represented as a series of lines. Lines are separated by
 a single byte 0x0A. The file is encoded in UTF-8, and begins with the
-Unicode BOM marker, i.e. the bytes "EF BB BF".
+Unicode byte order mark (BOM), i.e. the bytes "EF BB BF".
 
-There are two kinds of lines: Normal lines and config lines.
+After the BOM, the first line contains "#Version x", where x is the
+file format number, currently either 1 or 2.
 
-Config lines are of the form: "#", "Config-Name", " " (space),
-"Config-Value". Config-Value can be empty. Example: "#Version 1". The
-file's first line must contain the "Version" config value.
+If file format is 2, the second line contains "#Begin-Config ", and the
+lines after that and up to the line preceding a "#End-Config " line
+contain config directives of the form "key:value".
 
-Config values:
+Config values can be booleans, integers, floating point values, text
+strings, or lists. Booleans are either "True" or "False", integers are
+[0-9]+, floating point values are [0-9]+\.[0-9]+, text strings are
+all the characters between ":" and "\n".
 
-"Version". Required. Value: integer >= 0. The fileformat version that the
-file uses. Currently only version 1 exists.
+If you have a a config directive named Foo that is a list, the format is:
+
+Foo:2
+Foo/1:val1
+Foo/2:val2
+
+i.e. the directive itself contains the number of items in the list, and
+then key-name/x items contain the list values, where x is in the range [1,
+list-size].
+
+The following config directives are supported:
+
+ FontSize (int): Font size in the PDF output in 1/72 inch units.
+
+ Margin/(Bottom|Left|Right|Top) (floating point): Margins in millimeters.
+
+ Paper/(Height|Width) (floating point): Paper size in millimeters.
+
+ PageBreakActionLines (integer): How many lines of action must be left on
+ bottom of a page.
+
+ PageBreakDialogueLines (integer): How many lines of dialogue must be left
+ on bottom of a page.
+
+ SceneContinueds (boolean): Whether to include scene continueds.
+
+ ShowSceneNumbers: (boolean): Whether to include scene numbers.
+
+ ShowMargins: (boolean): Whether to show margins by drawing lines.
+
+ ShowLineNumbers: (boolean): Whether to prefix each line with its line
+ number.
+
+In addition, there are element-type specific config directives, which are
+named "Element/x/y", where x is (Scene|Action|Character|Dialogue|
+Parenthetical|Transition|Shot|Note) and y is one of:
+
+ BeforeSpacing (integer): How many lines to leave empty above a block, in
+ units of line * 10, i.e. a value of 15 would mean 1.5 lines.
+
+ IntraSpacing (integer): Like BeforeSpacing, but for intra-element lines.
+
+ Indent (integer): How many characters to indent from left margin.
+
+ Width (integer): How many characters wide, max.
+
+ AutoCompletion (boolean): Whether auto-completion is on.
+
+ AutoCompletionList (list of strings): Auto-completion values.
+
+ The following are found twice, as "Screen/y" and "Export/y". The first
+ one is used to display the element on-screen, while the second one is
+ used when generating PDF output.
+
+ AllCaps (boolean): Whether to show text as all caps.
+
+ Bold: (boolean): Whether to bold text.
+
+ Italic: (boolean): Whether to italicize text.
+
+ Underlined: (boolean): Whether to underline text.
+
+After "#End-Config " (in v2 files, in v1 files after "#Version 1") there
+is more configuration, but in a different syntax. This is mostly due to
+historical accidents...
+
+These config lines are of the form: "#", "Config-Name", " " (space),
+"Config-Value". Config-Value can be empty.
+
+Config values (none are required):
 
 "Title-Page". Value: None. Starts a new title page.
 
@@ -71,11 +143,10 @@ pages exist yet, creates one. Example:
 is the number of empty lines between headers and actual script contents.
 
 
-Normal lines:
-
-Each normal line has two bytes at the beginning that signal the type of
-linebreak at the end of that line and the general type of the line, and
-everything after that is the text of the line.
+After that, the actual script starts. Each line has two bytes at the
+beginning that signal the type of linebreak at the end of that line and
+the general type of the line, and everything after that is the text of the
+line.
 
 Linebreak types:
 
@@ -116,9 +187,142 @@ increasing the fileformat version number, so unknown line types should be
 converted to Action, and a warning given to user about this.
 
 
-An example screenplay using this format:
+An example screenplay:
 
-﻿#Version 1
+﻿#Version 2
+#Begin-Config 
+FontSize:12
+Margin/Bottom:25.40
+Margin/Left:38.10
+Margin/Right:25.40
+Margin/Top:12.70
+Paper/Height:297.00
+Paper/Width:210.00
+PageBreakActionLines:2
+PageBreakDialogueLines:2
+SceneContinueds:True
+ShowSceneNumbers:False
+ShowMargins:False
+ShowLineNumbers:False
+Element/Scene/BeforeSpacing:10
+Element/Scene/IntraSpacing:0
+Element/Scene/Indent:0
+Element/Scene/Width:60
+Element/Scene/AutoCompletion:True
+Element/Scene/AutoCompletionList:0
+Element/Scene/Screen/AllCaps:True
+Element/Scene/Screen/Bold:True
+Element/Scene/Screen/Italic:False
+Element/Scene/Screen/Underlined:False
+Element/Scene/Export/AllCaps:True
+Element/Scene/Export/Bold:False
+Element/Scene/Export/Italic:False
+Element/Scene/Export/Underlined:False
+Element/Action/BeforeSpacing:10
+Element/Action/IntraSpacing:0
+Element/Action/Indent:0
+Element/Action/Width:60
+Element/Action/AutoCompletion:False
+Element/Action/AutoCompletionList:0
+Element/Action/Screen/AllCaps:False
+Element/Action/Screen/Bold:False
+Element/Action/Screen/Italic:False
+Element/Action/Screen/Underlined:False
+Element/Action/Export/AllCaps:False
+Element/Action/Export/Bold:False
+Element/Action/Export/Italic:False
+Element/Action/Export/Underlined:False
+Element/Character/BeforeSpacing:10
+Element/Character/IntraSpacing:0
+Element/Character/Indent:22
+Element/Character/Width:38
+Element/Character/AutoCompletion:True
+Element/Character/AutoCompletionList:0
+Element/Character/Screen/AllCaps:True
+Element/Character/Screen/Bold:False
+Element/Character/Screen/Italic:False
+Element/Character/Screen/Underlined:False
+Element/Character/Export/AllCaps:True
+Element/Character/Export/Bold:False
+Element/Character/Export/Italic:False
+Element/Character/Export/Underlined:False
+Element/Dialogue/BeforeSpacing:0
+Element/Dialogue/IntraSpacing:0
+Element/Dialogue/Indent:10
+Element/Dialogue/Width:35
+Element/Dialogue/AutoCompletion:False
+Element/Dialogue/AutoCompletionList:0
+Element/Dialogue/Screen/AllCaps:False
+Element/Dialogue/Screen/Bold:False
+Element/Dialogue/Screen/Italic:False
+Element/Dialogue/Screen/Underlined:False
+Element/Dialogue/Export/AllCaps:False
+Element/Dialogue/Export/Bold:False
+Element/Dialogue/Export/Italic:False
+Element/Dialogue/Export/Underlined:False
+Element/Parenthetical/BeforeSpacing:0
+Element/Parenthetical/IntraSpacing:0
+Element/Parenthetical/Indent:16
+Element/Parenthetical/Width:25
+Element/Parenthetical/AutoCompletion:False
+Element/Parenthetical/AutoCompletionList:0
+Element/Parenthetical/Screen/AllCaps:False
+Element/Parenthetical/Screen/Bold:False
+Element/Parenthetical/Screen/Italic:False
+Element/Parenthetical/Screen/Underlined:False
+Element/Parenthetical/Export/AllCaps:False
+Element/Parenthetical/Export/Bold:False
+Element/Parenthetical/Export/Italic:False
+Element/Parenthetical/Export/Underlined:False
+Element/Transition/BeforeSpacing:10
+Element/Transition/IntraSpacing:0
+Element/Transition/Indent:45
+Element/Transition/Width:20
+Element/Transition/AutoCompletion:True
+Element/Transition/AutoCompletionList:6
+Element/Transition/AutoCompletionList/1:CUT TO:
+Element/Transition/AutoCompletionList/2:DISSOLVE TO:
+Element/Transition/AutoCompletionList/3:FADE IN:
+Element/Transition/AutoCompletionList/4:FADE OUT
+Element/Transition/AutoCompletionList/5:FADE TO BLACK
+Element/Transition/AutoCompletionList/6:MATCH CUT TO:
+Element/Transition/Screen/AllCaps:True
+Element/Transition/Screen/Bold:False
+Element/Transition/Screen/Italic:False
+Element/Transition/Screen/Underlined:False
+Element/Transition/Export/AllCaps:True
+Element/Transition/Export/Bold:False
+Element/Transition/Export/Italic:False
+Element/Transition/Export/Underlined:False
+Element/Shot/BeforeSpacing:10
+Element/Shot/IntraSpacing:0
+Element/Shot/Indent:0
+Element/Shot/Width:60
+Element/Shot/AutoCompletion:False
+Element/Shot/AutoCompletionList:0
+Element/Shot/Screen/AllCaps:True
+Element/Shot/Screen/Bold:False
+Element/Shot/Screen/Italic:False
+Element/Shot/Screen/Underlined:False
+Element/Shot/Export/AllCaps:True
+Element/Shot/Export/Bold:False
+Element/Shot/Export/Italic:False
+Element/Shot/Export/Underlined:False
+Element/Note/BeforeSpacing:10
+Element/Note/IntraSpacing:0
+Element/Note/Indent:5
+Element/Note/Width:55
+Element/Note/AutoCompletion:False
+Element/Note/AutoCompletionList:0
+Element/Note/Screen/AllCaps:False
+Element/Note/Screen/Bold:False
+Element/Note/Screen/Italic:True
+Element/Note/Screen/Underlined:False
+Element/Note/Export/AllCaps:False
+Element/Note/Export/Bold:False
+Element/Note/Export/Italic:True
+Element/Note/Export/Underlined:False
+#End-Config 
 #Title-String 0.000000,70.000000,24,cb,Helvetica,UNTITLED SCREENPLAY
 #Title-String 0.000000,85.460000,12,c,Courier,by
 #Title-String 0.000000,93.930000,12,c,Courier,Anonymous Writer

@@ -1,13 +1,13 @@
-import config
 import misc
 import pdf
 import pml
+import screenplay
 import util
 
 from wxPython.wx import *
 
 # show all all dialogue charts as a PDF document
-def genDialogueChart(mainFrame, ctrl, cfg):
+def genDialogueChart(mainFrame, ctrl):
     inf = []
     for it in [ ("Characters appearing on a single page", None),
                 ("Sorted by: First appearance", cmpFirst),
@@ -32,7 +32,7 @@ def genDialogueChart(mainFrame, ctrl, cfg):
     if not inf[0].selected:
         minPages = 2
 
-    chart = DialogueChart(ctrl, cfg, minPages)
+    chart = DialogueChart(ctrl, minPages)
 
     if not chart.cinfo:
         wxMessageBox("No characters speaking found.", "Error", wxOK,
@@ -50,12 +50,12 @@ def genDialogueChart(mainFrame, ctrl, cfg):
         
     data = chart.generate(inf)
 
-    util.showTempPDF(data, cfg, mainFrame)
+    util.showTempPDF(data, ctrl.sp.cfgGl, mainFrame)
     
 class DialogueChart:
-    def __init__(self, ctrl, cfg, minPages):
+    def __init__(self, ctrl, minPages):
 
-        self.cfg = cfg
+        self.ctrl = ctrl
         
         ls = ctrl.sp.lines
 
@@ -67,18 +67,19 @@ class DialogueChart:
         # each page
         self.diagDens = []
         
-        for i in xrange(len(ctrl.pages) - 1):
+        for i in xrange(len(ctrl.sp.pages) - 1):
             self.pages.append({})
 
         curPage = 0
         diagLines = 0
         totalLines = 0
         name = "UNKNOWN"
-        diagTypes = [config.CHARACTER, config.DIALOGUE, config.PAREN]
+        diagTypes = [screenplay.CHARACTER, screenplay.DIALOGUE,
+                     screenplay.PAREN]
         characters = {}
         
         for i in xrange(len(ls)):
-            page = ctrl.line2page(i) - 1
+            page = ctrl.sp.line2page(i) - 1
             line = ls[i]
 
             if page != curPage:
@@ -93,12 +94,12 @@ class DialogueChart:
             if line.lt in diagTypes:
                 diagLines += 1
             
-            if (line.lt == config.CHARACTER) and\
-                   (line.lb == config.LB_LAST):
+            if (line.lt == screenplay.CHARACTER) and\
+                   (line.lb == screenplay.LB_LAST):
                 name = util.upper(line.text)
                 characters[name] = None
                 
-            elif line.lt in (config.DIALOGUE, config.PAREN):
+            elif line.lt in (screenplay.DIALOGUE, screenplay.PAREN):
                 self.pages[page][name] = None
 
         self.diagDens.append((float(diagLines) / totalLines))
@@ -148,7 +149,7 @@ class DialogueChart:
                 break
             
             if (self.chartY + self.chartHeight) <= \
-                   (self.cfg.paperWidth - self.margin):
+                   (self.ctrl.sp.cfg.paperWidth - self.margin):
                 break
 
             size -= 1
@@ -167,10 +168,12 @@ class DialogueChart:
         self.chartX = self.margin + maxLen * charX + 3
 
         # width of chart
-        self.chartWidth = self.cfg.paperHeight - self.chartX - self.margin
+        self.chartWidth = self.ctrl.sp.cfg.paperHeight - self.chartX -\
+                          self.margin
 
     def generate(self, cbil):
-        doc = pml.Document(self.cfg.paperHeight, self.cfg.paperWidth)
+        doc = pml.Document(self.ctrl.sp.cfg.paperHeight,
+                           self.ctrl.sp.cfg.paperWidth)
 
         for it in cbil:
             if it.selected:

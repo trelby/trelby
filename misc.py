@@ -63,6 +63,10 @@ class ScriptChooserDlg(wxDialog):
 
         vsizer.Add(gsizer)
 
+        self.forceCb = wxCheckBox(self, -1, "Use same configuration")
+        self.forceCb.SetValue(True)
+        vsizer.Add(self.forceCb, 0, wxTOP, 10)
+
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
         hsizer.Add(1, 1, 1)
@@ -73,12 +77,14 @@ class ScriptChooserDlg(wxDialog):
         okBtn = wxButton(self, -1, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
+        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
 
         util.finishWindow(self, vsizer)
 
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
         EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+
+        okBtn.SetFocus()
 
     def addCombo(self, name, descr, parent, sizer, items, sel):
         al = wxALIGN_CENTER_VERTICAL | wxRIGHT
@@ -102,6 +108,7 @@ class ScriptChooserDlg(wxDialog):
     def OnOK(self, event):
         self.sel1 = self.firstCombo.GetSelection()
         self.sel2 = self.secondCombo.GetSelection()
+        self.forceSameCfg = bool(self.forceCb.GetValue())
         
         self.EndModal(wxID_OK)
 
@@ -270,3 +277,34 @@ class CheckBoxDlg(wxDialog):
 
     def OnCancel(self, event):
         self.EndModal(wxID_CANCEL)
+
+class TextDlg(wxDialog):
+    def __init__(self, parent, text, title):
+        wxDialog.__init__(self, parent, -1, title,
+                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        tc = wxTextCtrl(self, -1, size = wxSize(400, 200),
+            style = wxTE_MULTILINE | wxTE_READONLY | wxTE_LINEWRAP)
+        tc.SetValue(text)
+        vsizer.Add(tc, 1, wxEXPAND);
+        
+        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 5)
+        
+        okBtn = wxButton(self, -1, "OK")
+        vsizer.Add(okBtn, 0, wxALIGN_CENTER)
+
+        util.finishWindow(self, vsizer)
+
+        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+
+        okBtn.SetFocus()
+
+    def OnOK(self, event):
+        self.EndModal(wxID_OK)
+
+def showText(parent, text, title = "Message"):
+    dlg = TextDlg(parent, text, title)
+    dlg.ShowModal()
+    dlg.Destroy()

@@ -49,7 +49,7 @@ class PageCache:
         pg = self.pages.get(pageNr)
 
         if not pg:
-            pg = self.ctrl.generatePMLPage(pager, pageNr, False, False)
+            pg = self.ctrl.sp.generatePMLPage(pager, pageNr, False, False)
             self.pages[pageNr] = pg
             
         return pg
@@ -79,7 +79,7 @@ class ViewMode:
         raise "getLineHeight not implemented"
 
     # return width of one page in (floating point) pixels
-    def getPageWidth(self, cfg, cfgGui, gd):
+    def getPageWidth(self, ctrl):
         raise "getPageWidth not implemented"
 
     # see MyCtrl.OnPaint for what tl is. note: this is only a default
@@ -131,40 +131,40 @@ class ViewMode:
 
     # semi-generic implementation, for use by Draft and Layout modes.
     def makeLineVisibleGeneric(self, ctrl, line, texts):
-        ctrl.setTopLine(max(0, int(line - (len(texts) * 0.5))))
+        ctrl.sp.setTopLine(max(0, int(line - (len(texts) * 0.5))))
 
         if not ctrl.isLineVisible(line):
-            ctrl.setTopLine(line)
+            ctrl.sp.setTopLine(line)
 
     # semi-generic implementation, for use by Draft and Layout modes.
     def pageCmdGeneric(self, ctrl, cs, dir, texts, dpages):
         if dir > 0:
             line = texts[-1].line
-            ctrl.line = line
-            ctrl.setTopLine(line)
+            ctrl.sp.line = line
+            ctrl.sp.setTopLine(line)
         else:
-            tl = ctrl.getTopLine()
+            tl = ctrl.sp.getTopLine()
             if tl == texts[-1].line:
-                ctrl.setTopLine(tl - 5)
+                ctrl.sp.setTopLine(tl - 5)
             else:
-                ctrl.line = tl
+                ctrl.sp.line = tl
 
                 pc = PageCache(ctrl)
 
                 while 1:
-                    tl = ctrl.getTopLine()
+                    tl = ctrl.sp.getTopLine()
                     if tl == 0:
                         break
 
                     texts = self.getScreen(ctrl, False, False, pc)[0]
                     lastLine = texts[-1].line
 
-                    if ctrl.line > lastLine:
+                    if ctrl.sp.line > lastLine:
                         # line scrolled off screen, back up one line
-                        ctrl.setTopLine(tl + 1)
+                        ctrl.sp.setTopLine(tl + 1)
                         break
 
-                    ctrl.setTopLine(tl - 1)
+                    ctrl.sp.setTopLine(tl - 1)
 
             cs.needsVisifying = False
 
@@ -172,7 +172,7 @@ class ViewMode:
 class ViewModeDraft(ViewMode):
 
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
-        cfg = ctrl.getCfg()
+        cfg = ctrl.sp.cfg
         cfgGui = ctrl.getCfgGui()
         
         texts = []
@@ -180,14 +180,14 @@ class ViewModeDraft(ViewMode):
         width, height = ctrl.GetClientSizeTuple()
 
         ls = ctrl.sp.lines
-        y = cfg.offsetY
-        i = ctrl.getTopLine()
-        cox = cfg.offsetX
-        fyd = cfg.fontYdelta
+        y = 10
+        i = ctrl.sp.getTopLine()
+        cox = 10
+        fyd = ctrl.sp.cfgGl.fontYdelta
         length = len(ls)
 
         while (y < height) and (i < length):
-            y += int((ctrl.sp.getSpacingBefore(i, cfg) / 10.0) * fyd)
+            y += int((ctrl.sp.getSpacingBefore(i) / 10.0) * fyd)
 
             if y >= height:
                 break
@@ -203,7 +203,7 @@ class ViewModeDraft(ViewMode):
             else:
                 text = l.text
 
-            fi = cfgGui.getType(l.lt)
+            fi = cfgGui.tt2fi(tcfg.screen)
             texts.append(TextString(i, text,
                 cox + tcfg.indent * fi.fx, y, fi,
                 tcfg.screen.isUnderlined))
@@ -214,13 +214,14 @@ class ViewModeDraft(ViewMode):
         return (texts, [])
 
     def getLineHeight(self, ctrl):
-        return ctrl.getCfg().fontYdelta
+        return ctrl.sp.cfgGl.fontYdelta
 
-    def getPageWidth(self, cfg, cfgGui, gd):
-        # this is not really used for much in draft mode, as it as no
+    def getPageWidth(self, ctrl):
+        # this is not really used for much in draft mode, as it has no
         # concept of page width, but it's safer to return something
         # anyway.
-        return (cfg.paperWidth / gd.chX) * cfgGui.fonts[pml.NORMAL].fx
+        return (ctrl.sp.cfg.paperWidth / ctrl.chX) *\
+               ctrl.getCfgGui().fonts[pml.NORMAL].fx
 
     def pos2linecol(self, ctrl, x, y):
         return self.pos2linecolGeneric(ctrl, x, y)
@@ -236,9 +237,7 @@ class ViewModeDraft(ViewMode):
 class ViewModeLayout(ViewMode):
 
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
-        cfg = ctrl.getCfg()
         cfgGui = ctrl.getCfgGui()
-        gd = ctrl.getGd()
         
         texts = []
         dpages = []
@@ -247,26 +246,26 @@ class ViewModeLayout(ViewMode):
 
         # gap between pages (pixels)
         pageGap = 10
-        pager = mypager.Pager(ctrl.sp, cfg)
+        pager = mypager.Pager(ctrl.sp.cfg)
 
-        mm2p = gd.mm2p
+        mm2p = ctrl.mm2p
         fontY = cfgGui.fonts[pml.NORMAL].fy
 
-        cox = util.clamp((width - gd.pageW) / 2, 0)
+        cox = util.clamp((width - ctrl.pageW) / 2, 0)
 
         y = 0
-        topLine = ctrl.getTopLine()
-        pageNr = ctrl.line2page(topLine)
+        topLine = ctrl.sp.getTopLine()
+        pageNr = ctrl.sp.line2page(topLine)
 
-        if doExtra and cfg.pdfShowSceneNumbers:
-            pager.scene = ctrl.getSceneNumber(topLine)
+        if doExtra and ctrl.sp.cfg.pdfShowSceneNumbers:
+            pager.scene = ctrl.sp.getSceneNumber(topLine)
 
         # find out starting place (if something bugs, generatePMLPage
         # below could return None, but it shouldn't happen...)
         if pageCache:
             pg = pageCache.getPage(pager, pageNr)
         else:
-            pg = ctrl.generatePMLPage(pager, pageNr, False, doExtra)
+            pg = ctrl.sp.generatePMLPage(pager, pageNr, False, doExtra)
 
         topOfPage = True
         for op in pg.ops:
@@ -293,7 +292,7 @@ class ViewModeLayout(ViewMode):
 
             if not pg:
                 pageNr += 1
-                if pageNr >= len(ctrl.pages):
+                if pageNr >= len(ctrl.sp.pages):
                     break
 
                 # we'd have to go back an arbitrary number of pages to
@@ -304,12 +303,13 @@ class ViewModeLayout(ViewMode):
                 if pageCache:
                     pg = pageCache.getPage(pager, pageNr)
                 else:
-                    pg = ctrl.generatePMLPage(pager, pageNr, False,
-                                              doExtra)
+                    pg = ctrl.sp.generatePMLPage(pager, pageNr, False,
+                                                 doExtra)
                 if not pg:
                     break
 
-            dp = DisplayPage(pageNr, cox, y, cox + gd.pageW, y + gd.pageH)
+            dp = DisplayPage(pageNr, cox, y, cox + ctrl.pageW,
+                             y + ctrl.pageH)
             dpages.append(dp)
 
             pageY = y
@@ -335,13 +335,13 @@ class ViewModeLayout(ViewMode):
                                         cfgGui.fonts[op.flags & 3],
                                         op.flags & pml.UNDERLINED))
 
-            y = pageY + gd.pageH + pageGap
+            y = pageY + ctrl.pageH + pageGap
             pg = None
 
         # if user has inserted new text causing the script to overflow
         # the last page, we need to make the last page extra-long on
         # the screen.
-        if dpages and texts and (pageNr >= (len(ctrl.pages) - 1)):
+        if dpages and texts and (pageNr >= (len(ctrl.sp.pages) - 1)):
 
             lastY = texts[-1].y + fontY
             if lastY >= dpages[-1].y2:
@@ -350,14 +350,13 @@ class ViewModeLayout(ViewMode):
         return (texts, dpages)
     
     def getLineHeight(self, ctrl):
-        gd = ctrl.getGd()
-
         # the + 1.0 avoids occasional non-consecutive backgrounds for
         # lines.
-        return int(gd.chY * gd.mm2p + 1.0)
+        return int(ctrl.chY * ctrl.mm2p + 1.0)
 
-    def getPageWidth(self, cfg, cfgGui, gd):
-        return (cfg.paperWidth / gd.chX) * cfgGui.fonts[pml.NORMAL].fx
+    def getPageWidth(self, ctrl):
+        return (ctrl.sp.cfg.paperWidth / ctrl.chX) *\
+               ctrl.getCfgGui().fonts[pml.NORMAL].fx
 
     def pos2linecol(self, ctrl, x, y):
         return self.pos2linecolGeneric(ctrl, x, y)
@@ -374,35 +373,33 @@ class ViewModeLayout(ViewMode):
 class ViewModeSideBySide(ViewMode):
 
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
-        cfg = ctrl.getCfg()
         cfgGui = ctrl.getCfgGui()
-        gd = ctrl.getGd()
         
         texts = []
         dpages = []
 
         width, height = ctrl.GetClientSizeTuple()
 
-        mm2p = gd.mm2p
+        mm2p = ctrl.mm2p
 
         # gap between pages (+ screen left edge)
         pageGap = 10
 
         # how many pages fit on screen
-        pageCnt = max(1, (width - pageGap) // (gd.pageW + pageGap))
+        pageCnt = max(1, (width - pageGap) // (ctrl.pageW + pageGap))
 
-        pager = mypager.Pager(ctrl.sp, cfg)
+        pager = mypager.Pager(ctrl.sp.cfg)
 
-        topLine = ctrl.getTopLine()
+        topLine = ctrl.sp.getTopLine()
         
-        if doExtra and cfg.pdfShowSceneNumbers:
-            pager.scene = ctrl.getSceneNumber(topLine)
+        if doExtra and ctrl.sp.cfg.pdfShowSceneNumbers:
+            pager.scene = ctrl.sp.getSceneNumber(topLine)
 
-        pageNr = ctrl.line2page(topLine)
+        pageNr = ctrl.sp.line2page(topLine)
         pagesDone = 0
         
         while 1:
-            if (pagesDone >= pageCnt) or (pageNr >= len(ctrl.pages)):
+            if (pagesDone >= pageCnt) or (pageNr >= len(ctrl.sp.pages)):
                 break
 
             # we'd have to go back an arbitrary number of pages to get an
@@ -413,15 +410,16 @@ class ViewModeSideBySide(ViewMode):
             if pageCache:
                 pg = pageCache.getPage(pager, pageNr)
             else:
-                pg = ctrl.generatePMLPage(pager, pageNr, False,
-                                          doExtra)
+                pg = ctrl.sp.generatePMLPage(pager, pageNr, False,
+                                             doExtra)
             if not pg:
                 break
 
-            sx = pageGap + pagesDone * (gd.pageW + pageGap)
+            sx = pageGap + pagesDone * (ctrl.pageW + pageGap)
             sy = pageGap
 
-            dp = DisplayPage(pageNr, sx, sy, sx + gd.pageW, sy + gd.pageH)
+            dp = DisplayPage(pageNr, sx, sy, sx + ctrl.pageW,
+                             sy + ctrl.pageH)
             dpages.append(dp)
 
             for op in pg.ops:
@@ -438,14 +436,13 @@ class ViewModeSideBySide(ViewMode):
         return (texts, dpages)
     
     def getLineHeight(self, ctrl):
-        gd = ctrl.getGd()
-
         # the + 1.0 avoids occasional non-consecutive backgrounds for
         # lines.
-        return int(gd.chY * gd.mm2p + 1.0)
+        return int(ctrl.chY * ctrl.mm2p + 1.0)
 
-    def getPageWidth(self, cfg, cfgGui, gd):
-        return (cfg.paperWidth / gd.chX) * cfgGui.fonts[pml.NORMAL].fx
+    def getPageWidth(self, ctrl):
+        return (ctrl.sp.cfg.paperWidth / ctrl.chX) *\
+               ctrl.getCfgGui().fonts[pml.NORMAL].fx
 
     def pos2linecol(self, ctrl, x, y):
         lineh = self.getLineHeight(ctrl)
@@ -484,7 +481,7 @@ class ViewModeSideBySide(ViewMode):
         return (line, column)
 
     def makeLineVisible(self, ctrl, line, texts):
-        ctrl.setTopLine(line)
+        ctrl.sp.setTopLine(line)
 
     def pageCmd(self, ctrl, cs, dir, texts, dpages):
         if dir < 0:
@@ -492,10 +489,10 @@ class ViewModeSideBySide(ViewMode):
         else:
             pageNr = dpages[-1].pageNr + 1
 
-        line = ctrl.page2lines(pageNr)[0]
+        line = ctrl.sp.page2lines(pageNr)[0]
 
-        ctrl.line = line
-        ctrl.setTopLine(line)
+        ctrl.sp.line = line
+        ctrl.sp.setTopLine(line)
         cs.needsVisifying = False
 
 # Overview view mode. Very small pages with unreadable text are displayed
@@ -507,9 +504,7 @@ class ViewModeOverview(ViewMode):
         self.size = size
         
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
-        cfg = ctrl.getCfg()
         cfgGui = ctrl.getCfgGui()
-        gd = ctrl.getGd()
 
         texts = []
         dpages = []
@@ -521,39 +516,40 @@ class ViewModeOverview(ViewMode):
         pageGap = 10
 
         # how many columns and rows
-        cols = max(1, (width - pageGap) // (gd.pageW + pageGap))
-        rows = max(1, (height - pageGap) // (gd.pageH + pageGap))
+        cols = max(1, (width - pageGap) // (ctrl.pageW + pageGap))
+        rows = max(1, (height - pageGap) // (ctrl.pageH + pageGap))
         pageCnt = cols * rows
         
-        pager = mypager.Pager(ctrl.sp, cfg)
+        pager = mypager.Pager(ctrl.sp.cfg)
         fi = config.FontInfo()
         fi.font = cfgGui.fonts[pml.NORMAL].font
         fi.fx = fi.fy = self.size
         
-        mm2p = gd.mm2p
+        mm2p = ctrl.mm2p
 
-        pageNr = ctrl.line2page(ctrl.getTopLine())
+        pageNr = ctrl.sp.line2page(ctrl.sp.getTopLine())
         pagesDone = 0
         
         while 1:
-            if (pagesDone >= pageCnt) or (pageNr >= len(ctrl.pages)):
+            if (pagesDone >= pageCnt) or (pageNr >= len(ctrl.sp.pages)):
                 break
 
             if pageCache:
                 pg = pageCache.getPage(pager, pageNr)
             else:
-                pg = ctrl.generatePMLPage(pager, pageNr, False,
-                                          doExtra)
+                pg = ctrl.sp.generatePMLPage(pager, pageNr, False,
+                                             doExtra)
             if not pg:
                 break
 
             xi = pagesDone % cols
             yi = pagesDone // cols
 
-            sx = pageGap + xi * (gd.pageW + pageGap)
-            sy = pageGap + yi * (gd.pageH + pageGap)
+            sx = pageGap + xi * (ctrl.pageW + pageGap)
+            sy = pageGap + yi * (ctrl.pageH + pageGap)
 
-            dp = DisplayPage(pageNr, sx, sy, sx + gd.pageW, sy + gd.pageH)
+            dp = DisplayPage(pageNr, sx, sy, sx + ctrl.pageW,
+                             sy + ctrl.pageH)
             dpages.append(dp)
 
             for op in pg.ops:
@@ -572,8 +568,8 @@ class ViewModeOverview(ViewMode):
     def getLineHeight(self, ctrl):
         return self.size
 
-    def getPageWidth(self, cfg, cfgGui, gd):
-        return (cfg.paperWidth / gd.chX) * self.size
+    def getPageWidth(self, ctrl):
+        return (ctrl.sp.cfg.paperWidth / ctrl.chX) * self.size
 
     def drawTexts(self, ctrl, dc, tl):
         for i in xrange(len(tl[1][0])):
@@ -597,12 +593,12 @@ class ViewModeOverview(ViewMode):
             if (x < dp.x1) or (x > dp.x2) or (y < dp.y1) or (y > dp.y2):
                 continue
 
-            return (ctrl.page2lines(dp.pageNr)[0], 0)
+            return (ctrl.sp.page2lines(dp.pageNr)[0], 0)
             
         return (None, None)
 
     def makeLineVisible(self, ctrl, line, texts):
-        ctrl.setTopLine(line)
+        ctrl.sp.setTopLine(line)
 
     # not implemented for overview mode at least for now.
     def pageCmd(self, ctrl, cs, dir, texts, dpages):

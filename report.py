@@ -1,15 +1,15 @@
-import config
 import misc
 import pdf
 import pml
+import screenplay
 import util
 
 import textwrap
 
 from wxPython.wx import *
 
-def genCharacterReport(mainFrame, ctrl, cfg):
-    report = CharacterReport(ctrl, cfg)
+def genCharacterReport(mainFrame, ctrl):
+    report = CharacterReport(ctrl)
 
     if not report.cinfo:
         wxMessageBox("No characters speaking found.",
@@ -39,12 +39,12 @@ def genCharacterReport(mainFrame, ctrl, cfg):
     
     data = report.generate()
 
-    util.showTempPDF(data, cfg, mainFrame)
+    util.showTempPDF(data, ctrl.sp.cfgGl, mainFrame)
     
 class CharacterReport:
-    def __init__(self, ctrl, cfg):
+    def __init__(self, ctrl):
 
-        self.cfg = cfg
+        self.ctrl = ctrl
         
         ls = ctrl.sp.lines
 
@@ -60,16 +60,16 @@ class CharacterReport:
         for i in xrange(len(ls)):
             line = ls[i]
 
-            if (line.lt == config.SCENE) and\
-                   (line.lb == config.LB_LAST):
+            if (line.lt == screenplay.SCENE) and\
+                   (line.lb == screenplay.LB_LAST):
                 scene = util.upper(line.text)
                 
-            elif (line.lt == config.CHARACTER) and\
-                   (line.lb == config.LB_LAST):
+            elif (line.lt == screenplay.CHARACTER) and\
+                   (line.lb == screenplay.LB_LAST):
                 name = util.upper(line.text)
                 curSpeechLines = 0
                 
-            elif line.lt in (config.DIALOGUE, config.PAREN) and name:
+            elif line.lt in (screenplay.DIALOGUE, screenplay.PAREN) and name:
                 ci = chars.get(name)
                 if not ci:
                     ci = CharInfo(name)
@@ -89,7 +89,7 @@ class CharacterReport:
                 ci.wordCnt += len(words)
                 ci.wordCharCnt += reduce(lambda x, y: x + len(y), words, 0)
                 
-                ci.addPage(ctrl.line2page(i))
+                ci.addPage(ctrl.sp.line2page(i))
 
             else:
                 name = None
@@ -118,7 +118,8 @@ class CharacterReport:
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
         
     def generate(self):
-        self.doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight)
+        self.doc = pml.Document(self.ctrl.sp.cfg.paperWidth,
+                                self.ctrl.sp.cfg.paperHeight)
 
         # how much to leave empty on each side (mm)
         self.margin = 20.0
@@ -126,7 +127,7 @@ class CharacterReport:
         # normal font
         self.fontSize = 12
 
-        charsToLine = int((self.cfg.paperWidth - self.margin * 2.0) /
+        charsToLine = int((self.ctrl.sp.cfg.paperWidth - self.margin * 2.0) /
                           util.getTextWidth(" ", pml.COURIER, self.fontSize))
         
         # character name font
@@ -190,7 +191,7 @@ class CharacterReport:
 
         yd = util.getTextHeight(fs)
 
-        if (self.y + yd) > (self.cfg.paperHeight - self.margin):
+        if (self.y + yd) > (self.ctrl.sp.cfg.paperHeight - self.margin):
             self.doc.add(self.pg)
             self.pg = pml.Page(self.doc)
             self.y = self.margin

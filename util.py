@@ -417,11 +417,6 @@ class MyKeyEvent:
         self.altDown = False
         self.shiftDown = False
 
-        # if True, means processing this key event shouldn't do expensive
-        # screen updating stuff as there will be more key events coming
-        # in.
-        self.noUpdate = False
-
     def GetKeyCode(self):
         return self.kc
     
@@ -655,7 +650,7 @@ class TimerDev:
 # temporary file, first deleting all old temporary files, then opens PDF
 # viewer application. 'mainFrame' is used as a parent for message boxes in
 # case there are any errors.
-def showTempPDF(pdfData, cfg, mainFrame):
+def showTempPDF(pdfData, cfgGl, mainFrame):
 
     try:
         try:
@@ -669,7 +664,7 @@ def showTempPDF(pdfData, cfg, mainFrame):
             finally:
                 os.close(fd)
 
-            showPDF(filename, cfg, mainFrame)
+            showPDF(filename, cfgGl, mainFrame)
 
         except IOError, (errno, strerror):
             raise MiscError("IOError: %s" % strerror)
@@ -679,9 +674,9 @@ def showTempPDF(pdfData, cfg, mainFrame):
                      "Error", wxOK, mainFrame)
 
 # show PDF file.
-def showPDF(filename, cfg, frame):
+def showPDF(filename, cfgGl, frame):
     try:
-        os.stat(cfg.pdfViewerPath)
+        os.stat(cfgGl.pdfViewerPath)
     except OSError:
         wxMessageBox("PDF viewer application not found.\n\n"
                      "You can change your PDF settings\n"
@@ -692,6 +687,6 @@ def showPDF(filename, cfg, frame):
     # on Windows, Acrobat complains about "invalid path" if we
     # give the full path of the program as first arg, so give a
     # dummy arg.
-    args = ["pdf"] + cfg.pdfViewerArgs.split() + [filename]
+    args = ["pdf"] + cfgGl.pdfViewerArgs.split() + [filename]
     
-    os.spawnv(os.P_NOWAIT, cfg.pdfViewerPath, args)
+    os.spawnv(os.P_NOWAIT, cfgGl.pdfViewerPath, args)

@@ -7,12 +7,13 @@ import util
 from wxPython.wx import *
 
 class HeadersDlg(wxDialog):
-    def __init__(self, parent, headers, cfg, applyFunc):
+    def __init__(self, parent, headers, cfg, cfgGl, applyFunc):
         wxDialog.__init__(self, parent, -1, "Headers",
                           style = wxDEFAULT_DIALOG_STYLE)
 
         self.headers = headers
         self.cfg = cfg
+        self.cfgGl = cfgGl
         self.applyFunc = applyFunc
 
         # whether some events are blocked
@@ -200,7 +201,7 @@ class HeadersDlg(wxDialog):
         doc.add(pg)
         
         tmp = pdf.generate(doc)
-        util.showTempPDF(tmp, self.cfg, self)
+        util.showTempPDF(tmp, self.cfgGl, self)
 
     def OnKillFocus(self, event):
         self.OnMisc()

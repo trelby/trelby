@@ -13,7 +13,7 @@ SCENE_ACTION = -2
 # import text file from fileName, return list of Line objects for the
 # screenplay or None if something went wrong. returned list always
 # contains at least one line.
-def importTextFile(fileName, frame, cfg):
+def importTextFile(fileName, frame):
 
     # the 1 MB limit is arbitrary, we just want to avoid getting a
     # MemoryError exception for /dev/zero etc.
@@ -74,16 +74,16 @@ def importTextFile(fileName, frame, cfg):
     setType(SCENE_ACTION, indDict, lambda v: v.sceneStart)
 
     # indent with most lines is dialogue in non-pure-action scripts
-    setType(config.DIALOGUE, indDict, lambda v: len(v.lines))
+    setType(screenplay.DIALOGUE, indDict, lambda v: len(v.lines))
 
     # remaining indent with lines is character most likely
-    setType(config.CHARACTER, indDict, lambda v: len(v.lines))
+    setType(screenplay.CHARACTER, indDict, lambda v: len(v.lines))
 
     # transitions
-    setType(config.TRANSITION, indDict, lambda v: v.trans)
+    setType(screenplay.TRANSITION, indDict, lambda v: v.trans)
     
     # parentheticals
-    setType(config.PAREN, indDict, lambda v: v.paren)
+    setType(screenplay.PAREN, indDict, lambda v: v.paren)
 
     # some text files have this type of parens:
     #
@@ -92,21 +92,21 @@ def importTextFile(fileName, frame, cfg):
     #       hopping along)
     #
     # this handles them.
-    parenIndent = findIndent(indDict, lambda v: v.lt == config.PAREN)
+    parenIndent = findIndent(indDict, lambda v: v.lt == screenplay.PAREN)
     if parenIndent != -1:
         paren2Indent = findIndent(indDict,
             lambda v, var: (v.lt == -1) and (v.indent == var),
             parenIndent + 1)
 
         if paren2Indent != -1:
-            indDict[paren2Indent].lt = config.PAREN
+            indDict[paren2Indent].lt = screenplay.PAREN
     
     # set line type to ACTION for any indents not recognized
     for v in indDict.itervalues():
         if v.lt == -1:
-            v.lt = config.ACTION
+            v.lt = screenplay.ACTION
 
-    dlg = ImportDlg(frame, indDict.values(), cfg)
+    dlg = ImportDlg(frame, indDict.values())
 
     if dlg.ShowModal() != wxID_OK:
         dlg.Destroy()
@@ -128,33 +128,33 @@ def importTextFile(fileName, frame, cfg):
 
             if lt == SCENE_ACTION:
                 if s.startswith("EXT.") or s.startswith("INT."):
-                    lt = config.SCENE
+                    lt = screenplay.SCENE
                 else:
-                    lt = config.ACTION
+                    lt = screenplay.ACTION
 
             if ret and (ret[-1].lt != lt):
-                ret[-1].lb = config.LB_LAST
+                ret[-1].lb = screenplay.LB_LAST
 
-            if lt == config.CHARACTER:
+            if lt == screenplay.CHARACTER:
                 if sUp.endswith("(CONT'D)"):
                     s = sUp[:-8].rstrip()
 
-            elif lt == config.PAREN:
+            elif lt == screenplay.PAREN:
                 if s == "(continuing)":
                     s = ""
 
             if s:
-                line = screenplay.Line(config.LB_SPACE, lt, s)
+                line = screenplay.Line(screenplay.LB_SPACE, lt, s)
                 ret.append(line)
 
         elif ret:
-            ret[-1].lb = config.LB_LAST
+            ret[-1].lb = screenplay.LB_LAST
 
     if len(ret) == 0:
-        ret.append(screenplay.Line(config.LB_LAST, config.ACTION))
+        ret.append(screenplay.Line(screenplay.LB_LAST, screenplay.ACTION))
 
     # make sure the last line ends an element
-    ret[-1].lb = config.LB_LAST
+    ret[-1].lb = screenplay.LB_LAST
     
     return ret
 
@@ -212,7 +212,7 @@ class Indent:
 
 
 class ImportDlg(wxDialog):
-    def __init__(self, parent, indents, cfg):
+    def __init__(self, parent, indents):
         wxDialog.__init__(self, parent, -1, "Adjust styles",
                           style = wxDEFAULT_DIALOG_STYLE)
 
@@ -237,7 +237,7 @@ class ImportDlg(wxDialog):
         self.styleCombo = wxComboBox(self, -1, style = wxCB_READONLY)
 
         self.styleCombo.Append("Scene / Action", SCENE_ACTION)
-        for t in cfg.types.values():
+        for t in config.getTIs():
             self.styleCombo.Append(t.name, t.lt)
 
         util.setWH(self.styleCombo, w = 150)

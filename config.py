@@ -4,62 +4,43 @@
 from error import *
 import misc
 import mypickle
+import screenplay
 import util
 
 from wxPython.wx import *
 
-# linebreak types
-LB_SPACE = 1
-LB_SPACE2 = 2
-LB_NONE = 3
-LB_FORCED = 4
-LB_LAST = 5
-
 # mapping from character to linebreak
-_text2lb = {
-    '>' : LB_SPACE,
-    '+' : LB_SPACE2,
-    '&' : LB_NONE,
-    '|' : LB_FORCED,
-    '.' : LB_LAST
+_char2lb = {
+    '>' : screenplay.LB_SPACE,
+    '+' : screenplay.LB_SPACE2,
+    '&' : screenplay.LB_NONE,
+    '|' : screenplay.LB_FORCED,
+    '.' : screenplay.LB_LAST
     }
 
 # reverse to above
-_lb2text = {}
+_lb2char = {}
 
 # what string each linebreak type should be mapped to.
 _lb2str = {
-    LB_SPACE : " ",
-    LB_SPACE2 : "  ",
-    LB_NONE : "",
-    LB_FORCED : "\n",
-    LB_LAST : "\n"
+    screenplay.LB_SPACE  : " ",
+    screenplay.LB_SPACE2 : "  ",
+    screenplay.LB_NONE   : "",
+    screenplay.LB_FORCED : "\n",
+    screenplay.LB_LAST   : "\n"
     }
 
-# line types
-SCENE = 1
-ACTION = 2
-CHARACTER = 3
-DIALOGUE = 4
-PAREN = 5
-TRANSITION = 6
-SHOT = 7
-NOTE = 8
+# contains a TypeInfo for each element type
+_ti = []
 
-# mapping from character to line type
-_text2lt = {
-    '\\' : SCENE,
-    '.' : ACTION,
-    '_' : CHARACTER,
-    ':' : DIALOGUE,
-    '(' : PAREN,
-    '/' : TRANSITION,
-    '=' : SHOT,
-    '%' : NOTE
-    }
+# mapping from character to TypeInfo
+_char2ti = {}
 
-# reverse to above
-_lt2text = {}
+# mapping from line type to TypeInfo
+_lt2ti = {}
+
+# mapping from element name to TypeInfo
+_name2ti = {}
 
 # page break indicators. do not change these values as they're saved to
 # the config file.
@@ -73,14 +54,25 @@ PBI_FIRST, PBI_LAST = PBI_NONE, PBI_REAL_AND_UNADJ
 
 # construct reverse lookup tables
 
-for k, v in _text2lb.items():
-    _lb2text[v] = k
-
-for k, v in _text2lt.items():
-    _lt2text[v] = k
+for k, v in _char2lb.items():
+    _lb2char[v] = k
 
 del k, v
 
+# non-changing information about an element type
+class TypeInfo:
+    def __init__(self, lt, char, name):
+
+        # line type, e.g. screenplay.ACTION
+        self.lt = lt
+
+        # character used in saved scripts, e.g. "."
+        self.char = char
+
+        # textual name, e.g. "Action"
+        self.name = name
+
+# text type
 class TextType:
     cvars = None
     
@@ -101,28 +93,22 @@ class TextType:
     def load(self, vals, prefix):
         self.cvars.load(vals, prefix, self)
 
+# script-specific information about an element type
 class Type:
     cvars = None
 
-    def __init__(self, cfg):
-        self.cfg = cfg
-        
-        # line type
-        self.lt = None
+    def __init__(self, lt):
 
-        # textual description. this is saved into the config file, so
-        # don't change these.
-        self.name = None
+        # line type
+        self.lt = lt
+
+        # pointer to TypeInfo
+        self.ti = lt2ti(lt)
 
         # text types, one for screen and one for export
         self.screen = TextType()
         self.export = TextType()
 
-        # font size for this type. these are dummy values, ConfigGui sets
-        # real values, so these don't need to be initialized/saved.
-        self.fontX = 1
-        self.fontY = 1
-        
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
 
@@ -135,14 +121,6 @@ class Type:
             v.addInt("indent", 0, "Indent", 0, 80)
             v.addInt("width", 5, "Width", 5, 80)
 
-            # what type of element to insert when user presses enter or tab.
-            v.addElemName("newTypeEnter", ACTION, "NewTypeEnter")
-            v.addElemName("newTypeTab", ACTION, "NewTypeTab")
-
-            # what element to switch to when user hits tab / shift-tab.
-            v.addElemName("nextTypeTab", ACTION, "NextTypeTab")
-            v.addElemName("prevTypeTab", ACTION, "PrevTypeTab")
-            
             # auto-completion stuff, only used for some element types
             v.addBool("doAutoComp", False, "AutoCompletion")
             v.addList("autoCompList", [], "AutoCompletionList",
@@ -153,7 +131,7 @@ class Type:
         self.__class__.cvars.setDefaults(self)
             
     def save(self, prefix):
-        prefix += "%s/" % self.name
+        prefix += "%s/" % self.ti.name
 
         s = self.cvars.save(prefix, self)
         s += self.screen.save(prefix + "Screen/")
@@ -162,11 +140,48 @@ class Type:
         return s
 
     def load(self, vals, prefix):
-        prefix += "%s/" % self.name
+        prefix += "%s/" % self.ti.name
         
         self.cvars.load(vals, prefix, self)
         self.screen.load(vals, prefix + "Screen/")
         self.export.load(vals, prefix + "Export/")
+
+# global information about an element type
+class TypeGlobal:
+    cvars = None
+
+    def __init__(self, lt):
+        
+        # line type
+        self.lt = lt
+
+        # pointer to TypeInfo
+        self.ti = lt2ti(lt)
+        
+        if not self.__class__.cvars:
+            v = self.__class__.cvars = mypickle.Vars()
+
+            # what type of element to insert when user presses enter or tab.
+            v.addElemName("newTypeEnter", screenplay.ACTION, "NewTypeEnter")
+            v.addElemName("newTypeTab", screenplay.ACTION, "NewTypeTab")
+
+            # what element to switch to when user hits tab / shift-tab.
+            v.addElemName("nextTypeTab", screenplay.ACTION, "NextTypeTab")
+            v.addElemName("prevTypeTab", screenplay.ACTION, "PrevTypeTab")
+            
+            v.makeDicts()
+            
+        self.__class__.cvars.setDefaults(self)
+            
+    def save(self, prefix):
+        prefix += "%s/" % self.ti.name
+
+        return self.cvars.save(prefix, self)
+
+    def load(self, vals, prefix):
+        prefix += "%s/" % self.ti.name
+        
+        self.cvars.load(vals, prefix, self)
 
 # information about one screen font
 class FontInfo:
@@ -177,15 +192,11 @@ class FontInfo:
         self.fx = 1
         self.fy = 1
 
+# per-script config, each script has its own one of these.
 class Config:
     cvars = None
     
     def __init__(self):
-
-        # offsets from upper left corner of main widget, ie. this much empty
-        # space is left on the top and left sides.
-        self.offsetY = 10
-        self.offsetX = 10
 
         if not self.__class__.cvars:
             self.setupVars()
@@ -196,83 +207,47 @@ class Config:
         self.types = { }
 
         # element types
-        t = Type(self)
-        t.lt = SCENE
-        t.name = "Scene"
+        t = Type(screenplay.SCENE)
         t.beforeSpacing = 10
         t.indent = 0 
         t.width = 60
         t.screen.isCaps = True
         t.screen.isBold = True
         t.export.isCaps = True
-        t.newTypeEnter = ACTION
-        t.newTypeTab = CHARACTER
-        t.nextTypeTab = ACTION
-        t.prevTypeTab = TRANSITION
         t.doAutoComp = True
         self.types[t.lt] = t
 
-        t = Type(self)
-        t.lt = ACTION
-        t.name = "Action"
+        t = Type(screenplay.ACTION)
         t.beforeSpacing = 10
         t.indent = 0
         t.width = 60
-        t.newTypeEnter = ACTION
-        t.newTypeTab = CHARACTER
-        t.nextTypeTab = CHARACTER
-        t.prevTypeTab = CHARACTER
         self.types[t.lt] = t
 
-        t = Type(self)
-        t.lt = CHARACTER
-        t.name = "Character"
+        t = Type(screenplay.CHARACTER)
         t.beforeSpacing = 10
         t.indent = 22
         t.width = 38
         t.screen.isCaps = True
         t.export.isCaps = True
-        t.newTypeEnter = DIALOGUE
-        t.newTypeTab = PAREN
-        t.nextTypeTab = ACTION
-        t.prevTypeTab = ACTION
         t.doAutoComp = True
         self.types[t.lt] = t
 
-        t = Type(self)
-        t.lt = DIALOGUE
-        t.name = "Dialogue"
+        t = Type(screenplay.DIALOGUE)
         t.indent = 10
         t.width = 35
-        t.newTypeEnter = CHARACTER
-        t.newTypeTab = ACTION
-        t.nextTypeTab = PAREN
-        t.prevTypeTab = ACTION
         self.types[t.lt] = t
 
-        t = Type(self)
-        t.lt = PAREN
-        t.name = "Parenthetical"
+        t = Type(screenplay.PAREN)
         t.indent = 16
         t.width = 25
-        t.newTypeEnter = DIALOGUE
-        t.newTypeTab = ACTION
-        t.nextTypeTab = CHARACTER
-        t.prevTypeTab = DIALOGUE
         self.types[t.lt] = t
 
-        t = Type(self)
-        t.lt = TRANSITION
-        t.name = "Transition"
+        t = Type(screenplay.TRANSITION)
         t.beforeSpacing = 10
         t.indent = 45
         t.width = 20
         t.screen.isCaps = True
         t.export.isCaps = True
-        t.newTypeEnter = SCENE
-        t.newTypeTab = TRANSITION
-        t.nextTypeTab = SCENE
-        t.prevTypeTab = CHARACTER
         t.doAutoComp = True
         t.autoCompList = [
             "CUT TO:",
@@ -284,32 +259,20 @@ class Config:
             ]
         self.types[t.lt] = t
 
-        t = Type(self)
-        t.lt = SHOT
-        t.name = "Shot"
+        t = Type(screenplay.SHOT)
         t.beforeSpacing = 10
         t.indent = 0
         t.width = 60
         t.screen.isCaps = True
         t.export.isCaps = True
-        t.newTypeEnter = ACTION
-        t.newTypeTab = CHARACTER
-        t.nextTypeTab = ACTION
-        t.prevTypeTab = SCENE
         self.types[t.lt] = t
         
-        t = Type(self)
-        t.lt = NOTE
-        t.name = "Note"
+        t = Type(screenplay.NOTE)
         t.beforeSpacing = 10
         t.indent = 5
         t.width = 55
         t.screen.isItalic = True
         t.export.isItalic = True
-        t.newTypeEnter = ACTION
-        t.newTypeTab = CHARACTER
-        t.nextTypeTab = ACTION
-        t.prevTypeTab = CHARACTER
         self.types[t.lt] = t
 
         self.recalc()
@@ -317,27 +280,14 @@ class Config:
     def setupVars(self):
         v = self.__class__.cvars = mypickle.Vars()
         
-        # confirm non-undoable delete operations that would delete at
-        # least this many lines. (0 = disabled)
-        v.addInt("confirmDeletes", 2, "ConfirmDeletes", 0, 500)
-
-        # vertical distance between rows, in pixels
-        v.addInt("fontYdelta", 18, "FontYDelta", 4, 125)
-
         # font size used for PDF generation, in points
-        v.addInt("fontSize", 12, "PDF/FontSize", 4, 72)
+        v.addInt("fontSize", 12, "FontSize", 4, 72)
 
         # margins
         v.addFloat("marginBottom", 25.4, "Margin/Bottom", 0.0, 900.0)
         v.addFloat("marginLeft", 38.1, "Margin/Left", 0.0, 900.0)
         v.addFloat("marginRight", 25.4, "Margin/Right", 0.0, 900.0)
         v.addFloat("marginTop", 12.7, "Margin/Top", 0.0, 900.0)
-
-        # how many lines to scroll per mouse wheel event
-        v.addInt("mouseWheelLines", 4, "MouseWheelLines", 1, 50)
-
-        # interval in seconds between automatic pagination (0 = disabled)
-        v.addInt("paginateInterval", 1, "PaginateInterval", 0, 10)
 
         # paper size
         v.addFloat("paperHeight", 297.0, "Paper/Height", 100.0, 1000.0)
@@ -352,6 +302,167 @@ class Config:
         # whether scene continueds are enabled
         v.addBool("sceneContinueds", True, "SceneContinueds")
         
+        # whether to include scene numbers
+        v.addBool("pdfShowSceneNumbers", False, "ShowSceneNumbers")
+
+        # whether to draw rectangle showing margins
+        v.addBool("pdfShowMargins", False, "ShowMargins")
+
+        # whether to show line numbers next to each line
+        v.addBool("pdfShowLineNumbers", False, "ShowLineNumbers")
+
+        v.makeDicts()
+        
+    # load config from string 's'. does not throw any exceptions, silently
+    # ignores any errors, and always leaves config in an ok state.
+    def load(self, s):
+        vals = self.cvars.makeVals(s)
+
+        self.cvars.load(vals, "", self)
+
+        for t in self.types.itervalues():
+            t.load(vals, "Element/")
+
+        self.recalc()
+        
+    # save config into a string and return that.
+    def save(self):
+        s = self.cvars.save("", self)
+
+        for t in self.types.itervalues():
+            s += t.save("Element/")
+            
+        return s
+            
+    # fix up all invalid config values and recalculate all variables
+    # dependent on other variables.
+    #
+    # if doAll is False, enforces restrictions only on a per-variable
+    # basis, e.g. doesn't modify variable v2 based on v1's value. this is
+    # useful when user is interactively modifying v1, and it temporarily
+    # strays out of bounds (e.g. when deleting the old text in an entry
+    # box, thus getting the minimum value), which would then possibly
+    # modify the value of other variables which is not what we want.
+    def recalc(self, doAll = True):
+        for it in self.cvars.numeric.itervalues():
+            util.clampObj(self, it.name, it.minVal, it.maxVal)
+
+        for el in self.types.itervalues():
+            for it in el.cvars.numeric.itervalues():
+                util.clampObj(el, it.name, it.minVal, it.maxVal)
+
+            tmp = []
+            for v in el.autoCompList:
+                v = util.toInputStr(v).strip()
+                if len(v) > 0:
+                    tmp.append(v)
+
+            el.autoCompList = tmp
+            
+        # make sure usable space on the page isn't too small
+        if doAll and (self.marginTop + self.marginBottom) >= \
+               (self.paperHeight - 100.0):
+            self.marginTop = 0.0
+            self.marginBottom = 0.0
+            
+        h = self.paperHeight - self.marginTop - self.marginBottom
+
+        # how many lines on a page
+        self.linesOnPage = int(h / util.getTextHeight(self.fontSize))
+
+    def getType(self, lt):
+        return self.types[lt]
+
+# global config. there is only ever one of these active.
+class ConfigGlobal:
+    cvars = None
+    
+    def __init__(self):
+
+        if not self.__class__.cvars:
+            self.setupVars()
+
+        self.__class__.cvars.setDefaults(self)
+
+        # type configs, key = line type, value = TypeGlobal
+        self.types = { }
+
+        # element types
+        t = TypeGlobal(screenplay.SCENE)
+        t.newTypeEnter = screenplay.ACTION
+        t.newTypeTab = screenplay.CHARACTER
+        t.nextTypeTab = screenplay.ACTION
+        t.prevTypeTab = screenplay.TRANSITION
+        self.types[t.lt] = t
+
+        t = TypeGlobal(screenplay.ACTION)
+        t.newTypeEnter = screenplay.ACTION
+        t.newTypeTab = screenplay.CHARACTER
+        t.nextTypeTab = screenplay.CHARACTER
+        t.prevTypeTab = screenplay.CHARACTER
+        self.types[t.lt] = t
+
+        t = TypeGlobal(screenplay.CHARACTER)
+        t.newTypeEnter = screenplay.DIALOGUE
+        t.newTypeTab = screenplay.PAREN
+        t.nextTypeTab = screenplay.ACTION
+        t.prevTypeTab = screenplay.ACTION
+        t.doAutoComp = True
+        self.types[t.lt] = t
+
+        t = TypeGlobal(screenplay.DIALOGUE)
+        t.newTypeEnter = screenplay.CHARACTER
+        t.newTypeTab = screenplay.ACTION
+        t.nextTypeTab = screenplay.PAREN
+        t.prevTypeTab = screenplay.ACTION
+        self.types[t.lt] = t
+
+        t = TypeGlobal(screenplay.PAREN)
+        t.newTypeEnter = screenplay.DIALOGUE
+        t.newTypeTab = screenplay.ACTION
+        t.nextTypeTab = screenplay.CHARACTER
+        t.prevTypeTab = screenplay.DIALOGUE
+        self.types[t.lt] = t
+
+        t = TypeGlobal(screenplay.TRANSITION)
+        t.newTypeEnter = screenplay.SCENE
+        t.newTypeTab = screenplay.TRANSITION
+        t.nextTypeTab = screenplay.SCENE
+        t.prevTypeTab = screenplay.CHARACTER
+        self.types[t.lt] = t
+
+        t = TypeGlobal(screenplay.SHOT)
+        t.newTypeEnter = screenplay.ACTION
+        t.newTypeTab = screenplay.CHARACTER
+        t.nextTypeTab = screenplay.ACTION
+        t.prevTypeTab = screenplay.SCENE
+        self.types[t.lt] = t
+        
+        t = TypeGlobal(screenplay.NOTE)
+        t.newTypeEnter = screenplay.ACTION
+        t.newTypeTab = screenplay.CHARACTER
+        t.nextTypeTab = screenplay.ACTION
+        t.prevTypeTab = screenplay.CHARACTER
+        self.types[t.lt] = t
+
+        self.recalc()
+
+    def setupVars(self):
+        v = self.__class__.cvars = mypickle.Vars()
+        
+        # confirm non-undoable delete operations that would delete at
+        # least this many lines. (0 = disabled)
+        v.addInt("confirmDeletes", 2, "ConfirmDeletes", 0, 500)
+
+        # vertical distance between rows, in pixels
+        v.addInt("fontYdelta", 18, "FontYDelta", 4, 125)
+
+        # how many lines to scroll per mouse wheel event
+        v.addInt("mouseWheelLines", 4, "MouseWheelLines", 1, 50)
+
+        # interval in seconds between automatic pagination (0 = disabled)
+        v.addInt("paginateInterval", 1, "PaginateInterval", 0, 10)
+
         # whether to check script for errors before export / print
         v.addBool("checkOnExport", True, "CheckScriptForErrors")
         
@@ -395,15 +506,6 @@ class Config:
         # default script directory
         v.addStr("scriptDir", misc.progPath, "DefaultScriptDirectory")
         
-        # whether to include scene numbers
-        v.addBool("pdfShowSceneNumbers", False, "PDF/ShowSceneNumbers")
-
-        # whether to draw rectangle showing margins
-        v.addBool("pdfShowMargins", False, "PDF/ShowMargins")
-
-        # whether to show line numbers next to each line
-        v.addBool("pdfShowLineNumbers", False, "PDF/ShowLineNumbers")
-
         # colors
         v.addColor("text", 0, 0, 0, "TextFG", "Text foreground")
         v.addColor("textHdr", 128, 128, 128, "TextHeadersFG",
@@ -449,47 +551,16 @@ class Config:
             
         return s
             
-    # fix up all invalid config values and recalculate all variables
-    # dependent on other variables.
-    #
-    # if doAll is False, enforces restrictions only on a per-variable
-    # basis, e.g. doesn't modify variable v2 based on v1's value. this is
-    # useful when user is interactively modifying v1, and it temporarily
-    # strays out of bounds (e.g. when deleting the old text in an entry
-    # box, thus getting the minimum value), which would then possibly
-    # modify the value of other variables which is not what we want.
-    def recalc(self, doAll = True):
+    # fix up all invalid config values.
+    def recalc(self):
         for it in self.cvars.numeric.itervalues():
             util.clampObj(self, it.name, it.minVal, it.maxVal)
-
-        for el in self.types.itervalues():
-            for it in Type.cvars.numeric.itervalues():
-                util.clampObj(el, it.name, it.minVal, it.maxVal)
-
-            tmp = []
-            for v in el.autoCompList:
-                v = util.toInputStr(v).strip()
-                if len(v) > 0:
-                    tmp.append(v)
-
-            el.autoCompList = tmp
-            
-        # make sure usable space on the page isn't too small
-        if doAll and (self.marginTop + self.marginBottom) >= \
-               (self.paperHeight - 100.0):
-            self.marginTop = 0.0
-            self.marginBottom = 0.0
-            
-        h = self.paperHeight - self.marginTop - self.marginBottom
-
-        # how many lines on a page
-        self.linesOnPage = int(h / util.getTextHeight(self.fontSize))
 
     def getType(self, lt):
         return self.types[lt]
 
 # config stuff that are wxwindows objects, so can't be in normal
-# Config (deepcopy dies)
+# ConfigGlobal (deepcopy dies)
 class ConfigGui:
 
     # constants
@@ -498,7 +569,7 @@ class ConfigGui:
     redColor = None
     blackColor = None
     
-    def __init__(self, cfg):
+    def __init__(self, cfgGl):
 
         if not ConfigGui.constantsInited:
             ConfigGui.bluePen = wxPen(wxColour(0, 0, 255))
@@ -507,15 +578,11 @@ class ConfigGui:
 
             ConfigGui.constantsInited = True
 
-        # convert cfg.MyColor -> cfgGui.wxColour
-        for it in cfg.cvars.color.itervalues():
-            c = getattr(cfg, it.name)
+        # convert cfgGl.MyColor -> cfgGui.wxColour
+        for it in cfgGl.cvars.color.itervalues():
+            c = getattr(cfgGl, it.name)
             tmp = wxColour(c.r, c.g, c.b)
             setattr(self, it.name, tmp)
-
-        # font configs (pointers to objects actually stored in
-        # self.fonts), key = line type, value = FontInfo.
-        self.types = { }
 
         self.textPen = wxPen(self.textColor)
         self.textHdrPen = wxPen(self.textHdrColor)
@@ -559,7 +626,7 @@ class ConfigGui:
             fi = FontInfo()
             
             nfi = wxNativeFontInfo()
-            nfi.FromString(getattr(cfg, fname))
+            nfi.FromString(getattr(cfgGl, fname))
             nfi.SetEncoding(wxFONTENCODING_ISO8859_1)
 
             fi.font = wxFontFromNativeInfo(nfi)
@@ -571,12 +638,9 @@ class ConfigGui:
 
             self.fonts.append(fi)
             
-        for t in cfg.types.values():
-            self.types[t.lt] = self.fonts[t.screen.isBold |
-                                          (t.screen.isItalic << 1)]
-
-    def getType(self, lt):
-        return self.types[lt]
+    # TextType -> FontInfo
+    def tt2fi(self, tt):
+        return self.fonts[tt.isBold | (tt.isItalic << 1)]
 
 def _conv(dict, key, raiseException = True):
     val = dict.get(key)
@@ -585,17 +649,54 @@ def _conv(dict, key, raiseException = True):
     
     return val
 
-def text2lb(str, raiseException = True):
-    return _conv(_text2lb, str, raiseException)
+# get TypeInfos
+def getTIs():
+    return _ti
 
-def lb2text(lb):
-    return _conv(_lb2text, lb)
+def char2lb(char, raiseException = True):
+    return _conv(_char2lb, char, raiseException)
+
+def lb2char(lb):
+    return _conv(_lb2char, lb)
 
 def lb2str(lb):
     return _conv(_lb2str, lb)
 
-def text2lt(str, raiseException = True):
-    return _conv(_text2lt, str, raiseException)
+def char2lt(char, raiseException = True):
+    ti = _conv(_char2ti, char, raiseException)
 
-def lt2text(lt):
-    return _conv(_lt2text, lt)
+    if ti:
+        return ti.lt
+    else:
+        return None
+
+def lt2char(lt):
+    return _conv(_lt2ti, lt).char
+
+def name2ti(name, raiseException = True):
+    return _conv(_name2ti, name, raiseException)
+
+def lt2ti(lt):
+    return _conv(_lt2ti, lt)
+
+def _init():
+
+    for lt, char, name in (
+        (screenplay.SCENE,      "\\", "Scene"),
+        (screenplay.ACTION,     ".",  "Action"),
+        (screenplay.CHARACTER,  "_",  "Character"),
+        (screenplay.DIALOGUE,   ":",  "Dialogue"),
+        (screenplay.PAREN,      "(",  "Parenthetical"),
+        (screenplay.TRANSITION, "/",  "Transition"),
+        (screenplay.SHOT,       "=",  "Shot"),
+        (screenplay.NOTE,       "%",  "Note")
+        ):
+        
+        ti = TypeInfo(lt, char, name)
+
+        _ti.append(ti)
+        _lt2ti[lt] = ti
+        _char2ti[char] = ti
+        _name2ti[name] = ti
+
+_init()

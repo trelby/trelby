@@ -5,7 +5,7 @@ import util
 from wxPython.wx import *
 
 class FindDlg(wxDialog):
-    def __init__(self, parent, ctrl, cfg):
+    def __init__(self, parent, ctrl):
         wxDialog.__init__(self, parent, -1, "Find & Replace",
                           style = wxDEFAULT_DIALOG_STYLE | wxWANTS_CHARS)
 
@@ -64,7 +64,7 @@ class FindDlg(wxDialog):
         # so we have to store it ourselves
         self.elementTypes = []
         
-        for t in cfg.types.values():
+        for t in config.getTIs():
             self.elements.Append(t.name)
             self.elementTypes.append(t.lt)
 
@@ -253,8 +253,8 @@ class FindDlg(wxDialog):
         else:
             inc = 1
             
-        line = self.ctrl.line
-        col = self.ctrl.column
+        line = self.ctrl.sp.line
+        col = self.ctrl.sp.column
         ls = self.ctrl.sp.lines
 
         if (line == self.ctrl.searchLine) and (col == self.ctrl.searchColumn):
@@ -314,8 +314,8 @@ class FindDlg(wxDialog):
                         col = max(len(ls[line].text) - 1, 0)
 
             if found:
-                self.ctrl.line = line
-                self.ctrl.column = res
+                self.ctrl.sp.line = line
+                self.ctrl.sp.column = res
                 self.ctrl.searchLine = line
                 self.ctrl.searchColumn = res
 
@@ -370,22 +370,22 @@ class FindDlg(wxDialog):
             diff = len(value) - self.ctrl.searchWidth
 
             if not self.dirUp:
-                self.ctrl.column += self.ctrl.searchWidth + diff
+                self.ctrl.sp.column += self.ctrl.searchWidth + diff
             else:
-                self.ctrl.column -= 1
+                self.ctrl.sp.column -= 1
 
-                if self.ctrl.column < 0:
-                    self.ctrl.line -= 1
+                if self.ctrl.sp.column < 0:
+                    self.ctrl.sp.line -= 1
 
-                    if self.ctrl.line < 0:
-                        self.ctrl.line = 0
-                        self.ctrl.column = 0
+                    if self.ctrl.sp.line < 0:
+                        self.ctrl.sp.line = 0
+                        self.ctrl.sp.column = 0
                         
                         self.ctrl.searchLine = 0
                         self.ctrl.searchColumn = 0
                         self.ctrl.searchWidth = 0
                     else:
-                        self.ctrl.column = len(ls[self.ctrl.line].text)
+                        self.ctrl.sp.column = len(ls[self.ctrl.sp.line].text)
 
             if diff != 0:
                 self.didReplaces = True
@@ -407,7 +407,7 @@ class FindDlg(wxDialog):
             count += 1
 
         if count != 0:
-            self.ctrl.makeLineVisible(self.ctrl.line)
+            self.ctrl.makeLineVisible(self.ctrl.sp.line)
             self.ctrl.updateScreen()
         
         wxMessageBox("Replaced %d matches" % count, "Results", wxOK, self)

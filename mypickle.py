@@ -1,11 +1,7 @@
-import copy
-
+import config
 import util
 
-# ElementName is the only one who needs to access the containing object
-# (for the cfg variable), so instead of passing it through all functions
-# we record it here.
-currentObj = None
+import copy
 
 # keep track about one object's variables
 class Vars:
@@ -68,23 +64,15 @@ class Vars:
         return vals
     
     def save(self, prefix, obj):
-        global currentObj
-        currentObj = obj
-        
         s = ""
         
         for it in self.cvars:
             if it.name2:
                 s += it.toStr(getattr(obj, it.name), prefix + it.name2)
 
-        currentObj = None
-        
         return s
     
     def load(self, vals, prefix, obj):
-        global currentObj
-        currentObj = obj
-        
         for it in self.cvars:
             if it.name2:
                 name = prefix + it.name2
@@ -92,8 +80,6 @@ class Vars:
                     res = it.fromStr(vals, vals[name], name)
                     setattr(obj, it.name, res)
                     del vals[name]
-
-        currentObj = None
 
     def addVar(self, var):
         self.cvars.append(var)
@@ -194,20 +180,22 @@ class StrVar(ConfVar):
 
     def fromStr(self, vals, val, prefix):
         return util.decodeStr(val)
-        
+
+# screenplay.ACTION <-> "Action"
 class ElementNameVar(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
         
     def toStr(self, val, prefix):
-        return "%s:%s\n" % (prefix, currentObj.cfg.getType(val).name)
+        return "%s:%s\n" % (prefix, config.lt2ti(val).name)
 
     def fromStr(self, vals, val, prefix):
-        for t in currentObj.cfg.types.values():
-            if t.name == val:
-                return t.lt
+        ti = config.name2ti(val)
 
-        return self.defVal
+        if ti:
+            return ti.lt
+        else:
+            return self.defVal
         
 class ListVar(ConfVar):
     def __init__(self, name, defVal, name2, itemType):

@@ -1,5 +1,6 @@
 import config
 import misc
+import screenplay
 import util
 
 import os.path
@@ -50,7 +51,7 @@ class MyListBook(wxListBox):
         panel.Show()
     
 class CfgDlg(wxDialog):
-    def __init__(self, parent, cfg, applyFunc):
+    def __init__(self, parent, cfg, applyFunc, isGlobal):
         wxDialog.__init__(self, parent, -1, "Settings dialog",
                           style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
         self.cfg = cfg
@@ -73,21 +74,23 @@ class CfgDlg(wxDialog):
         
         hsizer.Add(self.panel, 1, wxEXPAND)
 
-        self.AddPage(AutoCompPanel, "Auto-completion")
-        self.AddPage(ColorsPanel, "Colors")
-        self.AddPage(DisplayPanel, "Display")
-        self.AddPage(ElementsPanel, "Elements")
-        self.AddPage(MiscPanel, "Misc")
-        self.AddPage(PaginationPanel, "Pagination")
-        self.AddPage(PaperPanel, "Paper")
-        self.AddPage(PDFPanel, "PDF")
+        if isGlobal:
+            self.AddPage(ColorsPanel, "Colors")
+            self.AddPage(DisplayPanel, "Display")
+            self.AddPage(ElementsGlobalPanel, "Elements")
+            self.AddPage(MiscPanel, "Misc")
+        else:
+            self.AddPage(AutoCompPanel, "Auto-completion")
+            self.AddPage(ElementsPanel, "Elements")
+            self.AddPage(FormattingPanel, "Formatting")
+            self.AddPage(PaperPanel, "Paper")
 
         size = self.listbook.GetContainingSize()
 
         hsizer.SetItemMinSize(self.panel, *size)
         self.listbook.SetPageSizes(*size)
 
-        self.listbook.SetSelection(3)
+        self.listbook.SetSelection(0)
 
         # it's unclear whether SetSelection sends an event on all
         # platforms or not, so force correct action.
@@ -255,7 +258,7 @@ class ElementsPanel(wxPanel):
 
         self.elementsCombo = wxComboBox(self, -1, style = wxCB_READONLY)
 
-        for t in self.cfg.types.values():
+        for t in config.getTIs():
             self.elementsCombo.Append(t.name, t.lt)
 
         hsizer.Add(self.elementsCombo, 0)
@@ -277,7 +280,7 @@ class ElementsPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
 
         tmp = wxSpinCtrl(self, -1)
-        tmp.SetRange(*self.cfg.getType(config.ACTION).cvars.getMinMax(
+        tmp.SetRange(*self.cfg.getType(screenplay.ACTION).cvars.getMinMax(
             "beforeSpacing"))
         EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(tmp, self.OnKillFocus)
@@ -288,7 +291,7 @@ class ElementsPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
 
         tmp = wxSpinCtrl(self, -1)
-        tmp.SetRange(*self.cfg.getType(config.ACTION).cvars.getMinMax(
+        tmp.SetRange(*self.cfg.getType(screenplay.ACTION).cvars.getMinMax(
             "intraSpacing"))
         EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(tmp, self.OnKillFocus)
@@ -304,7 +307,7 @@ class ElementsPanel(wxPanel):
         
         self.indentEntry = wxSpinCtrl(self, -1)
         self.indentEntry.SetRange(
-            *self.cfg.getType(config.ACTION).cvars.getMinMax("indent"))
+            *self.cfg.getType(screenplay.ACTION).cvars.getMinMax("indent"))
         EVT_SPINCTRL(self, self.indentEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.indentEntry, self.OnKillFocus)
         gsizer.Add(self.indentEntry, 0)
@@ -317,7 +320,7 @@ class ElementsPanel(wxPanel):
         
         self.widthEntry = wxSpinCtrl(self, -1)
         self.widthEntry.SetRange(
-            *self.cfg.getType(config.ACTION).cvars.getMinMax("width"))
+            *self.cfg.getType(screenplay.ACTION).cvars.getMinMax("width"))
         EVT_SPINCTRL(self, self.widthEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.widthEntry, self.OnKillFocus)
         gsizer.Add(self.widthEntry, 0)
@@ -326,15 +329,6 @@ class ElementsPanel(wxPanel):
             " = 1 inch)"), 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
         vsizer.Add(gsizer, 0, wxBOTTOM, 20)
-
-        gsizer = wxFlexGridSizer(2, 2, 5, 0)
-
-        self.addTypeCombo("newEnter", "Enter creates", self, gsizer)
-        self.addTypeCombo("newTab", "Tab creates", self, gsizer)
-        self.addTypeCombo("nextTab", "Tab switches to", self, gsizer)
-        self.addTypeCombo("prevTab", "Shift+Tab switches to", self, gsizer)
-
-        vsizer.Add(gsizer)
 
         util.finishWindow(self, vsizer, center = False)
 
@@ -370,21 +364,6 @@ class ElementsPanel(wxPanel):
         sizer.Add(cb, 0, wxTOP, pad)
         setattr(self, prefix + name + "Cb", cb)
         
-    def addTypeCombo(self, name, descr, parent, sizer):
-        sizer.Add(wxStaticText(parent, -1, descr + ":"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-        
-        combo = wxComboBox(parent, -1, style = wxCB_READONLY)
-
-        for t in self.cfg.types.values():
-            combo.Append(t.name, t.lt)
-
-        sizer.Add(combo)
-
-        EVT_COMBOBOX(self, combo.GetId(), self.OnMisc)
-        
-        setattr(self, name + "Combo", combo)
-
     def OnKillFocus(self, event):
         self.OnMisc()
 
@@ -417,15 +396,6 @@ class ElementsPanel(wxPanel):
         tcfg.intraSpacing = util.getSpinValue(self.intraSpacingEntry)
         tcfg.indent = util.getSpinValue(self.indentEntry)
         tcfg.width = util.getSpinValue(self.widthEntry)
-
-        tcfg.newTypeEnter = self.newEnterCombo.GetClientData(
-            self.newEnterCombo.GetSelection())
-        tcfg.newTypeTab = self.newTabCombo.GetClientData(
-            self.newTabCombo.GetSelection())
-        tcfg.nextTypeTab = self.nextTabCombo.GetClientData(
-            self.nextTabCombo.GetSelection())
-        tcfg.prevTypeTab = self.prevTabCombo.GetClientData(
-            self.prevTabCombo.GetSelection())
             
     def cfg2gui(self):
         tcfg = self.cfg.types[self.lt]
@@ -450,11 +420,6 @@ class ElementsPanel(wxPanel):
         self.intraSpacingEntry.SetValue(tcfg.intraSpacing)
         self.indentEntry.SetValue(tcfg.indent)
         self.widthEntry.SetValue(tcfg.width)
-
-        util.reverseComboSelect(self.newEnterCombo, tcfg.newTypeEnter)
-        util.reverseComboSelect(self.newTabCombo, tcfg.newTypeTab)
-        util.reverseComboSelect(self.nextTabCombo, tcfg.nextTypeTab)
-        util.reverseComboSelect(self.prevTabCombo, tcfg.prevTypeTab)
 
 class ColorsPanel(wxPanel):
     def __init__(self, parent, id, cfg):
@@ -737,8 +702,9 @@ class AutoCompPanel(wxPanel):
 
         self.elementsCombo = wxComboBox(self, -1, style = wxCB_READONLY)
 
-        for t in (config.SCENE, config.CHARACTER, config.TRANSITION):
-            self.elementsCombo.Append(cfg.getType(t).name, t)
+        for t in (screenplay.SCENE, screenplay.CHARACTER,
+                  screenplay.TRANSITION):
+            self.elementsCombo.Append(cfg.getType(t).ti.name, t)
 
         EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
 
@@ -793,7 +759,7 @@ class AutoCompPanel(wxPanel):
         self.itemsEntry.Enable(tcfg.doAutoComp)
         self.itemsEntry.SetValue("\n".join(tcfg.autoCompList))
 
-class PaginationPanel(wxPanel):
+class FormattingPanel(wxPanel):
     def __init__(self, parent, id, cfg):
         wxPanel.__init__(self, parent, id)
         self.cfg = cfg
@@ -811,17 +777,35 @@ class PaginationPanel(wxPanel):
 
         vsizer.Add(gsizer, 0, wxLEFT, 10)
 
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        hsizer.Add(wxStaticText(self, -1, "Font size:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.fontSizeEntry = wxSpinCtrl(self, -1)
+        self.fontSizeEntry.SetRange(*self.cfg.cvars.getMinMax("fontSize"))
+        EVT_SPINCTRL(self, self.fontSizeEntry.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(self.fontSizeEntry, self.OnKillFocus)
+        hsizer.Add(self.fontSizeEntry, 0)
+
+        vsizer.Add(hsizer, 0, wxTOP, 20)
+
         self.sceneContinuedsCb = wxCheckBox(self, -1,
-            "Include scene continueds")
+            "Include scene CONTINUEDs")
         EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
         vsizer.Add(self.sceneContinuedsCb, 0, wxTOP, 20)
         
-        gsizer = wxFlexGridSizer(1, 2, 5, 0)
-        
-        self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
-                     " (0 = disable)", self, gsizer, "paginateInterval")
+        self.scenesCb = wxCheckBox(self, -1, "Include scene numbers")
+        EVT_CHECKBOX(self, self.scenesCb.GetId(), self.OnMisc)
+        vsizer.Add(self.scenesCb)
 
-        vsizer.Add(gsizer, 0, wxTOP, 10)
+        self.marginsCb = wxCheckBox(self, -1, "Show margins (debug)")
+        EVT_CHECKBOX(self, self.marginsCb.GetId(), self.OnMisc)
+        vsizer.Add(self.marginsCb, 0, wxTOP, 10)
+
+        self.lineNumbersCb = wxCheckBox(self, -1, "Show line numbers (debug)")
+        EVT_CHECKBOX(self, self.lineNumbersCb.GetId(), self.OnMisc)
+        vsizer.Add(self.lineNumbersCb)
 
         self.cfg2gui()
         
@@ -850,19 +834,24 @@ class PaginationPanel(wxPanel):
         self.cfg.pbActionLines = util.getSpinValue(self.actionEntry)
         self.cfg.pbDialogueLines = util.getSpinValue(self.dialogueEntry)
         self.cfg.sceneContinueds = self.sceneContinuedsCb.GetValue()
-        self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
+        self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
+        self.cfg.pdfShowSceneNumbers = self.scenesCb.GetValue()
+        self.cfg.pdfShowMargins = self.marginsCb.GetValue()
+        self.cfg.pdfShowLineNumbers = self.lineNumbersCb.GetValue()
         
     def cfg2gui(self):
         # stupid wxwindows/wxpython displays empty box if the initial
         # value is zero if we don't do this...
         self.actionEntry.SetValue(5)
         self.dialogueEntry.SetValue(5)
-        self.paginateEntry.SetValue(5)
         
         self.actionEntry.SetValue(self.cfg.pbActionLines)
         self.dialogueEntry.SetValue(self.cfg.pbDialogueLines)
         self.sceneContinuedsCb.SetValue(self.cfg.sceneContinueds)
-        self.paginateEntry.SetValue(self.cfg.paginateInterval)
+        self.fontSizeEntry.SetValue(self.cfg.fontSize)
+        self.scenesCb.SetValue(self.cfg.pdfShowSceneNumbers)
+        self.marginsCb.SetValue(self.cfg.pdfShowMargins)
+        self.lineNumbersCb.SetValue(self.cfg.pdfShowLineNumbers)
 
 class MiscPanel(wxPanel):
     def __init__(self, parent, id, cfg):
@@ -871,28 +860,67 @@ class MiscPanel(wxPanel):
 
         vsizer = wxBoxSizer(wxVERTICAL)
 
-        vsizer.Add(wxStaticText(self, -1, "Default script directory:"), 0,
-                   wxBOTTOM, 5)
+        bsizer = wxStaticBoxSizer(wxStaticBox(self, -1,
+            "Default script directory"), wxVERTICAL)
         
         hsizer = wxBoxSizer(wxHORIZONTAL)
-
+        
         self.scriptDirEntry = wxTextCtrl(self, -1)
-        hsizer.Add(self.scriptDirEntry, 1, wxLEFT, 10)
+        hsizer.Add(self.scriptDirEntry, 1,
+                   wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
         btn = wxButton(self, -1, "Browse")
         EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
-        hsizer.Add(btn, 0, wxLEFT, 10)
+        hsizer.Add(btn, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 10)
+        bsizer.Add(hsizer, 1, wxEXPAND | wxTOP | wxBOTTOM, 5)
+
+        vsizer.Add(bsizer, 0, wxEXPAND | wxBOTTOM, 10)
+
+        bsizer = wxStaticBoxSizer(wxStaticBox(self, -1,
+            "PDF viewer application"), wxVERTICAL)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        hsizer.Add(wxStaticText(self, -1, "Path:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        self.progEntry = wxTextCtrl(self, -1)
+        hsizer.Add(self.progEntry, 1, wxALIGN_CENTER_VERTICAL)
+
+        btn = wxButton(self, -1, "Browse")
+        EVT_BUTTON(self, btn.GetId(), self.OnBrowsePDF)
+        hsizer.Add(btn, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
+
+        bsizer.Add(hsizer, 1, wxEXPAND)
+        
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        hsizer.Add(wxStaticText(self, -1, "Arguments:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        self.argsEntry = wxTextCtrl(self, -1)
+        hsizer.Add(self.argsEntry, 1, wxALIGN_CENTER_VERTICAL)
+
+        bsizer.Add(hsizer, 1, wxEXPAND)
+
+        vsizer.Add(bsizer, 1, wxEXPAND)
 
         self.autoCapSentences = wxCheckBox(self, -1,
                                            "Auto-capitalize sentences")
         EVT_CHECKBOX(self, self.autoCapSentences.GetId(), self.OnMisc)
-        vsizer.Add(self.autoCapSentences, 0, wxBOTTOM, 5)
+        vsizer.Add(self.autoCapSentences)
+
+        self.checkErrorsCb = wxCheckBox(self, -1,
+            "Check script for errors before print, export or compare")
+        EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
+        vsizer.Add(self.checkErrorsCb, 0, wxBOTTOM, 10)
+
+        self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
+                     " (0 = disable)", self, vsizer, "paginateInterval")
 
         self.addSpin("confDel", "Confirm deletes >= this many lines\n"
-                     " (0 = disable):", self, vsizer,
-                     "confirmDeletes")
+                     " (0 = disable):", self, vsizer, "confirmDeletes")
         
         self.addSpin("wheelScroll", "Lines to scroll per mouse wheel event:",
                      self, vsizer, "mouseWheelLines")
@@ -902,6 +930,8 @@ class MiscPanel(wxPanel):
         util.finishWindow(self, vsizer, center = False)
 
         EVT_TEXT(self, self.scriptDirEntry.GetId(), self.OnMisc)
+        EVT_TEXT(self, self.progEntry.GetId(), self.OnMisc)
+        EVT_TEXT(self, self.argsEntry.GetId(), self.OnMisc)
 
     def addSpin(self, name, descr, parent, sizer, cfgName):
         hsizer = wxBoxSizer(wxHORIZONTAL)
@@ -928,7 +958,11 @@ class MiscPanel(wxPanel):
 
     def OnMisc(self, event = None):
         self.cfg.scriptDir = self.scriptDirEntry.GetValue().rstrip("/\\")
+        self.cfg.pdfViewerPath = self.progEntry.GetValue()
+        self.cfg.pdfViewerArgs = self.argsEntry.GetValue()
         self.cfg.capitalize = self.autoCapSentences.GetValue()
+        self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
+        self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
         self.cfg.confirmDeletes = util.getSpinValue(self.confDelEntry)
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
 
@@ -941,95 +975,7 @@ class MiscPanel(wxPanel):
 
         dlg.Destroy()
             
-    def cfg2gui(self):
-        # stupid wxwindows/wxpython displays empty box if the initial
-        # value is zero if we don't do this...
-        self.confDelEntry.SetValue(5)
-
-        self.scriptDirEntry.SetValue(self.cfg.scriptDir)
-        self.autoCapSentences.SetValue(self.cfg.capitalize)
-        self.confDelEntry.SetValue(self.cfg.confirmDeletes)
-        self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
-
-class PDFPanel(wxPanel):
-    def __init__(self, parent, id, cfg):
-        wxPanel.__init__(self, parent, id)
-        self.cfg = cfg
-
-        vsizer = wxBoxSizer(wxVERTICAL)
-
-        vsizer.Add(wxStaticText(self, -1, "PDF viewer application:"), 0,
-                   wxBOTTOM, 5)
-        
-        hsizer = wxBoxSizer(wxHORIZONTAL)
-
-        hsizer.Add(wxStaticText(self, -1, "Path:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-        
-        self.progEntry = wxTextCtrl(self, -1)
-        hsizer.Add(self.progEntry, 1, wxLEFT, 10)
-
-        btn = wxButton(self, -1, "Browse")
-        EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
-        hsizer.Add(btn, 0, wxLEFT, 10)
-
-        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM | wxLEFT, 5)
-        
-        hsizer = wxBoxSizer(wxHORIZONTAL)
-        
-        hsizer.Add(wxStaticText(self, -1, "Arguments:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-        
-        self.argsEntry = wxTextCtrl(self, -1)
-        hsizer.Add(self.argsEntry, 1)
-
-        vsizer.Add(hsizer, 0, wxEXPAND | wxLEFT, 5)
-
-        hsizer = wxBoxSizer(wxHORIZONTAL)
-        
-        hsizer.Add(wxStaticText(self, -1, "Font size:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-
-        self.fontSizeEntry = wxSpinCtrl(self, -1)
-        self.fontSizeEntry.SetRange(*self.cfg.cvars.getMinMax("fontSize"))
-        EVT_SPINCTRL(self, self.fontSizeEntry.GetId(), self.OnMisc)
-        EVT_KILL_FOCUS(self.fontSizeEntry, self.OnKillFocus)
-        hsizer.Add(self.fontSizeEntry, 0)
-
-        vsizer.Add(hsizer, 0, wxTOP, 20)
-
-        self.checkErrorsCb = wxCheckBox(self, -1,
-            "Check script for errors before print, export or compare")
-        EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
-        vsizer.Add(self.checkErrorsCb, 0, wxTOP, 10)
-
-        self.scenesCb = wxCheckBox(self, -1, "Include scene numbers")
-        EVT_CHECKBOX(self, self.scenesCb.GetId(), self.OnMisc)
-        vsizer.Add(self.scenesCb, 0, wxTOP, 5)
-
-        self.marginsCb = wxCheckBox(self, -1, "Show margins (debug)")
-        EVT_CHECKBOX(self, self.marginsCb.GetId(), self.OnMisc)
-        vsizer.Add(self.marginsCb, 0, wxTOP, 10)
-
-        self.lineNumbersCb = wxCheckBox(self, -1, "Show line numbers (debug)")
-        EVT_CHECKBOX(self, self.lineNumbersCb.GetId(), self.OnMisc)
-        vsizer.Add(self.lineNumbersCb, 0, wxTOP, 5)
-
-        self.cfg2gui()
-
-        util.finishWindow(self, vsizer, center = False)
-
-        EVT_TEXT(self, self.progEntry.GetId(), self.OnMisc)
-        EVT_TEXT(self, self.argsEntry.GetId(), self.OnMisc)
-
-    def OnKillFocus(self, event):
-        self.OnMisc()
-
-        # if we don't call this, the spin entry on wxGTK gets stuck in
-        # some weird state
-        event.Skip()
-        
-    def OnBrowse(self, event):
+    def OnBrowsePDF(self, event):
         dlg = wxFileDialog(cfgFrame, "Choose program",
             os.path.dirname(self.cfg.pdfViewerPath), self.cfg.pdfViewerPath,
             style = wxOPEN)
@@ -1038,21 +984,97 @@ class PDFPanel(wxPanel):
             self.progEntry.SetValue(dlg.GetPath())
 
         dlg.Destroy()
-    
-    def OnMisc(self, event = None):
-        self.cfg.pdfViewerPath = self.progEntry.GetValue()
-        self.cfg.pdfViewerArgs = self.argsEntry.GetValue()
-        self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
-        self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
-        self.cfg.pdfShowSceneNumbers = self.scenesCb.GetValue()
-        self.cfg.pdfShowMargins = self.marginsCb.GetValue()
-        self.cfg.pdfShowLineNumbers = self.lineNumbersCb.GetValue()
-        
+
     def cfg2gui(self):
+        # stupid wxwindows/wxpython displays empty box if the initial
+        # value is zero if we don't do this...
+        self.paginateEntry.SetValue(5)
+        self.confDelEntry.SetValue(5)
+
+        self.scriptDirEntry.SetValue(self.cfg.scriptDir)
         self.progEntry.SetValue(self.cfg.pdfViewerPath)
         self.argsEntry.SetValue(self.cfg.pdfViewerArgs)
-        self.fontSizeEntry.SetValue(self.cfg.fontSize)
+        self.autoCapSentences.SetValue(self.cfg.capitalize)
         self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
-        self.scenesCb.SetValue(self.cfg.pdfShowSceneNumbers)
-        self.marginsCb.SetValue(self.cfg.pdfShowMargins)
-        self.lineNumbersCb.SetValue(self.cfg.pdfShowLineNumbers)
+        self.paginateEntry.SetValue(self.cfg.paginateInterval)
+        self.confDelEntry.SetValue(self.cfg.confirmDeletes)
+        self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
+
+class ElementsGlobalPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        hsizer.Add(wxStaticText(self, -1, "Element:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.elementsCombo = wxComboBox(self, -1, style = wxCB_READONLY)
+
+        for t in config.getTIs():
+            self.elementsCombo.Append(t.name, t.lt)
+
+        hsizer.Add(self.elementsCombo, 0)
+
+        vsizer.Add(hsizer, 0, wxEXPAND)
+
+        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 10)
+
+        gsizer = wxFlexGridSizer(2, 2, 5, 0)
+
+        self.addTypeCombo("newEnter", "Enter creates", self, gsizer)
+        self.addTypeCombo("newTab", "Tab creates", self, gsizer)
+        self.addTypeCombo("nextTab", "Tab switches to", self, gsizer)
+        self.addTypeCombo("prevTab", "Shift+Tab switches to", self, gsizer)
+
+        vsizer.Add(gsizer)
+
+        util.finishWindow(self, vsizer, center = False)
+
+        EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
+
+        self.elementsCombo.SetSelection(0)
+        self.OnElementCombo()
+
+    def addTypeCombo(self, name, descr, parent, sizer):
+        sizer.Add(wxStaticText(parent, -1, descr + ":"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        combo = wxComboBox(parent, -1, style = wxCB_READONLY)
+
+        for t in config.getTIs():
+            combo.Append(t.name, t.lt)
+
+        sizer.Add(combo)
+
+        EVT_COMBOBOX(self, combo.GetId(), self.OnMisc)
+        
+        setattr(self, name + "Combo", combo)
+
+    def OnElementCombo(self, event = None):
+        self.lt = self.elementsCombo.GetClientData(self.elementsCombo.
+                                                   GetSelection())
+        self.cfg2gui()
+                         
+    def OnMisc(self, event = None):
+        tcfg = self.cfg.types[self.lt]
+
+        tcfg.newTypeEnter = self.newEnterCombo.GetClientData(
+            self.newEnterCombo.GetSelection())
+        tcfg.newTypeTab = self.newTabCombo.GetClientData(
+            self.newTabCombo.GetSelection())
+        tcfg.nextTypeTab = self.nextTabCombo.GetClientData(
+            self.nextTabCombo.GetSelection())
+        tcfg.prevTypeTab = self.prevTabCombo.GetClientData(
+            self.prevTabCombo.GetSelection())
+            
+    def cfg2gui(self):
+        tcfg = self.cfg.types[self.lt]
+        
+        util.reverseComboSelect(self.newEnterCombo, tcfg.newTypeEnter)
+        util.reverseComboSelect(self.newTabCombo, tcfg.newTypeTab)
+        util.reverseComboSelect(self.nextTabCombo, tcfg.nextTypeTab)
+        util.reverseComboSelect(self.prevTabCombo, tcfg.prevTypeTab)
