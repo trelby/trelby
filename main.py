@@ -1762,7 +1762,7 @@ class MyCtrl(wxControl):
             startPos = max(0, endPos - show)
 
         w = 0
-        for i in range(startPos, endPos):
+        for i in range(len(self.autoComp)):
             tw, tmp = dc.GetTextExtent(self.autoComp[i])
             w = max(w, tw)
 
