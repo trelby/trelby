@@ -57,6 +57,14 @@ def upper(s):
 def lower(s):
     return s.translate(_to_lower)
 
+# returns True if kc (key-code) is a valid character to add to the script.
+def isValidInputChar(kc):
+    # [0x80, 0x9F] = unspecified control characters in ISO-8859-1, added
+    # characters like euro etc in windows-1252. 0x7F = backspace, 0xA0 =
+    # non-breaking space, 0xAD = soft hyphen.
+    return (kc >= 32) and (kc <= 255) and not\
+           ((kc >= 0x7F) and (kc <= 0xA0)) and (kc != 0xAD)
+
 # returns s with all possible different types of newlines converted to
 # unix newlines, i.e. a single "\n"
 def fixNL(s):

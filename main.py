@@ -1734,8 +1734,8 @@ class MyCtrl(wxControl):
             self.loadFile("default.nasp")
         elif (kc < 256) and (chr(kc) == "Å"):
             self.OnSettings()
-        
-        elif (kc == WXK_SPACE) or (kc > 32) and (kc < 256):
+
+        elif util.isValidInputChar(kc):
             char = chr(kc)
 
             if self.capitalizeNeeded():
