@@ -3729,6 +3729,9 @@ class MyFrame(wxFrame):
                             "evaluation mode?", "Confirm",
                             wxYES_NO | wxNO_DEFAULT, self) == wxYES:
                 misc.license = None
+                gd.license = ""
+                util.writeToFile(gd.stateFilename, gd.cvars.save("", gd),
+                                 self)
 
     def OnTypeCombo(self, event):
         self.panel.ctrl.OnTypeCombo(event)
