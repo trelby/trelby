@@ -212,7 +212,7 @@ class MyCtrl(wxControl):
 
         except NaspError, e:
             wxMessageBox("Error loading file: %s" % e, "Error",
-                         wxOK, self)
+                         wxOK, mainFrame)
 
             return False
 
@@ -239,7 +239,7 @@ class MyCtrl(wxControl):
                 
         except NaspError, e:
             wxMessageBox("Error saving file: %s" % e, "Error",
-                         wxOK, self)
+                         wxOK, mainFrame)
 
     # script must be correctly paginated before this is called
     def export(self, sp, fileName, doPages):
@@ -289,7 +289,7 @@ class MyCtrl(wxControl):
                 
         except NaspError, e:
             wxMessageBox("Error saving file: %s" % e, "Error",
-                         wxOK, self)
+                         wxOK, mainFrame)
 
     def makeBackup(self):
         self.backup = copy.deepcopy(self.sp)
@@ -1046,7 +1046,7 @@ class MyCtrl(wxControl):
         if misc.isEval:
             wxMessageBox("This feature is not supported in the\n"
                          "evaluation version.", "Notice",
-                         wxOK, self)
+                         wxOK, mainFrame)
             return True
 
         return False
@@ -1104,7 +1104,7 @@ class MyCtrl(wxControl):
         if self.isModified():
             if wxMessageBox("The script has been modified. Are you sure\n"
                             "you want to discard the changes?", "Confirm",
-                            wxYES_NO | wxNO_DEFAULT, self) == wxNO:
+                            wxYES_NO | wxNO_DEFAULT, mainFrame) == wxNO:
                 return False
 
         return True
@@ -1197,7 +1197,7 @@ class MyCtrl(wxControl):
         else:
             msg = "No errors found."
             
-        wxMessageBox(msg, "Results", wxOK, self)
+        wxMessageBox(msg, "Results", wxOK, mainFrame)
         
     def OnFind(self):
         dlg = finddlg.FindDlg(mainFrame, self, cfg)

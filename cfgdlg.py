@@ -2,6 +2,10 @@ import config
 import util
 from wxPython.wx import *
 
+# stupid hack to get correct window modality stacking for message box
+# windows
+cfgFrame = None
+
 class CfgDlg(wxDialog):
     def __init__(self, parent, cfg, applyFunc):
         wxDialog.__init__(self, parent, -1, "Config dialog",
@@ -11,6 +15,9 @@ class CfgDlg(wxDialog):
         self.cfg = cfg
         self.applyFunc = applyFunc
 
+        global cfgFrame
+        cfgFrame = self
+        
         self.Center()
         
         vsizer = wxBoxSizer(wxVERTICAL)
@@ -132,7 +139,7 @@ class FontPanel(wxPanel):
                 self.Layout()
             else:
                 wxMessageBox("The selected font is not fixed width and"
-                             " can not be used.", "Error", wxOK, self)
+                             " can not be used.", "Error", wxOK, cfgFrame)
 
         dlg.Destroy()
 
