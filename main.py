@@ -185,6 +185,10 @@ class MyCtrl(wxControl):
                 
             sp = Screenplay()
 
+            # used to keep track that element type only changes after a
+            # LB_LAST line.
+            prevType = None
+            
             i = 0
             for i in range(len(lines)):
                 str = lines[i].strip()
@@ -193,17 +197,29 @@ class MyCtrl(wxControl):
                     continue
 
                 if len(str) < 2:
-                    raise MiscError("line %d is invalid" % (i + 1))
+                    raise MiscError("Line %d has invalid syntax" % (i + 1))
 
                 lb = config.text2lb(str[0])
                 type = config.text2linetype(str[1])
                 text = str[2:]
 
+                if prevType and (type != prevType):
+                    raise MiscError("Line %d has invalid element type" %
+                                    (i + 1))
+                
                 line = Line(lb, type, text)
                 sp.lines.append(line)
 
+                if lb != config.LB_LAST:
+                    prevType = type
+                else:
+                    prevType = None
+
             if len(sp.lines) == 0:
-                raise MiscError("empty file")
+                raise MiscError("Empty file.")
+
+            if sp.lines[-1].lb != config.LB_LAST:
+                raise MiscError("Last line doesn't end an element")
             
             self.clearVars()
             self.sp = sp
