@@ -510,6 +510,15 @@ def removeTempFiles(prefix):
         except OSError:
             continue
 
+# return True if given file exists.
+def fileExists(path):
+    try:
+        os.stat(path)
+    except OSError:
+        return False
+
+    return True
+    
 # simple timer class for use during development only
 class TimerDev:
     def __init__(self, msg = ""):

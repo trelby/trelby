@@ -65,6 +65,8 @@ ID_FILE_REVERT,\
 ID_FILE_SAVE,\
 ID_FILE_SAVE_AS,\
 ID_FILE_SETTINGS,\
+ID_FILE_CFG_LOAD,\
+ID_FILE_CFG_SAVE_AS,\
 ID_HELP_ABOUT,\
 ID_HELP_COMMANDS,\
 ID_REPORTS_CHARACTER_REP,\
@@ -77,12 +79,37 @@ ID_SCRIPT_TITLES,\
 ID_TOOLS_CHARMAP,\
 ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
-= range(32)
+= range(34)
 
 def refreshGuiConfig():
     global cfgGui
 
     cfgGui = config.ConfigGui(cfg)
+
+# keeps (some) global data
+class GlobalData:
+    def __init__(self):
+
+        self.confFilename = misc.confPath + "/default.conf"
+        self.stateFilename = misc.confPath + "/state"
+
+        self.makeConfDir()
+        
+    def makeConfDir(self):
+        makeDir = False
+
+        try:
+            os.stat(misc.confPath)
+        except OSError:
+            makeDir = True
+
+        if makeDir:
+            try:
+                os.mkdir(misc.confPath, 0755)
+            except OSError, (errno, strerror):
+                wxMessageBox("Error creating configuration directory\n"
+                             "'%s': %s" % (misc.confPath, strerror), "Error",
+                             wxOK, None)
 
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.
@@ -1807,7 +1834,7 @@ class MyCtrl(wxControl):
 
         sb.SetStatusText("Tab: %s" % s, 1)
         
-    def applyCfg(self, newCfg):
+    def applyCfg(self, newCfg, writeCfg = True):
         global cfg
         
         oldCfg = cfg
@@ -1829,7 +1856,9 @@ class MyCtrl(wxControl):
             c.adjustScrollBar()
 
         self.updateScreen()
-        mainFrame.writeConfigFile("default.conf", cfg.save())
+
+        if writeCfg:
+            util.writeToFile(gd.confFilename, cfg.save(), mainFrame)
         
     def checkEval(self):
         if misc.isEval:
@@ -2461,7 +2490,7 @@ class MyCtrl(wxControl):
         s = self.generatePDF(sp)
         util.showTempPDF(s, cfg, mainFrame)
 
-    def OnSettings(self):
+    def OnCfg(self):
         dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfg), self.applyCfg)
         if dlg.ShowModal() == wxID_OK:
             self.applyCfg(dlg.cfg)
@@ -2713,7 +2742,7 @@ class MyCtrl(wxControl):
         elif (kc < 256) and (chr(kc) == "å"):
             self.loadFile("default.blyte")
         elif (kc < 256) and (chr(kc) == "Å"):
-            self.OnSettings()
+            self.OnCfg()
         elif (kc < 256) and (chr(kc) == "¤"):
             pass
 
@@ -3000,10 +3029,12 @@ class MyFrame(wxFrame):
 
         self.height = min(self.height,
                           wxSystemSettings_GetMetric(wxSYS_SCREEN_Y) - 50)
-        
-        s = self.loadConfigFile("state", self)
-        if s:
-            self.cvars.load(self.cvars.makeVals(s), "", self)
+
+        if util.fileExists(gd.stateFilename):
+            s = util.loadFile(gd.stateFilename, self)
+
+            if s:
+                self.cvars.load(self.cvars.makeVals(s), "", self)
 
         self.MoveXY(self.posX, self.posY)
         self.SetSize(wxSize(self.width, self.height))
@@ -3026,6 +3057,8 @@ class MyFrame(wxFrame):
         fileMenu.Append(ID_FILE_PRINT, "&Print\tCTRL-P")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_SETTINGS, "Se&ttings...")
+        fileMenu.Append(ID_FILE_CFG_LOAD, "Load...")
+        fileMenu.Append(ID_FILE_CFG_SAVE_AS, "Save as...")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_EXIT, "E&xit\tCTRL-Q")
 
@@ -3129,7 +3162,9 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FILE_CLOSE, self.OnClose)
         EVT_MENU(self, ID_FILE_REVERT, self.OnRevert)
         EVT_MENU(self, ID_FILE_PRINT, self.OnPrint)
-        EVT_MENU(self, ID_FILE_SETTINGS, self.OnSettings)
+        EVT_MENU(self, ID_FILE_SETTINGS, self.OnCfg)
+        EVT_MENU(self, ID_FILE_CFG_LOAD, self.OnCfgLoad)
+        EVT_MENU(self, ID_FILE_CFG_SAVE_AS, self.OnCfgSaveAs)
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
         EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
@@ -3224,41 +3259,6 @@ class MyFrame(wxFrame):
 
         return False
 
-    # write 's' into config_path/filename.
-    def writeConfigFile(self, filename, s):
-        makeDir = False
-
-        try:
-            os.stat(misc.confPath)
-        except OSError:
-            makeDir = True
-
-        if makeDir:
-            try:
-                os.mkdir(misc.confPath, 0755)
-            except OSError, (errno, strerror):
-                wxMessageBox("Error creating configuration directory\n"
-                             "'%s': %s" % (misc.confPath, strerror), "Error",
-                             wxOK, self)
-
-                return
-            
-        util.writeToFile(misc.confPath + "/" + filename, s, self)
-
-    # load config file config_path/filename. returns None if file doesn't
-    # exist or can't be read for some reason.
-    def loadConfigFile(filename, frame):
-        path = misc.confPath + "/" + filename
-        
-        try:
-            os.stat(path)
-        except OSError:
-            return None
-
-        return util.loadFile(path, frame)
-
-    loadConfigFile = staticmethod(loadConfigFile)
-    
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
         # override it and do nothing
@@ -3333,8 +3333,40 @@ class MyFrame(wxFrame):
     def OnPrint(self, event):
         self.panel.ctrl.OnPrint()
 
-    def OnSettings(self, event):
-        self.panel.ctrl.OnSettings()
+    def OnCfg(self, event):
+        self.panel.ctrl.OnCfg()
+
+    def OnCfgLoad(self, event):
+        dlg = wxFileDialog(self, "File to open",
+            defaultDir = os.path.dirname(gd.confFilename),
+            defaultFile = os.path.basename(gd.confFilename),
+            wildcard = "Setting files (*.conf)|*.conf|All files|*",
+            style = wxOPEN)
+
+        if dlg.ShowModal() == wxID_OK:
+            s = util.loadFile(dlg.GetPath(), self)
+
+            if s:
+                c = config.Config()
+                c.load(s)
+                gd.confFilename = dlg.GetPath()
+                
+                self.panel.ctrl.applyCfg(c, False)
+
+        dlg.Destroy()
+
+    def OnCfgSaveAs(self, event):
+        dlg = wxFileDialog(self, "Filename to save as",
+            defaultDir = os.path.dirname(gd.confFilename),
+            defaultFile = os.path.basename(gd.confFilename),
+            wildcard = "Setting files (*.conf)|*.conf|All files|*",
+            style = wxSAVE | wxOVERWRITE_PROMPT)
+
+        if dlg.ShowModal() == wxID_OK:
+            if util.writeToFile(dlg.GetPath(), cfg.save(), self):
+                gd.confFilename = dlg.GetPath()
+            
+        dlg.Destroy()
 
     def OnCut(self, event):
         self.panel.ctrl.OnCut()
@@ -3433,7 +3465,8 @@ class MyFrame(wxFrame):
                 doExit = False
 
         if doExit:
-            self.writeConfigFile("state", self.cvars.save("", self))
+            util.writeToFile(gd.stateFilename, self.cvars.save("", self),
+                             self)
             util.removeTempFiles(misc.tmpPrefix)
             self.Destroy()
             myApp.ExitMainLoop()
@@ -3454,7 +3487,7 @@ class MyFrame(wxFrame):
 class MyApp(wxApp):
 
     def OnInit(self):
-        global cfg, mainFrame
+        global cfg, mainFrame, gd
 
         if (wxMAJOR_VERSION != 2) or (wxMINOR_VERSION != 4) or (
             wxRELEASE_NUMBER < 2):
@@ -3471,6 +3504,8 @@ class MyApp(wxApp):
         misc.init()
         util.init()
 
+        gd = GlobalData()
+
         if misc.isWindows:
             major = sys.getwindowsversion()[0]
             if major < 5:
@@ -3483,9 +3518,17 @@ class MyApp(wxApp):
         
         cfg = config.Config()
         config.currentCfg = cfg
-        s = MyFrame.loadConfigFile("default.conf", None)
-        if s:
-            cfg.load(s)
+
+        if util.fileExists(gd.confFilename):
+            s = util.loadFile(gd.confFilename, None)
+
+            if s:
+                cfg.load(s)
+        else:
+            # we want to write out a default config file at startup
+            # for various reasons, if no default config file yet
+            # exists
+            util.writeToFile(gd.confFilename, cfg.save(), None)
 
         refreshGuiConfig()
 
