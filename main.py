@@ -46,6 +46,7 @@ ID_FILE_EXPORT = 14
 ID_EDIT_FIND = 15
 ID_EDIT_SELECT_SCENE = 16
 ID_EDIT_FIND_ERROR = 17
+ID_EDIT_SHOW_FORMATTING = 18
 
 def refreshGuiConfig():
     global cfgGui
@@ -1227,8 +1228,7 @@ class MyCtrl(wxControl):
                 dc.SetBrush(cfgGui.selectedBrush)
                 dc.DrawRectangle(0, y, size.width, cfg.fontYdelta)
 
-            # FIXME: debug code, make a hidden config-option
-            if 0:
+            if mainFrame.showFormatting:
                 dc.SetPen(cfgGui.bluePen)
                 dc.DrawLine(cfg.offsetX + tcfg.indent * cfgGui.fontX, y,
                             cfg.offsetX + tcfg.indent * cfgGui.fontX,
@@ -1236,7 +1236,19 @@ class MyCtrl(wxControl):
                 dc.DrawLine(cfg.offsetX + (tcfg.indent + tcfg.width)
                     * cfgGui.fontX, y, cfg.offsetX + (tcfg.indent + tcfg.width)
                     * cfgGui.fontX, y + cfg.fontYdelta)
+
+                if self.isFirstLineOfElem(i):
+                    dc.DrawLine(cfg.offsetX + tcfg.indent * cfgGui.fontX,
+                        y, cfg.offsetX + (tcfg.indent + tcfg.width) *
+                        cfgGui.fontX, y)
+                        
+                if self.isLastLineOfElem(i):
+                    dc.DrawLine(cfg.offsetX + tcfg.indent * cfgGui.fontX,
+                        y + cfg.fontYdelta, cfg.offsetX + (tcfg.indent +
+                        tcfg.width) * cfgGui.fontX, y + cfg.fontYdelta)
+                        
                 dc.SetTextForeground(cfgGui.redColor)
+                dc.SetFont(cfgGui.getType(config.ACTION).font)
                 dc.DrawText(config.lb2text(l.lb), 0, y)
                 dc.SetTextForeground(cfg.textColor)
 
@@ -1356,6 +1368,7 @@ class MyFrame(wxFrame):
                          wxPoint(100, 100), wxSize(700, 830))
 
         self.clipboard = None
+        self.showFormatting = False
         
         fileMenu = wxMenu()
         fileMenu.Append(ID_FILE_NEW, "&New")
@@ -1379,6 +1392,8 @@ class MyFrame(wxFrame):
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace\tCTRL-F")
         editMenu.Append(ID_EDIT_FIND_ERROR, "Find next &error\tCTRL-E")
+        editMenu.AppendSeparator()
+        editMenu.AppendCheckItem(ID_EDIT_SHOW_FORMATTING, "S&how formatting")
         
         formatMenu = wxMenu()
         formatMenu.Append(ID_REFORMAT, "&Reformat all")
@@ -1388,12 +1403,12 @@ class MyFrame(wxFrame):
         helpMenu.AppendSeparator()
         helpMenu.Append(ID_HELP_ABOUT, "&About")
         
-        menuBar = wxMenuBar()
-        menuBar.Append(fileMenu, "&File")
-        menuBar.Append(editMenu, "&Edit")
-        menuBar.Append(formatMenu, "F&ormat")
-        menuBar.Append(helpMenu, "&Help")
-        self.SetMenuBar(menuBar)
+        self.menuBar = wxMenuBar()
+        self.menuBar.Append(fileMenu, "&File")
+        self.menuBar.Append(editMenu, "&Edit")
+        self.menuBar.Append(formatMenu, "F&ormat")
+        self.menuBar.Append(helpMenu, "&Help")
+        self.SetMenuBar(self.menuBar)
 
         EVT_SIZE(self, self.OnSize)
 
@@ -1442,6 +1457,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_FIND_ERROR, self.OnFindError)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
+        EVT_MENU(self, ID_EDIT_SHOW_FORMATTING, self.OnShowFormatting)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
@@ -1550,6 +1566,10 @@ class MyFrame(wxFrame):
 
     def OnFind(self, event):
         self.panel.ctrl.OnFind()
+
+    def OnShowFormatting(self, event):
+        self.showFormatting = self.menuBar.IsChecked(ID_EDIT_SHOW_FORMATTING)
+        self.panel.ctrl.Refresh(False)
 
     def OnReformat(self, event):
         self.panel.ctrl.OnReformat()
