@@ -510,7 +510,17 @@ class MyCtrl(wxControl):
                 self.deleteChar(self.line, self.column)
 
             self.rewrap()
-            
+
+        elif event.ControlDown():
+            if kc == WXK_HOME:
+                self.line = 0
+                self.topLine = 0
+                self.column = 0
+            elif kc == WXK_END:
+                self.line = len(self.sp.lines) - 1
+            else:
+                event.Skip()
+                
         elif (kc == WXK_LEFT) or (kc == KC_CTRL_B):
             self.column = max(self.column - 1, 0)
             
