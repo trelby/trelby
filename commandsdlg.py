@@ -8,6 +8,8 @@ class CommandsDlg(wxDialog):
                           size = (650, 600),
                           style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 
+        self.Center()
+        
         vsizer = wxBoxSizer(wxVERTICAL)
         self.SetSizer(vsizer)
 
