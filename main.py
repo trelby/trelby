@@ -426,6 +426,21 @@ class MyCtrl(wxControl):
         self.makeBackup()
         self.paginate()
 
+    # generate exportable text from given screenplay, or None.
+    def getExportText(self, sp):
+        inf = []
+        inf.append(misc.CheckBoxItem("Include page markers"))
+
+        dlg = misc.CheckBoxDlg(mainFrame, "Output options", (200, 100),
+                               inf, "Options:", False)
+
+        if dlg.ShowModal() != wxID_OK:
+            dlg.Destroy()
+
+            return None
+
+        return self.generateText(sp, inf[0].selected)
+
     # generate formatted text from given screenplay and return it as a
     # string. if 'dopages' is True, marks pagination in the output.
     def generateText(self, sp, doPages):
@@ -2070,9 +2085,10 @@ class MyCtrl(wxControl):
             if dlg.GetFilterIndex() == 0:
                 data = self.generatePDF(sp)
             else:
-                data = self.generateText(sp, True)
+                data = self.getExportText(sp)
 
-            util.writeToFile(dlg.GetPath(), data, mainFrame)
+            if data:
+                util.writeToFile(dlg.GetPath(), data, mainFrame)
 
         dlg.Destroy()
 
