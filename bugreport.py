@@ -36,7 +36,7 @@ class BugReportHandler:
 class BugReportDlg(wxDialog):
     def __init__(self, parent, brh):
         wxDialog.__init__(self, parent, -1, "Error",
-            pos = wxDefaultPosition, size = (400, 275),
+            pos = wxDefaultPosition, size = (400, 300),
             style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 
         self.brh = brh
@@ -59,10 +59,12 @@ clipboard, and then paste that information at the end of your
 mail. Don't close this window until you've safely copied this
 extra information to another program.
 
-(If you have other windows besides the main window open in
+If you have other windows besides the main window open in
 this program, you need to close them before being able to
-press "Copy".)
+press "Copy".
 
+After doing all this, save your work (if possible), and
+restart the program.
 """
 
         vsizer.Add(wxTextCtrl(panel, -1, s.strip(),
