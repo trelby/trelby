@@ -439,10 +439,8 @@ class Config:
             util.clampObj(self, it.name, it.minVal, it.maxVal)
 
         for el in self.types.itervalues():
-            util.clampObj(el, "emptyLinesBefore",
-                          *el.cvars.getMinMax("emptyLinesBefore"))
-            util.clampObj(el, "indent", *el.cvars.getMinMax("indent"))
-            util.clampObj(el, "width", *el.cvars.getMinMax("width"))
+            for it in Type.cvars.numeric.itervalues():
+                util.clampObj(el, it.name, it.minVal, it.maxVal)
 
             tmp = []
             for v in el.autoCompList:
