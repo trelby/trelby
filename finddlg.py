@@ -68,9 +68,6 @@ class FindDlg(wxDialog):
             self.elements.Append(t.name)
             self.elementTypes.append(t.lt)
 
-        for i in range(self.elements.GetCount()):
-            self.elements.Check(i, True)
-            
         vsizer.Add(self.elements, 1, wxEXPAND)
         
         hsizer.Add(vsizer, 1, wxEXPAND)
@@ -115,11 +112,48 @@ class FindDlg(wxDialog):
         
         util.finishWindow(self, hsizer, center = False)
         
-        self.showExtra(False)
-        self.Center()
-
+        self.loadState()
         self.findEntry.SetFocus()
         
+    def loadState(self):
+        self.findEntry.SetValue(self.ctrl.findDlgFindText)
+        self.findEntry.SetSelection(-1, -1)
+        
+        self.replaceEntry.SetValue(self.ctrl.findDlgReplaceText)
+        
+        self.matchWholeCb.SetValue(self.ctrl.findDlgMatchWholeWord)
+        self.matchCaseCb.SetValue(self.ctrl.findDlgMatchCase)
+
+        self.direction.SetSelection(int(not self.ctrl.findDlgDirUp))
+
+        count = self.elements.GetCount()
+        tmp = self.ctrl.findDlgElements
+        
+        if (tmp == None) or (len(tmp) != count):
+            tmp = [True] * self.elements.GetCount()
+            
+        for i in range(count):
+            self.elements.Check(i, tmp[i])
+        
+        self.showExtra(self.ctrl.findDlgUseExtra)
+        self.Center()
+
+    def saveState(self):
+        self.getParams()
+        
+        self.ctrl.findDlgFindText = self.findEntry.GetValue()
+        self.ctrl.findDlgReplaceText = self.replaceEntry.GetValue()
+        self.ctrl.findDlgMatchWholeWord = self.matchWhole
+        self.ctrl.findDlgMatchCase = self.matchCase
+        self.ctrl.findDlgDirUp = self.dirUp
+        self.ctrl.findDlgUseExtra = self.useExtra
+
+        tmp = []
+        for i in range(self.elements.GetCount()):
+            tmp.append(bool(self.elements.IsChecked(i)))
+
+        self.ctrl.findDlgElements = tmp
+
     def OnMore(self, event):
         self.showExtra(not self.useExtra)
 
@@ -194,7 +228,7 @@ class FindDlg(wxDialog):
             for i in range(self.elements.GetCount()):
                 self.elementMap[self.elementTypes[i]] = \
                     self.elements.IsChecked(i)
-            
+
     def typeIncluded(self, lt):
         if not self.useExtra:
             return True

@@ -213,6 +213,15 @@ class MyCtrl(wxControl):
         self.pagesNoAdjust = [-1, 0]
         self.maxAutoCompItems = 10
         self.lastPaginated = 0.0
+
+        # find dialog stored settings
+        self.findDlgFindText = ""
+        self.findDlgReplaceText = ""
+        self.findDlgMatchWholeWord= False
+        self.findDlgMatchCase = False
+        self.findDlgDirUp = False
+        self.findDlgUseExtra = False
+        self.findDlgElements = None
         
     def createEmptySp(self):
         self.clearVars()
@@ -2256,7 +2265,8 @@ class MyCtrl(wxControl):
     def OnFind(self):
         dlg = finddlg.FindDlg(mainFrame, self, cfg)
         dlg.ShowModal()
-
+        dlg.saveState()
+        
         if dlg.didReplaces:
             self.reformatAll()
         
