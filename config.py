@@ -63,19 +63,19 @@ class Type:
         # what element to switch to when user hits tab / shift-tab.
         self.nextTypeTab = None
         self.prevTypeTab = None
-        
+
+# type-specific stuff that are wxwindows objects, so can't be in normal
+# Type (deepcopy dies)
+class TypeGui:
+    def __init__(self):
+        self.font = None
+
 class Config:
     def __init__(self):
 
         # type configs, key = line type, value = Type
         self.types = { }
         
-        # various non-user configurable (for now anyway) settings
-
-        # font size values in pixels
-        self.fontY = 14
-        self.fontX = 9
-
         # vertical distance between rows, in pixels
         self.fontYdelta = 18
 
@@ -163,37 +163,87 @@ class Config:
         t.prevTypeTab = CHARACTER
         self.types[t.type] = t
 
-        # wxWindows stuff
-        self.baseFont = wxFont(self.fontY, wxMODERN, wxNORMAL, wxNORMAL)
-        self.sceneFont = wxFont(self.fontY, wxMODERN, wxNORMAL, wxBOLD)
-
-        self.bluePen = wxPen(wxColour(0, 0, 255))
-        self.redColor = wxColour(255, 0, 0)
-        self.blackColor = wxColour(0, 0, 0)
+        # FIXME: use a different one in Windows
+        self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
 
         self.bgColor = wxColour(204, 204, 204)
-        self.bgBrush = wxBrush(self.bgColor)
-        self.bgPen = wxPen(self.bgColor)
-
         self.selectedColor = wxColour(128, 192, 192)
-        self.selectedBrush = wxBrush(self.selectedColor)
-        self.selectedPen = wxPen(self.selectedColor)
-
         self.cursorColor = wxColour(205, 0, 0)
-        self.cursorBrush = wxBrush(self.cursorColor)
-        self.cursorPen = wxPen(self.cursorColor)
-
         self.autoCompFgColor = wxColour(0, 0, 0)
         self.autoCompBgColor = wxColor(249, 222, 99)
-        self.autoCompPen = wxPen(self.autoCompFgColor)
-        self.autoCompBrush = wxBrush(self.autoCompBgColor)
-        self.autoCompRevPen = wxPen(self.autoCompBgColor)
-        self.autoCompRevBrush = wxBrush(self.autoCompFgColor)
+        self.pagebreakColor = wxColour(128, 128, 128)
 
-        self.pagebreakPen = wxPen(wxColour(128, 128, 128),
-                                  style = wxSHORT_DASH)
+    def getType(self, type):
+        return self.types[type]
 
-    def getTypeCfg(self, type):
+# config stuff that are wxwindows objects, so can't be in normal
+# Config (deepcopy dies)
+class ConfigGui:
+
+    # constants
+    constantsInited = False
+    bluePen = None
+    redColor = None
+    blackColor = None
+    
+    def __init__(self, cfg):
+
+        if not ConfigGui.constantsInited:
+            ConfigGui.bluePen = wxPen(wxColour(0, 0, 255))
+            ConfigGui.redColor = wxColour(255, 0, 0)
+            ConfigGui.blackColor = wxColour(0, 0, 0)
+
+            ConfigGui.constantsInited = True
+            
+        # type-gui configs, key = line type, value = TypeGui
+        self.types = { }
+
+        nfi = wxNativeFontInfo()
+        nfi.FromString(cfg.nativeFont)
+        font = wxFontFromNativeInfo(nfi)
+
+        dc = wxMemoryDC()
+        dc.SetFont(font)
+        self.fontX, self.fontY = dc.GetTextExtent("O")
+
+        self.bgBrush = wxBrush(cfg.bgColor)
+        self.bgPen = wxPen(cfg.bgColor)
+
+        self.selectedBrush = wxBrush(cfg.selectedColor)
+        self.selectedPen = wxPen(cfg.selectedColor)
+
+        self.cursorBrush = wxBrush(cfg.cursorColor)
+        self.cursorPen = wxPen(cfg.cursorColor)
+
+        self.autoCompPen = wxPen(cfg.autoCompFgColor)
+        self.autoCompBrush = wxBrush(cfg.autoCompBgColor)
+        self.autoCompRevPen = wxPen(cfg.autoCompBgColor)
+        self.autoCompRevBrush = wxBrush(cfg.autoCompFgColor)
+
+        self.pagebreakPen = wxPen(cfg.pagebreakColor, style = wxSHORT_DASH)
+
+        for t in cfg.types.values():
+            tg = TypeGui()
+            
+            nfi = wxNativeFontInfo()
+            nfi.FromString(cfg.nativeFont)
+            
+            if t.isBold:
+                nfi.SetWeight(wxBOLD)
+            else:
+                nfi.SetWeight(wxNORMAL)
+
+            if t.isItalic:
+                nfi.SetStyle(wxITALIC)
+            else:
+                nfi.SetStyle(wxNORMAL)
+
+            nfi.SetUnderlined(t.isUnderlined)
+            
+            tg.font = wxFontFromNativeInfo(nfi)
+            self.types[t.type] = tg
+
+    def getType(self, type):
         return self.types[type]
 
 def _conv(dict, key):

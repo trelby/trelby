@@ -44,6 +44,11 @@ def clamp(val, min, max):
     else:
         return val
 
+def refreshGuiConfig():
+    global cfgGui
+
+    cfgGui = config.ConfigGui(cfg)
+
 class Line:
     def __init__(self, lb = config.LB_LAST, type = config.ACTION, text = ""):
         self.lb = lb
@@ -83,7 +88,7 @@ class Screenplay:
             return 0
         
         if self.lines[i - 1].lb == config.LB_LAST:
-            return cfg.getTypeCfg(self.lines[i].type).emptyLinesBefore
+            return cfg.getType(self.lines[i].type).emptyLinesBefore
         else:
             return 0
 
@@ -259,7 +264,7 @@ class MyCtrl(wxControl):
         
     def wrapLine(self, line):
         ret = []
-        tcfg = cfg.getTypeCfg(line.type)
+        tcfg = cfg.getType(line.type)
 
         firstWrap = True
         while 1:
@@ -298,7 +303,7 @@ class MyCtrl(wxControl):
 
     def rewrap(self, startLine = -1, toElemEnd = False):
         ls = self.sp.lines
-        tcfg = cfg.getTypeCfg(ls[self.line].type)
+        tcfg = cfg.getType(ls[self.line].type)
 
         if startLine == -1:
             line1 = self.line
@@ -598,9 +603,9 @@ class MyCtrl(wxControl):
         self.autoComp = None
         pos = event.GetPosition()
         self.line = self.pos2line(pos)
-        tcfg = cfg.getTypeCfg(self.sp.lines[self.line].type)
-        x = pos.x - tcfg.indent * cfg.fontX - cfg.offsetX
-        self.column = clamp(x / cfg.fontX, 0,
+        tcfg = cfg.getType(self.sp.lines[self.line].type)
+        x = pos.x - tcfg.indent * cfgGui.fontX - cfg.offsetX
+        self.column = clamp(x / cfgGui.fontX, 0,
                             len(self.sp.lines[self.line].text))
 
         if mark and (self.mark == -1):
@@ -725,22 +730,29 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnSettings(self):
-        dlg = CfgDlg(self, copy.deepcopy(cfg._types))
+        dlg = CfgDlg(self, copy.deepcopy(cfg))
         dlg.ShowModal()
         dlg.Destroy()
         
         fd = wxFontData()
-        fd.SetInitialFont(cfg.baseFont)
+        nfi = wxNativeFontInfo()
+        nfi.FromString(cfg.nativeFont)
+        font = wxFontFromNativeInfo(nfi)
+        fd.SetInitialFont(font)
+
         dlg = wxFontDialog(self, fd)
         if dlg.ShowModal() == wxID_OK:
-            cfg.baseFont = dlg.GetFontData().GetChosenFont()
+            font = dlg.GetFontData().GetChosenFont()
+            cfg.nativeFont = font.GetNativeFontInfo().ToString()
 
-            # FIXME: test fixed widthness and refuse to use if not
-            #self.isFixedWidth(cfg.baseFont)
+            # FIXME: do this in config dialog after selecting font and
+            # allow tweaking
+            dc = wxMemoryDC()
+            dc.SetFont(font)
+            w1, h1, descent, nada = dc.GetFullTextExtent("O")
+            cfg.fontYdelta = h1 + descent
 
-            cfg.sceneFont = wxFontFromNativeInfo(
-                cfg.baseFont.GetNativeFontInfo())
-            cfg.sceneFont.SetWeight(wxBOLD)
+            refreshGuiConfig()
             
             self.updateScreen()
 
@@ -752,7 +764,7 @@ class MyCtrl(wxControl):
         #print "kc: %d, ctrldown: %d" % (kc, ev.ControlDown())
         
         ls = self.sp.lines
-        tcfg = cfg.getTypeCfg(ls[self.line].type)
+        tcfg = cfg.getType(ls[self.line].type)
 
         # FIXME: call ensureCorrectLine()
 
@@ -971,14 +983,13 @@ class MyCtrl(wxControl):
         dc = wxBufferedPaintDC(self, self.screenBuf)
 
         size = self.GetClientSize()
-        dc.SetBrush(cfg.bgBrush)
-        dc.SetPen(cfg.bgPen)
+        dc.SetBrush(cfgGui.bgBrush)
+        dc.SetPen(cfgGui.bgPen)
         dc.DrawRectangle(0, 0, size.width, size.height)
-        dc.SetFont(cfg.baseFont)
 
         y = cfg.offsetY
         length = len(ls)
-
+        prevType = -1
         marked = self.getMarkedLines()
 
         cursorY = -1
@@ -991,54 +1002,51 @@ class MyCtrl(wxControl):
                 break
             
             l = ls[i]
-            tcfg = cfg.getTypeCfg(l.type)
+            tcfg = cfg.getType(l.type)
 
             if (self.mark != -1) and self.isLineMarked(i, marked):
-                dc.SetPen(cfg.selectedPen)
-                dc.SetBrush(cfg.selectedBrush)
+                dc.SetPen(cfgGui.selectedPen)
+                dc.SetBrush(cfgGui.selectedBrush)
                 dc.DrawRectangle(0, y, size.width, cfg.fontYdelta)
             
             # FIXME: debug code, make a hidden config-option
             if 0:
-                dc.SetPen(cfg.bluePen)
-                dc.DrawLine(cfg.offsetX + tcfg.indent * cfg.fontX, y,
-                    cfg.offsetX + tcfg.indent * cfg.fontX, y + cfg.fontYdelta)
+                dc.SetPen(cfgGui.bluePen)
+                dc.DrawLine(cfg.offsetX + tcfg.indent * cfgGui.fontX, y,
+                            cfg.offsetX + tcfg.indent * cfgGui.fontX,
+                            y + cfg.fontYdelta)
                 dc.DrawLine(cfg.offsetX + (tcfg.indent + tcfg.width)
-                    * cfg.fontX, y, cfg.offsetX + (tcfg.indent + tcfg.width)
-                    * cfg.fontX, y + cfg.fontYdelta)
-                dc.SetTextForeground(cfg.redColor)
+                    * cfgGui.fontX, y, cfg.offsetX + (tcfg.indent + tcfg.width)
+                    * cfgGui.fontX, y + cfg.fontYdelta)
+                dc.SetTextForeground(cfgGui.redColor)
                 dc.DrawText(config.lb2text(l.lb), 0, y)
-                dc.SetTextForeground(cfg.blackColor)
+                dc.SetTextForeground(cfgGui.blackColor)
 
             if (i != 0) and (self.line2page(i - 1) != self.line2page(i)):
-                dc.SetPen(cfg.pagebreakPen)
+                dc.SetPen(cfgGui.pagebreakPen)
                 dc.DrawLine(0, y, size.width, y)
                 
             if i == self.line:
                 cursorY = y
                 ccfg = tcfg
-                dc.SetPen(cfg.cursorPen)
-                dc.SetBrush(cfg.cursorBrush)
+                dc.SetPen(cfgGui.cursorPen)
+                dc.SetBrush(cfgGui.cursorBrush)
                 dc.DrawRectangle(cfg.offsetX + (self.column + tcfg.indent)
-                    * cfg.fontX, y, cfg.fontX, cfg.fontY)
-                
-            savedFont = False
-            if l.type == config.SCENE:
-                savedFont = True
-                dc.SetFont(cfg.sceneFont)
+                    * cfgGui.fontX, y, cfgGui.fontX, cfgGui.fontY)
+
+            if l.type != prevType:
+                dc.SetFont(cfgGui.getType(l.type).font)
 
             if tcfg.isCaps:
                 text = l.text.upper()
             else:
                 text = l.text
 
-            dc.DrawText(text, cfg.offsetX + tcfg.indent * cfg.fontX, y)
+            dc.DrawText(text, cfg.offsetX + tcfg.indent * cfgGui.fontX, y)
 
-            if savedFont:
-                dc.SetFont(cfg.baseFont)
-            
             y += cfg.fontYdelta
             i += 1
+            prevType = l.type
 
         if self.autoComp and (cursorY > 0):
             self.drawAutoComp(dc, cursorY, ccfg)
@@ -1050,7 +1058,9 @@ class MyCtrl(wxControl):
         offset = 5
         sbw = 10
         selBleed = 2
-        
+
+        dc.SetFont(cfgGui.getType(tcfg.type).font)
+
         show = min(10, len(self.autoComp))
         doSbw = show < len(self.autoComp)
         
@@ -1065,44 +1075,44 @@ class MyCtrl(wxControl):
             w = max(w, tw)
 
         w += offset * 2
-        h = show * cfg.fontY + offset * 2
+        h = show * cfgGui.fontY + offset * 2
 
         itemW = w - offset * 2 + selBleed * 2
         if doSbw:
             w += sbw + offset * 2
             sbh = h - offset * 2 + selBleed * 2
 
-        posX = cfg.offsetX + tcfg.indent * cfg.fontX
+        posX = cfg.offsetX + tcfg.indent * cfgGui.fontX
         posY = cursorY + cfg.fontYdelta
         
-        dc.SetPen(cfg.autoCompPen)
-        dc.SetBrush(cfg.autoCompBrush)
+        dc.SetPen(cfgGui.autoCompPen)
+        dc.SetBrush(cfgGui.autoCompBrush)
         dc.DrawRectangle(posX, posY, w, h)
 
         dc.SetTextForeground(cfg.autoCompFgColor)
 
         for i in range(startPos, endPos):
             if i == self.autoCompSel:
-                dc.SetPen(cfg.autoCompRevPen)
-                dc.SetBrush(cfg.autoCompRevBrush)
+                dc.SetPen(cfgGui.autoCompRevPen)
+                dc.SetBrush(cfgGui.autoCompRevBrush)
                 dc.SetTextForeground(cfg.autoCompBgColor)
                 dc.DrawRectangle(posX + offset - selBleed,
-                    posY + offset + (i - startPos) * cfg.fontY - selBleed,
+                    posY + offset + (i - startPos) * cfgGui.fontY - selBleed,
                     itemW,
-                    cfg.fontY + selBleed * 2)
+                    cfgGui.fontY + selBleed * 2)
                 dc.SetTextForeground(cfg.autoCompBgColor)
-                dc.SetPen(cfg.autoCompPen)
-                dc.SetBrush(cfg.autoCompBrush)
+                dc.SetPen(cfgGui.autoCompPen)
+                dc.SetBrush(cfgGui.autoCompBrush)
                 
             dc.DrawText(self.autoComp[i], posX + offset, posY + offset +
-                        (i - startPos) * cfg.fontY)
+                        (i - startPos) * cfgGui.fontY)
 
             if i == self.autoCompSel:
                 dc.SetTextForeground(cfg.autoCompFgColor)
 
         if doSbw:
-            dc.SetPen(cfg.autoCompPen)
-            dc.SetBrush(cfg.autoCompRevBrush)
+            dc.SetPen(cfgGui.autoCompPen)
+            dc.SetBrush(cfgGui.autoCompRevBrush)
             dc.DrawLine(posX + w - offset * 2 - sbw,
                 posY,
                 posX + w - offset * 2 - sbw,
@@ -1326,6 +1336,7 @@ class MyApp(wxApp):
         global cfg, mainFrame
 
         cfg = config.Config()
+        refreshGuiConfig()
         
         mainFrame = MyFrame(NULL, -1, "Nasp")
         mainFrame.init()
