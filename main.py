@@ -3289,6 +3289,14 @@ class MyApp(wxApp):
     def OnInit(self):
         global cfg, mainFrame
 
+        if (wxMAJOR_VERSION != 2) or (wxMINOR_VERSION != 4) or (
+            wxRELEASE_NUMBER < 2):
+            wxMessageBox("You seem to have an invalid version\n"
+                         "(%s) of wxWidgets installed. This\n"
+                         "program needs version 2.4.x, where\n"
+                         "x >= 2." % wxVERSION_STRING, "Error", wxOK)
+            sys.exit()
+
         if 0:
             betatest.check()
             
