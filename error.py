@@ -6,7 +6,7 @@ class NaspError(Exception):
         self.msg = msg
 
     def __str__(self):
-        return repr(self.msg)
+        return str(self.msg)
 
 class ConfigError(NaspError):
     def __init__(self, msg):

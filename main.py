@@ -91,7 +91,7 @@ class Screenplay:
         if len(self.lines) != len(other.lines):
             return False
 
-        for i in range(len(self.lines)):
+        for i in xrange(len(self.lines)):
             if self.lines[i] != other.lines[i]:
                 return False
 
@@ -110,8 +110,21 @@ class Screenplay:
             return 0
 
     def replace(self):
-        for i in range(len(self.lines)):
+        for i in xrange(len(self.lines)):
             self.lines[i].replace()
+
+    # this is ~8x faster than the generic deepcopy, which makes a
+    # noticeable difference at least on an Athlon 1.3GHz (0.06s versus
+    # 0.445s)
+    def __deepcopy__(self, memo):
+        sp = Screenplay()
+        l = sp.lines
+        
+        for i in xrange(len(self.lines)):
+            ln = self.lines[i]
+            l.append(Line(ln.lb, ln.type, ln.text))
+
+        return sp
             
 class MyPanel(wxPanel):
 
@@ -197,45 +210,96 @@ class MyCtrl(wxControl):
             # used to keep track that element type only changes after a
             # LB_LAST line.
             prevType = None
-            
-            i = 0
+
+            # remove newlines
             for i in range(len(lines)):
-                str = util.fixNL(lines[i]).rstrip("\n")
+                lines[i] = util.fixNL(lines[i]).rstrip("\n")
 
-                if len(str) == 0:
-                    continue
+            if len(lines) < 3:
+                raise MiscError("File has too few lines to be a valid"
+                                " screenplay file")
 
-                if len(str) < 2:
-                    raise MiscError("Line %d has invalid syntax" % (i + 1))
+            key, version = self.parseConfigLine(lines[0])
+            if not key or (key != "Version"):
+                raise MiscError("File doesn't seem to be a proper"
+                                " screenplay file.")
 
-                lb = config.text2lb(str[0])
-                type = config.text2linetype(str[1])
-                text = str[2:]
+            if version != "1":
+                raise MiscError("File uses fileformat version '%s',\n"
+                                "while this version of the program only"
+                                " supports version '1'." % version)
 
-                if prevType and (type != prevType):
-                    raise MiscError("Line %d has invalid element type" %
-                                    (i + 1))
-                
-                line = Line(lb, type, text)
-                sp.lines.append(line)
+            key, charset = self.parseConfigLine(lines[1])
+            if not key or (key != "Character-Set"):
+                raise MiscError("File doesn't seem to be a proper"
+                                " screenplay file.")
 
-                if lb != config.LB_LAST:
-                    prevType = type
+            if charset != "ISO-8859-1":
+                raise MiscError("File is coded in character set '%s'\n"
+                                "while this version of the program only"
+                                " supports ISO-8859-1." % charset)
+            
+            # did we encounter unknown element types
+            unknownTypes = False
+            
+            for i in range(2, len(lines)):
+                s = lines[i]
+
+                if len(s) < 2:
+                    raise MiscError("Line %d is too short." % (i + 1))
+
+                if s[0] == "#":
+                    key, val = self.parseConfigLine(s)
+                    if not key:
+                        raise MiscError("Line %d has invalid syntax for"
+                            " config line" % (i + 1))
+                    
+                    # TODO: handle different config values once we have some
+                    
                 else:
-                    prevType = None
+                    lb = config.text2lb(s[0], False)
+                    type = config.text2linetype(s[1], False)
+                    text = s[2:]
+
+                    if lb == None:
+                        raise MiscError("Line %d has invalid linebreak type" %
+                             (i + 1))
+
+                    # convert unknown types into ACTION
+                    if type == None:
+                        type = config.ACTION
+                        unknownTypes = True
+                    
+                    if prevType and (type != prevType):
+                        raise MiscError("Line %d has invalid element type" %
+                             (i + 1))
+
+                    line = Line(lb, type, text)
+                    sp.lines.append(line)
+
+                    if lb != config.LB_LAST:
+                        prevType = type
+                    else:
+                        prevType = None
 
             if len(sp.lines) == 0:
                 raise MiscError("Empty file.")
 
             if sp.lines[-1].lb != config.LB_LAST:
                 raise MiscError("Last line doesn't end an element")
-            
+
             self.clearVars()
             self.sp = sp
             self.setFile(fileName)
             self.makeBackup()
             self.paginate()
 
+            if unknownTypes:
+                wxMessageBox("Warning: Screenplay contained unknown\n"
+                             "element types; these have been converted\n"
+                             "to Action elements.", "Warning",
+                             wxOK, mainFrame)
+                
             return True
 
         except NaspError, e:
@@ -255,6 +319,8 @@ class MyCtrl(wxControl):
                 f = open(fileName, "wb")
 
                 try:
+                    f.write("#Version 1\n")
+                    f.write("#Character-Set ISO-8859-1\n")
                     f.writelines(output)
                 finally:
                     f.close()
@@ -321,7 +387,7 @@ class MyCtrl(wxControl):
 
     def makeBackup(self):
         self.backup = copy.deepcopy(self.sp)
-        
+
     def setFile(self, fileName):
         self.fileName = fileName
         if fileName:
@@ -331,13 +397,24 @@ class MyCtrl(wxControl):
             
         mainFrame.setTabText(self.panel, self.fileNameDisplay)
         mainFrame.setTitle(self.fileNameDisplay)
-            
+
+    # parse a line containing a config-value in the format detailed in
+    # fileformat.txt. line must have newline stripped from the end
+    # already. returns a (key, value) tuple. if line doesn't match the
+    # format, (None, None) is returned.
+    def parseConfigLine(self, s):
+        m = re.match("#([a-zA-Z0-9\-]+) (.*)", s)
+
+        if m:
+            return (m.group(1), m.group(2))
+        else:
+            return (None, None)
+        
     def updateTypeCb(self):
         util.reverseComboSelect(mainFrame.typeCb,
                                 self.sp.lines[self.line].type)
 
     def reformatAll(self):
-        #t = time.time()
         line = 0
         while 1:
             line += self.rewrapPara(line)
@@ -345,9 +422,6 @@ class MyCtrl(wxControl):
                 break
 
         self.makeLineVisible(self.line)
-
-        #t = time.time() - t
-        #print "took %.3f seconds" % t
 
     def fillAutoComp(self):
         ls = self.sp.lines
@@ -1898,7 +1972,7 @@ class MyFrame(wxFrame):
         # than in misc.pyo
         misc.isEval = False
         misc.licensedTo = "Evaluation version."
-        misc.version = "0.43"
+        misc.version = "0.6"
         misc.copyright = "© Oskusoft 2004. All rights reserved."
 
         hsizer.Add(self.typeCb)

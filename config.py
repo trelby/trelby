@@ -330,21 +330,21 @@ class ConfigGui:
     def getType(self, type):
         return self.types[type]
 
-def _conv(dict, key):
+def _conv(dict, key, raiseException = True):
     val = dict.get(key)
-    if val == None:
+    if (val == None) and raiseException:
         raise ConfigError("key '%s' not found from '%s'" % (key, dict))
     
     return val
 
-def text2lb(str):
-    return _conv(_text2lb, str)
+def text2lb(str, raiseException = True):
+    return _conv(_text2lb, str, raiseException)
 
 def lb2text(lb):
     return _conv(_lb2text, lb)
 
-def text2linetype(str):
-    return _conv(_text2linetype, str)
+def text2linetype(str, raiseException = True):
+    return _conv(_text2linetype, str, raiseException)
 
 def linetype2text(type):
     return _conv(_linetype2text, type)
