@@ -236,8 +236,13 @@ class MyCtrl(wxControl):
             for i in range(0, len(ls)):
                 line = ls[i]
                 tcfg = cfg.getType(line.type)
+                if tcfg.isCaps:
+                    text = line.text.upper()
+                else:
+                    text = line.text
+
                 output.append(self.sp.getEmptyLinesBefore(i) * "\n" +
-                              " " * tcfg.indent + line.text + "\n")
+                              " " * tcfg.indent + text + "\n")
         
             try:
                 f = open(fileName, "wt")
