@@ -1,4 +1,16 @@
 ﻿#Version 1
+#Title-String 0.000000,100.000000,12,c,Courier,by
+#Title-String 0.000000,108.470000,12,c,Courier,Osku Salerma
+#Title-String 67.000000,200.000000,12,,Courier,Sample script for 
+#Title-String 0.000000,80.000000,32,cb,Times,THE KOALA INCIDENT
+#Title-String 112.000000,200.000000,12,,Times,Blyte
+#Title-String 123.000000,200.000000,12,,Courier,program.
+#Title-String 160.000000,208.000000,12,c,Courier,All rights reserved.
+#Title-Page 
+#Title-String 80.000000,100.000000,12,,Courier,'Tis not in mortals to command success,
+#Title-String 80.000000,104.230000,12,,Courier,But we'll do more, Sempronius, we'll
+#Title-String 80.000000,108.460000,12,,Courier,deserve it.
+#Title-String 123.000000,116.930000,12,,Courier,Joseph Addison -- Cato
 #Header-String 1,0,r,${PAGE}.
 #Header-Empty-Lines 1
 .\ext. stonehenge - night
@@ -15,9 +27,9 @@
 >.of the trucks are full and not a single stone is left in the
 ..ground.
 >.The men pile back into the trucks and start off into the
->.storm. Momentarily they are gone, and in place of the
->.familiar Stonehenge monument is just a few holes in the
-..ground, rapidly filling with snow.
+>.storm. In a moment they are gone, and in place of the
+>.Stonehenge monument is just a few holes in the ground,
+..rapidly filling with snow.
 .\ext. airport - night
 >.A small local airport, with the storm still raging. Not a
 >.person or a light can be seen, it being obviously abandoned
@@ -37,8 +49,8 @@
 .\int. airplane cargo bay - night
 >.Up until now everyone has been wearing heavy winter clothes
 >.and face masks, which they now take off. JASON, in his
->.thirties, climbs on top of a stone pile and addresses the
-..crowd.
+>.thirties, and obviously in command, climbs on top of the
+..stone pile and addresses the crowd.
 ._JASON
 >:I want to congratulate you all on a
 >:job well done. It's now three in
@@ -88,21 +100,22 @@
 >:do. Sarah, get on the radio and
 >:start signalling to the boat that
 >:we're coming. Eddie, get the
->:equipment ready. I'll go mingle
->:with the masses so that they don't
-.:get suspicious.
-.\INT. AIRPLANE CARGO BAY - NIGHT - later
+>:equipment ready. I'll go entertain
+>:the others so that they don't get
+.:suspicious.
+.\INT. AIRPLANE CARGO BAY - ONE HOUR later
 >.The party is in full swing. People are drunk and getting
 ..more so. Jason is sitting with a group of people.
-._man #1
->:So what are we gonna do next, melt
-.:the Eiffel tower?
+._CREW MEMBER
+>:So what are we gonna do next, steal
+>:the Eiffel tower and sell it for
+.:scrap metal?
 ..Laughter all around. Jason looks at his watch and gets up.
 .\INT. AIRPLANE COCKPIT - NIGHT
 >.All four of them are back in the cockpit. Sarah and Kevin
 >.are in the pilots' seats, strapped in tightly. Jason and
->.Eddie sit in the other two seats behind them and grab ahold
-..of whatever they can.
+>.Eddie sit in two foldout seats behind them and grab hold of
+..whatever they can.
 ._KEVIN
 .:Here goes nothing...
 ..Kevin presses a button on the console.
@@ -111,24 +124,18 @@
 .\INT. AIRPLANE CARGO BAY - NIGHT
 >.A whistling sound grows into a roar as the cargo door keeps
 >.opening. Items start to tumble toward it, and people are
->.starting to panic. The two people who were sitting by the
->.door are swept out into the air, their screams cut off in an
-..instant as they disappear.
+>.starting to panic. Two people by the door are swept out into
+..the air, their screams cut off as they disappear.
 ._Crew member
 >:Those fuckers are trying to dump
->:us! Cut the control cables and use
-.:the manual override!
+.:us! Cut the control cables!
 >.Gunfire erupts as people start randomly firing at the walls.
 >.Eventually someone hits something, as there's a spark and
 ..the opening of the cargo door is halted.
->.Someone is holding on to a cargo net with his other hand and
->.tapping furiously on a keypad with his other hand, near the
-..cargo door.
-..He succeeds, as the cargo door starts to close.
 ._CREW MEMBER
 .:Kill the motherfuckers!
->.The crowd starts running toward the front of the cargo bay,
-..waving guns and yelling threats.
+>.The crowd starts running toward the cockpit, waving guns and
+..yelling threats.
 .\INT. AIRPLANE COCKPIT - NIGHT
 >.They've been watching the events in the cargo bay on a
 >.monitor. They don't appear remotely worried about this turn
@@ -147,9 +154,8 @@
 >.look up to see the huge mass of stones beginning to slide
 >.toward them. They try to escape to the sides of the cargo
 >.bay, but it's no use, the stones come down in a huge
->.avalanche, crushing everything in their path, including the
->.cargo door, which is obliterated as hundreds of tonnes of
-..stone strike it.
+>.avalanche crushing everything in the way, including the
+..cargo door which is ripped off.
 .\EXT. OUTSIDE THE AIRPLANE - NIGHT
 >.It's a stunning sight as the huge plane is climbing on a 45
 >.degree angle, with a trail of stones tumbling out of its
@@ -169,8 +175,7 @@
 >.Suddenly, huge blocks of stone rain down on the boat,
 ..smashing it to pieces.
 .\INT. AIRPLANE COCKPIT - NIGHT
->.Satisfied smiles all around. Kevin eases his stick forward
-..until the plane is flying normally again.
+..Kevin eases his stick forward until the plane is level.
 ._JASON
 >:That wraps up phase one of the
 >:operation. Is everything ready for
@@ -181,27 +186,30 @@
 .:The raft's ready.
 ._KEVIN
 >:We're 5 minutes from the jump-off
-.:point.
+.:point and the autopilot is set.
 ._JASON
 .:Good. In your places, everyone.
 .\EXT. OUTSIDE THE AIRPLANE - NIGHT
 >.A bright yellow package drops from the airplane with 4
->.people holding on to it. They tumble down, waiting until the
->.last possible moment before opening their parachutes. In the
-..background, the plane crashes into the ocean.
+>.people holding on to it. Within seconds of their exit the
+..plane starts a steep dive.
+>.The package and the people tumble down. They wait until the
+>.last possible moment before releasing their grip on the
+..package and opening their parachutes.
+..In the background, the plane crashes into the ocean.
 .\Ext. Ocean - night
 >.The package hits the water and is submerged. A few seconds
 ..later, a rapidly inflating liferaft appears.
->.The people lang into the water in of their parachutes. They
-..dispose of them and start to swim toward the liferaft.
+>.The people land into the water in their parachutes. They
+..dispose of them and swim toward the liferaft.
 .\Int. Liferaft - night
 >.They're all aboard, taking off their clothes. When they're
 >.all naked, Sarah gathers the wet clothes, throws them out,
 >.and closes the entrance to the tent-like liferaft. The men
 >.openly admire Sarah's body, as she opens a storage locker
-..and takes dry clothes for everyone which they then put on.
+>.and takes out dry clothes for everyone which they then put
+..on.
 ._EDDIE
-.((to Sarah)
 .:I know a great way to warm up.
 ._SARAH
 >:Sorry, I got over the "older men"
@@ -215,7 +223,7 @@
 .:myself.
 .\EXT. OCEAN - NIGHT
 >.The liferaft bobs in the waves, utterly alone in the world.
->.Or maybe not so alone after all, for a giant submarine
+>.Or maybe not so alone after all, for a small submarine
 ..surfaces just beside it.
 .\Int. Submarine - night
 >.The gang of four descend from the tower. The captain is
@@ -223,5 +231,72 @@
 ._Captain
 >:Welcome aboard. I trust everything
 .:went well?
-._KEVIN
+._jason
+.:Splendid. How many men do you have?
+._CAPTAIN
+>:A skeleton crew of only five
+>:handpicked men who I'd trust with
+.:my life, just as you requested.
+._jason
+>:That's exactly what you're doing.
+>:If word of this ever leaks out, we
+>:both know I'm going to find you, no
+>:matter how long it takes.
+.:Understood?
+._CAPTAIN
 .:Yes.
+._jason
+.:Ok. Now let's get going.
+.\Map of the atlantic ocean
+>.A red line marks their progress southwest until it reaches
+..Antigua.
+.\EXT. SUBMARINE - NIGHT
+>.The four of them are naked once more. They slip into the
+>.water and start swimming towards a nearby island, pushing a
+>.floating package of clothes before them. As soon as they're
+..gone, the submarine disappears beneath the waves.
+.\Ext. Rabbit island - beach - night
+>.They reach the deserted beach. They open the package, take
+>.out towels and dry themselves, then dress in clothes from
+..the package. They start walking away.
+.\EXT. RABBIT ISLAND - harbor - dawn
+>.The rest of the gang looks on as Jason talks with a local
+>.fisherman. Eventually he turns around and waves them over,
+..as the fisherman goes to his boat.
+._jason
+>:He's agreed to take us to the
+.:mainland for 250 dollars.
+._KEVIN
+.:250 dollars???
+._JASON
+>:That's 250 East Caribbean dollars,
+.:about a hundred US dollars.
+..They get on the boat too and it starts off.
+.\Map of the american continents
+>.The red line snakes from Antigua to Dominican Republic, from
+..there to Miami, and finally to Los Angeles.
+.\ext. jason's house - day
+>.A luxurious mansion in the hills of Los Angeles, with a huge
+..swimming pool in the backyard.
+.\int. jason'S HOuse - living room - DAY
+>.The four of them are finally back home after their long
+>.return trip. They're sitting around sipping drinks and
+>.watching the TV, which is showing a special report about the
+..Stonehenge incident.
+._Reporter
+>:We still have no idea who did this.
+>:The British government is
+>:investigating several ransom
+>:demands about the stones, but so
+.:far they all appear to be fake.
+>.The TV screen shows the monument site as it now is: A bunch
+>.of holes in the ground, surrounded by yellow tape and police
+..keeping people out.
+._REPORTER
+>:What possible motive could anyone
+>:have to destroy one of the oldest
+>:artifacts in the world? We don't
+.:know.
+..Jason turns the TV off.
+._JASON
+.:They'll soon learn, won't they?
