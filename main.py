@@ -597,13 +597,42 @@ class MyCtrl(wxControl):
     def setFile(self, fileName):
         self.fileName = fileName
         if fileName:
-            self.fileNameDisplay = os.path.basename(fileName)
+            self.setDisplayName(os.path.basename(fileName))
         else:
-            self.fileNameDisplay = "<new>"
-            
-        mainFrame.setTabText(self.panel, self.fileNameDisplay)
+            self.setDisplayName("untitled")
+
+        self.setTabText()
         mainFrame.setTitle(self.fileNameDisplay)
 
+    def setDisplayName(self, name):
+        i = 1
+        while 1:
+            if i == 1:
+                tmp = name
+            else:
+                tmp = name + "<%d>" % i
+
+            matched = False
+            
+            for c in mainFrame.getCtrls():
+                if c == self:
+                    continue
+
+                if c.fileNameDisplay == tmp:
+                    matched = True
+
+                    break
+
+            if not matched:
+                break
+
+            i += 1
+            
+        self.fileNameDisplay = tmp
+
+    def setTabText(self):
+        mainFrame.setTabText(self.panel, self.fileNameDisplay)
+        
     # parse a line containing a config-value in the format detailed in
     # fileformat.txt. line must have newline stripped from the end
     # already. returns a (key, value) tuple. if line doesn't match the
@@ -621,8 +650,6 @@ class MyCtrl(wxControl):
                                 self.sp.lines[self.line].lt)
 
     def reformatAll(self, makeVisible = True):
-        #t = time.time()
-        
         line = 0
         while 1:
             line += self.rewrapPara(line)
@@ -631,9 +658,6 @@ class MyCtrl(wxControl):
 
         if makeVisible:
             self.makeLineVisible(self.line)
-
-        #t = time.time() - t
-        #print "reformat took %.4f seconds" % t
         
     def fillAutoComp(self):
         ls = self.sp.lines
@@ -1291,8 +1315,6 @@ class MyCtrl(wxControl):
             line -= 1
 
     def paginate(self):
-        #t = time.time()
-        
         self.pages = [-1]
         self.pagesNoAdjust = [-1]
 
@@ -1431,9 +1453,6 @@ class MyCtrl(wxControl):
             lastBreak = i
 
             i += 1
-
-        #t = time.time() - t
-        #print "paginate took %.4f seconds" % t
 
     def removeDanglingElement(self, line, lt, lastBreak):
         while (self.sp.lines[line].lt == lt) and\
@@ -2225,8 +2244,6 @@ class MyCtrl(wxControl):
 
     def OnPaint(self, event):
         ls = self.sp.lines
-
-        #t = time.time()
         dc = wxBufferedPaintDC(self, self.screenBuf)
 
         size = self.GetClientSize()
@@ -2345,9 +2362,6 @@ class MyCtrl(wxControl):
 
         if self.autoComp and (cursorY > 0):
             self.drawAutoComp(dc, cursorY, ccfg)
-            
-        #t = time.time() - t
-        #print "paint took %.4f seconds" % t
 
     def drawAutoComp(self, dc, cursorY, tcfg):
         offset = 5
@@ -2582,7 +2596,8 @@ class MyFrame(wxFrame):
 
     def createNewPanel(self):
         newPanel = MyPanel(self.notebook, -1)
-        self.notebook.AddPage(newPanel, "<new>", True)
+        self.notebook.AddPage(newPanel, "", True)
+        newPanel.ctrl.setTabText()
         newPanel.ctrl.SetFocus()
 
         return newPanel
