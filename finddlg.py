@@ -89,6 +89,8 @@ class FindDlg(wxDialog):
         EVT_BUTTON(self, replaceAll.GetId(), self.OnReplaceAll)
         EVT_BUTTON(self, self.moreButton.GetId(), self.OnMore)
 
+        EVT_TEXT(self, self.findEntry.GetId(), self.OnText)
+        
         EVT_CHAR(panel, self.OnCharMisc)
         EVT_CHAR(self.findEntry, self.OnCharEntry)
         EVT_CHAR(self.replaceEntry, self.OnCharEntry)
@@ -114,6 +116,11 @@ class FindDlg(wxDialog):
     def OnMore(self, event):
         self.showExtra(not self.useExtra)
 
+    def OnText(self, event):
+        if self.ctrl.searchLine != -1:
+            self.ctrl.searchLine = -1
+            self.ctrl.updateScreen()
+        
     def OnCharEntry(self, event):
         self.OnChar(event, True, False)
 
@@ -183,8 +190,9 @@ class FindDlg(wxDialog):
 
         return self.elementMap[type]
         
-    def OnFind(self, event = None):
-        self.getParams()
+    def OnFind(self, event = None, autoFind = False):
+        if not autoFind:
+            self.getParams()
 
         value = self.findEntry.GetValue()
         if not self.matchCase:
@@ -263,13 +271,18 @@ class FindDlg(wxDialog):
             if found:
                 self.ctrl.line = line
                 self.ctrl.column = res
-                self.ctrl.makeLineVisible(line)
                 self.ctrl.searchLine = line
                 self.ctrl.searchColumn = res
-                self.ctrl.updateScreen()
+
+                if not autoFind:
+                    self.ctrl.makeLineVisible(line)
+                    self.ctrl.updateScreen()
 
                 break
             else:
+                if autoFind:
+                    break
+                
                 if fullSearch:
                     wxMessageBox("Search finished without results.",
                                  "No matches", wxOK, self)
@@ -294,11 +307,62 @@ class FindDlg(wxDialog):
                 else:
                     break
 
-        self.ctrl.updateScreen()
-
+        if not autoFind:
+            self.ctrl.updateScreen()
             
-    def OnReplace(self, event = None):
-        print "replace"
+    def OnReplace(self, event = None, autoFind = False):
+        if self.ctrl.searchLine != -1:
+            value = self.replaceEntry.GetValue()
+            ls = self.ctrl.sp.lines
+
+            old = ls[self.ctrl.searchLine].text
+            new = old[0 : self.ctrl.searchColumn] + value +\
+                  old[self.ctrl.searchColumn + self.ctrl.searchWidth:]
+            ls[self.ctrl.searchLine].text = new
+
+            self.ctrl.searchLine = -1
+
+            diff = len(value) - self.ctrl.searchWidth
+
+            if not self.dirUp:
+                self.ctrl.column += self.ctrl.searchWidth + diff
+            else:
+                self.ctrl.column -= 1
+
+                if self.ctrl.column < 0:
+                    self.ctrl.line -= 1
+
+                    if self.ctrl.line < 0:
+                        self.ctrl.line = 0
+                        self.ctrl.column = 0
+                        
+                        self.ctrl.searchLine = 0
+                        self.ctrl.searchColumn = 0
+                        self.ctrl.searchWidth = 0
+                    else:
+                        self.ctrl.column = len(ls[self.ctrl.line].text)
+
+            if diff != 0:
+                self.ctrl.findDlgDidReplaces = True
+            
+            self.OnFind(autoFind = autoFind)
+
+            return True
+        else:
+            return False
             
     def OnReplaceAll(self, event = None):
-        print "replace all"
+        self.getParams()
+
+        if self.ctrl.searchLine == -1:
+            self.OnFind(autoFind = True)
+
+        count = 0
+        while self.OnReplace(autoFind = True):
+            count += 1
+
+        if count != 0:
+            self.ctrl.makeLineVisible(self.ctrl.line)
+            self.ctrl.updateScreen()
+        
+        wxMessageBox("Replaced %d matches" % count, "Results", wxOK, self)

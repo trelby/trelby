@@ -773,6 +773,11 @@ class MyCtrl(wxControl):
         self.searchLine = -1
         self.searchColStart = -1
         self.searchWidth = -1
+
+        if hasattr(self, "findDlgDidReplaces"):
+            del self.findDlgDidReplaces
+            self.reformatAll()
+            
         self.updateScreen()
         
     def OnSave(self):
