@@ -1,7 +1,5 @@
 -file changed warnings for open,new,exit
 
--ctrl+home/ctrl+end to go to start/end of script
-
 -mouse scroll wheel support
 
 -left mouse click to position cursor at that point
@@ -15,8 +13,6 @@
 -help system, at least supported keyboard commands
 
 -file revert
-
--cursor should be hollow when writing area doesn't have keyboard focus
 
 -show column that the cursor is in (is this really needed?)
 

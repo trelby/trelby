@@ -421,6 +421,7 @@ class MyCtrl(wxControl):
     def OnTypeCombo(self, event):
         type = mainFrame.typeCb.GetClientData(mainFrame.typeCb.GetSelection())
         self.convertCurrentTo(type)
+        self.SetFocus()
         self.updateScreen()
 
     def OnScroll(self, event):
