@@ -112,6 +112,8 @@ class MyCtrl(wxControl):
         EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
         EVT_LEFT_DOWN(self, self.OnLeftDown)
         EVT_LEFT_DCLICK(self, self.OnLeftDown)
+        EVT_RIGHT_DOWN(self, self.OnRightDown)
+        EVT_MOTION(self, self.OnMotion)
         EVT_CHAR(self, self.OnKeyChar)
 
         self.createEmptySp()
@@ -520,15 +522,27 @@ class MyCtrl(wxControl):
         size = self.GetClientSize()
         self.screenBuf = wxEmptyBitmap(size.width, size.height)
     
-    def OnLeftDown(self, event):
+    def OnLeftDown(self, event, mark = False):
         pos = event.GetPosition()
         self.line = self.pos2line(pos)
         tcfg = cfg.getTypeCfg(self.sp.lines[self.line].type)
         x = pos.x - tcfg.indent * cfg.fontX - cfg.offsetX
         self.column = clamp(x / cfg.fontX, 0,
                             len(self.sp.lines[self.line].text))
+
+        if mark and (self.mark == -1):
+            self.mark = self.line
+            
         self.updateScreen()
 
+    def OnRightDown(self, event):
+        self.mark = -1
+        self.updateScreen()
+        
+    def OnMotion(self, event):
+        if event.LeftIsDown():
+            self.OnLeftDown(event, mark = True)
+        
     def OnTypeCombo(self, event):
         type = mainFrame.typeCb.GetClientData(mainFrame.typeCb.GetSelection())
         self.convertCurrentTo(type)
