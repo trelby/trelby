@@ -13,6 +13,7 @@ import namesdlg
 import pdf
 import pml
 import splash
+import titles
 import util
 
 import codecs
@@ -94,11 +95,15 @@ class Line:
 class Screenplay:
     def __init__(self):
         self.lines = []
+        self.titles = titles.Titles()
 
     def __eq__(self, other):
         if len(self.lines) != len(other.lines):
             return False
 
+        if self.titles != other.titles:
+            return False
+        
         for i in xrange(len(self.lines)):
             if self.lines[i] != other.lines[i]:
                 return False
@@ -127,7 +132,9 @@ class Screenplay:
     def __deepcopy__(self, memo):
         sp = Screenplay()
         l = sp.lines
-        
+
+        sp.titles = copy.deepcopy(self.titles)
+
         for i in xrange(len(self.lines)):
             ln = self.lines[i]
             l.append(Line(ln.lb, ln.type, ln.text))
@@ -417,6 +424,8 @@ class MyCtrl(wxControl):
         doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
                            cfg.paperType)
 
+        sp.titles.generatePages(doc)
+        
         ch_x = util.points2x(fs)
         ch_y = util.points2y(fs)
         
