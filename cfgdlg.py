@@ -913,7 +913,8 @@ class MiscPanel(wxPanel):
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
 
     def OnBrowse(self, event):
-        dlg = wxDirDialog(cfgFrame, defaultPath = self.cfg.scriptDir)
+        dlg = wxDirDialog(cfgFrame, defaultPath = self.cfg.scriptDir,
+                          style = wxDD_NEW_DIR_BUTTON)
 
         if dlg.ShowModal() == wxID_OK:
             self.scriptDirEntry.SetValue(dlg.GetPath())
