@@ -653,12 +653,13 @@ class MyCtrl(wxControl):
                     cfg.marginLeft + tcfg.indent * ch_x,
                     cfg.marginTop + (y / 10.0) * ch_y, fs, typ))
 
-                if (tcfg.lt == config.SCENE) and cfg.pdfShowSceneNumbers and\
-                   self.isFirstLineOfElem(i):
-                    scene += 1
+                if (tcfg.lt == config.SCENE) and self.isFirstLineOfElem(i):
                     sceneContNr = 0
-                    self.addSceneNumbers(pg, "%d" % scene, tcfg.width, y,
-                        ch_x, ch_y, fs)
+                    
+                    if cfg.pdfShowSceneNumbers:
+                        scene += 1
+                        self.addSceneNumbers(pg, "%d" % scene, tcfg.width,
+                                             y, ch_x, ch_y, fs)
                     
                 if cfg.pdfShowLineNumbers:
                     pg.add(pml.TextOp("%02d" % (i - start + 1),
