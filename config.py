@@ -140,7 +140,7 @@ class Config:
             
             # interval in seconds between automatic pagination (0 = disabled)
             # TODO: change this to 5 or something
-            "paginateInterval" : (5, 0, 60),
+            "paginateInterval" : (0, 0, 60),
 
             # paper size
             "paperHeight" : (297.0, 100.0, 1000.0),
