@@ -93,6 +93,15 @@ class GlobalData:
         self.confFilename = misc.confPath + "/default.conf"
         self.stateFilename = misc.confPath + "/state"
 
+        if "--conf" in sys.argv:
+            i = sys.argv.index("--conf")
+
+            if (i + 1) >= len(sys.argv):
+                wxMessageBox("Missing argument to --conf parameter.",
+                             "Error")
+            else:
+                self.confFilename = sys.argv[i + 1]
+
         self.makeConfDir()
         
     def makeConfDir(self):
