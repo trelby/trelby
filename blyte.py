@@ -118,7 +118,7 @@ class GlobalData:
 
         v.addInt("posX", 0, "PositionX", -20, 9999)
         v.addInt("posY", 0, "PositionY", -20, 9999)
-        v.addInt("width", 700, "Width", 500, 9999)
+        v.addInt("width", 750, "Width", 500, 9999)
         v.addInt("height", 830, "Height", 300, 9999)
         v.addBool("isDraft", False, "IsDraftMode")
         v.addStr("license", "", "License")
@@ -3544,11 +3544,11 @@ class MyFrame(wxFrame):
 
         # this is hidden here because it's somewhat harder to find here
         # than in misc.pyo
-        misc.version = "1.0beta1"
+        misc.version = "1.0beta2"
 
         # slightly obfuscated in a desperate attempt to fool at least some
         # people...
-        misc.releaseDate = datetime.date(500 * 4 + 4, 5 + 5, 12 + 11)
+        misc.releaseDate = datetime.date(500 * 4 + 4, 5 + 6, 14 + 13 + 1)
 
         misc.license = None
 
