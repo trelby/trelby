@@ -29,6 +29,7 @@ ID_REFORMAT = 4
 ID_FILE_NEW = 5
 ID_FILE_SETTINGS = 6
 ID_FILE_CLOSE = 7
+ID_FILE_REVERT = 8
 
 def clamp(val, min, max):
     if val < min:
@@ -493,6 +494,11 @@ class MyCtrl(wxControl):
         self.topLine = 0
         self.setFile(None)
         
+    def OnRevert(self, event):
+        if self.fileName:
+            self.loadFile(self.fileName)
+            self.updateScreen()
+            
     def OnSave(self, event):
         if self.fileName:
             self.saveFile(self.fileName)
@@ -774,6 +780,7 @@ class MyFrame(wxFrame):
         fileMenu.Append(ID_FILE_SAVE, "&Save\tCTRL-S")
         fileMenu.Append(ID_FILE_SAVE_AS, "Save &As...")
         fileMenu.Append(ID_FILE_CLOSE, "&Close")
+        fileMenu.Append(ID_FILE_REVERT, "&Revert")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_SETTINGS, "Se&ttings...")
         fileMenu.AppendSeparator()
@@ -827,6 +834,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FILE_SAVE, self.OnSave)
         EVT_MENU(self, ID_FILE_SAVE_AS, self.OnSaveAs)
         EVT_MENU(self, ID_FILE_CLOSE, self.OnClose)
+        EVT_MENU(self, ID_FILE_REVERT, self.OnRevert)
         EVT_MENU(self, ID_FILE_SETTINGS, self.OnSettings)
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
@@ -883,6 +891,9 @@ class MyFrame(wxFrame):
         self.notebook.DeletePage(self.notebook.GetSelection())
         if self.notebook.GetPageCount() == 0:
             self.OnNew()
+
+    def OnRevert(self, event):
+        self.panel.ctrl.OnRevert(event)
 
     def OnSettings(self, event):
         self.panel.ctrl.OnSettings(event)

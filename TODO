@@ -14,8 +14,6 @@
 
 -help system, at least supported keyboard commands
 
--file revert
-
 -undo/redo support
 
 -config dialogs
