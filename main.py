@@ -210,6 +210,7 @@ class MyCtrl(wxControl):
         self.pages = [-1, 0]
         self.pagesNoAdjust = [-1, 0]
         self.maxAutoCompItems = 10
+        self.lastPaginated = 0.0
         
     def createEmptySp(self):
         self.clearVars()
@@ -1651,6 +1652,8 @@ class MyCtrl(wxControl):
 
             i += 1
 
+        self.lastPaginated = time.time()
+        
     def removeDanglingElement(self, line, lt, lastBreak):
         ls = self.sp.lines
         startLine = line
@@ -2651,6 +2654,11 @@ class MyCtrl(wxControl):
             self.fillAutoComp()
 
         if doUpdate:
+            if cfg.paginateInterval > 0:
+                now = time.time()
+                if (now - self.lastPaginated) >= cfg.paginateInterval:
+                    self.paginate()
+                
             self.makeLineVisible(self.line)
             self.updateScreen()
 
@@ -3041,12 +3049,6 @@ class MyFrame(wxFrame):
 
         EVT_CLOSE(self, self.OnCloseWindow)
 
-        # FIXME: reset timer on settings change
-        if cfg.paginateInterval != 0:
-            self.timer = wxTimer(self)
-            EVT_TIMER(self, -1, self.OnTimer)
-            self.timer.Start(cfg.paginateInterval * 1000)
-
         self.Layout()
         
     def init(self):
@@ -3151,9 +3153,6 @@ class MyFrame(wxFrame):
 
     loadConfigFile = staticmethod(loadConfigFile)
     
-    def OnTimer(self, event):
-        self.OnPaginate()
-
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
         # override it and do nothing

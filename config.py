@@ -329,8 +329,7 @@ class Config:
         v.addInt("mouseWheelLines", 4, "MouseWheelLines", 1, 50)
 
         # interval in seconds between automatic pagination (0 = disabled)
-        # TODO: change this to 5 or something
-        v.addInt("paginateInterval", 0, "PaginateInterval", 0, 60)
+        v.addInt("paginateInterval", 10, "PaginateInterval", 5, 60)
 
         # paper size
         v.addFloat("paperHeight", 297.0, "Paper/Height", 100.0, 1000.0)
