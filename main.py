@@ -297,6 +297,9 @@ class MyCtrl(wxControl):
             # did we encounter unknown element types
             unknownTypes = False
 
+            # did we encounter unknown config lines
+            unknownConfigs = False
+
             for i in range(1, len(lines)):
                 s = lines[i]
 
@@ -328,6 +331,9 @@ class MyCtrl(wxControl):
                     elif key == "Header-Empty-Lines":
                         sp.headers.emptyLinesAfter = util.str2int(val, 1, 0, 5)
 
+                    else:
+                        unknownConfigs = True
+                        
                 else:
                     lb = config.text2lb(s[0], False)
                     lt = config.text2lt(s[1], False)
@@ -372,6 +378,14 @@ class MyCtrl(wxControl):
                              "These have been converted to Action elements.",
                              "Warning",
                              wxOK, mainFrame)
+
+            if unknownConfigs:
+                wxMessageBox("Screenplay contained unknown information.\n"
+                             "This probably means that the file was created\n"
+                             "with a newer version of this program.\n\n"
+                             "You'll lose that information if you save over\n"
+                             "the existing file.\n",
+                             "Warning", wxOK, mainFrame)
 
             if invalidChars:
                 wxMessageBox("Screenplay contained characters not in the\n"
