@@ -431,6 +431,8 @@ class PaperPanel(wxPanel):
         wxPanel.__init__(self, parent, id)
         self.cfg = cfg
 
+        self.blockEvents = 1
+        
         self.paperSizes = {
             "A4" : (210.0, 297.0),
             "Letter" : (215.9, 279.4),
@@ -476,39 +478,12 @@ class PaperPanel(wxPanel):
         bsizer = wxStaticBoxSizer(wxStaticBox(panel, -1, "Margins"),
                                   wxHORIZONTAL)
 
-        gsizer = wxFlexGridSizer(4, 3, 5, 5)
+        gsizer = wxFlexGridSizer(4, 5, 5, 5)
 
-        gsizer.Add(wxStaticText(panel, -1, "Top:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.topEntry = wxTextCtrl(panel, -1)
-        gsizer.Add(self.topEntry, 0)
-        self.topLabel = wxStaticText(panel, -1, "mm")
-        gsizer.Add(self.topLabel, 0,
-            wxALIGN_CENTER_VERTICAL | wxADJUST_MINSIZE)
-
-        gsizer.Add(wxStaticText(panel, -1, "Bottom:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.bottomEntry = wxTextCtrl(panel, -1)
-        gsizer.Add(self.bottomEntry, 0)
-        self.bottomLabel = wxStaticText(panel, -1, "mm")
-        gsizer.Add(self.bottomLabel, 0,
-            wxALIGN_CENTER_VERTICAL | wxADJUST_MINSIZE)
-
-        gsizer.Add(wxStaticText(panel, -1, "Left:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.leftEntry = wxTextCtrl(panel, -1)
-        gsizer.Add(self.leftEntry, 0)
-        self.leftLabel = wxStaticText(panel, -1, "mm")
-        gsizer.Add(self.leftLabel, 0,
-            wxALIGN_CENTER_VERTICAL | wxADJUST_MINSIZE)
-
-        gsizer.Add(wxStaticText(panel, -1, "Right:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.rightEntry = wxTextCtrl(panel, -1)
-        gsizer.Add(self.rightEntry, 0)
-        self.rightLabel = wxStaticText(panel, -1, "mm")
-        gsizer.Add(self.rightLabel, 0,
-            wxALIGN_CENTER_VERTICAL | wxADJUST_MINSIZE)
+        self.addMarginCtrl("Top", panel, gsizer)
+        self.addMarginCtrl("Bottom", panel, gsizer)
+        self.addMarginCtrl("Left", panel, gsizer)
+        self.addMarginCtrl("Right", panel, gsizer)
             
         bsizer.Add(gsizer, 0, wxEXPAND | wxALL, 10)
         
@@ -524,8 +499,6 @@ class PaperPanel(wxPanel):
         
         self.SetSizer(vmsizer)
 
-        self.blockEvents = True
-        
         idx = self.paperCombo.FindString(self.cfg.paperType)
         if idx != -1:
             self.paperCombo.SetSelection(idx)
@@ -536,14 +509,33 @@ class PaperPanel(wxPanel):
         EVT_TEXT(self, self.widthEntry.GetId(), self.OnMisc)
         EVT_TEXT(self, self.heightEntry.GetId(), self.OnMisc)
         
-        self.cfg2gui()
+        self.cfg2mm()
+        self.cfg2inch()
         
-        EVT_TEXT(self, self.topEntry.GetId(), self.OnMisc)
-        EVT_TEXT(self, self.bottomEntry.GetId(), self.OnMisc)
-        EVT_TEXT(self, self.leftEntry.GetId(), self.OnMisc)
-        EVT_TEXT(self, self.rightEntry.GetId(), self.OnMisc)
+        self.blockEvents -= 1
 
-        self.blockEvents = False
+    def addMarginCtrl(self, name, panel, sizer):
+        sizer.Add(wxStaticText(panel, -1, name + ":"), 0,
+                  wxALIGN_CENTER_VERTICAL)
+        
+        entry = wxTextCtrl(panel, -1)
+        sizer.Add(entry, 0)
+        label = wxStaticText(panel, -1, "mm")
+        sizer.Add(label, 0, wxALIGN_CENTER_VERTICAL)
+
+        entry2 = wxTextCtrl(panel, -1)
+        sizer.Add(entry2, 0, wxLEFT, 20)
+        label2 = wxStaticText(panel, -1, "inch")
+        sizer.Add(label2, 0, wxALIGN_CENTER_VERTICAL)
+
+        setattr(self, name.lower() + "EntryMm", entry)
+        setattr(self, name.lower() + "LabelMm", label)
+        
+        setattr(self, name.lower() + "EntryInch", entry2)
+        setattr(self, name.lower() + "LabelInch", label2)
+
+        EVT_TEXT(self, entry.GetId(), self.OnMarginMm)
+        EVT_TEXT(self, entry2.GetId(), self.OnMarginInch)
         
     def OnPaperCombo(self, event):
         w, h = self.paperCombo.GetClientData(self.paperCombo.GetSelection())
@@ -564,40 +556,57 @@ class PaperPanel(wxPanel):
         self.heightEntry.SetValue(str(h))
                          
     def OnMisc(self, event):
-        if self.blockEvents:
+        if self.blockEvents > 0:
             return
 
-        self.entry2float(self.topEntry, "marginTop", 0.0)
-        self.entry2float(self.bottomEntry, "marginBottom", 0.0)
-        self.entry2float(self.leftEntry, "marginLeft", 0.0)
-        self.entry2float(self.rightEntry, "marginRight", 0.0)
         self.entry2float(self.widthEntry, "paperWidth", 100.0)
         self.entry2float(self.heightEntry, "paperHeight", 100.0)
-
-        self.mm2inchAll()
     
-    def cfg2gui(self):
-        self.topEntry.SetValue(str(self.cfg.marginTop))
-        self.bottomEntry.SetValue(str(self.cfg.marginBottom))
-        self.leftEntry.SetValue(str(self.cfg.marginLeft))
-        self.rightEntry.SetValue(str(self.cfg.marginRight))
+    def OnMarginMm(self, event):
+        if self.blockEvents > 0:
+            return
 
-        self.mm2inchAll()
-
-    def mm2inchAll(self):
-        self.mm2inch(self.cfg.marginTop, self.topLabel)
-        self.mm2inch(self.cfg.marginBottom, self.bottomLabel)
-        self.mm2inch(self.cfg.marginLeft, self.leftLabel)
-        self.mm2inch(self.cfg.marginRight, self.rightLabel)
-
-        self.Layout()
+        self.blockEvents += 1
         
-    def mm2inch(self, val, ctrl):
-        ctrl.SetLabel("mm (%.3f inch)" % (val / 25.4))
+        self.entry2float(self.topEntryMm, "marginTop", 0.0)
+        self.entry2float(self.bottomEntryMm, "marginBottom", 0.0)
+        self.entry2float(self.leftEntryMm, "marginLeft", 0.0)
+        self.entry2float(self.rightEntryMm, "marginRight", 0.0)
+
+        self.cfg2inch()
+
+        self.blockEvents -= 1
         
-    def entry2float(self, entry, name, minVal):
+    def OnMarginInch(self, event):
+        if self.blockEvents > 0:
+            return
+
+        self.blockEvents += 1
+
+        self.entry2float(self.topEntryInch, "marginTop", 0.0, 25.4)
+        self.entry2float(self.bottomEntryInch, "marginBottom", 0.0, 25.4)
+        self.entry2float(self.leftEntryInch, "marginLeft", 0.0, 25.4)
+        self.entry2float(self.rightEntryInch, "marginRight", 0.0, 25.4)
+
+        self.cfg2mm()
+
+        self.blockEvents -= 1
+
+    def cfg2mm(self):
+        self.topEntryMm.SetValue(str(self.cfg.marginTop))
+        self.bottomEntryMm.SetValue(str(self.cfg.marginBottom))
+        self.leftEntryMm.SetValue(str(self.cfg.marginLeft))
+        self.rightEntryMm.SetValue(str(self.cfg.marginRight))
+
+    def cfg2inch(self):
+        self.topEntryInch.SetValue(str(self.cfg.marginTop / 25.4))
+        self.bottomEntryInch.SetValue(str(self.cfg.marginBottom / 25.4))
+        self.leftEntryInch.SetValue(str(self.cfg.marginLeft / 25.4))
+        self.rightEntryInch.SetValue(str(self.cfg.marginRight / 25.4))
+
+    def entry2float(self, entry, name, minVal, factor = 1.0):
         try:
-            val = max(minVal, float(entry.GetValue()))
+            val = max(minVal, float(entry.GetValue()) * factor)
         except ValueError:
             val = minVal
 
