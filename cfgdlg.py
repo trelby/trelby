@@ -12,7 +12,7 @@ class CfgDlg(wxDialog):
     def __init__(self, parent, cfg, applyFunc):
         wxDialog.__init__(self, parent, -1, "Config dialog",
                           pos = wxDefaultPosition,
-                          size = (400, 400),
+                          size = (400, 450),
                           style = wxDEFAULT_DIALOG_STYLE)
         self.cfg = cfg
         self.applyFunc = applyFunc
@@ -271,25 +271,10 @@ class ElementsPanel(wxPanel):
 
         gsizer = wxFlexGridSizer(2, 2, 5, 0)
 
-        gsizer.Add(wxStaticText(panel, -1, "Next in tab order:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-
-        self.nextTabCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
-
-        for t in self.cfg.types.values():
-            self.nextTabCombo.Append(t.name, t.type)
-
-        gsizer.Add(self.nextTabCombo, 0)
-
-        gsizer.Add(wxStaticText(panel, -1, "Previous in tab order:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-
-        self.prevTabCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
-
-        for t in self.cfg.types.values():
-            self.prevTabCombo.Append(t.name, t.type)
-
-        gsizer.Add(self.prevTabCombo, 0)
+        self.addTypeCombo("newEnter", "Enter creates", panel, gsizer)
+        self.addTypeCombo("newTab", "Tab creates", panel, gsizer)
+        self.addTypeCombo("nextTab", "Tab switches to", panel, gsizer)
+        self.addTypeCombo("prevTab", "Shift+Tab switches to", panel, gsizer)
 
         vsizer.Add(gsizer, 0, 0)
 
@@ -300,13 +285,25 @@ class ElementsPanel(wxPanel):
         
         self.SetSizer(vmsizer)
 
-        EVT_COMBOBOX(self, self.nextTabCombo.GetId(), self.OnMisc)
-        EVT_COMBOBOX(self, self.prevTabCombo.GetId(), self.OnMisc)
-        
         EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
 
         self.elementsCombo.SetSelection(0)
         self.OnElementCombo()
+
+    def addTypeCombo(self, name, descr, panel, sizer):
+        sizer.Add(wxStaticText(panel, -1, descr + ":"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        combo = wxComboBox(panel, -1, style = wxCB_READONLY)
+
+        for t in self.cfg.types.values():
+            combo.Append(t.name, t.type)
+
+        sizer.Add(combo, 0)
+
+        EVT_COMBOBOX(self, combo.GetId(), self.OnMisc)
+        
+        setattr(self, name + "Combo", combo)
 
     def OnKillFocus(self, event):
         self.OnMisc()
@@ -335,6 +332,10 @@ class ElementsPanel(wxPanel):
         tcfg.indent = util.getSpinValue(self.indentEntry)
         tcfg.width = util.getSpinValue(self.widthEntry)
 
+        tcfg.newTypeEnter = self.newEnterCombo.GetClientData(
+            self.newEnterCombo.GetSelection())
+        tcfg.newTypeTab = self.newTabCombo.GetClientData(
+            self.newTabCombo.GetSelection())
         tcfg.nextTypeTab = self.nextTabCombo.GetClientData(
             self.nextTabCombo.GetSelection())
         tcfg.prevTypeTab = self.prevTabCombo.GetClientData(
@@ -357,6 +358,8 @@ class ElementsPanel(wxPanel):
         self.indentEntry.SetValue(tcfg.indent)
         self.widthEntry.SetValue(tcfg.width)
 
+        util.reverseComboSelect(self.newEnterCombo, tcfg.newTypeEnter)
+        util.reverseComboSelect(self.newTabCombo, tcfg.newTypeTab)
         util.reverseComboSelect(self.nextTabCombo, tcfg.nextTypeTab)
         util.reverseComboSelect(self.prevTabCombo, tcfg.prevTypeTab)
 
