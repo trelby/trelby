@@ -17,13 +17,14 @@ class CommandsDlg(wxDialog):
 <b>Mouse:</b>
 
 Left click             Position cursor
-Left click + drag      Select area
+Left click + drag      Select text
 Right click            Unselect
 
-<b>Keyboard:</b>
+<b>Keyboard commands:</b>
 
 Left/Right/Up/Down     Move
 Home/End               Move to start/end of line
+CTRL + Up/Down         Move one scene up/down
 Page up / Page down    Move one page up/down
 CTRL + Home/End        Move to start/end of script
 
@@ -37,8 +38,11 @@ SHIFT + TAB            Change element to previous style
 
 SHIFT/CTRL + ENTER     Insert forced linebreak
 
-CTRL + SPACE           Set mark
+CTRL + SPACE           Set start of selection
+CTRL + A               Select current scene
 ESCAPE                 Unselect
+
+CTRL + F               Find / Replace
 
 Alt + S                Change element to scene heading
 Alt + A                Change element to action
@@ -46,8 +50,6 @@ Alt + C                Change element to character
 Alt + P                Change element to parenthetical
 Alt + D                Change element to dialogue
 Alt + T                Change element to transition
-
-<b>Menu shortcuts:</b>
 
 CTRL + O               Open file
 CTRL + S               Save file
