@@ -189,7 +189,7 @@ def isWordBoundary(c):
     if len(c) != 1:
         return True
 
-    # FIXME: this is broken for ISO-8859-1 characters
+    c = unicode(c, "ISO-8859-1")
     if not c.isalnum():
         return True
 
