@@ -3100,11 +3100,10 @@ class MyCtrl(wxControl):
             self.mark = None
 
         # debug stuff
-        # FIXME: enable these when --test is on
-#         elif (kc < 256) and (chr(kc) == "å"):
-#             self.loadFile("default.blyte")
-#         elif (kc < 256) and (chr(kc) == "¤"):
-#             pass
+        elif misc.isTest and (kc < 256) and (chr(kc) == "å"):
+            self.loadFile("sample.blyte")
+        elif misc.isTest and (kc < 256) and (chr(kc) == "¤"):
+            pass
 
         elif util.isValidInputChar(kc):
             char = chr(kc)
@@ -4028,7 +4027,7 @@ class MyApp(wxApp):
         # if we're on linux and running a released version, remove all
         # ~/.oskusoft-tmp/*.pyo files now, we've already loaded them all,
         # and we don't want them lying around for the user to stumble on.
-        if misc.isUnix and "--test" not in sys.argv:
+        if misc.isUnix and not misc.isTest:
             tmpDir = os.environ["HOME"] + "/.oskusoft-tmp"
             os.chdir(tmpDir)
             os.system("rm -f *.pyo")
@@ -4086,7 +4085,7 @@ class MyApp(wxApp):
         
         self.SetTopWindow(mainFrame)
 
-        if "--test" not in sys.argv:
+        if not misc.isTest:
             win = splash.SplashWindow(mainFrame, 2500)
             win.Show()
             win.Raise()

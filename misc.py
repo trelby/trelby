@@ -6,10 +6,12 @@ import sys
 from wxPython.wx import *
 
 def init():
-    global isWindows, isUnix, progPath, confPath, tmpPrefix
+    global isWindows, isUnix, isTest, progPath, confPath, tmpPrefix
 
     # prefix used for temp files
     tmpPrefix = "oskusoft-blyte-tmp-"
+
+    isTest = "--test" in sys.argv
     
     isWindows = False
     isUnix = False
@@ -19,7 +21,7 @@ def init():
     else:
         isUnix = True
 
-    if "--test" in sys.argv:
+    if isTest:
         progPath = "."
         confPath = ".blyte"
     else:
