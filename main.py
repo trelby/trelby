@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
@@ -2114,7 +2113,8 @@ class MyApp(wxApp):
         
         return True
 
-
-global myApp
-myApp = MyApp(0)
-myApp.MainLoop()
+def main():
+    global myApp
+    
+    myApp = MyApp(0)
+    myApp.MainLoop()
