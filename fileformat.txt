@@ -10,8 +10,8 @@ file's first line must contain the "Version" config value.
 
 Config values:
 
-"Version". Required. Value: (digit)+. The fileformat version that the file
-uses. Currently only version 1 exists.
+"Version". Required. Value: integer >= 0. The fileformat version that the
+file uses. Currently only version 1 exists.
 
 "Title-Page". Value: None. Starts a new title page.
 
@@ -20,7 +20,7 @@ pages exist yet, creates one. Example:
 
  0.000000,70.000000,24,cb,Helvetica,text here
 
- Format is: xpos,ypos,fontsize,style-flags,font,text
+ Format is: xpos,ypos,fontsize,flags,font,text
 
   'xpos' and 'ypos' are floating point values, giving the offset in
   millimeters of the upper-left corner of the text string from the
@@ -28,7 +28,7 @@ pages exist yet, creates one. Example:
 
   'fontsize' is font size in points, e.g. 1/72 inch units.
 
-  'style-flags' can contain any combination of the following characters:
+  'flags' contains any combination of the following characters:
 
    c: Text is centered horizontally on the page. In this case xpos is not
    used for anything.
@@ -38,7 +38,33 @@ pages exist yet, creates one. Example:
   'font' is the font name. Currently supported are Courier, Helvetica and
   Times (Times-Roman).
 
-  'text' is simply the text string.
+  'text' is the text string.
+
+"Header-String". Adds a new header string. Example:
+
+ 1,0,r,${PAGE}.
+
+ Format is: line,xoff,flags,text
+
+ 'line' is the 1-based line number.
+
+ 'xoff' is the number of characters by which the string is offsetted in
+ the horizontal direction. Can be negative.
+
+ 'flags' contains:
+
+  Any combination of the following characters:
+
+   b, i, u: Text is bold / italic / underlined.
+
+  One of the following characters:
+
+   l, c, r: Alignment is left / centered / right.
+
+  'text' is the text string.
+
+"Header-Empty-Lines". Value: integer >= 0. If there are header lines, this
+is the number of empty lines between headers and actual script contents.
 
 
 Normal lines:
@@ -88,6 +114,11 @@ converted to Action, and a warning given to user about this.
 An example screenplay using this format:
 
 ﻿#Version 1
+#Title-String 0.000000,70.000000,24,cb,Helvetica,UNTITLED SCREENPLAY
+#Title-String 0.000000,85.460000,12,c,Courier,by
+#Title-String 0.000000,93.930000,12,c,Courier,Anonymous Writer
+#Header-String 1,0,r,${PAGE}.
+#Header-Empty-Lines 1
 .\INT. WAREHOUSE - NIGHT
 >.JIM and JASON, two men in their thirties, are standing in
 >.the middle of an empty warehouse. The place looks like it was

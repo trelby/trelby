@@ -8,6 +8,7 @@ import config
 import decode
 import dialoguechart
 import finddlg
+import headers
 import misc
 import namesdlg
 import pdf
@@ -98,14 +99,18 @@ class Line:
         
 class Screenplay:
     def __init__(self):
-        self.lines = []
         self.titles = titles.Titles()
-
+        self.headers = headers.Headers()
+        self.lines = []
+        
     def __eq__(self, other):
         if len(self.lines) != len(other.lines):
             return False
 
         if self.titles != other.titles:
+            return False
+        
+        if self.headers != other.headers:
             return False
         
         for i in xrange(len(self.lines)):
@@ -138,6 +143,7 @@ class Screenplay:
         l = sp.lines
 
         sp.titles = copy.deepcopy(self.titles)
+        sp.headers = copy.deepcopy(self.headers)
 
         for i in xrange(len(self.lines)):
             ln = self.lines[i]
@@ -208,6 +214,7 @@ class MyCtrl(wxControl):
         self.clearVars()
         self.sp = Screenplay()
         self.sp.titles.addDefaults()
+        self.sp.headers.addDefaults()
         self.sp.lines.append(Line(config.LB_LAST, config.SCENE, ""))
         self.setFile(None)
         self.makeBackup()
@@ -313,6 +320,14 @@ class MyCtrl(wxControl):
                         tmp.load(val)
                         sp.titles.pages[-1].append(tmp)
 
+                    elif key == "Header-String":
+                        tmp = headers.HeaderString()
+                        tmp.load(val)
+                        sp.headers.hdrs.append(tmp)
+
+                    elif key == "Header-Empty-Lines":
+                        sp.headers.emptyLinesAfter = util.str2int(val, 1, 0, 5)
+
                 else:
                     lb = config.text2lb(s[0], False)
                     lt = config.text2lt(s[1], False)
@@ -395,6 +410,11 @@ class MyCtrl(wxControl):
             for i in xrange(len(pgs[pg])):
                 output += "#Title-String %s\n" % util.toUTF8(str(pgs[pg][i]))
 
+        for h in self.sp.headers.hdrs:
+            output += "#Header-String %s\n" % util.toUTF8(str(h))
+
+        output += "#Header-Empty-Lines %d\n" % self.sp.headers.emptyLinesAfter
+        
         for i in range(0, len(ls)):
             output += util.toUTF8(str(ls[i]) + "\n")
 
@@ -461,11 +481,8 @@ class MyCtrl(wxControl):
             y = 0
 
             if p != 1:
-                pg.add(pml.TextOp("%d." % p,
-                    cfg.paperWidth - cfg.marginRight,
-                    cfg.marginTop, fs, align = util.ALIGN_RIGHT))
-
-                y += 2
+                sp.headers.generatePML(pg, str(p), cfg)
+                y += sp.headers.getNrOfLines()
 
                 if self.needsMore(start - 1):
                     pg.add(pml.TextOp(self.getPrevSpeaker(start) + " (cont'd)",
@@ -1270,15 +1287,14 @@ class MyCtrl(wxControl):
         # fast aliases for stuff
         lbl = config.LB_LAST
         ct = cfg.types
+        hdrLines = self.sp.headers.getNrOfLines()
         
         i = 0
         while 1:
             lp = cfg.linesOnPage
 
             if i != 0:
-                # decrease by 2 for every page but the first to account
-                # for the page number
-                lp -= 2
+                lp -= hdrLines
 
                 # decrease by 1 if we have to put a "WHOEVER (cont'd)" on
                 # top of this page.
