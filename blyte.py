@@ -3937,11 +3937,15 @@ class MyFrame(wxFrame):
         dlg.Destroy()
     
     def OnLicenseRelease(self, event):
-        if wxMessageBox("Are you sure you want to release your\n"
-                        "license information, i.e. go back to\n"
-                        "evaluation mode?", "Confirm",
-                        wxYES_NO | wxNO_DEFAULT, self) == wxYES:
-            misc.license = None
+        if misc.license == None:
+            wxMessageBox("You already are in evaluation mode.", "Error",
+                         wxOK, self)
+        else:
+            if wxMessageBox("Are you sure you want to release your\n"
+                            "license information, i.e. go back to\n"
+                            "evaluation mode?", "Confirm",
+                            wxYES_NO | wxNO_DEFAULT, self) == wxYES:
+                misc.license = None
 
     def OnTypeCombo(self, event):
         self.panel.ctrl.OnTypeCombo(event)
