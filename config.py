@@ -542,7 +542,8 @@ class ConfigGui:
                 nfi.SetStyle(wxNORMAL)
 
             nfi.SetUnderlined(t.screen.isUnderlined)
-            
+            nfi.SetEncoding(wxFONTENCODING_ISO8859_1)
+
             tg.font = wxFontFromNativeInfo(nfi)
             self.types[t.lt] = tg
 

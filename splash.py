@@ -41,9 +41,12 @@ class SplashWindow(wxFrame):
         self.textColor = wxColour(0, 0, 0)
 
         if misc.isUnix:
-            self.font = wxFont(12, wxMODERN, wxNORMAL, wxNORMAL)
+            fs = 12
         else:
-            self.font = wxFont(10, wxMODERN, wxNORMAL, wxNORMAL)
+            fs = 10
+            
+        self.font = wxFont(fs, wxMODERN, wxNORMAL, wxNORMAL,
+                           encoding = wxFONTENCODING_ISO8859_1)
 
         if delay != -1:
             self.timer = wxTimer(self)

@@ -252,7 +252,8 @@ def createPixelFont(height, family, style, weight):
     over = 0
     
     while 1:
-        fn = wxFont(fs, family, style, weight)
+        fn = wxFont(fs, family, style, weight,
+                    encoding = wxFONTENCODING_ISO8859_1)
         h = getFontHeight(fn)
         diff = height -h
 
@@ -268,7 +269,8 @@ def createPixelFont(height, family, style, weight):
 
         fs += 2
 
-    return wxFont(selected, family, style, weight)
+    return wxFont(selected, family, style, weight,
+                  encoding = wxFONTENCODING_ISO8859_1)
     
 def reverseComboSelect(combo, clientData):
     for i in range(combo.GetCount()):
