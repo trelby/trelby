@@ -1751,6 +1751,8 @@ class MyCtrl(wxControl):
         
         selBleed = 2
 
+        size = self.GetClientSize()
+        
         dc.SetFont(cfgGui.getType(tcfg.type).font)
 
         show = min(self.maxAutoCompItems, len(self.autoComp))
@@ -1776,6 +1778,12 @@ class MyCtrl(wxControl):
 
         posX = cfg.offsetX + tcfg.indent * cfgGui.fontX
         posY = cursorY + cfg.fontYdelta
+
+        # if the box doesn't fit on the screen in the normal position, put
+        # it above the current line. if it doesn't fit there either,
+        # that's just too bad, we don't support window sizes that small.
+        if (posY + h) > size.height:
+            posY = cursorY - h - 1
         
         dc.SetPen(cfgGui.autoCompPen)
         dc.SetBrush(cfgGui.autoCompBrush)
