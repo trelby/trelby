@@ -789,7 +789,7 @@ class MyCtrl(wxControl):
             s += config.lb2str(ls[i - 1].lb)
             s += ls[i].text
 
-        tmp = screenplay.Line(ls[line2].lb, ls[line2].lt, s)
+        tmp = screenplay.Line(ls[line2].lb, ls[line1].lt, s)
         wrappedLines = self.wrapLine(tmp)
         ls[line1:line2 + 1] = wrappedLines
 
