@@ -5,7 +5,7 @@ class CommandsDlg(wxDialog):
     def __init__(self, parent):
         wxDialog.__init__(self, parent, -1, "Commands",
                           pos = wxDefaultPosition,
-                          size = (550, 600),
+                          size = (650, 600),
                           style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 
         vsizer = wxBoxSizer(wxVERTICAL)
@@ -22,6 +22,8 @@ Right click            Unselect
 
 <b>Keyboard commands:</b>
 
+<b>Editing:</b>
+ 
 Left/Right/Up/Down     Move
 Home/End               Move to start/end of line
 CTRL + Up/Down         Move one scene up/down
@@ -38,16 +40,26 @@ SHIFT + TAB            Change element to previous style
 
 SHIFT/CTRL + ENTER     Insert forced linebreak
 
-CTRL + SPACE           Set start of selection
+CTRL + SPACE           Start selection
 CTRL + A               Select current scene
 ESCAPE                 Unselect
 
 CTRL + F               Find / Replace
 
- (in Find/Replace dialog):
+<b>In Find/Replace dialog:</b>
 
- F                     Find
- R                     Replace
+F                      Find
+R                      Replace
+
+<b>During Auto-Completion:</b>
+
+Up/Down/Page up/       Move selection
+ Page down            
+Enter                  Complete selection, start new element
+End                    Complete selection
+ESCAPE                 Abort auto-completion
+
+<b>Commands:</b>
 
 CTRL + E               Find next error in screenplay
 

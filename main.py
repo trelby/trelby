@@ -170,6 +170,7 @@ class MyCtrl(wxControl):
         self.searchWidth = -1
         self.pages = [-1, 0]
         self.pagesNoAdjust = [-1, 0]
+        self.maxAutoCompItems = 10
         
     def createEmptySp(self):
         self.clearVars()
@@ -1503,25 +1504,43 @@ class MyCtrl(wxControl):
             self.column = 0
             
         elif kc == WXK_END:
+            if self.autoComp:
+                ls[self.line].text = self.autoComp[self.autoCompSel]
+                
             self.column = len(ls[self.line].text)
-
+                
         elif kc == WXK_PRIOR:
-            self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
-                0)
-            self.line = min(self.topLine + 5, len(ls) - 1)
+            if not self.autoComp:
+                self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
+                    0)
+                self.line = min(self.topLine + 5, len(ls) - 1)
+            else:
+                if len(self.autoComp) > self.maxAutoCompItems:
+                    self.autoCompSel = self.autoCompSel - self.maxAutoCompItems
+                    if self.autoCompSel < 0:
+                        self.autoCompSel = len(self.autoComp) - 1
+                
+                doAutoComp = AC_KEEP
             
         elif kc == WXK_NEXT:
-            oldTop = self.topLine
-            
-            self.topLine += self.getLinesOnScreen() - 2
-            if self.topLine >= len(ls):
-                self.topLine = len(ls) - self.getLinesOnScreen() / 2
+            if not self.autoComp:
+                oldTop = self.topLine
 
-            if self.topLine < 0:
-                self.topLine = 0
+                self.topLine += self.getLinesOnScreen() - 2
+                if self.topLine >= len(ls):
+                    self.topLine = len(ls) - self.getLinesOnScreen() / 2
+
+                if self.topLine < 0:
+                    self.topLine = 0
+
+                self.line += self.topLine - oldTop
+                self.line = util.clamp(self.line, 0, len(ls) - 1)
+            else:
+                if len(self.autoComp) > self.maxAutoCompItems:
+                    self.autoCompSel = (self.autoCompSel +
+                        self.maxAutoCompItems) % len(self.autoComp)
                 
-            self.line += self.topLine - oldTop
-            self.line = util.clamp(self.line, 0, len(ls) - 1)
+                doAutoComp = AC_KEEP
             
         elif ev.AltDown() and (kc < 256):
             ch = string.upper(chr(kc))
@@ -1726,12 +1745,15 @@ class MyCtrl(wxControl):
 
     def drawAutoComp(self, dc, cursorY, tcfg):
         offset = 5
+
+        # scroll bar width
         sbw = 10
+        
         selBleed = 2
 
         dc.SetFont(cfgGui.getType(tcfg.type).font)
 
-        show = min(10, len(self.autoComp))
+        show = min(self.maxAutoCompItems, len(self.autoComp))
         doSbw = show < len(self.autoComp)
         
         startPos = (self.autoCompSel / show) * show
