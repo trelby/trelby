@@ -10,10 +10,11 @@ import splash
 import util
 
 import copy
+import os.path
 import re
 import string
+import sys
 import time
-import os.path
 from wxPython.wx import *
 
 #keycodes
@@ -1351,10 +1352,10 @@ class MyApp(wxApp):
         mainFrame.Show(True)
         self.SetTopWindow(mainFrame)
 
-        win = splash.SplashWindow(mainFrame, 5000)
-        win.Show()
-        
-        win.Raise()
+        if "--no-splash" not in sys.argv:
+            win = splash.SplashWindow(mainFrame, 5000)
+            win.Show()
+            win.Raise()
         
         return True
 
