@@ -6,13 +6,13 @@ import util
 
 # show all all dialogue charts as a PDF document
 def show(mainFrame, ctrl, cfg):
-    tmp = DialogueChart(ctrl, cfg)
+    tmp = DialogueChart(ctrl, cfg, 0)
     s = tmp.generate()
 
     util.showTempPDF(s, cfg, mainFrame)
     
 class DialogueChart:
-    def __init__(self, ctrl, cfg):
+    def __init__(self, ctrl, cfg, minPages):
 
         self.cfg = cfg
         
@@ -21,9 +21,6 @@ class DialogueChart:
         # appearances by each character. index = page (0-indexed), value =
         # map of characters speaking on that page
         self.pages = []
-
-        # map of characters
-        self.characters = {}
 
         # dialogue density, 0.0 - 1.0, proportion of dialogue lines on
         # each page
@@ -37,6 +34,7 @@ class DialogueChart:
         totalLines = 0
         name = "UNKNOWN"
         diagTypes = [config.CHARACTER, config.DIALOGUE, config.PAREN]
+        characters = {}
         
         for i in xrange(len(ls)):
             page = ctrl.line2page(i) - 1
@@ -57,7 +55,7 @@ class DialogueChart:
             if (line.lt == config.CHARACTER) and\
                    (line.lb == config.LB_LAST):
                 name = util.upper(line.text)
-                self.characters[name] = None
+                characters[name] = None
                 
             elif line.lt in (config.DIALOGUE, config.PAREN):
                 self.pages[page][name] = None
@@ -76,7 +74,8 @@ class DialogueChart:
         # character info, list of CharInfo objects
         self.cinfo = []
         for v in tmpMap.values():
-            self.cinfo.append(v)
+            if v.pageCnt > minPages:
+                self.cinfo.append(v)
 
         # start Y of page markers
         self.pageY = 20.0
@@ -102,7 +101,7 @@ class DialogueChart:
             self.charY = util.points2y(self.charFs)
 
             # height of chart
-            self.chartHeight = len(self.characters) * self.charY
+            self.chartHeight = len(self.cinfo) * self.charY
 
             if size <= 6:
                 break
