@@ -224,6 +224,19 @@ class ElementsPanel(wxPanel):
         
         vsizer.Add(hsizer, 0, wxBOTTOM, 10)
 
+        hsizer2 = wxBoxSizer(wxHORIZONTAL)
+        
+        hsizer2.Add(wxStaticText(panel, -1, "Empty lines before:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        self.emptyLinesEntry = wxSpinCtrl(panel, -1)
+        self.emptyLinesEntry.SetRange(0, 5)
+        EVT_SPINCTRL(self, self.emptyLinesEntry.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(self.emptyLinesEntry, self.OnKillFocus)
+        hsizer2.Add(self.emptyLinesEntry, 0)
+        
+        vsizer.Add(hsizer2, 0, wxBOTTOM, 20)
+        
         gsizer = wxFlexGridSizer(2, 3, 5, 0)
 
         gsizer.Add(wxStaticText(panel, -1, "Indent:"), 0,
@@ -250,7 +263,7 @@ class ElementsPanel(wxPanel):
         gsizer.Add(wxStaticText(panel, -1, "characters (10 characters"
             " = 1 inch)"), 0, wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
-        vsizer.Add(gsizer, 0, wxBOTTOM, 10)
+        vsizer.Add(gsizer, 0, wxBOTTOM, 20)
 
         gsizer = wxFlexGridSizer(2, 2, 5, 0)
 
@@ -314,6 +327,7 @@ class ElementsPanel(wxPanel):
     def OnMisc(self, event = None):
         tcfg = self.cfg.types[self.type]
 
+        tcfg.emptyLinesBefore = util.getSpinValue(self.emptyLinesEntry)
         tcfg.indent = util.getSpinValue(self.indentEntry)
         tcfg.width = util.getSpinValue(self.widthEntry)
 
@@ -332,8 +346,10 @@ class ElementsPanel(wxPanel):
 
         # stupid wxwindows/wxpython displays empty box if the initial
         # value is zero if we don't do this...
+        self.emptyLinesEntry.SetValue(5)
         self.indentEntry.SetValue(5)
         
+        self.emptyLinesEntry.SetValue(tcfg.emptyLinesBefore)
         self.indentEntry.SetValue(tcfg.indent)
         self.widthEntry.SetValue(tcfg.width)
 
