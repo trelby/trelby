@@ -135,14 +135,188 @@
 	  </variablelist>
 	  
 	</sect1>
-	
+
   </chapter>
   
   <chapter>
 	<title>Basic usage</title>
 
-	<para>This chapter discusses the basic usage of the program.</para>
+	<para>This chapter discusses basic usage of &blyte;.</para>
 
+	<sect1>
+	  <title>Main window</title>
+
+	  <para>The main window has the following parts in it in top-to-bottom
+	  order, after the standard menu bar:</para>
+
+	  <variablelist>
+
+		<varlistentry>
+		  <term>Element style combo box</term>
+		  <listitem>
+
+			<para>This shows the style of the element the cursor is
+			currently positioned in and allows you to change it.</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Script tabs</term>
+		  <listitem>
+
+			<para>Each script gets its own tab, with the tab's name being
+			the filename of each script. You can click on each tab to
+			change the active script to that one.</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Main text area</term>
+		  <listitem>
+
+			<para>This is where the actual script is shown and
+			edited.</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Status bars</term>
+		  <listitem>
+
+			<para>At the bottom is a three-part status bar that shows
+			current page and total page count in the last section, and
+			information about what the Enter/Tab keys would do in the
+			first two sections.</para>
+			
+		  </listitem>
+		</varlistentry>
+		
+	  </variablelist>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Basic editing</title>
+
+	  <sect2>
+		<title>Moving around</title>
+
+		<para>The usual movement keys are available: Up/Down/Left/Right to
+		move around, Home/End to move to start/end of line, Page Up/Page
+		Down to move up/down one page (actually one screenful), and CTRL +
+		Home/End to move to start/end of script.</para>
+
+		<para>CTRL + Up/Down moves one scene up or down.</para>
+	  
+	  </sect2>
+
+	  <sect2>
+		<title>Deleting elements</title>
+
+		<para>The Delete and Backspace keys delete text one character at a
+		time. They also join elements to one another if pressed at,
+		respectively, at the end or at the start of an element. The joined
+		element will always have the style of the preceding
+		element.</para>
+		
+	  </sect2>
+
+	  <sect2>
+		<title>Adding elements and changing their style</title>
+
+		<para>The Enter key will always create a new element. If the
+		cursor is at the end of an element, the new element will be an
+		empty one, otherwise the current element is split at the cursor
+		position.</para>
+
+		<para>The Tab key will create a new element if the cursor is at
+		the end of an element, otherwise it will switch the current
+		element's style. Shift + Tab will always switch the element's
+		style.</para>
+
+		<para>What kind of element Enter/Tab/Shift + Tab will
+		create/switch to is dependent on the current style of the element,
+		and is configurable by the user. These values for Enter/Tab are
+		always shown at the bottom of the window at the status bar.
+		Additionally the Tab section will have a "[change]" at the end if
+		pressing Tab would switch the element's style, not create a new
+		one.</para>
+
+		<para>Other ways to change an element's style are using the combo
+		box at the top of the window, or pressing a short-cut key for each
+		element style. See Help/Commands for a list of the keys.</para>
+
+		<para>Shift + Enter or CTRL + Enter will insert a forced
+		linebreak.</para>
+		
+	  </sect2>
+	  
+	  <sect2>
+		<title>Selecting text</title>
+
+		<para>When selecting text, one end of the selection is always
+		fixed and the other one moves around with the cursor. You can
+		select text by clicking and dragging with the mouse (right-click
+		unselects), or by pressing CTRL + Space which sets the fixed point
+		of the selection at current position and then moving around, or by
+		pressing some movement key together with Shift (e.g. Shift +
+		Up).</para>
+
+		<para>You can select the current scene with CTRL + A.</para>
+
+		<para>After you've selected the desired text, you can the
+		cut/copy/paste commands to move text around, delete it, etc. You
+		can also press Del to simply delete it. Note that this is not
+		undoable in any way.</para>
+		
+	  </sect2>
+
+	  <sect2>
+		<title>Auto-completion</title>
+
+		<para>Auto-completion saves typing in scene/character/transition
+		elements by showing a list of other elements from the script that
+		match the text in the current element. For example, if you've
+		written the characters "MO" in a new character element, you'll see
+		a list of all character elements that start with "MO" and if you
+		want, you can select one of them and that text will complete the
+		current element.</para>
+
+		<para>The auto-completion list only appears after you've written
+		at least one character. If you want to see a list of all possible
+		choices, write a single character and delete it.</para>
+
+		<para>You can move around in the list with the Up/Down/Page
+		up/Page down keys. Pressing Enter will complete the text and start
+		a new element, while pressing End will complete the text but will
+		not start a new element. Pressing ESC will make the list go
+		away.</para>
+		
+	  </sect2>
+
+	  <sect2>
+		<title>Miscellaneous</title>
+
+		<para>When inserting a new empty parenthetical element, "()" will
+		automatically be added to it and the cursor positioned in the
+		middle. Likewise, when switching a parenthetical element to
+		something else, if it only contains "()", it will be replaced by
+		"" (empty). If you write a "(" in an empty dialogue or character
+		element if will switch to a parenthetical element. If you press
+		Enter or Tab at the ending ")" to start a new element, the ")"
+		will stay in the parenthetical.</para>
+
+		<para>If you write "EXT." or "INT." (case doesn't matter) at the
+		start of any element, it will switch to a scene element
+		automatically.</para>
+		
+	  </sect2>
+
+	</sect1>
+	
   </chapter>
 
   <chapter>
@@ -154,7 +328,7 @@
 	<sect1>
 	  <title>File/New,open,save,save as,close,revert</title>
 
-	  <para>These do exactly what you'd expect.</para>
+	  <para>These do what you'd expect them to do.</para>
 	  
 	</sect1>
 
@@ -171,15 +345,14 @@
 	  <title>File/Settings,load,save as</title>
 
 	  <para>'Settings' allows you to edit the various configurable
-	  settings of the program. See chapter FIXME: link here for help on
-	  the settings window.</para>
+	  settings of &blyte;. See <xref linkend="settings"/>.</para>
 	  
 	  <para>&blyte; loads settings from a file named "default.conf" on
 	  startup. You can have as many config files as you want, and use the
 	  load/save as commands to manage them.</para>
 
 	  <para>You can give a "--conf /home/me/someother.conf" command line
-	  parameter to the program to have it start up with some other
+	  parameter to &blyte; to have it start up with some other
 	  configuration file.</para>
 	  
 	</sect1>
@@ -188,7 +361,7 @@
 	  <title>Edit/Cut,Copy,Paste</title>
 
 	  <para>Cut, copy and paste work pretty much the same way as in every
-	  other program. Note that these commands only use the program's own
+	  other program. Note that these commands only use &blyte;'s own
 	  internal clipboard so can't be used for copying text to/from other
 	  programs. For that, see below.</para>
 	  
@@ -218,6 +391,8 @@
 	  replace text. Usually it operates on all element styles, but if you
 	  press the "More" button, you can select the styles it operates on,
 	  which is useful renaming a character and so on.</para>
+
+	  <para>FIXME: document F/R keys.</para>
 	  
 	</sect1>
 
@@ -435,7 +610,7 @@
 
 	  <para>You need two different versions of the same script open to use
 	  'Compare scripts'. Select the older one as the first script and the
-	  newer one as the second script. The program then goes through the
+	  newer one as the second script. &blyte; then goes through the
 	  scripts looking for changes between them and displays the results as
 	  a PDF file.</para>
 
@@ -500,14 +675,21 @@
 	<sect1>
 	  <title>Help/About</title>
 
-	  <para>'About' opens the about screen for the program, showing
-	  information such as the version and the date the program was
+	  <para>'About' opens the about screen for &blyte;, showing
+	  information such as the version and the date this version was
 	  released on.</para>
 	  
 	</sect1>
 	
   </chapter>
 
+  <chapter id="settings">
+	<title>Settings</title>
+
+	<para>FIXME: describe settings.</para>
+	
+  </chapter>
+  
   <chapter>
 	<title>Import and export</title>
 
@@ -560,7 +742,7 @@
 		</itemizedlist>
 
 		<para>Below is a short example of the kind of format best
-		recognized by the program.</para>
+		recognized by &blyte;.</para>
 		
 		<screen>
 EXT. OCEAN - NIGHT
@@ -603,9 +785,9 @@ Something starts beeping.
 	  <para>You can export the script as a PDF file or as a formatted
 	  ASCII text file. Both are found in the File/Export dialog, which
 	  allows you to choose which one to export as. If you export as a text
-	  file, the program will ask whether you want the page markers
-	  included or not. If you're planning on importing the script to some
-	  other program, you shouldn't include them, otherwise you probably
+	  file, &blyte; will ask whether you want the page markers included or
+	  not. If you're planning on importing the script to some other
+	  program, you shouldn't include them, otherwise you probably
 	  should.</para>
 	</sect1>
 	
@@ -615,7 +797,7 @@ Something starts beeping.
 	<title>Reports</title>
 
 	<para>This chapter discusses the various report types &blyte; can
-	  generate.</para>
+	generate.</para>
 
 	<sect1>
 	  <title>Dialogue chart</title>
