@@ -478,14 +478,17 @@ class MyCtrl(wxControl):
         return self.isLastLineOfElem(line) and self.isFirstLineOfElem(line)
         
     def getElemIndexes(self):
-        return (self.getElemFirstIndex(), self.getElemLastIndex())
+        return self.getElemIndexesFromLine(self.line)
 
     def getElemIndexesFromLine(self, line):
         return (self.getElemFirstIndexFromLine(line),
                 self.getElemLastIndexFromLine(line))
 
     def getSceneIndexes(self):
-        top, bottom = self.getElemIndexes()
+        return self.getSceneIndexesFromLine(self.line)
+    
+    def getSceneIndexesFromLine(self, line):
+        top, bottom = self.getElemIndexesFromLine(line)
         ls = self.sp.lines
         
         while 1:
@@ -939,8 +942,27 @@ class MyCtrl(wxControl):
                 self.column = 0
                 
             elif kc == WXK_END:
-                self.line = len(self.sp.lines) - 1
+                self.line = len(ls) - 1
                 self.column = len(ls[self.line].text)
+
+            elif kc == WXK_UP:
+                tmpUp, nothing = self.getSceneIndexes()
+
+                if self.line != tmpUp:
+                    self.line = tmpUp
+                else:
+                    tmpUp -= 1
+                    if tmpUp >= 0:
+                        self.line, nothing = self.getSceneIndexesFromLine(
+                            tmpUp)
+                    
+                self.column = 0
+
+            elif kc == WXK_DOWN:
+                nothing, tmpBottom = self.getSceneIndexes()
+                self.line = min(len(ls) - 1, tmpBottom + 1)
+                self.column = 0
+                
             else:
                 ev.Skip()
                 return
@@ -984,7 +1006,7 @@ class MyCtrl(wxControl):
         elif kc == WXK_PRIOR:
             self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
                 0)
-            self.line = min(self.topLine + 5, len(self.sp.lines) - 1)
+            self.line = min(self.topLine + 5, len(ls) - 1)
             
         elif kc == WXK_NEXT:
             oldTop = self.topLine
