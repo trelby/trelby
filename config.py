@@ -75,6 +75,9 @@ class Config:
 
         # type configs, key = line type, value = Type
         self.types = { }
+
+        # color list, key = color description, value = attribute name
+        self.colors = { }
         
         # vertical distance between rows, in pixels
         self.fontYdelta = 18
@@ -166,16 +169,23 @@ class Config:
         # FIXME: use a different one in Windows
         self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
 
-        self.bgColor = wxColour(204, 204, 204)
-        self.selectedColor = wxColour(128, 192, 192)
-        self.cursorColor = wxColour(205, 0, 0)
-        self.autoCompFgColor = wxColour(0, 0, 0)
-        self.autoCompBgColor = wxColor(249, 222, 99)
-        self.pagebreakColor = wxColour(128, 128, 128)
-
+        self.addColor("textColor", "Text foreground", 0, 0, 0)
+        self.addColor("bgColor", "Text background", 204, 204, 204)
+        self.addColor("selectedColor", "Selection", 128, 192, 192)
+        self.addColor("cursorColor", "Cursor", 205, 0, 0)
+        self.addColor("autoCompFgColor", "Auto-completion Foreground",
+                      0, 0, 0)
+        self.addColor("autoCompBgColor", "Auto-completion Background",
+                      249, 222, 99)
+        self.addColor("pagebreakColor", "Page-break line", 128, 128, 128)
+        
     def getType(self, type):
         return self.types[type]
 
+    def addColor(self, name, descr, r, g, b):
+        setattr(self, name, wxColour(r, g, b))
+        self.colors[descr] = name
+        
 # config stuff that are wxwindows objects, so can't be in normal
 # Config (deepcopy dies)
 class ConfigGui:

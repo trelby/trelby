@@ -22,6 +22,9 @@ class CfgDlg(wxDialog):
         p = ElementsPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Elements")
 
+        p = ColorsPanel(self.notebook, -1, cfg)
+        self.notebook.AddPage(p, "Colors")
+
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
         hsizer.Add(1, 1, 1)
@@ -282,3 +285,69 @@ class ElementsPanel(wxPanel):
 
         util.reverseComboSelect(self.nextTabCombo, tcfg.nextTypeTab)
         util.reverseComboSelect(self.prevTabCombo, tcfg.prevTypeTab)
+
+class ColorsPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        panel = wxPanel(self, -1)
+        
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        self.colorsCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+
+        keys = self.cfg.colors.keys()
+        keys.sort()
+        for k in keys:
+            self.colorsCombo.Append(k, self.cfg.colors[k])
+
+        hsizer.Add(self.colorsCombo, 1)
+
+        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 10)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        btn = wxButton(panel, -1, "Change")
+        EVT_BUTTON(self, btn.GetId(), self.OnChangeColor)
+        hsizer.Add(btn, 0, wxRIGHT, 10)
+        
+        self.sampleBtn = wxButton(panel, -1, "    ")
+        self.sampleBtn.Disable()
+        hsizer.Add(self.sampleBtn, 0)
+        
+        vsizer.Add(hsizer, 0, wxEXPAND)
+
+        panel.SetSizer(vsizer)
+
+        vmsizer = wxBoxSizer(wxVERTICAL)
+        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
+        
+        self.SetSizer(vmsizer)
+
+        EVT_COMBOBOX(self, self.colorsCombo.GetId(), self.OnColorCombo)
+        self.OnColorCombo(None)
+
+    def OnColorCombo(self, event):
+        self.color = self.colorsCombo.GetClientData(self.colorsCombo.
+                                                    GetSelection())
+        self.cfg2gui()
+                         
+    def OnChangeColor(self, event):
+        cd = wxColourData()
+        cd.SetColour(getattr(self.cfg, self.color))
+        dlg = wxColourDialog(self, cd)
+        #dlg.GetColourData().SetChooseFull(True)
+        if dlg.ShowModal() == wxID_OK:
+            setattr(self.cfg, self.color,
+                    dlg.GetColourData().GetColour().Get())
+        dlg.Destroy()
+
+        self.cfg2gui()
+            
+    def cfg2gui(self):
+        self.sampleBtn.SetBackgroundColour(getattr(self.cfg, self.color))
+        self.sampleBtn.Refresh()
+        

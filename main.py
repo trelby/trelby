@@ -951,6 +951,8 @@ class MyCtrl(wxControl):
         dc.SetPen(cfgGui.bgPen)
         dc.DrawRectangle(0, 0, size.width, size.height)
 
+        dc.SetTextForeground(cfg.textColor)
+        
         y = cfg.offsetY
         length = len(ls)
         prevType = -1
@@ -984,7 +986,7 @@ class MyCtrl(wxControl):
                     * cfgGui.fontX, y + cfg.fontYdelta)
                 dc.SetTextForeground(cfgGui.redColor)
                 dc.DrawText(config.lb2text(l.lb), 0, y)
-                dc.SetTextForeground(cfgGui.blackColor)
+                dc.SetTextForeground(cfg.textColor)
 
             if (i != 0) and (self.line2page(i - 1) != self.line2page(i)):
                 dc.SetPen(cfgGui.pagebreakPen)
