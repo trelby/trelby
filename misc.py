@@ -99,30 +99,56 @@ class ScriptChooserDlg(wxDialog):
     def OnCancel(self, event):
         self.EndModal(wxID_CANCEL)
 
-# shows one or two (one is s2 = None) checklistbox widgets with contents
-# from s1 and possibly s2, which are lists of strings. size is the size of
-# the dialog as an (x,y) tuple. btns[12] are bools for whether or not to
-# include helper buttons. port[12] are the portions that the listboxes are
-# given. if OK is pressed, results are stored in res1 and maybe res2 as
-# lists of booleans.
+# CheckBoxDlg below handles lists of these
+class CheckBoxItem:
+    def __init__(self, text, selected = True, cdata = None):
+        self.text = text
+        self.selected = selected
+        self.cdata = cdata
+
+    # return dict which has keys for all selected items' client data.
+    # takes a list of CheckBoxItem's as its parameter. note: this is a
+    # static function.
+    def getClientData(cbil):
+        tmp = {}
+        
+        for i in range(len(cbil)):
+            cbi = cbil[i]
+            
+            if cbi.selected:
+                tmp[cbi.cdata] = None
+
+        return tmp
+    
+    getClientData = staticmethod(getClientData)
+
+# shows one or two (one is cbil2 = None) checklistbox widgets with
+# contents from cbil1 and possibly cbil2, which are lists of
+# CheckBoxItems. size is the size of the dialog as an (x,y) tuple.
+# btns[12] are bools for whether or not to include helper buttons.
+# port[12] are the portions that the listboxes are given. cdata[12] are
+# the optional client data lists. if OK is pressed, the incoming lists'
+# items' selection status will be modified.
 class CheckBoxDlg(wxDialog):
-    def __init__(self, parent, title, size, s1, descr1, btns1, port1 = 1,
-                 s2 = None, descr2 = None, btns2 = None, port2 = None):
+    def __init__(self, parent, title, size, cbil1, descr1, btns1, port1 = 1,
+                 cbil2 = None, descr2 = None, btns2 = None, port2 = None):
         wxDialog.__init__(self, parent, -1, title,
                           style = wxDEFAULT_DIALOG_STYLE)
 
         self.SetClientSizeWH(*size);
         self.Center()
-        
+
         panel = wxPanel(self, -1)
         
         vsizer = wxBoxSizer(wxVERTICAL)
 
-        self.list1 = self.addList(descr1, panel, vsizer, s1, btns1, port1,
+        self.cbil1 = cbil1
+        self.list1 = self.addList(descr1, panel, vsizer, cbil1, btns1, port1,
                                   True)
         
-        if s2 != None:
-            self.list2 = self.addList(descr2, panel, vsizer, s2, btns2,
+        if cbil2 != None:
+            self.cbil2 = cbil2
+            self.list2 = self.addList(descr2, panel, vsizer, cbil2, btns2,
                                       port2, False, 20)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
@@ -177,23 +203,19 @@ class CheckBoxDlg(wxDialog):
         
         tmp = wxCheckListBox(panel, -1)
 
-        for it in items:
-            tmp.Append(it)
+        for i in range(len(items)):
+            it = items[i]
 
-        for i in range(tmp.GetCount()):
-            tmp.Check(i, True)
+            tmp.Append(it.text)
+            tmp.Check(i, it.selected)
             
         sizer.Add(tmp, portion, wxEXPAND)
 
         return tmp
 
-    def storeResults(self, ctrl):
-        tmp = []
-
-        for i in range(ctrl.GetCount()):
-            tmp.append(bool(ctrl.IsChecked(i)))
-
-        return tmp
+    def storeResults(self, cbil, ctrl):
+        for i in range(len(cbil)):
+            cbil[i].selected = bool(ctrl.IsChecked(i))
 
     def setAll(self, ctrl, state):
         for i in range(ctrl.GetCount()):
@@ -220,12 +242,12 @@ class CheckBoxDlg(wxDialog):
         
     def OnToggle2(self, event):
         self.toggle(self.list2)
-        
+
     def OnOK(self, event):
-        self.res1 = self.storeResults(self.list1)
+        self.storeResults(self.cbil1, self.list1)
 
         if hasattr(self, "list2"):
-            self.res2 = self.storeResults(self.list2)
+            self.storeResults(self.cbil2, self.list2)
         
         self.EndModal(wxID_OK)
 

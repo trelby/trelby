@@ -9,34 +9,35 @@ import textwrap
 from wxPython.wx import *
 
 def genCharacterReport(mainFrame, ctrl, cfg):
-    tmp = CharacterReport(ctrl, cfg)
+    report = CharacterReport(ctrl, cfg)
 
-    if not tmp.cinfo:
+    if not report.cinfo:
         wxMessageBox("No characters speaking found.",
                      "Error", wxOK, mainFrame)
 
         return
 
+    charNames = []
+    for s in util.listify(report.cinfo, "name"):
+        charNames.append(misc.CheckBoxItem(s))
+    
     dlg = misc.CheckBoxDlg(mainFrame, "Report type", (300, 400),
-        tmp.infList, "Information to include:", False, 1,
-        util.listify(tmp.cinfo, "name"), "Characters to include:", True, 4)
+        report.inf, "Information to include:", False, 1,
+        charNames, "Characters to include:", True, 4)
 
     ok = False
     if dlg.ShowModal() == wxID_OK:
         ok = True
 
-        for i in range(len(tmp.infList)):
-            tmp.inf[i] = dlg.res1[i]
-
-        for i in range(len(tmp.cinfo)):
-            tmp.cinfo[i].include = dlg.res2[i]
+        for i in range(len(report.cinfo)):
+            report.cinfo[i].include = charNames[i].selected
 
     dlg.Destroy()
 
     if not ok:
         return
     
-    data = tmp.generate()
+    data = report.generate()
 
     util.showTempPDF(data, cfg, mainFrame)
     
@@ -108,8 +109,9 @@ class CharacterReport:
 
         # information types and what to include
         self.INF_BASIC, self.INF_PAGES, self.INF_LOCATIONS = range(3)
-        self.infList = ["Basic information", "Page list", "Location list"]
-        self.inf = [True] * len(self.infList)
+        self.inf = []
+        for s in ["Basic information", "Page list", "Location list"]:
+            self.inf.append(misc.CheckBoxItem(s))
 
     # calculate total sum of self.cinfo.{name} and return it.
     def sum(self, name):
@@ -141,7 +143,7 @@ class CharacterReport:
             self.addText(ci.name, fs = nameFs,
                          style = pml.BOLD | pml.UNDERLINED)
 
-            if self.inf[self.INF_BASIC]:
+            if self.inf[self.INF_BASIC].selected:
                 self.addText("Speeches: %d, Lines: %d (%.2f%%),"
                              " per speech: %.2f" %
                              (ci.speechCnt, ci.lineCnt,
@@ -153,7 +155,7 @@ class CharacterReport:
                                 ci.wordCharCnt / float(ci.wordCnt)))
 
                 
-            if self.inf[self.INF_PAGES]:
+            if self.inf[self.INF_PAGES].selected:
                 pl = ci.getPageList()
                 plWrapped = textwrap.wrap("Pages: %d, list: " % len(ci.pages)
                     + pl, charsToLine, subsequent_indent = "       ")
@@ -161,7 +163,7 @@ class CharacterReport:
                 for l in plWrapped:
                     self.addText(l)
 
-            if self.inf[self.INF_LOCATIONS]:
+            if self.inf[self.INF_LOCATIONS].selected:
                 self.y += 2.5
 
                 tmp = []
