@@ -800,7 +800,7 @@ class MyCtrl(wxControl):
 
             self.rewrap()
             
-        elif (kc == WXK_DELETE) or (kc == KC_CTRL_D):
+        elif kc == WXK_DELETE:
             if self.column == len(ls[self.line].text):
                 if self.line != (len(ls) - 1):
                     if ls[self.line].lb == cfg.LB_AUTO_NONE:
@@ -828,13 +828,13 @@ class MyCtrl(wxControl):
                 ev.Skip()
                 return
                 
-        elif (kc == WXK_LEFT) or (kc == KC_CTRL_B):
+        elif kc == WXK_LEFT:
             self.column = max(self.column - 1, 0)
             
-        elif (kc == WXK_RIGHT) or (kc == KC_CTRL_F):
+        elif kc == WXK_RIGHT:
             self.column = min(self.column + 1, len(ls[self.line].text))
             
-        elif (kc == WXK_DOWN) or (kc == KC_CTRL_N):
+        elif kc == WXK_DOWN:
             if not self.autoComp:
                 if self.line < (len(ls) - 1):
                     self.line += 1
@@ -846,7 +846,7 @@ class MyCtrl(wxControl):
                 self.autoCompSel = (self.autoCompSel + 1) % len(self.autoComp)
                 doAutoComp = AC_KEEP
                         
-        elif (kc == WXK_UP) or (kc == KC_CTRL_P):
+        elif kc == WXK_UP:
             if not self.autoComp:
                 if self.line > 0:
                     self.line -= 1
@@ -858,18 +858,18 @@ class MyCtrl(wxControl):
                     self.autoCompSel = len(self.autoComp) - 1
                 doAutoComp = AC_KEEP
                     
-        elif (kc == WXK_HOME) or (kc == KC_CTRL_A):
+        elif kc == WXK_HOME:
             self.column = 0
             
-        elif (kc == WXK_END) or (kc == KC_CTRL_E):
+        elif kc == WXK_END:
             self.column = len(ls[self.line].text)
 
-        elif (kc == WXK_PRIOR) or (ev.AltDown() and chr(kc) == "v"):
+        elif kc == WXK_PRIOR:
             self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
                 0)
             self.line = min(self.topLine + 5, len(self.sp.lines) - 1)
             
-        elif (kc == WXK_NEXT) or (kc == KC_CTRL_V):
+        elif kc == WXK_NEXT:
             oldTop = self.topLine
             
             self.topLine += self.getLinesOnScreen() - 2

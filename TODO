@@ -1,5 +1,3 @@
--remove useless emacs keyboard commands
-
 -search, search & replace
 
 -"are you sure you want to open multiple copies of the same file?"
@@ -21,6 +19,8 @@ in ")", add it
 -config dialogs
 
  -font
+
+  -test fixed widthness and refuse to use if not
 
  -element styles
 
