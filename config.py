@@ -77,6 +77,7 @@ for k, v in _text2lb.items():
 for k, v in _text2lt.items():
     _lt2text[v] = k
 
+del k, v
 
 class TextType:
     def __init__(self):

@@ -18,11 +18,11 @@ def getTextWidth(text, style, size):
     if widths == -1:
         return 0.6 * size * len(text)
 
-    sum = 0
+    total = 0
     for i in range(len(text)):
-        sum += widths[ord(text[i])]
+        total += widths[ord(text[i])]
 
-    return (sum / 1000.0) * size
+    return (total / 1000.0) * size
     
 _fontMetrics = {
 
