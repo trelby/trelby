@@ -136,6 +136,20 @@ class PDFExporter:
                     else:
                         cont += "S\n"
                     
+                elif op.type == pml.OP_RECT:
+                    if op.lw != -1:
+                        cont += "%f w\n" % self.mm2points(op.lw)
+
+                    cont += "%f %f %f %f re\n" % (
+                        self.x(op.x),
+                        self.y(op.y) - self.mm2points(op.height),
+                        self.mm2points(op.width), self.mm2points(op.height))
+
+                    if op.isFilled:
+                        cont += "f\n"
+                    else:
+                        cont += "S\n"
+
                 elif op.type == pml.OP_PDF:
                     cont += "%s\n" % op.cmds
                     

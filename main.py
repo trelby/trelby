@@ -438,10 +438,9 @@ class MyCtrl(wxControl):
             y = 0
 
             if p != 1:
-                tmp = "%d." % p
-                pg.add(pml.TextOp(tmp,
-                    cfg.paperWidth - cfg.marginRight - len(tmp) * ch_x,
-                    cfg.marginTop, fs))
+                pg.add(pml.TextOp("%d." % p,
+                    cfg.paperWidth - cfg.marginRight,
+                    cfg.marginTop, fs, align = util.ALIGN_RIGHT))
 
                 y += 2
 
@@ -1518,10 +1517,7 @@ class MyCtrl(wxControl):
 
     def OnDialogueChart(self):
         self.paginate()
-
-        dlg = dialoguechart.DialogueChartDlg(mainFrame, self)
-        dlg.ShowModal()
-        dlg.Destroy()
+        dialoguechart.show(mainFrame, self, cfg)
 
     def OnCharMap(self):
         dlg = charmapdlg.CharMapDlg(mainFrame, self)
@@ -1691,8 +1687,8 @@ class MyCtrl(wxControl):
         if not sp:
             return
         
-        pdf = self.generatePDF(sp)
-        util.showTempPDF(pdf, cfg, mainFrame)
+        s = self.generatePDF(sp)
+        util.showTempPDF(s, cfg, mainFrame)
 
     def OnSettings(self):
         dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfg), self.applyCfg)
@@ -2175,8 +2171,9 @@ class MyFrame(wxFrame):
         wxFrame.__init__(self, parent, id, title,
                          wxPoint(100, 100), wxSize(700, 830))
 
+        # FIXME: only do this on unix.
         # automatically reaps zombies
-        signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        #signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         
         self.clipboard = None
         self.showFormatting = False

@@ -144,7 +144,7 @@ class Config:
             self.pdfViewerArgs = [ "-tempFile" ]
         elif wxPlatform == "__WXMSW__":
             self.pdfViewerPath = "C:\\Program Files\\Adobe\\Acrobat 6.0\\Reader\\AcroRd32.exe"
-            self.pdfViewerArgs = ["/p"]
+            self.pdfViewerArgs = [""]
         else:
             self.pdfViewerPath = "not set yet (unknown platform %s)"\
                                  % wxPlatform

@@ -12,10 +12,13 @@
 
 # All measurements in PML are in (floating point) millimeters.
 
+import util
+
 # types of drawing operations
 OP_TEXT = 0
 OP_LINE = 1
-OP_PDF = 2
+OP_RECT = 2
+OP_PDF = 3
 
 # text flags
 NORMAL = 0
@@ -53,11 +56,12 @@ class DrawOp:
     def __init__(self, type):
         self.type = type
 
-# Draw text string 'text', with upper left corner offsetted (x, y) mm from
-# the upper left corner of the page. Font used is 'size'-point Courier,
-# with it possibly being bold/italic/underlined as given by the flags.
+# Draw text string 'text', at position (x, y) mm from the upper left
+# corner of the page. Font used is 'size'-point Courier, with it possibly
+# being bold/italic/underlined as given by the flags.
 class TextOp(DrawOp):
-    def __init__(self, text, x, y, size, flags = NORMAL):
+    def __init__(self, text, x, y, size, flags = NORMAL,
+                 align = util.ALIGN_LEFT, valign = util.VALIGN_TOP):
         DrawOp.__init__(self, OP_TEXT)
 
         self.text = text
@@ -65,6 +69,22 @@ class TextOp(DrawOp):
         self.y = y
         self.size = size
         self.flags = flags
+
+        if align != util.ALIGN_LEFT:
+            w = util.points2x(size) * len(text)
+
+            if align == util.ALIGN_CENTER:
+                self.x -= w / 2
+            elif align == util.ALIGN_RIGHT:
+                self.x -= w
+
+        if valign != util.VALIGN_TOP:
+            h = util.points2y(size)
+            
+            if valign == util.VALIGN_CENTER:
+                self.y -= h / 2
+            elif valign == util.VALIGN_BOTTOM:
+                self.y -= h
 
 # Draw consecutive lines. 'points' is a list of (x, y) pairs (minimum 2
 # pairs) and 'width' is the line width, with 0 being the thinnest possible
@@ -77,6 +97,20 @@ class LineOp(DrawOp):
         self.points = points
         self.width = width
         self.isClosed = isClosed
+
+# Draw a rectangle, possibly filled, with specified lineWidth. (x, y) is
+# position of upper left corner. Line width of filled rectangles is
+# ignored.
+class RectOp(DrawOp):
+    def __init__(self, x, y, width, height, lineWidth, isFilled = False):
+        DrawOp.__init__(self, OP_RECT)
+
+        self.x = x
+        self.y = y
+        self.width = width
+        self.height = height
+        self.lw = lineWidth
+        self.isFilled = isFilled
 
 # Arbitrary PDF commands. Should not have whitespace in the beginning or
 # the end. Should be used only for non-critical things like tweaking line

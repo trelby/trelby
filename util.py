@@ -241,11 +241,11 @@ class TimerDev:
         self.t = time.time() - self.t
         print "%s took %.4f seconds" % (self.msg, self.t)
 
-# show PDF document 'pdf' in an external viewer program. writes out a
+# show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF
 # viewer application. 'mainFrame' is needed as a parent for message boxes
 # in case there are any errors.
-def showTempPDF(pdf, cfg, mainFrame):
+def showTempPDF(pdfData, cfg, mainFrame):
     try:
         try:
             removeTempFiles(cfg.tmpPrefix)
@@ -254,7 +254,7 @@ def showTempPDF(pdf, cfg, mainFrame):
                                             suffix = ".pdf")
 
             try:
-                os.write(fd, pdf)
+                os.write(fd, pdfData)
             finally:
                 os.close(fd)
 
