@@ -247,6 +247,18 @@ def splitToWords(s):
 
     return tmp.encode("ISO-8859-1").split()
 
+# return count of how many 'ch' characters 's' begins with.
+def countInitial(s, ch):
+    cnt = 0
+
+    for i in range(len(s)):
+        if s[i] != ch:
+            break
+
+        cnt += 1
+
+    return cnt
+
 # DrawLine-wrapper that makes it easier when the end-point is just
 # offsetted from the starting point
 def drawLine(dc, x, y, xd, yd):
