@@ -81,6 +81,13 @@ def refreshGuiConfig():
 
     cfgGui = config.ConfigGui(cfg)
 
+# used to keep track of selected area. this marks one of the end-points,
+# while the other one is the current position.
+class Mark:
+    def __init__(self, line, col):
+        self.line = line
+        self.col = col
+    
 class Screenplay:
     def __init__(self):
         self.titles = titles.Titles()
@@ -184,7 +191,7 @@ class MyCtrl(wxControl):
         self.line = 0
         self.column = 0
         self.topLine = 0
-        self.mark = -1
+        self.mark = None
         self.autoComp = None
         self.autoCompSel = -1
         self.searchLine = -1
@@ -1122,8 +1129,8 @@ class MyCtrl(wxControl):
     # it), returns a valid pair (by truncating selection to current
     # end). returns (-1, -1) if no lines marked.
     def getMarkedLines(self):
-        if self.mark != -1:
-            mark = min(len(self.sp.lines) - 1, self.mark)
+        if self.mark:
+            mark = min(len(self.sp.lines) - 1, self.mark.line)
             if self.line < mark:
                 return (self.line, mark)
             else:
@@ -1587,13 +1594,13 @@ class MyCtrl(wxControl):
         self.column = util.clamp(x / cfgGui.fontX, 0,
                             len(self.sp.lines[self.line].text))
 
-        if mark and (self.mark == -1):
-            self.mark = self.line
+        if mark and not self.mark:
+            self.mark = Mark(self.line, -42)
             
         self.updateScreen()
 
     def OnRightDown(self, event):
-        self.mark = -1
+        self.mark = None
         self.updateScreen()
         
     def OnMotion(self, event):
@@ -1861,7 +1868,7 @@ class MyCtrl(wxControl):
             self.updateScreen()
 
     def OnCut(self, doUpdate = True, copyToClip = True):
-        if self.mark != -1:
+        if self.mark:
             marked = self.getMarkedLines()
 
             ls = self.sp.lines
@@ -1885,14 +1892,14 @@ class MyCtrl(wxControl):
                 self.line = len(ls) - 1
                 self.column = len(ls[self.line].text)
             
-            self.mark = -1
+            self.mark = None
 
             if doUpdate:
                 self.makeLineVisible(self.line)
                 self.updateScreen()
         
     def OnCopy(self):
-        if self.mark != -1:
+        if self.mark:
             marked = self.getMarkedLines()
 
             mainFrame.clipboard = copy.deepcopy(self.sp.lines[marked[0] :
@@ -1920,7 +1927,7 @@ class MyCtrl(wxControl):
                 if ls[self.line].lt != ls[self.line + 1].lt:
                     ls[self.line].lb = config.LB_LAST
 
-            self.mark = -1
+            self.mark = None
             self.makeLineVisible(self.line)
             self.updateScreen()
 
@@ -1992,7 +1999,11 @@ class MyCtrl(wxControl):
         self.updateScreen()
         
     def OnSelectScene(self):
-        self.mark, self.line = self.getSceneIndexes()
+        l1, l2 = self.getSceneIndexes()
+        
+        self.mark = Mark(l1, -42)
+
+        self.line = l2
         self.column = 0
 
         self.makeLineVisible(self.line)
@@ -2067,7 +2078,7 @@ class MyCtrl(wxControl):
         self.line = 0
         self.column = 0
         self.topLine = 0
-        self.mark = -1
+        self.mark = None
         
         self.paginate()
         self.updateScreen()
@@ -2177,7 +2188,7 @@ class MyCtrl(wxControl):
             self.rewrapPara()
             
         elif kc == WXK_DELETE:
-            if self.mark == -1:
+            if not self.mark:
                 if self.column == len(ls[self.line].text):
                     if self.line != (len(ls) - 1):
                         if ls[self.line].lb == config.LB_AUTO_NONE:
@@ -2193,7 +2204,7 @@ class MyCtrl(wxControl):
 
         elif ev.ControlDown():
             if kc == WXK_SPACE:
-                self.mark = self.line
+                self.mark = Mark(self.line, -42)
                 
             elif kc == WXK_HOME:
                 self.line = 0
@@ -2334,7 +2345,7 @@ class MyCtrl(wxControl):
                 self.convertCurrentTo(lt)
 
         elif kc == WXK_ESCAPE:
-            self.mark = -1
+            self.mark = None
 
         # FIXME: debug stuff
         elif (kc < 256) and (chr(kc) == "å"):
@@ -2439,7 +2450,7 @@ class MyCtrl(wxControl):
                 if self.isLastLineOfElem(i):
                     util.drawLine(dc, nx - 1, y + cfg.fontYdelta, nw + 2, 0)
 
-            if (self.mark != -1) and self.isLineMarked(i, marked):
+            if self.mark and self.isLineMarked(i, marked):
                 dc.SetPen(cfgGui.selectedPen)
                 dc.SetBrush(cfgGui.selectedBrush)
                 dc.DrawRectangle(0, y, size.width, cfg.fontYdelta)
