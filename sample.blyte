@@ -1,17 +1,17 @@
 ﻿#Version 1
-#Title-String 0.000000,100.000000,12,c,Courier,by
-#Title-String 0.000000,108.470000,12,c,Courier,Osku Salerma
-#Title-String 67.000000,200.000000,12,,Courier,Sample script for 
-#Title-String 0.000000,80.000000,32,cb,Times,THE KOALA INCIDENT
-#Title-String 112.000000,200.000000,12,,Times,Blyte
-#Title-String 123.000000,200.000000,12,,Courier,program.
-#Title-String 160.000000,208.000000,12,c,Courier,All rights reserved.
+#Title-String 0.000000,100.000000,12,c,Courier,,by
+#Title-String 0.000000,108.470000,12,c,Courier,,Osku Salerma
+#Title-String 67.000000,200.000000,12,,Courier,,Sample script for 
+#Title-String 0.000000,80.000000,32,cb,Times,,THE KOALA INCIDENT
+#Title-String 112.000000,200.000000,12,,Times,,Blyte
+#Title-String 123.000000,200.000000,12,,Courier,,program.
+#Title-String 160.000000,208.000000,12,c,Courier,,All rights reserved.
 #Title-Page 
-#Title-String 80.000000,100.000000,12,,Courier,'Tis not in mortals to command success,
-#Title-String 80.000000,104.230000,12,,Courier,But we'll do more, Sempronius, we'll
-#Title-String 80.000000,108.460000,12,,Courier,deserve it.
-#Title-String 123.000000,116.930000,12,,Courier,Joseph Addison -- Cato
-#Header-String 1,0,r,${PAGE}.
+#Title-String 80.000000,100.000000,12,,Courier,,'Tis not in mortals to command success,
+#Title-String 80.000000,104.230000,12,,Courier,,But we'll do more, Sempronius, we'll
+#Title-String 80.000000,108.460000,12,,Courier,,deserve it.
+#Title-String 123.000000,116.930000,12,,Courier,,Joseph Addison -- Cato
+#Header-String 1,0,r,,${PAGE}.
 #Header-Empty-Lines 1
 .\ext. stonehenge - night
 >.A blizzard rages. Snow is everywhere and visibility is
