@@ -69,6 +69,10 @@ class Type:
         self.nextTypeTab = None
         self.prevTypeTab = None
 
+        # auto-completion stuff, only used for some element types
+        self.doAutoComp = False
+        self.autoCompList = []
+
 # type-specific stuff that are wxwindows objects, so can't be in normal
 # Type (deepcopy dies)
 class TypeGui:
@@ -109,8 +113,6 @@ class Config:
         # how many lines to scroll per mouse wheel event
         self.mouseWheelLines = 4
         
-        # page break stuff
-
         # page break indicators to show
         self.pbi = PBI_REAL
         
@@ -123,7 +125,7 @@ class Config:
 
         # leave at least this many dialogue lines on the end of a page
         self.pbDialogueLines = 2
-        
+
         # construct reverse lookup tables
         for k, v in _text2lb.items():
             _lb2text[v] = k
@@ -143,6 +145,7 @@ class Config:
         t.nextType = ACTION
         t.nextTypeTab = ACTION
         t.prevTypeTab = TRANSITION
+        t.doAutoComp = True
         self.types[t.type] = t
 
         t = Type()
@@ -166,6 +169,7 @@ class Config:
         t.nextType = DIALOGUE
         t.nextTypeTab = ACTION
         t.prevTypeTab = ACTION
+        t.doAutoComp = True
         self.types[t.type] = t
 
         t = Type()
@@ -200,6 +204,15 @@ class Config:
         t.nextType = SCENE
         t.nextTypeTab = SCENE
         t.prevTypeTab = CHARACTER
+        t.doAutoComp = True
+        t.autoCompList = [
+            "CUT TO:",
+            "DISSOLVE TO:",
+            "FADE IN:",
+            "FADE OUT",
+            "FADE TO BLACK",
+            "MATCH CUT TO:"
+            ]
         self.types[t.type] = t
 
         if wxPlatform == "__WXGTK__":

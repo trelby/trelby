@@ -349,11 +349,11 @@ class MyCtrl(wxControl):
 
     def fillAutoComp(self):
         ls = self.sp.lines
-        
-        if ls[self.line].type in (config.SCENE, config.CHARACTER,
-                                  config.TRANSITION):
+
+        tcfg = cfg.getType(ls[self.line].type)
+        if tcfg.doAutoComp:
             self.autoComp = self.getMatchingText(ls[self.line].text,
-                                                 ls[self.line].type)
+                                                 tcfg.type)
             self.autoCompSel = 0
 
     # wraps a single line into however many lines are needed, according to
@@ -711,15 +711,16 @@ class MyCtrl(wxControl):
         self.panel.scrollBar.SetScrollbar(self.topLine, pageSize,
                                           len(self.sp.lines), pageSize) 
 
-    # get a list of strings (single-line text elements for now) that
-    # start with 'text' (not case sensitive) and are of of type
-    # 'type'. ignores current line.
+    # get a list of strings (single-line text elements for now) that start
+    # with 'text' (not case sensitive) and are of of type 'type'. also
+    # mixes in the type's default items from config. ignores current line.
     def getMatchingText(self, text, type):
-        ls = self.sp.lines
         text = text.upper()
+        tcfg = cfg.getType(type)
+        ls = self.sp.lines
         matches = {}
         last = None
-        
+
         for i in range(0, len(ls)):
             if (ls[i].type == type) and (ls[i].lb == config.LB_LAST):
                 if i != self.line and ls[i].text.upper().\
@@ -727,6 +728,10 @@ class MyCtrl(wxControl):
                     matches[ls[i].text.upper()] = None
                     if i < self.line:
                         last = ls[i].text.upper()
+
+        for i in tcfg.autoCompList:
+            if i.upper().startswith(text):
+                matches[i.upper()] = None
 
         if last:
             del matches[last]
