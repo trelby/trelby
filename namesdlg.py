@@ -5,12 +5,13 @@ import random
 from wxPython.wx import *
 
 class NamesDlg(wxDialog):
-    def __init__(self, parent, nameArr):
+    def __init__(self, parent, ctrl, nameArr):
         wxDialog.__init__(self, parent, -1, "Character name database",
                           pos = wxDefaultPosition,
                           size = (530, 500),
                           style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 
+        self.ctrl = ctrl
         self.nameArr = nameArr
         
         self.Center()
@@ -53,10 +54,15 @@ class NamesDlg(wxDialog):
         vsizer2 = wxBoxSizer(wxVERTICAL)
         
         searchBtn = wxButton(panel, -1, "Search")
+        EVT_BUTTON(self, searchBtn.GetId(), self.OnSearch)
         vsizer2.Add(searchBtn, 0, wxBOTTOM | wxTOP, 10)
 
         self.searchEntry = wxTextCtrl(panel, -1, style = wxTE_PROCESS_ENTER)
         vsizer2.Add(self.searchEntry)
+
+        tmp = wxButton(panel, -1, "Insert")
+        EVT_BUTTON(self, tmp.GetId(), self.OnInsertName)
+        vsizer2.Add(tmp, 0, wxBOTTOM | wxTOP, 10)
 
         hsizer2.Add(vsizer2, 0, wxRIGHT, 10)
 
@@ -85,7 +91,6 @@ class NamesDlg(wxDialog):
         hsizer.Add(vsizer, 20, wxEXPAND | wxLEFT, 10)
 
         EVT_TEXT_ENTER(self, self.searchEntry.GetId(), self.OnSearch)
-        EVT_BUTTON(self, searchBtn.GetId(), self.OnSearch)
         EVT_BUTTON(self, selectAllBtn.GetId(), self.selectAllTypes)
         EVT_LIST_COL_CLICK(self, self.typeList.GetId(), self.OnHeaderClick)
         
@@ -114,7 +119,21 @@ class NamesDlg(wxDialog):
     
     def CmpType(self, i1, i2):
         return cmp(self.nameArr.typeNames[i1], self.nameArr.typeNames[i2])
-    
+
+    def OnInsertName(self, event):
+        item = self.list.GetNextItem(-1, wxLIST_NEXT_ALL,
+                                     wxLIST_STATE_SELECTED)
+
+        if item == -1:
+            return
+
+        # this seems to return column 0's text, which is lucky, because I
+        # don't see a way of getting other columns' texts...
+        name = self.list.GetItemText(item)
+
+        for ch in name:
+            self.ctrl.OnKeyChar(util.MyKeyEvent(ord(ch)))
+
     def OnSearch(self, event = None):
         l = []
 
@@ -186,7 +205,8 @@ class NamesDlg(wxDialog):
 class MyListCtrl(wxListCtrl):
     def __init__(self, parent, nameArr):
         wxListCtrl.__init__(self, parent, -1,
-            style = wxLC_REPORT | wxLC_VIRTUAL | wxLC_HRULES | wxLC_VRULES)
+            style = wxLC_REPORT | wxLC_VIRTUAL | wxLC_SINGLE_SEL |
+                    wxLC_HRULES | wxLC_VRULES)
 
         self.nameArr = nameArr
 

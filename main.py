@@ -1655,11 +1655,6 @@ class MyCtrl(wxControl):
         self.paginate()
         report.genCharacterReport(mainFrame, self, cfg)
 
-    def OnCharMap(self):
-        dlg = charmapdlg.CharMapDlg(mainFrame, self)
-        dlg.ShowModal()
-        dlg.Destroy()
-
     def OnCompareScripts(self):
         if mainFrame.notebook.GetPageCount() < 2:
             wxMessageBox("You need two at least two scripts open to"
@@ -2969,12 +2964,14 @@ class MyFrame(wxFrame):
 
                 return
 
-        dlg = namesdlg.NamesDlg(self, self.names)
+        dlg = namesdlg.NamesDlg(self, self.panel.ctrl, self.names)
         dlg.ShowModal()
         dlg.Destroy()
 
     def OnCharMap(self, event):
-        self.panel.ctrl.OnCharMap()
+        dlg = charmapdlg.CharMapDlg(self, self.panel.ctrl)
+        dlg.ShowModal()
+        dlg.Destroy()
 
     def OnCompareScripts(self, event):
         self.panel.ctrl.OnCompareScripts()
