@@ -3,8 +3,10 @@
 
 from error import *
 import config
-from cfgdlg import CfgDlg
-from commandsdlg import CommandsDlg
+import cfgdlg
+import commandsdlg
+import namesdlg
+import decode
 import finddlg
 import misc
 import splash
@@ -48,6 +50,7 @@ ID_EDIT_SELECT_SCENE = 16
 ID_EDIT_FIND_ERROR = 17
 ID_EDIT_SHOW_FORMATTING = 18
 ID_FORMAT_PAGINATE = 19
+ID_TOOLS_NAME_DB = 20
 
 def refreshGuiConfig():
     global cfgGui
@@ -1257,7 +1260,7 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnSettings(self):
-        dlg = CfgDlg(mainFrame, copy.deepcopy(cfg), self.applyCfg)
+        dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfg), self.applyCfg)
         if dlg.ShowModal() == wxID_OK:
             self.applyCfg(dlg.cfg)
 
@@ -1729,6 +1732,9 @@ class MyFrame(wxFrame):
         formatMenu.Append(ID_FORMAT_REFORMAT, "&Reformat all")
         formatMenu.Append(ID_FORMAT_PAGINATE, "&Paginate")
 
+        toolsMenu = wxMenu()
+        toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
+
         helpMenu = wxMenu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
         helpMenu.AppendSeparator()
@@ -1738,6 +1744,7 @@ class MyFrame(wxFrame):
         self.menuBar.Append(fileMenu, "&File")
         self.menuBar.Append(editMenu, "&Edit")
         self.menuBar.Append(formatMenu, "F&ormat")
+        self.menuBar.Append(toolsMenu, "Too&ls")
         self.menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(self.menuBar)
 
@@ -1798,6 +1805,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_SHOW_FORMATTING, self.OnShowFormatting)
         EVT_MENU(self, ID_FORMAT_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_FORMAT_PAGINATE, self.OnPaginate)
+        EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
 
@@ -1925,8 +1933,28 @@ class MyFrame(wxFrame):
     def OnPaginate(self, event = None):
         self.panel.ctrl.OnPaginate()
 
+    def OnNameDb(self, event):
+        if not hasattr(self, "names"):
+            self.statusBar.SetStatusText("Opening name database...", 1)
+            wxSafeYield()
+            wxBeginBusyCursor()
+            self.names = decode.readNames("names.dat")
+            wxEndBusyCursor()
+            self.statusBar.SetStatusText("", 1)
+
+            if self.names.count == 0:
+                wxMessageBox("Error opening name database", "Error",
+                             wxOK, self)
+                del self.names
+
+                return
+
+        dlg = namesdlg.NamesDlg(self, self.names)
+        dlg.ShowModal()
+        dlg.Destroy()
+
     def OnHelpCommands(self, event):
-        dlg = CommandsDlg(self)
+        dlg = commandsdlg.CommandsDlg(self)
         dlg.Show()
 
     def OnAbout(self, event):
