@@ -320,10 +320,19 @@ class MyCtrl(wxControl):
         ls = self.sp.lines
         first, last = self.getElemIndexes()
 
-        #print "first - last: %d - %d" % (first, last)
+        if (first == last) and (ls[first].type == cfg.PAREN) and\
+           (ls[first].text == "()"):
+            ls[first].text = ""
+            self.column = 0
+            
         for i in range(first, last + 1):
             ls[i].type = type
 
+        if (first == last) and (ls[first].type == cfg.PAREN) and\
+               (len(ls[first].text) == 0):
+            ls[first].text = "()"
+            self.column = 1
+            
         self.rewrap(startLine = first, toElemEnd = True)
 
     # join lines 'line' and 'line + 1' and position cursor at the join
@@ -375,20 +384,25 @@ class MyCtrl(wxControl):
         return line
     
     def getElemLastIndex(self):
+        return self.getElemLastIndexFromLine(self.line)
+    
+    def getElemLastIndexFromLine(self, line):
         ls = self.sp.lines
 
-        last = self.line
         while 1:
-            if ls[last].lb == cfg.LB_LAST:
+            if ls[line].lb == cfg.LB_LAST:
                 break
-            if (last + 1) >= len(ls):
+            if (line + 1) >= len(ls):
                 break
-            last += 1
+            line += 1
 
-        return last
+        return line
 
     def isFirstLineOfElem(self, line):
         return self.getElemFirstIndexFromLine(line) == self.line
+
+    def isLastLineOfElem(self, line):
+        return self.getElemLastIndexFromLine(line) == self.line
         
     def getElemIndexes(self):
         return (self.getElemFirstIndex(), self.getElemLastIndex())
@@ -703,6 +717,11 @@ class MyCtrl(wxControl):
                 
                 self.rewrap()
             else:
+                if self.isLastLineOfElem(self.line) and\
+                   (ls[self.line].type == cfg.PAREN) and\
+                   (ls[self.line].text[self.column:] == ")"):
+                    self.column += 1
+                    
                 self.splitLine()
                 ls[self.line - 1].lb = cfg.LB_LAST
                 

@@ -12,9 +12,13 @@
 
 -config dialogs
 
+ -font
+
  -element styles
 
- -colors, fonts
+  -underlined, italic, bold, caps
+
+ -colors
 
  -needs config file saving/loading as well
 
@@ -39,12 +43,6 @@ that one, inserts it, and positions cursor at end of line.
 
   -scripts have watermarks in them when exported/printed, like "MADE USING
    NASP EVALUATION COPY"
-
--element style options:
-
- -font (keep in cfg)
-
- -underlined, italic, bold
 
 -import support for:
 
@@ -76,14 +74,5 @@ that one, inserts it, and positions cursor at end of line.
 
   -formatted output of one character's total dialogue
  
--insert "()" when creating a new empty paren-element
-
- -when switching element from paren to something else, if all it
- contains is "()", delete them
-
- -when pressing enter in paren element, if current line after cursor
- only contains ")", keep it in the line instead of including it in the
- new element
-
 -investigate spell checking possibilities (is aspell's database freely
 available?
