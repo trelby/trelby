@@ -141,17 +141,20 @@ class DisplayPanel(wxPanel):
 
         vsizer = wxBoxSizer(wxVERTICAL)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        vsizer.Add(wxStaticText(self, -1, "Screen fonts:"))
+        
+        self.fontsLb = wxListBox(self, -1, size = (300, 100))
 
+        for it in ["fontNormal", "fontBold", "fontItalic", "fontBoldItalic"]:
+            self.fontsLb.Append("", it)
+        self.fontsLb.SetSelection(0)
+        self.updateFontLb()
+        
+        vsizer.Add(self.fontsLb, 0, wxBOTTOM, 10)
+        
         btn = wxButton(self, -1, "Change")
         EVT_BUTTON(self, btn.GetId(), self.OnChangeFont)
-        hsizer.Add(btn, 0)
-
-        self.fontLabel = wxStaticText(self, -1, "")
-        hsizer.Add(self.fontLabel, 0, wxADJUST_MINSIZE |
-                   wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
-
-        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 10)
+        vsizer.Add(btn, 0, wxBOTTOM, 15)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
@@ -167,16 +170,12 @@ class DisplayPanel(wxPanel):
         hsizer.Add(wxStaticText(self, -1, "pixels"), 0,
                    wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 20)
-
-        vsizer.Add(wxStaticText(self, -1, "This font is only used for"
-            " display on screen, printing always"))
-        vsizer.Add(wxStaticText(self, -1, "uses Courier."))
+        vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 15)
 
         self.pbRb = wxRadioBox(self, -1, "Page break lines to show",
             style = wxRA_SPECIFY_COLS, majorDimension = 1,
             choices = [ "None", "Normal", "Normal + unadjusted   " ])
-        vsizer.Add(self.pbRb, 0, wxTOP, 10)
+        vsizer.Add(self.pbRb)
 
         self.cfg2gui()
 
@@ -190,11 +189,14 @@ class DisplayPanel(wxPanel):
         # if we don't call this, the spin entry on wxGTK gets stuck in
         # some weird state
         event.Skip()
-        
+
     def OnChangeFont(self, event):
+        fname = self.fontsLb.GetClientData(self.fontsLb.GetSelection())
+        nfont = getattr(self.cfg, fname)
+        
         fd = wxFontData()
         nfi = wxNativeFontInfo()
-        nfi.FromString(self.cfg.nativeFont)
+        nfi.FromString(nfont)
         font = wxFontFromNativeInfo(nfi)
         fd.SetInitialFont(font)
 
@@ -202,7 +204,7 @@ class DisplayPanel(wxPanel):
         if dlg.ShowModal() == wxID_OK:
             font = dlg.GetFontData().GetChosenFont()
             if util.isFixedWidth(font):
-                self.cfg.nativeFont = font.GetNativeFontInfo().ToString()
+                setattr(self.cfg, fname, font.GetNativeFontInfo().ToString())
 
                 dc = wxMemoryDC()
                 dc.SetFont(font)
@@ -210,7 +212,7 @@ class DisplayPanel(wxPanel):
                 self.cfg.fontYdelta = h1 + descent
                 
                 self.cfg2gui()
-                self.Layout()
+                self.updateFontLb()
             else:
                 wxMessageBox("The selected font is not fixed width and"
                              " can not be used.", "Error", wxOK, cfgFrame)
@@ -221,17 +223,22 @@ class DisplayPanel(wxPanel):
         self.cfg.fontYdelta = util.getSpinValue(self.spacingEntry)
         self.cfg.pbi = self.pbRb.GetSelection()
 
+    def updateFontLb(self):
+        names = ["Normal", "Bold", "Italic", "Bold + Italic"]
+
+        for i in range(len(names)):
+            nfi = wxNativeFontInfo()
+            nfi.FromString(getattr(self.cfg, self.fontsLb.GetClientData(i)))
+
+            ps = nfi.GetPointSize()
+            if misc.isUnix:
+                ps /= 10
+
+            s = nfi.GetFaceName()
+
+            self.fontsLb.SetString(i, "%s: %s, %d" % (names[i], s, ps))
+        
     def cfg2gui(self):
-        nfi = wxNativeFontInfo()
-        nfi.FromString(self.cfg.nativeFont)
-
-        ps = nfi.GetPointSize()
-        if misc.isUnix:
-            ps /= 10
-            
-        self.fontLabel.SetLabel("Font: '%s', Size: %d" %
-                                (nfi.GetFaceName(), ps))
-
         self.spacingEntry.SetValue(self.cfg.fontYdelta)
         self.pbRb.SetSelection(self.cfg.pbi)
         

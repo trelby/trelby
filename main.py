@@ -1790,8 +1790,8 @@ class MyCtrl(wxControl):
         pos = event.GetPosition()
         self.line = self.pos2line(pos)
         tcfg = cfg.getType(self.sp.lines[self.line].lt)
-        x = pos.x - tcfg.indent * cfgGui.fontX - cfg.offsetX
-        self.column = util.clamp(x / cfgGui.fontX, 0,
+        x = pos.x - tcfg.indent * tcfg.fontX - cfg.offsetX
+        self.column = util.clamp(x / tcfg.fontX, 0,
                             len(self.sp.lines[self.line].text))
 
         if mark and not self.mark:
@@ -2702,13 +2702,15 @@ class MyCtrl(wxControl):
             
             l = ls[i]
             tcfg = cfg.getType(l.lt)
-
+            fx = tcfg.fontX
+            fy = tcfg.fontY
+            
             if l.lt == config.NOTE:
                 dc.SetPen(cfgGui.notePen)
                 dc.SetBrush(cfgGui.noteBrush)
 
-                nx = cfg.offsetX + tcfg.indent * cfgGui.fontX - 5
-                nw = tcfg.width * cfgGui.fontX + 10
+                nx = cfg.offsetX + tcfg.indent * fx - 5
+                nw = tcfg.width * fx + 10
                 
                 dc.DrawRectangle(nx, y, nw, cfg.fontYdelta)
 
@@ -2729,24 +2731,24 @@ class MyCtrl(wxControl):
                 dc.SetBrush(cfgGui.selectedBrush)
 
                 dc.DrawRectangle(cfg.offsetX + (tcfg.indent + c1) *
-                    cfgGui.fontX, y, (c2 - c1 + 1) * cfgGui.fontX,
+                    fx, y, (c2 - c1 + 1) * fx,
                     cfg.fontYdelta)
 
             if mainFrame.showFormatting:
                 dc.SetPen(cfgGui.bluePen)
-                util.drawLine(dc, cfg.offsetX + tcfg.indent * cfgGui.fontX,
+                util.drawLine(dc, cfg.offsetX + tcfg.indent * fx,
                     y, 0, cfg.fontYdelta)
                 util.drawLine(dc, cfg.offsetX + (tcfg.indent + tcfg.width)
-                    * cfgGui.fontX, y, 0, cfg.fontYdelta)
+                    * fx, y, 0, cfg.fontYdelta)
 
                 if self.isFirstLineOfElem(i):
                     util.drawLine(dc, cfg.offsetX + tcfg.indent *
-                        cfgGui.fontX, y, tcfg.width * cfgGui.fontX, 0)
+                        fx, y, tcfg.width * fx, 0)
                         
                 if self.isLastLineOfElem(i):
                     util.drawLine(dc, cfg.offsetX + tcfg.indent *
-                        cfgGui.fontX, y + cfg.fontYdelta,
-                        tcfg.width * cfgGui.fontX, 0)
+                        fx, y + cfg.fontYdelta,
+                        tcfg.width * fx, 0)
                         
                 dc.SetTextForeground(cfgGui.redColor)
                 dc.SetFont(cfgGui.getType(config.ACTION).font)
@@ -2773,14 +2775,14 @@ class MyCtrl(wxControl):
                 dc.SetPen(cfgGui.cursorPen)
                 dc.SetBrush(cfgGui.cursorBrush)
                 dc.DrawRectangle(cfg.offsetX + (self.column + tcfg.indent)
-                    * cfgGui.fontX, y, cfgGui.fontX, cfgGui.fontY)
+                    * fx, y, fx, fy)
 
             if i == self.searchLine:
                 dc.SetPen(cfgGui.searchPen)
                 dc.SetBrush(cfgGui.searchBrush)
                 dc.DrawRectangle(cfg.offsetX + (tcfg.indent +
-                    self.searchColumn) * cfgGui.fontX, y,
-                    self.searchWidth * cfgGui.fontX, cfgGui.fontY)
+                    self.searchColumn) * fx, y,
+                    self.searchWidth * fx, fy)
 
             if tcfg.screen.isCaps:
                 text = util.upper(l.text)
@@ -2789,13 +2791,13 @@ class MyCtrl(wxControl):
 
             if len(text) != 0:
                 dc.SetFont(cfgGui.getType(l.lt).font)
-                dc.DrawText(text, cfg.offsetX + tcfg.indent * cfgGui.fontX, y)
+                dc.DrawText(text, cfg.offsetX + tcfg.indent * fx, y)
 
                 if tcfg.screen.isUnderlined and misc.isUnix:
                     dc.SetPen(cfgGui.textPen)
                     util.drawLine(dc, cfg.offsetX + tcfg.indent *
-                        cfgGui.fontX, y + cfg.fontYdelta - 1,
-                        cfgGui.fontX * len(text) - 1, 0)
+                        fx, y + cfg.fontYdelta - 1,
+                        fx * len(text) - 1, 0)
 
             y += cfg.fontYdelta
             i += 1
@@ -2804,6 +2806,9 @@ class MyCtrl(wxControl):
             self.drawAutoComp(dc, cursorY, ccfg)
 
     def drawAutoComp(self, dc, cursorY, tcfg):
+        fx = tcfg.fontX
+        fy = tcfg.fontY
+        
         offset = 5
 
         # scroll bar width
@@ -2829,14 +2834,14 @@ class MyCtrl(wxControl):
             w = max(w, tw)
 
         w += offset * 2
-        h = show * cfgGui.fontY + offset * 2
+        h = show * fy + offset * 2
 
         itemW = w - offset * 2 + selBleed * 2
         if doSbw:
             w += sbw + offset * 2
             sbh = h - offset * 2 + selBleed * 2
 
-        posX = cfg.offsetX + tcfg.indent * cfgGui.fontX
+        posX = cfg.offsetX + tcfg.indent * fx
         posY = cursorY + cfg.fontYdelta
 
         # if the box doesn't fit on the screen in the normal position, put
@@ -2857,15 +2862,15 @@ class MyCtrl(wxControl):
                 dc.SetBrush(cfgGui.autoCompRevBrush)
                 dc.SetTextForeground(cfg.autoCompBgColor)
                 dc.DrawRectangle(posX + offset - selBleed,
-                    posY + offset + (i - startPos) * cfgGui.fontY - selBleed,
+                    posY + offset + (i - startPos) * fy - selBleed,
                     itemW,
-                    cfgGui.fontY + selBleed * 2)
+                    fy + selBleed * 2)
                 dc.SetTextForeground(cfg.autoCompBgColor)
                 dc.SetPen(cfgGui.autoCompPen)
                 dc.SetBrush(cfgGui.autoCompBrush)
                 
             dc.DrawText(self.autoComp[i], posX + offset, posY + offset +
-                        (i - startPos) * cfgGui.fontY)
+                        (i - startPos) * fy)
 
             if i == self.autoCompSel:
                 dc.SetTextForeground(cfg.autoCompFgColor)

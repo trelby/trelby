@@ -120,6 +120,11 @@ class Type:
         # text types, one for screen and one for export
         self.screen = TextType()
         self.export = TextType()
+
+        # font size for this type. these are dummy values, ConfigGui sets
+        # real values, so these don't need to be initialized/saved.
+        self.fontX = 1
+        self.fontY = 1
         
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
@@ -369,15 +374,20 @@ class Config:
         v.addStr("pdfViewerPath", s1, "PDF/ViewerPath")
         v.addStr("pdfViewerArgs", s2, "PDF/ViewerArguments")
 
-        # font
+        # fonts
         if misc.isUnix:
-            s1 = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
-        elif misc.isWindows:
-            s1 = "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
-        else:
-            s1 = ""
+            v.addStr("fontNormal", "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1", "FontNormal")
+            v.addStr("fontBold", "0;-adobe-courier-bold-r-normal-*-*-140-*-*-m-*-iso8859-1", "FontBold")
+            v.addStr("fontItalic", "0;-adobe-courier-medium-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontItalic")
+            v.addStr("fontBoldItalic", "0;-adobe-courier-bold-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontBoldItalic")
             
-        v.addStr("nativeFont", s1, "FontInfo")
+        elif misc.isWindows:
+            v.addStr("fontNormal", "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New", "FontNormal")
+            v.addStr("fontBold", "0;-16;0;0;0;700;0;0;0;0;3;2;1;49;Courier New", "FontBold")
+            v.addStr("fontItalic", "0;-16;0;0;0;400;255;0;0;0;3;2;1;49;Courier New", "FontItalic")
+            v.addStr("fontBoldItalic", "0;-16;0;0;0;700;255;0;0;0;3;2;1;49;Courier New", "FontBoldItalic")
+        else:
+            raise ConfigError("unknown platform")
         
         # default script directory
         v.addStr("scriptDir", misc.progPath, "DefaultScriptDirectory")
@@ -489,17 +499,6 @@ class ConfigGui:
         # type-gui configs, key = line type, value = TypeGui
         self.types = { }
 
-        nfi = wxNativeFontInfo()
-        nfi.FromString(cfg.nativeFont)
-        font = wxFontFromNativeInfo(nfi)
-
-        dc = wxMemoryDC()
-        dc.SetFont(font)
-        self.fontX, self.fontY = dc.GetTextExtent("O")
-
-        self.fontX = max(1, self.fontX)
-        self.fontY = max(1, self.fontY)
-
         self.textPen = wxPen(cfg.textColor)
         
         self.bgBrush = wxBrush(cfg.bgColor)
@@ -526,26 +525,36 @@ class ConfigGui:
         self.pagebreakNoAdjustPen = wxPen(cfg.pagebreakNoAdjustColor,
                                           style = wxDOT)
 
+        dc = wxMemoryDC()
         for t in cfg.types.values():
             tg = TypeGui()
             
-            nfi = wxNativeFontInfo()
-            nfi.FromString(cfg.nativeFont)
-            
-            if t.screen.isBold:
-                nfi.SetWeight(wxBOLD)
+            if not t.screen.isBold and not t.screen.isItalic:
+                fname = "fontNormal"
+            elif t.screen.isBold and not t.screen.isItalic:
+                fname = "fontBold"
+            elif not t.screen.isBold and t.screen.isItalic:
+                fname = "fontItalic"
             else:
-                nfi.SetWeight(wxNORMAL)
+                fname = "fontBoldItalic"
 
-            if t.screen.isItalic:
-                nfi.SetStyle(wxITALIC)
-            else:
-                nfi.SetStyle(wxNORMAL)
+            nfi = wxNativeFontInfo()
+            nfi.FromString(getattr(cfg, fname))
 
             nfi.SetUnderlined(t.screen.isUnderlined)
             nfi.SetEncoding(wxFONTENCODING_ISO8859_1)
 
             tg.font = wxFontFromNativeInfo(nfi)
+
+            dc.SetFont(tg.font)
+            fx, fy = dc.GetTextExtent("O")
+
+            fx = max(1, fx)
+            fy = max(1, fy)
+
+            t.fontX = fx
+            t.fontY = fy
+            
             self.types[t.lt] = tg
 
     def getType(self, lt):
