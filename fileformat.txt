@@ -18,9 +18,9 @@ file uses. Currently only version 1 exists.
 "Title-String". Adds a new string to the current title page. If no title
 pages exist yet, creates one. Example:
 
- 0.000000,70.000000,24,cb,Helvetica,text here
+ 0.000000,70.000000,24,cb,Helvetica,,text here
 
- Format is: xpos,ypos,fontsize,flags,font,text
+ Format is: xpos,ypos,fontsize,flags,font,reserved,text
 
   'xpos' and 'ypos' are floating point values, giving the offset in
   millimeters of the upper-left corner of the text string from the
@@ -38,13 +38,15 @@ pages exist yet, creates one. Example:
   'font' is the font name. Currently supported are Courier, Helvetica and
   Times (Times-Roman).
 
+  'reserved' is reserved for future expansion and is empty for now.
+
   'text' is the text string.
 
 "Header-String". Adds a new header string. Example:
 
- 1,0,r,${PAGE}.
+ 1,0,r,,${PAGE}.
 
- Format is: line,xoff,flags,text
+ Format is: line,xoff,flags,reserved,text
 
  'line' is the 1-based line number.
 
@@ -60,6 +62,8 @@ pages exist yet, creates one. Example:
   One of the following characters:
 
    l, c, r: Alignment is left / centered / right.
+
+  'reserved' is reserved for future expansion and is empty for now.
 
   'text' is the text string.
 

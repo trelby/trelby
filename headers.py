@@ -106,11 +106,11 @@ class HeaderString:
     # and set object state accordingly. keeps default settings on any
     # errors, does not throw any exceptions.
     #
-    # sample of the format: '1,0,r,${PAGE}.'
+    # sample of the format: '1,0,r,,${PAGE}.'
     def load(self, s):
-        a = s.split(",", 3)
+        a = s.split(",", 4)
 
-        if len(a) != 4:
+        if len(a) != 5:
             return
         
         self.line = util.str2int(a[0], 1, 1, 5)
@@ -126,7 +126,7 @@ class HeaderString:
         else:
             self.align = util.ALIGN_RIGHT
             
-        self.text = a[3]
+        self.text = a[4]
                        
     def __str__(self):
         s = "%d,%d," % (self.line, self.xoff)
@@ -141,7 +141,7 @@ class HeaderString:
         s += util.bools2flags("biu", self.isBold, self.isItalic,
                               self.isUnderlined)
 
-        s += ",%s" % self.text
+        s += ",,%s" % self.text
 
         return s
 

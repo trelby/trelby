@@ -111,11 +111,11 @@ class TitleString:
     # and set object state accordingly. keeps default settings on any
     # errors, does not throw any exceptions.
     #
-    # sample of the format: '0.000000,70.000000,24,cb,Helvetica,text here'
+    # sample of the format: '0.000000,70.000000,24,cb,Helvetica,,text here'
     def load(self, s):
-        a = s.split(",", 5)
+        a = s.split(",", 6)
 
-        if len(a) != 6:
+        if len(a) != 7:
             return
         
         self.x = util.str2float(a[0], 0.0)
@@ -131,7 +131,7 @@ class TitleString:
 
         self.font = tmp.get(a[4], pml.COURIER)
 
-        self.text = a[5]
+        self.text = a[6]
                        
     def __str__(self):
         s = "%f,%f,%d," % (self.x, self.y, self.size)
@@ -147,7 +147,7 @@ class TitleString:
         else:
             s += "Times"
 
-        s += ",%s" % self.text
+        s += ",,%s" % self.text
 
         return s
 
