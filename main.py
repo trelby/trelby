@@ -95,12 +95,6 @@ class ClipData:
 
         # list of screenplay.Line objects
         self.lines = []
-
-        # True if this was at start of element
-        self.atStart = False
-
-        # True if this was at end of element
-        #self.atEnd = False
         
 class Screenplay:
     def __init__(self):
@@ -682,6 +676,25 @@ class MyCtrl(wxControl):
 
         if makeVisible:
             self.makeLineVisible(self.line)
+
+    # reformat part of script. par1 is line number of paragraph to start
+    # at, par2 the same for the ending one, inclusive.
+    def reformatRange(self, par1, par2):
+        ls = self.sp.lines
+
+        # add special tag to last paragraph we'll reformat
+        ls[par2].reformatMarker = 0
+        end = false
+
+        line = par1
+        while 1:
+            if hasattr(ls[line], "reformatMarker"):
+                del ls[line].reformatMarker
+                end = True
+                
+            line += self.rewrapPara(line)
+            if end:
+                break
         
     def fillAutoComp(self):
         ls = self.sp.lines
@@ -1231,9 +1244,6 @@ class MyCtrl(wxControl):
         
         for i in xrange(marked[0], marked[1] + 1):
             c1, c2 = self.getMarkedColumns(i, marked)
-
-            if i == marked[0]:
-                cd.atStart = (c1 == 0) and self.isFirstLineOfElem(i)
 
             ln = ls[i]
             
@@ -2080,34 +2090,87 @@ class MyCtrl(wxControl):
                 
             wxTheClipboard.Close()
 
-    def OnPaste(self):
-        # FIXME: make this work again
-        
-        if mainFrame.clipboard:
-            ls = self.sp.lines
-            
-            if self.column == 0:
-                insertPos = self.line
-            else:
-                insertPos = self.line + 1
-                
-            ls[insertPos : insertPos] = copy.deepcopy(mainFrame.clipboard)
+    def OnPaste(self, clines = None):
+        if not clines:
+            cd = mainFrame.clipboard
 
-            self.line = insertPos + len(mainFrame.clipboard) - 1
+            if not cd:
+                return
+
+            clines = cd.lines
+        
+        # shouldn't happen, but...
+        if len(clines) == 0:
+            return
+
+        inLines = []
+        i = 0
+
+        # wrap all paragraphs into single lines
+        while 1:
+            if i >= len(clines):
+                break
+            
+            ln = clines[i]
+            
+            newLine = screenplay.Line(config.LB_LAST, ln.lt)
+
+            while 1:
+                ln = clines[i]
+                i += 1
+                
+                newLine.text += ln.text
+                
+                if ln.lb in (config.LB_LAST, config.LB_FORCED):
+                    break
+            
+                newLine.text += config.lb2str(ln.lb)
+                
+            newLine.lb = ln.lb
+            inLines.append(newLine)
+
+        # shouldn't happen, but...
+        if len(inLines) == 0:
+            return
+        
+        ls = self.sp.lines
+        
+        # where we need to start wrapping
+        wrap1 = self.getParaFirstIndexFromLine(self.line)
+        
+        ln = ls[self.line]
+        
+        wasEmpty = len(ln.text) == 0
+        atEnd = self.column == len(ln.text)
+        
+        ln.text = ln.text[:self.column] + inLines[0].text + \
+                  ln.text[self.column:]
+        self.column += len(inLines[0].text)
+
+        if wasEmpty:
+            ln.lt = inLines[0].lt
+        
+        if len(inLines) != 1:
+
+            if not atEnd:
+                self.splitLine()
+                ls[self.line - 1].lb = inLines[0].lb
+                ls[self.line:self.line] = inLines[1:]
+                self.line += len(inLines) - 2
+            else:
+                ls[self.line + 1:self.line + 1] = inLines[1:]
+                self.line += len(inLines) - 1
+
             self.column = len(ls[self.line].text)
 
-            if insertPos != 0:
-                if ls[insertPos - 1].lt != ls[insertPos].lt:
-                    ls[insertPos - 1].lb = config.LB_LAST
+        self.reformatRange(wrap1, self.getParaFirstIndexFromLine(self.line))
 
-            if (self.line + 1) < len(ls):
-                if ls[self.line].lt != ls[self.line + 1].lt:
-                    ls[self.line].lb = config.LB_LAST
-
-            self.mark = None
-            self.makeLineVisible(self.line)
-            self.updateScreen()
-
+        self.mark = None
+        self.autoComp = None
+        
+        self.makeLineVisible(self.line)
+        self.updateScreen()
+    
     def OnPasteCb(self):
         s = ""
         
@@ -2134,47 +2197,17 @@ class MyCtrl(wxControl):
         if len(inLines) == 0:
             return
 
-        ev = util.MyKeyEvent(0)
-        ev.noUpdate = True
-        
-        # first line is added normally
-        for ch in inLines[0]:
-            kc = ord(ch)
-            if util.isValidInputChar(kc):
-                ev.kc = kc
-                self.OnKeyChar(ev)
-
-        if len(inLines) == 1:
-            self.makeLineVisible(self.line)
-            self.updateScreen()
-            
-            return
-
-        # now, force new element
-        ev.kc = 10
-        self.OnKeyChar(ev)
-
-        # finished, wrapped lines to add
         lines = []
 
-        lt = self.sp.lines[self.line].lt
-        
-        for i in range(1, len(inLines)):
-            s = util.toInputStr(inLines[i])
+        for s in inLines:
+            s = util.toInputStr(s)
 
             if len(s) != 0:
-                lines.extend(self.wrapLine(screenplay.Line(config.LB_LAST,
-                                                           lt, s)))
-                lt = cfg.getType(lt).newTypeEnter
+                lines.append(screenplay.Line(config.LB_LAST, config.ACTION,
+                                             s))
 
-        self.sp.lines[self.line:self.line] = lines
-
-        self.line += len(lines)
-        self.column = 0
-        
-        self.makeLineVisible(self.line)
-        self.updateScreen()
-        
+        self.OnPaste(lines)
+                
     def OnSelectScene(self):
         l1, l2 = self.getSceneIndexes()
         
