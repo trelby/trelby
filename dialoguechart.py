@@ -257,6 +257,14 @@ def cmpCount(c1, c2):
     else:
         return cmpFirst(c1, c2)
     
+def cmpCountThenName(c1, c2):
+    ret = cmp(c2.pageCnt, c1.pageCnt)
+
+    if ret != 0:
+        return ret
+    else:
+        return cmpName(c1, c2)
+    
 def cmpFirst(c1, c2):
     ret = cmp(c1.firstPage, c2.firstPage)
 
@@ -279,7 +287,7 @@ def cmpLastRev(c1, c2):
     if ret != 0:
         return ret
     else:
-        return cmpName(c1, c2)
+        return cmpCountThenName(c1, c2)
     
 def cmpName(c1, c2):
     return cmp(c1.name, c2.name)
