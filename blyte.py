@@ -3120,10 +3120,10 @@ class MyCtrl(wxControl):
 
         # debug stuff
         # FIXME: disable for beta2
-        elif (kc < 256) and (chr(kc) == "å"):
-            self.loadFile("default.blyte")
-        elif (kc < 256) and (chr(kc) == "¤"):
-            pass
+#         elif (kc < 256) and (chr(kc) == "å"):
+#             self.loadFile("default.blyte")
+#         elif (kc < 256) and (chr(kc) == "¤"):
+#             pass
 
         elif util.isValidInputChar(kc):
             char = chr(kc)
