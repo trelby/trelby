@@ -1160,12 +1160,9 @@ class MyFrame(wxFrame):
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
         self.typeCb = wxComboBox(self, -1, style = wxCB_READONLY)
-        self.typeCb.Append("Action", config.ACTION)
-        self.typeCb.Append("Character", config.CHARACTER)
-        self.typeCb.Append("Dialogue", config.DIALOGUE)
-        self.typeCb.Append("Paren", config.PAREN)
-        self.typeCb.Append("Scene", config.SCENE)
-        self.typeCb.Append("Transition", config.TRANSITION)
+
+        for t in cfg.types.values():
+            self.typeCb.Append(t.name, t.type)
 
         hsizer.Add(self.typeCb)
 

@@ -44,7 +44,8 @@ _linetype2text = { }
 
 class Type:
     def __init__(self):
-        self.linetype = None
+        self.type = None
+        self.name = None
         self.emptyLinesBefore = 0
 
         self.indent = 0
@@ -93,7 +94,8 @@ class Config:
 
         # element types
         t = Type()
-        t.linetype = SCENE
+        t.type = SCENE
+        t.name = "Scene"
         t.emptyLinesBefore = 1
         t.indent = 0 
         t.width = 60
@@ -102,20 +104,22 @@ class Config:
         t.nextType = ACTION
         t.nextTypeTab = ACTION
         t.prevTypeTab = TRANSITION
-        self.types[t.linetype] = t
+        self.types[t.type] = t
 
         t = Type()
-        t.linetype = ACTION
+        t.type = ACTION
+        t.name = "Action"
         t.emptyLinesBefore = 1
         t.indent = 0
         t.width = 60
         t.nextType = ACTION
         t.nextTypeTab = CHARACTER
         t.prevTypeTab = CHARACTER
-        self.types[t.linetype] = t
+        self.types[t.type] = t
 
         t = Type()
-        t.linetype = CHARACTER
+        t.type = CHARACTER
+        t.name = "Character"
         t.emptyLinesBefore = 1
         t.indent = 25
         t.width = 20
@@ -123,30 +127,33 @@ class Config:
         t.nextType = DIALOGUE
         t.nextTypeTab = ACTION
         t.prevTypeTab = ACTION
-        self.types[t.linetype] = t
+        self.types[t.type] = t
 
         t = Type()
-        t.linetype = DIALOGUE
+        t.type = DIALOGUE
+        t.name = "Dialogue"
         t.emptyLinesBefore = 0
         t.indent = 10
         t.width = 35
         t.nextType = CHARACTER
         t.nextTypeTab = PAREN
         t.prevTypeTab = ACTION
-        self.types[t.linetype] = t
+        self.types[t.type] = t
 
         t = Type()
-        t.linetype = PAREN
+        t.type = PAREN
+        t.name = "Parenthetical"
         t.emptyLinesBefore = 0
         t.indent = 20
         t.width = 25
         t.nextType = DIALOGUE
         t.nextTypeTab = CHARACTER
         t.prevTypeTab = DIALOGUE
-        self.types[t.linetype] = t
+        self.types[t.type] = t
 
         t = Type()
-        t.linetype = TRANSITION
+        t.type = TRANSITION
+        t.name = "Transition"
         t.emptyLinesBefore = 1
         t.indent = 55
         t.width = 15
@@ -154,7 +161,7 @@ class Config:
         t.nextType = SCENE
         t.nextTypeTab = SCENE
         t.prevTypeTab = CHARACTER
-        self.types[t.linetype] = t
+        self.types[t.type] = t
 
         # wxWindows stuff
         self.baseFont = wxFont(self.fontY, wxMODERN, wxNORMAL, wxNORMAL)
