@@ -1,6 +1,7 @@
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
+import betatest
 import bugreport
 import cfgdlg
 import charmapdlg
@@ -3288,6 +3289,9 @@ class MyApp(wxApp):
     def OnInit(self):
         global cfg, mainFrame
 
+        if 0:
+            betatest.check()
+            
         misc.init()
         util.init()
 
