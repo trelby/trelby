@@ -398,7 +398,7 @@ class MyCtrl(wxControl):
                 line = ls[i]
                 tcfg = cfg.getType(line.type)
 
-                if tcfg.isCaps:
+                if tcfg.export.isCaps:
                     text = util.upper(line.text)
                 else:
                     text = line.text
@@ -455,7 +455,7 @@ class MyCtrl(wxControl):
                 line = ls[i]
                 tcfg = cfg.getType(line.type)
 
-                if tcfg.isCaps:
+                if tcfg.export.isCaps:
                     text = util.upper(line.text)
                 else:
                     text = line.text
@@ -464,11 +464,11 @@ class MyCtrl(wxControl):
                     y += sp.getEmptyLinesBefore(i)
 
                 typ = pml.NORMAL
-                if tcfg.isBold:
+                if tcfg.export.isBold:
                     typ |= pml.BOLD
-                if tcfg.isItalic:
+                if tcfg.export.isItalic:
                     typ |= pml.ITALIC
-                if tcfg.isUnderlined:
+                if tcfg.export.isUnderlined:
                     typ |= pml.UNDERLINED
 
                 pg.add(pml.TextOp(text,
@@ -2063,7 +2063,7 @@ class MyCtrl(wxControl):
                     self.searchColumn) * cfgGui.fontX, y,
                     self.searchWidth * cfgGui.fontX, cfgGui.fontY)
 
-            if tcfg.isCaps:
+            if tcfg.screen.isCaps:
                 text = util.upper(l.text)
             else:
                 text = l.text
@@ -2072,7 +2072,7 @@ class MyCtrl(wxControl):
                 dc.SetFont(cfgGui.getType(l.type).font)
                 dc.DrawText(text, cfg.offsetX + tcfg.indent * cfgGui.fontX, y)
 
-                if tcfg.isUnderlined and (wxPlatform == "__WXGTK__"):
+                if tcfg.screen.isUnderlined and (wxPlatform == "__WXGTK__"):
                     dc.SetPen(cfgGui.textPen)
                     util.drawLine(dc, cfg.offsetX + tcfg.indent *
                         cfgGui.fontX, y + cfg.fontYdelta - 1,

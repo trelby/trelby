@@ -53,6 +53,13 @@ PBI_NONE = 0
 PBI_REAL = 1
 PBI_REAL_AND_UNADJ = 2
 
+class TextType:
+    def __init__(self):
+        self.isCaps = False
+        self.isBold = False
+        self.isItalic = False
+        self.isUnderlined = False
+
 class Type:
     def __init__(self):
         self.type = None
@@ -62,11 +69,10 @@ class Type:
         self.indent = 0
         self.width = 0
 
-        self.isCaps = False
-        self.isBold = False
-        self.isItalic = False
-        self.isUnderlined = False
-
+        # text types, one for screen and one for export
+        self.screen = TextType()
+        self.export = TextType()
+        
         # what type of element to insert when user presses enter or tab.
         self.newTypeEnter = None
         self.newTypeTab = None
@@ -164,8 +170,10 @@ class Config:
         t.emptyLinesBefore = 1
         t.indent = 0 
         t.width = 60
-        t.isCaps = True
-        t.isBold = True
+        t.screen.isCaps = True
+        t.screen.isBold = True
+        t.export.isCaps = True
+        t.export.isBold = True
         t.newTypeEnter = ACTION
         t.newTypeTab = CHARACTER
         t.nextTypeTab = ACTION
@@ -191,7 +199,8 @@ class Config:
         t.emptyLinesBefore = 1
         t.indent = 25
         t.width = 20
-        t.isCaps = True
+        t.screen.isCaps = True
+        t.export.isCaps = True
         t.newTypeEnter = DIALOGUE
         t.newTypeTab = PAREN
         t.nextTypeTab = ACTION
@@ -227,9 +236,10 @@ class Config:
         t.type = TRANSITION
         t.name = "Transition"
         t.emptyLinesBefore = 1
-        t.indent = 55
-        t.width = 15
-        t.isCaps = True
+        t.indent = 45
+        t.width = 20
+        t.screen.isCaps = True
+        t.export.isCaps = True
         t.newTypeEnter = SCENE
         t.newTypeTab = TRANSITION
         t.nextTypeTab = SCENE
@@ -251,7 +261,8 @@ class Config:
         t.emptyLinesBefore = 1
         t.indent = 0
         t.width = 60
-        t.isCaps = True
+        t.screen.isCaps = True
+        t.export.isCaps = True
         t.newTypeEnter = ACTION
         t.newTypeTab = CHARACTER
         t.nextTypeTab = ACTION
@@ -264,7 +275,8 @@ class Config:
         t.emptyLinesBefore = 1
         t.indent = 5
         t.width = 55
-        t.isItalic = True
+        t.screen.isItalic = True
+        t.export.isItalic = True
         t.newTypeEnter = ACTION
         t.newTypeTab = CHARACTER
         t.nextTypeTab = ACTION
@@ -370,17 +382,17 @@ class ConfigGui:
             nfi = wxNativeFontInfo()
             nfi.FromString(cfg.nativeFont)
             
-            if t.isBold:
+            if t.screen.isBold:
                 nfi.SetWeight(wxBOLD)
             else:
                 nfi.SetWeight(wxNORMAL)
 
-            if t.isItalic:
+            if t.screen.isItalic:
                 nfi.SetStyle(wxITALIC)
             else:
                 nfi.SetStyle(wxNORMAL)
 
-            nfi.SetUnderlined(t.isUnderlined)
+            nfi.SetUnderlined(t.screen.isUnderlined)
             
             tg.font = wxFontFromNativeInfo(nfi)
             self.types[t.type] = tg

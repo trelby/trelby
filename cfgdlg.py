@@ -229,34 +229,10 @@ class ElementsPanel(wxPanel):
 
         vsizer.Add(wxStaticLine(panel, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 10)
 
-        hsizer = wxStaticBoxSizer(wxStaticBox(panel, -1, "Style"),
-                                  wxHORIZONTAL)
-
-        gsizer = wxFlexGridSizer(2, 2, 0, 10)
-
-        # wxGTK adds way more space by default than wxMSG between the
-        # items, have to adjust for that
-        pad = 0
-        if wxPlatform == "__WXMSW__":
-            pad = 5
+        hsizer = wxBoxSizer(wxHORIZONTAL)
         
-        self.capsCb = wxCheckBox(panel, -1, "Caps")
-        EVT_CHECKBOX(self, self.capsCb.GetId(), self.OnStyleCb)
-        gsizer.Add(self.capsCb, 0, wxTOP, pad)
-            
-        self.italicCb = wxCheckBox(panel, -1, "Italic")
-        EVT_CHECKBOX(self, self.italicCb.GetId(), self.OnStyleCb)
-        gsizer.Add(self.italicCb, 0, wxTOP, pad)
-            
-        self.boldCb = wxCheckBox(panel, -1, "Bold")
-        EVT_CHECKBOX(self, self.boldCb.GetId(), self.OnStyleCb)
-        gsizer.Add(self.boldCb, 0, wxTOP, pad)
-            
-        self.underlinedCb = wxCheckBox(panel, -1, "Underlined")
-        EVT_CHECKBOX(self, self.underlinedCb.GetId(), self.OnStyleCb)
-        gsizer.Add(self.underlinedCb, 0, wxTOP, pad)
-            
-        hsizer.Add(gsizer, 0, wxEXPAND)
+        hsizer.Add(self.addTextStyles("Screen", "screen", panel))
+        hsizer.Add(self.addTextStyles("Print", "export", panel), 0, wxLEFT, 10)
         
         vsizer.Add(hsizer, 0, wxBOTTOM, 10)
 
@@ -322,6 +298,33 @@ class ElementsPanel(wxPanel):
         self.elementsCombo.SetSelection(0)
         self.OnElementCombo()
 
+    def addTextStyles(self, name, prefix, panel):
+        hsizer = wxStaticBoxSizer(wxStaticBox(panel, -1, name),
+                                  wxHORIZONTAL)
+
+        gsizer = wxFlexGridSizer(2, 2, 0, 10)
+
+        # wxGTK adds way more space by default than wxMSG between the
+        # items, have to adjust for that
+        pad = 0
+        if wxPlatform == "__WXMSW__":
+            pad = 5
+        
+        self.addCheckBox("Caps", prefix, panel, gsizer, pad)
+        self.addCheckBox("Italic", prefix, panel, gsizer, pad)
+        self.addCheckBox("Bold", prefix, panel, gsizer, pad)
+        self.addCheckBox("Underlined", prefix, panel, gsizer, pad)
+            
+        hsizer.Add(gsizer, 0, wxEXPAND)
+
+        return hsizer
+
+    def addCheckBox(self, name, prefix, panel, sizer, pad):
+        cb = wxCheckBox(panel, -1, name)
+        EVT_CHECKBOX(self, cb.GetId(), self.OnStyleCb)
+        sizer.Add(cb, 0, wxTOP, pad)
+        setattr(self, prefix + name + "Cb", cb)
+        
     def addTypeCombo(self, name, descr, panel, sizer):
         sizer.Add(wxStaticText(panel, -1, descr + ":"), 0,
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
@@ -352,10 +355,15 @@ class ElementsPanel(wxPanel):
     def OnStyleCb(self, event):
         tcfg = self.cfg.types[self.type]
         
-        tcfg.isCaps = self.capsCb.GetValue()
-        tcfg.isItalic = self.italicCb.GetValue()
-        tcfg.isBold = self.boldCb.GetValue()
-        tcfg.isUnderlined = self.underlinedCb.GetValue()
+        tcfg.screen.isCaps = self.screenCapsCb.GetValue()
+        tcfg.screen.isItalic = self.screenItalicCb.GetValue()
+        tcfg.screen.isBold = self.screenBoldCb.GetValue()
+        tcfg.screen.isUnderlined = self.screenUnderlinedCb.GetValue()
+
+        tcfg.export.isCaps = self.exportCapsCb.GetValue()
+        tcfg.export.isItalic = self.exportItalicCb.GetValue()
+        tcfg.export.isBold = self.exportBoldCb.GetValue()
+        tcfg.export.isUnderlined = self.exportUnderlinedCb.GetValue()
 
     def OnMisc(self, event = None):
         tcfg = self.cfg.types[self.type]
@@ -376,10 +384,15 @@ class ElementsPanel(wxPanel):
     def cfg2gui(self):
         tcfg = self.cfg.types[self.type]
         
-        self.capsCb.SetValue(tcfg.isCaps)
-        self.italicCb.SetValue(tcfg.isItalic)
-        self.boldCb.SetValue(tcfg.isBold)
-        self.underlinedCb.SetValue(tcfg.isUnderlined)
+        self.screenCapsCb.SetValue(tcfg.screen.isCaps)
+        self.screenItalicCb.SetValue(tcfg.screen.isItalic)
+        self.screenBoldCb.SetValue(tcfg.screen.isBold)
+        self.screenUnderlinedCb.SetValue(tcfg.screen.isUnderlined)
+
+        self.exportCapsCb.SetValue(tcfg.export.isCaps)
+        self.exportItalicCb.SetValue(tcfg.export.isItalic)
+        self.exportBoldCb.SetValue(tcfg.export.isBold)
+        self.exportUnderlinedCb.SetValue(tcfg.export.isUnderlined)
 
         # stupid wxwindows/wxpython displays empty box if the initial
         # value is zero if we don't do this...
