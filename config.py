@@ -228,7 +228,7 @@ class Config:
         t.name = "Character"
         t.emptyLinesBefore = 1
         t.indent = 25
-        t.width = 20
+        t.width = 30
         t.screen.isCaps = True
         t.export.isCaps = True
         t.newTypeEnter = DIALOGUE
