@@ -1549,16 +1549,37 @@ class MyCtrl(wxControl):
 
     def OnCompareScripts(self):
         if mainFrame.notebook.GetPageCount() < 2:
-            wxMessageBox("You need two scripts open to compare them.",
-                         "Error", wxOK, mainFrame)
+            wxMessageBox("You need two at least two scripts open to"
+                         " compare them.", "Error", wxOK, mainFrame)
 
             return
 
-        # FIXME: show dialog allowing user to select the two open scripts
-        # to compare
+        items = []
+        for i in range(mainFrame.notebook.GetPageCount()):
+            p = mainFrame.notebook.GetPage(i)
+            items.append(p.ctrl.fileNameDisplay)
+
+        dlg = misc.ScriptChooserDlg(mainFrame, items)
+
+        sel1 = -1
+        sel2 = -1
+        if dlg.ShowModal() == wxID_OK:
+            sel1 = dlg.sel1
+            sel2 = dlg.sel2
         
-        c1 = mainFrame.notebook.GetPage(0).ctrl
-        c2 = mainFrame.notebook.GetPage(1).ctrl
+        dlg.Destroy()
+
+        if sel1 == -1:
+            return
+
+        if sel1 == sel2:
+            wxMessageBox("You can't compare a script to itself.", "Error",
+                         wxOK, mainFrame)
+
+            return
+        
+        c1 = mainFrame.notebook.GetPage(sel1).ctrl
+        c2 = mainFrame.notebook.GetPage(sel2).ctrl
         
         sp1 = c1.getExportable("compare")
         sp2 = c2.getExportable("compare")
