@@ -85,6 +85,10 @@ Linebreak types:
 
 '.' - Last line of the element.
 
+More linebreak types are possibly going to be added in the future without
+increasing the fileformat version number, so unknown linebreak types
+should be converted to '>', and a warning given to user about this.
+
 Line types:
 
 '\' - Scene heading.

@@ -283,6 +283,9 @@ class MyCtrl(wxControl):
                                 "while this version of the program only"
                                 " supports version '1'." % version)
 
+            # did we encounter unknown lb types
+            unknownLb = False
+            
             # did we encounter unknown element types
             unknownTypes = False
 
@@ -328,10 +331,11 @@ class MyCtrl(wxControl):
                     lt = config.text2lt(s[1], False)
                     text = s[2:]
 
+                    # convert unknown lb types into LB_AUTO_SPACE
                     if lb == None:
-                        raise MiscError("Line %d has invalid linebreak type" %
-                             (i + 1))
-
+                        lb = config.LB_AUTO_SPACE
+                        unknownLb = True
+                        
                     # convert unknown types into ACTION
                     if lt == None:
                         lt = config.ACTION
@@ -361,6 +365,12 @@ class MyCtrl(wxControl):
             self.setFile(fileName)
             self.makeBackup()
             self.paginate()
+
+            if unknownLb:
+                wxMessageBox("Screenplay contained unknown linebreak types.\n"
+                             "These have been converted to a space.",
+                             "Warning",
+                             wxOK, mainFrame)
 
             if unknownTypes:
                 wxMessageBox("Screenplay contained unknown element types.\n"
