@@ -102,7 +102,6 @@ A. This EULA is effective until terminated and it will terminate
 immediately without notice from Oskusoft if you fail to comply with any of
 its provisions.
 
-
 B. Upon termination of this EULA, Oskusoft reserves the right to take any
 legal action necessary to recover any damages incurred by Oskusoft.
 
