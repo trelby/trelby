@@ -1,3 +1,4 @@
+import os
 import sys
 
 import misc
@@ -94,7 +95,8 @@ class BugReportDlg(wxDialog):
                 s2 += "1\n%s" % misc.license
 
             s2 += "%s---end info---\n" % s1
-            
+            s2 = s2.replace("\n", os.linesep)
+
             wxTheClipboard.AddData(wxTextDataObject(s2))
             wxTheClipboard.Flush()
                 

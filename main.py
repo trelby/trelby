@@ -2091,12 +2091,14 @@ class MyCtrl(wxControl):
         s = util.String()
         for ln in tmpSp.lines:
             s += ln.text + config.lb2str(ln.lb)
-            
+
+        s = str(s).replace("\n", os.linesep)
+        
         if wxTheClipboard.Open():
             wxTheClipboard.UsePrimarySelection(True)
             
             wxTheClipboard.Clear()
-            wxTheClipboard.AddData(wxTextDataObject(str(s)))
+            wxTheClipboard.AddData(wxTextDataObject(s))
             wxTheClipboard.Flush()
                 
             wxTheClipboard.Close()
