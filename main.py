@@ -32,7 +32,7 @@ ID_FILE_OPEN = 0
 ID_FILE_SAVE = 1
 ID_FILE_SAVE_AS = 2
 ID_FILE_EXIT = 3
-ID_REFORMAT = 4
+ID_FORMAT_REFORMAT = 4
 ID_FILE_NEW = 5
 ID_FILE_SETTINGS = 6
 ID_FILE_CLOSE = 7
@@ -47,6 +47,7 @@ ID_EDIT_FIND = 15
 ID_EDIT_SELECT_SCENE = 16
 ID_EDIT_FIND_ERROR = 17
 ID_EDIT_SHOW_FORMATTING = 18
+ID_FORMAT_PAGINATE = 19
 
 def refreshGuiConfig():
     global cfgGui
@@ -100,7 +101,7 @@ class Screenplay:
             return 0
         
         if self.lines[i - 1].lb == config.LB_LAST:
-            return cfg.getType(self.lines[i].type).emptyLinesBefore
+            return cfg.types[self.lines[i].type].emptyLinesBefore
         else:
             return 0
 
@@ -156,6 +157,8 @@ class MyCtrl(wxControl):
         self.searchLine = -1
         self.searchColumn = -1
         self.searchWidth = -1
+        self.pages = [-1, 0]
+        self.pagesNoAdjust = [-1, 0]
         
     def createEmptySp(self):
         self.clearVars()
@@ -203,6 +206,7 @@ class MyCtrl(wxControl):
             self.sp = sp
             self.setFile(fileName)
             self.makeBackup()
+            self.paginate()
 
             return True
 
@@ -570,9 +574,26 @@ class MyCtrl(wxControl):
 
         return line
 
-    def line2page(self, n):
-        return (n / 55) + 1
+    def line2page(self, line):
+        return self.line2pageReal(line, self.pages)
 
+    def line2pageNoAdjust(self, line):
+        return self.line2pageReal(line, self.pagesNoAdjust)
+
+    def line2pageReal(self, line, p):
+        lo = 1
+        hi = len(p) - 1
+
+        while lo != hi:
+            mid = (lo + hi) / 2
+
+            if line <= p[mid]:
+                hi = mid
+            else:
+                lo = mid + 1
+
+        return lo
+    
     def isLineVisible(self, line):
         bottom = self.topLine + self.getLinesOnScreen() - 1
         if (self.line >= self.topLine) and (self.line <= bottom):
@@ -724,6 +745,187 @@ class MyCtrl(wxControl):
             line = -1
 
         return (line, msg)
+
+    # returns true if 'line', which must be the last line on a page, needs
+    # (MORE) after it and the next page needs a "SOMEBODY (cont'd)"
+    def needsMore(self, line):
+        ls = self.sp.lines
+        if ls[line].type in (config.DIALOGUE, config.PAREN)\
+           and (line != (len(ls) - 1)) and\
+           ls[line + 1].type in (config.DIALOGUE, config.PAREN):
+            return True
+        else:
+            return False
+
+    # returns total number of lines, not counting empty ones at the end,
+    # on the given page. assumes that pagination is up-to-date.
+    def linesOnPage(self, page):
+
+        # not supposed to be called with invalid page argument, but you
+        # never know...
+        if (page < 1) or (page >= (len(self.pages) - 1)):
+            return 1
+        
+        start = self.pages[page - 1] + 1
+        end = self.pages[page]
+
+        lines = 1
+        for i in range(start + 1, end + 1):
+            lines += self.sp.getEmptyLinesBefore(i) + 1
+
+        if self.needsMore(start - 1):
+            lines += 1
+
+        if self.needsMore(end):
+            lines += 1
+
+        return lines
+        
+    def paginate(self):
+        t = time.time()
+        
+        self.pages = [-1]
+        self.pagesNoAdjust = [-1]
+
+        ls = self.sp.lines
+        length = len(ls)
+        lastBreak = -1
+
+        # fast aliases for stuff
+        lp = cfg.linesOnPage
+        lbl = config.LB_LAST
+        ct = cfg.types
+        
+        i = 0
+        while 1:
+            pageLines = 0
+
+            # FIXME: need to adjust lp here if we have to put a (cont'd)
+            # on top of the page. problem is it can take n lines if the
+            # character's name is long, and the (cont'd) itself can change
+            # the number of lines needed...
+            
+            #print "starting page %d at %d" % (len(self.pages), i)
+            if i < length:
+                pageLines = 1
+                
+                while i < (length - 1):
+
+                    pageLines += 1
+                    if ls[i].lb == lbl:
+                        pageLines += ct[ls[i + 1].type].emptyLinesBefore
+
+                    if pageLines > lp:
+                        break
+
+                    i += 1
+
+            if i == length:
+                if pageLines != 0:
+                    self.pages.append(length - 1)
+                    self.pagesNoAdjust.append(length - 1)
+                    
+                break
+
+            self.pagesNoAdjust.append(i)
+
+            line = ls[i]
+
+            if line.type == config.SCENE:
+                i = self.removeDanglingElement(i, config.SCENE, lastBreak)
+
+            elif line.type == config.ACTION:
+                if line.lb != config.LB_LAST:
+                    first = self.getElemFirstIndexFromLine(i)
+
+                    if first > (lastBreak + 1):
+                        linesOnThisPage = i - first + 1
+                        if linesOnThisPage < cfg.pbActionLines:
+                            i = first - 1
+
+                        i = self.removeDanglingElement(i, config.SCENE,
+                                                       lastBreak)
+
+            elif line.type == config.CHARACTER:
+                i = self.removeDanglingElement(i, config.CHARACTER, lastBreak)
+                i = self.removeDanglingElement(i, config.SCENE, lastBreak)
+
+            elif line.type in (config.DIALOGUE, config.PAREN):
+                if line.lb != config.LB_LAST or\
+                       self.getTypeOfNextElem(i) in\
+                       (config.DIALOGUE, config.PAREN):
+
+                    cutDialogue = False
+                    cutParen = False
+                    while 1:
+                        oldI = i
+                        line = ls[i]
+                        
+                        if line.type == config.PAREN:
+                            i = self.removeDanglingElement(i, config.PAREN,
+                              lastBreak)
+                            cutParen = True
+
+                        elif line.type == config.DIALOGUE:
+                            if cutParen:
+                                break
+                            
+                            first = self.getElemFirstIndexFromLine(i)
+
+                            if first > (lastBreak + 1):
+                                linesOnThisPage = i - first + 1
+
+                                # do we need to reserve one line for (MORE)
+                                reserveLine = not (cutDialogue or cutParen)
+
+                                val = cfg.pbDialogueLines
+                                if reserveLine:
+                                    val += 1
+                                
+                                if linesOnThisPage < val:
+                                    i = first - 1
+                                    cutDialogue = True
+                                else:
+                                    if reserveLine:
+                                        i -= 1
+                                    break
+                            else:
+                                # leave space for (MORE)
+                                i -= 1
+                                break
+
+                        elif line.type == config.CHARACTER:
+                            i = self.removeDanglingElement(i,
+                              config.CHARACTER, lastBreak)
+                            i = self.removeDanglingElement(i,
+                              config.SCENE, lastBreak)
+
+                            break
+
+                        else:
+                            break
+
+                        if i == oldI:
+                            break
+
+            # make sure no matter how buggy the code above is, we always
+            # advance at least one line per page
+            i = max(i, lastBreak + 1)
+            
+            self.pages.append(i)
+            lastBreak = i
+
+            i += 1
+
+        t = time.time() - t
+        print "paginate took %.4f seconds" % t
+
+    def removeDanglingElement(self, line, type, lastBreak):
+        while (self.sp.lines[line].type == type) and\
+                  (line >= (lastBreak + 2)):
+            line -= 1
+
+        return line
         
     def updateScreen(self, redraw = True, setCommon = True):
         self.adjustScrollBar()
@@ -737,14 +939,15 @@ class MyCtrl(wxControl):
     # update GUI elements shared by all scripts, like statusbar etc
     def updateCommon(self):
         self.updateTypeCb()
-        mainFrame.statusBar.SetStatusText("Page: %3d / %3d" %
+        mainFrame.statusBar.SetStatusText("Page: %3d / %3d (line %d)" %
             (self.line2page(self.line),
-             self.line2page(len(self.sp.lines) - 1)), 0)
+             self.line2page(len(self.sp.lines) - 1), self.line + 1), 0)
 
     def applyCfg(self, newCfg):
         global cfg
         
         cfg = copy.deepcopy(newCfg)
+        cfg.recalc()
         refreshGuiConfig()
         self.reformatAll()
         self.updateScreen()
@@ -801,6 +1004,10 @@ class MyCtrl(wxControl):
 
     def OnReformat(self):
         self.reformatAll()
+        self.updateScreen()
+
+    def OnPaginate(self):
+        self.paginate()
         self.updateScreen()
 
     def canBeClosed(self):
@@ -1155,7 +1362,7 @@ class MyCtrl(wxControl):
             self.loadFile("default.nasp")
         elif (chr(kc) == "Å"):
             self.OnSettings()
-            
+        
         elif (kc == WXK_SPACE) or (kc > 32) and (kc < 256):
             str = ls[self.line].text
             str = str[:self.column] + chr(kc) + str[self.column:]
@@ -1197,7 +1404,7 @@ class MyCtrl(wxControl):
     def OnPaint(self, event):
         ls = self.sp.lines
 
-#        t = time.time()
+        #t = time.time()
         dc = wxBufferedPaintDC(self, self.screenBuf)
 
         size = self.GetClientSize()
@@ -1209,7 +1416,6 @@ class MyCtrl(wxControl):
         
         y = cfg.offsetY
         length = len(ls)
-        prevType = -1
         marked = self.getMarkedLines()
 
         cursorY = -1
@@ -1231,32 +1437,45 @@ class MyCtrl(wxControl):
 
             if mainFrame.showFormatting:
                 dc.SetPen(cfgGui.bluePen)
-                dc.DrawLine(cfg.offsetX + tcfg.indent * cfgGui.fontX, y,
-                            cfg.offsetX + tcfg.indent * cfgGui.fontX,
-                            y + cfg.fontYdelta)
-                dc.DrawLine(cfg.offsetX + (tcfg.indent + tcfg.width)
-                    * cfgGui.fontX, y, cfg.offsetX + (tcfg.indent + tcfg.width)
-                    * cfgGui.fontX, y + cfg.fontYdelta)
+                self.myDrawLine(dc, cfg.offsetX + tcfg.indent * cfgGui.fontX,
+                    y, 0, cfg.fontYdelta)
+                self.myDrawLine(dc, cfg.offsetX + (tcfg.indent + tcfg.width)
+                    * cfgGui.fontX, y, 0, cfg.fontYdelta)
 
                 if self.isFirstLineOfElem(i):
-                    dc.DrawLine(cfg.offsetX + tcfg.indent * cfgGui.fontX,
-                        y, cfg.offsetX + (tcfg.indent + tcfg.width) *
-                        cfgGui.fontX, y)
+                    self.myDrawLine(dc, cfg.offsetX + tcfg.indent *
+                        cfgGui.fontX, y, tcfg.width * cfgGui.fontX, 0)
                         
                 if self.isLastLineOfElem(i):
-                    dc.DrawLine(cfg.offsetX + tcfg.indent * cfgGui.fontX,
-                        y + cfg.fontYdelta, cfg.offsetX + (tcfg.indent +
-                        tcfg.width) * cfgGui.fontX, y + cfg.fontYdelta)
+                    self.myDrawLine(dc, cfg.offsetX + tcfg.indent *
+                        cfgGui.fontX, y + cfg.fontYdelta,
+                        tcfg.width * cfgGui.fontX, 0)
                         
                 dc.SetTextForeground(cfgGui.redColor)
                 dc.SetFont(cfgGui.getType(config.ACTION).font)
                 dc.DrawText(config.lb2text(l.lb), 0, y)
                 dc.SetTextForeground(cfg.textColor)
 
-            if (i != 0) and (self.line2page(i - 1) != self.line2page(i)):
-                dc.SetPen(cfgGui.pagebreakPen)
-                dc.DrawLine(0, y, size.width, y)
-                
+            if cfg.pbi == config.PBI_REAL_AND_UNADJ:
+                if self.line2pageNoAdjust(i) != self.line2pageNoAdjust(i + 1):
+                    dc.SetPen(cfgGui.pagebreakNoAdjustPen)
+                    self.myDrawLine(dc, 0, y + cfg.fontYdelta - 1,
+                        size.width, 0)
+
+            if cfg.pbi in (config.PBI_REAL, config.PBI_REAL_AND_UNADJ):
+                thisPage = self.line2page(i)
+                if  thisPage != self.line2page(i + 1):
+                    dc.SetPen(cfgGui.pagebreakPen)
+                    self.myDrawLine(dc, 0, y + cfg.fontYdelta - 1,
+                        size.width, 0)
+
+                    # FIXME: take these out once done debugging
+                    dc.DrawText("%d" % self.linesOnPage(thisPage),
+                                size.width - 100, y + cfg.fontYdelta / 2)
+                    if self.needsMore(i):
+                        dc.DrawText("(MORE)", size.width - 50,
+                                    y + cfg.fontYdelta / 2)
+
             if i == self.line:
                 cursorY = y
                 ccfg = tcfg
@@ -1272,25 +1491,31 @@ class MyCtrl(wxControl):
                     self.searchColumn) * cfgGui.fontX, y,
                     self.searchWidth * cfgGui.fontX, cfgGui.fontY)
 
-            if l.type != prevType:
-                dc.SetFont(cfgGui.getType(l.type).font)
-
             if tcfg.isCaps:
                 text = l.text.upper()
             else:
                 text = l.text
 
-            dc.DrawText(text, cfg.offsetX + tcfg.indent * cfgGui.fontX, y)
+            if len(text) != 0:
+                dc.SetFont(cfgGui.getType(l.type).font)
+                dc.DrawText(text, cfg.offsetX + tcfg.indent * cfgGui.fontX, y)
+
+                # FIXME: only do this on platforms where native font
+                # underlining support doesn't work (linux)
+                if tcfg.isUnderlined:
+                    dc.SetPen(cfgGui.textPen)
+                    self.myDrawLine(dc, cfg.offsetX + tcfg.indent *
+                        cfgGui.fontX, y + cfg.fontYdelta - 1,
+                        cfgGui.fontX * len(text) - 1, 0)
 
             y += cfg.fontYdelta
             i += 1
-            prevType = l.type
 
         if self.autoComp and (cursorY > 0):
             self.drawAutoComp(dc, cursorY, ccfg)
             
-#        t = time.time() - t
-#        print "paint took %.4f seconds"
+        #t = time.time() - t
+        #print "paint took %.4f seconds" % t
 
     def drawAutoComp(self, dc, cursorY, tcfg):
         offset = 5
@@ -1351,16 +1576,16 @@ class MyCtrl(wxControl):
         if doSbw:
             dc.SetPen(cfgGui.autoCompPen)
             dc.SetBrush(cfgGui.autoCompRevBrush)
-            dc.DrawLine(posX + w - offset * 2 - sbw,
-                posY,
-                posX + w - offset * 2 - sbw,
-                posY + h)
+            self.myDrawLine(dc, posX + w - offset * 2 - sbw,
+                posY, 0, h)
             dc.DrawRectangle(posX + w - offset - sbw,
                 posY + offset - selBleed + int((float(startPos) /
                      len(self.autoComp)) * sbh),
                 sbw,
                 int((float(show) / len(self.autoComp)) * sbh))
 
+    def myDrawLine(self, dc, x, y, xd, yd):
+        dc.DrawLine(x, y, x + xd, y + yd)
 
 class MyFrame(wxFrame):
 
@@ -1397,7 +1622,8 @@ class MyFrame(wxFrame):
         editMenu.AppendCheckItem(ID_EDIT_SHOW_FORMATTING, "S&how formatting")
         
         formatMenu = wxMenu()
-        formatMenu.Append(ID_REFORMAT, "&Reformat all")
+        formatMenu.Append(ID_FORMAT_REFORMAT, "&Reformat all")
+        formatMenu.Append(ID_FORMAT_PAGINATE, "&Paginate")
 
         helpMenu = wxMenu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
@@ -1466,12 +1692,19 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_FIND_ERROR, self.OnFindError)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_EDIT_SHOW_FORMATTING, self.OnShowFormatting)
-        EVT_MENU(self, ID_REFORMAT, self.OnReformat)
+        EVT_MENU(self, ID_FORMAT_REFORMAT, self.OnReformat)
+        EVT_MENU(self, ID_FORMAT_PAGINATE, self.OnPaginate)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
 
         EVT_CLOSE(self, self.OnCloseWindow)
-        
+
+        # FIXME: reset timer on settings change
+        if cfg.paginateInterval != 0:
+            self.timer = wxTimer(self)
+            EVT_TIMER(self, -1, self.OnTimer)
+            self.timer.Start(cfg.paginateInterval * 1000)
+
         self.Layout()
         
     def init(self):
@@ -1507,7 +1740,10 @@ class MyFrame(wxFrame):
                 return True
 
         return False
-            
+
+    def OnTimer(self, event):
+        self.OnPaginate()
+
     def OnPageChange(self, event):
         newPage = event.GetSelection()
         self.panel = self.notebook.GetPage(newPage)
@@ -1581,6 +1817,9 @@ class MyFrame(wxFrame):
 
     def OnReformat(self, event):
         self.panel.ctrl.OnReformat()
+
+    def OnPaginate(self, event = None):
+        self.panel.ctrl.OnPaginate()
 
     def OnHelpCommands(self, event):
         dlg = CommandsDlg(self)

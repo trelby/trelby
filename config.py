@@ -42,6 +42,11 @@ _text2linetype = {
 # reverse to above, filled in init
 _linetype2text = { }
 
+# page break indicators
+PBI_NONE = 0
+PBI_REAL = 1
+PBI_REAL_AND_UNADJ = 2
+
 class Type:
     def __init__(self):
         self.type = None
@@ -93,10 +98,25 @@ class Config:
         self.paperHeight = 297.0
 
         # margins
-        self.marginTop = 10.0
-        self.marginBottom = 10.0
-        self.marginLeft = 10.0
-        self.marginRight = 10.0
+        self.marginTop = 25.4
+        self.marginBottom = 25.4
+        self.marginLeft = 38.1
+        self.marginRight = 25.4
+
+        # page break stuff
+
+        # page break indicators to show
+        self.pbi = PBI_REAL
+        
+        # interval (seconds) between automatic pagination (0 = disabled)
+        # TODO: change this to 5 or something
+        self.paginateInterval = 0
+        
+        # leave at least this many action lines on the end of a page
+        self.pbActionLines = 2
+
+        # leave at least this many dialogue lines on the end of a page
+        self.pbDialogueLines = 2
         
         # construct reverse lookup tables
         for k, v in _text2lb.items():
@@ -188,7 +208,20 @@ class Config:
                       0, 0, 0)
         self.addColor("autoCompBgColor", "Auto-completion background",
                       249, 222, 99)
+
         self.addColor("pagebreakColor", "Page-break line", 128, 128, 128)
+        self.addColor("pagebreakNoAdjustColor",
+            "Page-break (original, not adjusted) line", 128, 128, 128)
+
+        self.recalc()
+
+    # recalculate all variables dependent on other variables
+    def recalc(self):
+        h = self.paperHeight - self.marginTop - self.marginBottom
+
+        # how many lines on a page. 12-point font = 6 lines per inch, ie.
+        # 1 line = 4.2333333 mm
+        self.linesOnPage = int(h / 4.2333333)
         
     def getType(self, type):
         return self.types[type]
@@ -227,6 +260,8 @@ class ConfigGui:
         dc.SetFont(font)
         self.fontX, self.fontY = dc.GetTextExtent("O")
 
+        self.textPen = wxPen(cfg.textColor)
+        
         self.bgBrush = wxBrush(cfg.bgColor)
         self.bgPen = wxPen(cfg.bgColor)
 
@@ -244,7 +279,9 @@ class ConfigGui:
         self.autoCompRevPen = wxPen(cfg.autoCompBgColor)
         self.autoCompRevBrush = wxBrush(cfg.autoCompFgColor)
 
-        self.pagebreakPen = wxPen(cfg.pagebreakColor, style = wxSHORT_DASH)
+        self.pagebreakPen = wxPen(cfg.pagebreakColor)
+        self.pagebreakNoAdjustPen = wxPen(cfg.pagebreakNoAdjustColor,
+                                          style = wxDOT)
 
         for t in cfg.types.values():
             tg = TypeGui()
