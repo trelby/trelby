@@ -3,13 +3,14 @@ import util
 from wxPython.wx import *
 
 class CfgDlg(wxDialog):
-    def __init__(self, parent, cfg):
+    def __init__(self, parent, cfg, applyFunc):
         wxDialog.__init__(self, parent, -1, "Config dialog",
                           pos = wxDefaultPosition,
                           size = (400, 400),
                           style = wxDEFAULT_DIALOG_STYLE)
         self.cfg = cfg
-
+        self.applyFunc = applyFunc
+        
         vsizer = wxBoxSizer(wxVERTICAL)
         self.SetSizer(vsizer)
 
@@ -29,6 +30,9 @@ class CfgDlg(wxDialog):
 
         hsizer.Add(1, 1, 1)
         
+        apply = wxButton(self, -1, "Apply")
+        hsizer.Add(apply, 0, wxALL, 5)
+
         cancel = wxButton(self, -1, "Cancel")
         hsizer.Add(cancel, 0, wxALL, 5)
         
@@ -37,6 +41,7 @@ class CfgDlg(wxDialog):
 
         vsizer.Add(hsizer, 0, wxEXPAND)
 
+        EVT_BUTTON(self, apply.GetId(), self.OnApply)
         EVT_BUTTON(self, cancel.GetId(), self.OnCancel)
         EVT_BUTTON(self, ok.GetId(), self.OnOK)
         
@@ -44,6 +49,9 @@ class CfgDlg(wxDialog):
         
     def OnOK(self, event):
         self.EndModal(wxID_OK)
+
+    def OnApply(self, event):
+        self.applyFunc(self.cfg)
 
     def OnCancel(self, event):
         self.EndModal(wxID_CANCEL)

@@ -173,9 +173,9 @@ class Config:
         self.addColor("bgColor", "Text background", 204, 204, 204)
         self.addColor("selectedColor", "Selection", 128, 192, 192)
         self.addColor("cursorColor", "Cursor", 205, 0, 0)
-        self.addColor("autoCompFgColor", "Auto-completion Foreground",
+        self.addColor("autoCompFgColor", "Auto-completion foreground",
                       0, 0, 0)
-        self.addColor("autoCompBgColor", "Auto-completion Background",
+        self.addColor("autoCompBgColor", "Auto-completion background",
                       249, 222, 99)
         self.addColor("pagebreakColor", "Page-break line", 128, 128, 128)
         

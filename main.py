@@ -572,7 +572,15 @@ class MyCtrl(wxControl):
         self.updateTypeCb()
         mainFrame.statusBar.SetStatusText("Page: %3d / %3d" %
             (self.line / 55 + 1, len(self.sp.lines)/55 + 1), 0)
-                                                           
+
+    def applyCfg(self, newCfg):
+        global cfg
+        
+        cfg = copy.deepcopy(newCfg)
+        refreshGuiConfig()
+        self.reformatAll()
+        self.updateScreen()
+
     def OnEraseBackground(self, event):
         pass
         
@@ -711,14 +719,9 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnSettings(self):
-        global cfg
-        
-        dlg = CfgDlg(self, copy.deepcopy(cfg))
+        dlg = CfgDlg(self, copy.deepcopy(cfg), self.applyCfg)
         if dlg.ShowModal() == wxID_OK:
-            cfg = dlg.cfg
-            refreshGuiConfig()
-            self.reformatAll()
-            self.updateScreen()
+            self.applyCfg(dlg.cfg)
 
         dlg.Destroy()
         
