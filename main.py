@@ -537,10 +537,7 @@ class MyCtrl(wxControl):
 
             doc.add(pg)
 
-        exporter = pdf.PDFExporter()
-        s = exporter.generate(doc)
-
-        return s
+        return pdf.generate(doc)
 
     def makeBackup(self):
         self.backup = copy.deepcopy(self.sp)

@@ -1,6 +1,11 @@
 import pml
 import util
 
+# users should only use this.
+def generate(doc):
+    tmp = PDFExporter()
+    return tmp.generate(doc)
+    
 class PDFExporter:
     def __init__(self):
         pass
@@ -8,7 +13,6 @@ class PDFExporter:
     # generate PDF document from doc, which is a pml.Document. returns a
     # string containing the PDF data.
     def generate(self, doc):
-
         self.doc = doc
         
         # the stupid 'f' thingy in the xref table is an object of some
