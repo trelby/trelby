@@ -497,6 +497,9 @@ class ConfigGui:
         dc.SetFont(font)
         self.fontX, self.fontY = dc.GetTextExtent("O")
 
+        self.fontX = max(1, self.fontX)
+        self.fontY = max(1, self.fontY)
+
         self.textPen = wxPen(cfg.textColor)
         
         self.bgBrush = wxBrush(cfg.bgColor)
