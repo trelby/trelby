@@ -16,11 +16,12 @@ KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
 
-ID_OPEN = 0
-ID_SAVE = 1
-ID_SAVE_AS = 2
-ID_EXIT = 3
+ID_FILE_OPEN = 0
+ID_FILE_SAVE = 1
+ID_FILE_SAVE_AS = 2
+ID_FILE_EXIT = 3
 ID_REFORMAT = 4
+ID_FILE_NEW = 5
 
 def clamp(val, min, max):
     if val < min:
@@ -89,12 +90,7 @@ class MyCtrl(wxControl):
 #         print "basefont native: %s" % cfg.baseFont.GetNativeFontInfoDesc()
 #         print "basefont isfixedwidth: %s" % cfg.baseFont.IsFixedWidth()
 
-        self.sp = Screenplay()
-        self.sp.lines.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
-        self.line = 0
-        self.column = 0
-        self.topLine = 0
-        self.fileName = None
+        self.OnNew(redraw = False)
         
         self.updateScreen(redraw = False)
         
@@ -171,7 +167,12 @@ class MyCtrl(wxControl):
 
     def setFile(self, fileName):
         self.fileName = fileName
-        mainFrame.SetTitle("Nasp - %s" % fileName)
+        if fileName:
+            t = fileName
+        else:
+            t = "<new>"
+            
+        mainFrame.SetTitle("Nasp - %s" % t)
             
     def updateTypeCb(self):
         if "typeCbRevMap" not in self.__dict__:
@@ -374,12 +375,30 @@ class MyCtrl(wxControl):
 
     def line2page(self, n):
         return (n / 55) + 1
-    
-    def adjustScrollBar(self):
-        sb = mainFrame.scrollBar
 
+    def isLineVisible(self, line):
+        bottom = self.topLine + self.getLinesOnScreen() - 1
+        if (self.line >= self.topLine) and (self.line <= bottom):
+            return True
+        else:
+            return False
+        
+    def makeLineVisible(self, line, redraw = False):
+        if self.isLineVisible(line):
+            return
+        
+        self.topLine = max(0, int(self.line - (self.getLinesOnScreen()
+                                               * 0.66)))
+        if not self.isLineVisible(line):
+            self.topLine = line
+            
+        if redraw:
+            self.Refresh(False)
+        
+    def adjustScrollBar(self):
         pageSize = self.getLinesOnScreen()
-        sb.SetScrollbar(self.topLine, pageSize, len(self.sp.lines), pageSize) 
+        mainFrame.scrollBar.SetScrollbar(self.topLine, pageSize,
+                                         len(self.sp.lines), pageSize) 
 
     def updateScreen(self, redraw = True):
         mainFrame.statusBar.SetStatusText("Page: %3d / %3d" %
@@ -413,6 +432,17 @@ class MyCtrl(wxControl):
         self.reformatAll()
         self.updateScreen()
 
+    def OnNew(self, event = None, redraw = True):
+        self.sp = Screenplay()
+        self.sp.lines.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
+        self.line = 0
+        self.column = 0
+        self.topLine = 0
+        self.setFile(None)
+
+        if redraw:
+            self.updateScreen()
+        
     def OnOpen(self, event):
         dlg = wxFileDialog(self, "File to open",
                            wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
@@ -425,9 +455,9 @@ class MyCtrl(wxControl):
         if self.fileName:
             self.saveFile(self.fileName)
         else:
-            self.OnSaveAs(None)
+            self.OnSaveAs()
 
-    def OnSaveAs(self, event):
+    def OnSaveAs(self, event = None):
         dlg = wxFileDialog(self, "Filename to save as",
                            wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
                            style = wxSAVE | wxOVERWRITE_PROMPT)
@@ -439,6 +469,8 @@ class MyCtrl(wxControl):
 
         ls = self.sp.lines
         tcfg = cfg.getTypeCfg(ls[self.line].type)
+
+        # FIXME: call ensureCorrectLine()
         
         if kc == WXK_RETURN:
             if event.ShiftDown() or event.ControlDown():
@@ -488,7 +520,6 @@ class MyCtrl(wxControl):
         elif (kc == WXK_DOWN) or (kc == KC_CTRL_N):
             if self.line < (len(ls) - 1):
                 self.line += 1
-                self.column = min(self.column, len(ls[self.line].text))
                 if self.line >= (self.topLine + self.getLinesOnScreen()):
                     while (self.topLine + self.getLinesOnScreen() - 1)\
                           < self.line:
@@ -497,7 +528,6 @@ class MyCtrl(wxControl):
         elif (kc == WXK_UP) or (kc == KC_CTRL_P):
             if self.line > 0:
                 self.line -= 1
-                self.column = min(self.column, len(ls[self.line].text))
                 if self.line < self.topLine:
                     self.topLine -= 1
                     
@@ -510,7 +540,7 @@ class MyCtrl(wxControl):
         elif (kc == WXK_PRIOR) or (event.AltDown() and chr(kc) == "v"):
             self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
                 0)
-            self.line = self.topLine + 5
+            self.line = min(self.topLine + 5, len(self.sp.lines) - 1)
             
         elif (kc == WXK_NEXT) or (kc == KC_CTRL_V):
             oldTop = self.topLine
@@ -575,6 +605,10 @@ class MyCtrl(wxControl):
         else:
             print "something other than printable/handled character (%d)" % kc
 
+        # FIXME: call ensureCorrectLine()
+        self.column = min(self.column, len(ls[self.line].text))
+
+        self.makeLineVisible(self.line)
         self.updateScreen()
 
     def OnPaint(self, event):
@@ -652,11 +686,12 @@ class MyFrame(wxFrame):
                          wxPoint(100, 100), wxSize(700, 830))
 
         fileMenu = wxMenu()
-        fileMenu.Append(ID_OPEN, "&Open...")
-        fileMenu.Append(ID_SAVE, "&Save")
-        fileMenu.Append(ID_SAVE_AS, "Save &As")
+        fileMenu.Append(ID_FILE_NEW, "&New")
+        fileMenu.Append(ID_FILE_OPEN, "&Open...")
+        fileMenu.Append(ID_FILE_SAVE, "&Save")
+        fileMenu.Append(ID_FILE_SAVE_AS, "Save &As")
         fileMenu.AppendSeparator()
-        fileMenu.Append(ID_EXIT, "E&xit")
+        fileMenu.Append(ID_FILE_EXIT, "E&xit")
 
         formatMenu = wxMenu()
         formatMenu.Append(ID_REFORMAT, "&Reformat all")
@@ -709,10 +744,11 @@ class MyFrame(wxFrame):
 
         EVT_COMMAND_SCROLL(self, self.scrollBar.GetId(), self.ctrl.OnScroll)
                            
-        EVT_MENU(self, ID_OPEN, self.ctrl.OnOpen)
-        EVT_MENU(self, ID_SAVE, self.ctrl.OnSave)
-        EVT_MENU(self, ID_SAVE_AS, self.ctrl.OnSaveAs)
-        EVT_MENU(self, ID_EXIT, self.OnExit)
+        EVT_MENU(self, ID_FILE_NEW, self.ctrl.OnNew)
+        EVT_MENU(self, ID_FILE_OPEN, self.ctrl.OnOpen)
+        EVT_MENU(self, ID_FILE_SAVE, self.ctrl.OnSave)
+        EVT_MENU(self, ID_FILE_SAVE_AS, self.ctrl.OnSaveAs)
+        EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
         EVT_MENU(self, ID_REFORMAT, self.ctrl.OnReformat)
 
         self.Layout()

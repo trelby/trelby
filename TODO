@@ -1,3 +1,5 @@
+-file changed warnings for open,new,exit
+
 -ctrl+home/ctrl+end to go to start/end of script
 
 -mouse scroll wheel support
@@ -63,7 +65,7 @@ that one, inserts it, and positions cursor at end of line.
 
  -text
 
- -html?
+ -html
 
  -pdf
 

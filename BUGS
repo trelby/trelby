@@ -16,17 +16,3 @@ cursor position correct if wrapping begins somewhere other than on the
 current line.
 
 -----
-
-if the current line scrolls off the bottom of the screen as a result
-of pressing enter, display doesn't follow.
-
-------
-
-should cursor always stay on the visible page when scrolling?
-
-------
-
-page down doesn't reposition cursor if the target line is shorter than
-the source line.
-
-----------
