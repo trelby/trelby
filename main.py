@@ -535,7 +535,7 @@ class MyCtrl(wxControl):
             #pg.add(pml.LineOp([(lx, uy), (rx, uy), (rx, dy), (lx, dy)],
             #                  0, True))
 
-            doc.pages.append(pg)
+            doc.add(pg)
 
         exporter = pdf.PDFExporter()
         s = exporter.generate(doc)

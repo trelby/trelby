@@ -36,6 +36,9 @@ class Document:
         # a collection of Page objects
         self.pages = []
 
+    def add(self, page):
+        self.pages.append(page)
+
 class Page:
     def __init__(self):
 
