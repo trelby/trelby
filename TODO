@@ -1,20 +1,18 @@
+-search, search & replace
+
+-cut, copy, paste (internal)
+
 -file changed warnings for open,new,exit
 
 -mouse scroll wheel support
 
--left mouse click to position cursor at that point
-
--search, search & replace
-
--cut, copy, paste (internal)
+-not braindead page breaking
 
 -clipboard support, at least for importing / exporting straight text
 
 -help system, at least supported keyboard commands
 
 -file revert
-
--show column that the cursor is in (is this really needed?)
 
 -undo/redo support
 
@@ -43,7 +41,10 @@ that one, inserts it, and positions cursor at end of line.
 
  -limited functionality in demo, like:
 
-  -not being able to save/export scripts over X pages (10?)
+  -not being able to save/export/print scripts over X pages (10?)
+
+  -scripts have watermarks in them when exported/printed, like "MADE USING
+   NASP EVALUATION COPY"
 
 -element style options:
 

@@ -61,6 +61,7 @@ class MyCtrl(wxControl):
         EVT_SIZE(self, self.OnSize)
         EVT_PAINT(self, self.OnPaint)
         EVT_LEFT_DOWN(self, self.OnLeftDown)
+        EVT_LEFT_DCLICK(self, self.OnLeftDown)
         EVT_CHAR(self, self.OnKeyChar)
 
     def init(self):
@@ -373,6 +374,26 @@ class MyCtrl(wxControl):
 
         return lines
 
+    def pos2line(self, pos):
+        size = self.GetClientSize()
+        length = len(self.sp.lines)
+
+        line = self.topLine
+        y = cfg.offsetY
+        while (y < size.height) and (line < (length -1)):
+            y += self.sp.getEmptyLinesBefore(line) * cfg.fontYdelta
+
+            if (y + cfg.fontYdelta) > size.height:
+                break
+
+            if (y + cfg.fontYdelta) > pos.y:
+                break
+            
+            y += cfg.fontYdelta
+            line += 1
+
+        return line
+
     def line2page(self, n):
         return (n / 55) + 1
 
@@ -414,9 +435,13 @@ class MyCtrl(wxControl):
         self.screenBuf = wxEmptyBitmap(size.width, size.height)
     
     def OnLeftDown(self, event):
-        #pos = event.GetPosition()
-        #print "pos: %s" % event.GetPosition()
-        pass
+        pos = event.GetPosition()
+        self.line = self.pos2line(pos)
+        tcfg = cfg.getTypeCfg(self.sp.lines[self.line].type)
+        x = pos.x - tcfg.indent * cfg.fontX - cfg.offsetX
+        self.column = clamp(x / cfg.fontX, 0,
+                            len(self.sp.lines[self.line].text))
+        self.updateScreen()
 
     def OnTypeCombo(self, event):
         type = mainFrame.typeCb.GetClientData(mainFrame.typeCb.GetSelection())
