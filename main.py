@@ -241,20 +241,40 @@ class MyCtrl(wxControl):
             wxMessageBox("Error saving file: %s" % e, "Error",
                          wxOK, self)
 
-    def export(self, sp, fileName):
+    # script must be correctly paginated before this is called
+    def export(self, sp, fileName, doPages):
         try:
             output = []
             ls = sp.lines
-            for i in range(0, len(ls)):
-                line = ls[i]
-                tcfg = cfg.getType(line.type)
-                if tcfg.isCaps:
-                    text = line.text.upper()
-                else:
-                    text = line.text
+            
+            for p in range(1, len(self.pages)):
+                start = self.pages[p - 1] + 1
+                end = self.pages[p]
 
-                output.append(sp.getEmptyLinesBefore(i) * "\n" +
-                              " " * tcfg.indent + text + "\n")
+                if doPages and (p != 1):
+                    output.append("\n%70s%d.\n\n" % (" ", p))
+
+                    if self.needsMore(start - 1):
+                        output.append(" " * cfg.getType(config.CHARACTER).
+                                      indent + "OSKU (cont'd)\n")
+                
+                for i in range(start, end + 1):
+                    line = ls[i]
+                    tcfg = cfg.getType(line.type)
+                    
+                    if tcfg.isCaps:
+                        text = line.text.upper()
+                    else:
+                        text = line.text
+
+                    if i != start:
+                        output.append(sp.getEmptyLinesBefore(i) * "\n")
+                        
+                    output.append(" " * tcfg.indent + text + "\n")
+
+                if doPages and self.needsMore(i):
+                    output.append(" " * cfg.getType(config.CHARACTER).
+                        indent + "(MORE)\n")
         
             try:
                 f = open(fileName, "wt")
@@ -1156,7 +1176,7 @@ class MyCtrl(wxControl):
             sp = copy.deepcopy(self.sp)
             if misc.isEval:
                 sp.replace()
-            self.export(sp, dlg.GetPath())
+            self.export(sp, dlg.GetPath(), True)
 
         dlg.Destroy()
 
