@@ -8,11 +8,27 @@ from wxPython.wx import *
 # windows
 cfgFrame = None
 
+# we can delete this when/if we switch to using wxListBook in wxwidgets
+# 2.5
+class MyListBook(wxListBox):
+    def __init__(self, parent):
+        wxListBox.__init__(self, parent, -1)
+
+        EVT_LISTBOX(self, self.GetId(), self.OnPageChange)
+
+    def AddPage(self, page, name):
+        self.Append(name, page)
+        page.SetClientSizeWH(400, 400)
+        
+    def OnPageChange(self, event = None):
+        for i in range(self.GetCount()):
+            self.GetClientData(i).Hide()
+
+        self.GetClientData(self.GetSelection()).Show()
+    
 class CfgDlg(wxDialog):
     def __init__(self, parent, cfg, applyFunc):
         wxDialog.__init__(self, parent, -1, "Config dialog",
-                          pos = wxDefaultPosition,
-                          size = (400, 450),
                           style = wxDEFAULT_DIALOG_STYLE)
         self.cfg = cfg
         self.applyFunc = applyFunc
@@ -20,33 +36,39 @@ class CfgDlg(wxDialog):
         global cfgFrame
         cfgFrame = self
         
+        self.SetClientSizeWH(520, 450);
         self.Center()
         
         vsizer = wxBoxSizer(wxVERTICAL)
         self.SetSizer(vsizer)
 
-        self.notebook = wxNotebook(self, -1, style = wxCLIP_CHILDREN)
-        vsizer.Add(self.notebook, 1, wxEXPAND)
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        self.listbook = MyListBook(self)
+        self.listbook.SetClientSizeWH(120, 400)
+        hsizer.Add(self.listbook, 0)
 
-        p = AutoCompPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Auto-completion")
+        self.panel = wxPanel(self, -1)
+        self.panel.SetClientSizeWH(400, 400)
+        
+        hsizer.Add(self.panel)
 
-        p = ColorsPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Colors")
+        self.AddPage(AutoCompPanel, "Auto-completion")
+        self.AddPage(ColorsPanel, "Colors")
+        self.AddPage(ElementsPanel, "Elements")
+        self.AddPage(FontPanel, "Font")
+        self.AddPage(PaginationPanel, "Pagination")
+        self.AddPage(PaperPanel, "Paper")
 
-        p = ElementsPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Elements")
+        self.listbook.SetSelection(2)
 
-        p = FontPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Font")
+        # it's unclear whether SetSelection sends an event on all
+        # platforms or not, so force correct action.
+        self.listbook.OnPageChange()
+        
+        vsizer.Add(hsizer)
 
-        p = PaginationPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Pagination")
-
-        p = PaperPanel(self.notebook, -1, cfg)
-        self.notebook.AddPage(p, "Paper")
-
-        self.notebook.SetSelection(2)
+        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 5)
         
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
@@ -69,6 +91,10 @@ class CfgDlg(wxDialog):
         
         self.Layout()
 
+    def AddPage(self, classObj, name):
+        p = classObj(self.panel, -1, self.cfg)
+        self.listbook.AddPage(p, name)
+        
     def OnOK(self, event):
         self.EndModal(wxID_OK)
 
