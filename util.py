@@ -307,9 +307,18 @@ class TimerDev:
 
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF
-# viewer application. 'mainFrame' is needed as a parent for message boxes
-# in case there are any errors.
+# viewer application. 'mainFrame' is used as a parent for message boxes in
+# case there are any errors.
 def showTempPDF(pdfData, cfg, mainFrame):
+
+    try:
+        st = os.stat(cfg.pdfViewerPath)
+    except OSError:
+        wxMessageBox("PDF viewer application not found.", "Error", wxOK,
+                     mainFrame)
+
+        return
+    
     try:
         try:
             removeTempFiles(cfg.tmpPrefix)
@@ -326,9 +335,6 @@ def showTempPDF(pdfData, cfg, mainFrame):
             # give the full path of the program as first arg, so give a
             # dummy arg.
             args = ["pdf"] + cfg.pdfViewerArgs + [filename]
-
-            # FIXME: check with os.stat that pdf program exists and is
-            # an executable
 
             os.spawnv(os.P_NOWAIT, cfg.pdfViewerPath, args)
 
