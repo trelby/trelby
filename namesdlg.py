@@ -75,8 +75,9 @@ class NamesDlg(wxDialog):
         self.list = MyListCtrl(panel, nameArr)
         vsizer.Add(self.list, 1, wxEXPAND | wxBOTTOM, 5)
 
-        self.foundLabel = wxStaticText(panel, -1, "")
-        vsizer.Add(self.foundLabel, 0, wxALIGN_RIGHT | wxADJUST_MINSIZE )
+        self.foundLabel = wxStaticText(panel, -1, "",
+            style = wxALIGN_CENTRE | wxST_NO_AUTORESIZE)
+        vsizer.Add(self.foundLabel, 0, wxEXPAND)
 
         hsizer.Add(vsizer, 20, wxEXPAND | wxLEFT, 10)
 
@@ -164,7 +165,6 @@ class NamesDlg(wxDialog):
         self.list.EnsureVisible(0)
         
         self.foundLabel.SetLabel("%d names found." % len(l))
-        self.Layout()
         
 class MyListCtrl(wxListCtrl):
     def __init__(self, parent, nameArr):
@@ -178,7 +178,7 @@ class MyListCtrl(wxListCtrl):
         self.InsertColumn(0, "Name")
         self.InsertColumn(1, "Type")
         self.InsertColumn(2, "Sex")
-        self.SetColumnWidth(0, 130)
+        self.SetColumnWidth(0, 120)
         self.SetColumnWidth(1, 120)
         self.SetColumnWidth(2, 50)
 
@@ -191,3 +191,8 @@ class MyListCtrl(wxListCtrl):
             return self.nameArr.typeNames[self.nameArr.type[n]]
         elif col == 2:
             return self.sex[self.nameArr.sex[n]]
+
+    # for some reason this must be overridden as well, otherwise we get
+    # assert failures under windows.
+    def OnGetItemImage(self, item):
+        return -1

@@ -115,7 +115,7 @@ class Screenplay:
 class MyPanel(wxPanel):
 
     def __init__(self, parent, id):
-        wxPanel.__init__(self, parent, id)
+        wxPanel.__init__(self, parent, id, style = wxWANTS_CHARS)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
@@ -127,9 +127,15 @@ class MyPanel(wxPanel):
         
         EVT_COMMAND_SCROLL(self, self.scrollBar.GetId(),
                            self.ctrl.OnScroll)
+
+        EVT_SET_FOCUS(self.scrollBar, self.OnScrollbarFocus)
                            
         self.SetSizer(hsizer)
 
+    # we never want the scrollbar to get the keyboard focus, pass it on to
+    # the main widget
+    def OnScrollbarFocus(self, event):
+        self.ctrl.SetFocus()
     
 class MyCtrl(wxControl):
 
@@ -145,6 +151,7 @@ class MyCtrl(wxControl):
         EVT_LEFT_DCLICK(self, self.OnLeftDown)
         EVT_RIGHT_DOWN(self, self.OnRightDown)
         EVT_MOTION(self, self.OnMotion)
+        EVT_MOUSEWHEEL(self, self.OnMouseWheel)
         EVT_CHAR(self, self.OnKeyChar)
 
         self.createEmptySp()
@@ -337,7 +344,7 @@ class MyCtrl(wxControl):
 
         self.makeLineVisible(self.line)
 
-        t = time.time() - t
+        #t = time.time() - t
         #print "took %.3f seconds" % t
 
     def fillAutoComp(self):
@@ -1145,6 +1152,15 @@ class MyCtrl(wxControl):
     def OnMotion(self, event):
         if event.LeftIsDown():
             self.OnLeftDown(event, mark = True)
+
+    def OnMouseWheel(self, event):
+        if event.GetWheelRotation() > 0:
+            self.topLine -= cfg.mouseWheelLines
+        else:
+            self.topLine += cfg.mouseWheelLines
+            
+        self.topLine = util.clamp(self.topLine, 0, len(self.sp.lines) - 1)
+        self.updateScreen()
         
     def OnTypeCombo(self, event):
         type = mainFrame.typeCb.GetClientData(mainFrame.typeCb.GetSelection())
@@ -1332,7 +1348,8 @@ class MyCtrl(wxControl):
     def OnKeyChar(self, ev):
         kc = ev.GetKeyCode()
         
-        #print "kc: %d, ctrldown: %d" % (kc, ev.ControlDown())
+        #print "kc: %d, ctrl/alt/shift: %d, %d, %d" %\
+        #      (kc, ev.ControlDown(), ev.AltDown(), ev.ShiftDown())
         
         ls = self.sp.lines
         tcfg = cfg.getType(ls[self.line].type)
@@ -1345,8 +1362,9 @@ class MyCtrl(wxControl):
         AC_KEEP = 2
 
         doAutoComp = AC_DEL
-        
-        if kc == WXK_RETURN:
+
+        # 10 == CTRL+Enter under wxMSW
+        if (kc == WXK_RETURN) or (kc == 10):
             if ev.ShiftDown() or ev.ControlDown():
                 self.splitLine()
                 
@@ -1492,7 +1510,7 @@ class MyCtrl(wxControl):
             self.line += self.topLine - oldTop
             self.line = util.clamp(self.line, 0, len(ls) - 1)
             
-        elif ev.AltDown():
+        elif ev.AltDown() and (kc < 256):
             ch = string.upper(chr(kc))
             type = None
             if ch == "S":
@@ -1526,9 +1544,9 @@ class MyCtrl(wxControl):
             self.mark = -1
 
         # FIXME: debug stuff
-        elif (chr(kc) == "å"):
+        elif (kc < 256) and (chr(kc) == "å"):
             self.loadFile("default.nasp")
-        elif (chr(kc) == "Å"):
+        elif (kc < 256) and (chr(kc) == "Å"):
             self.OnSettings()
         
         elif (kc == WXK_SPACE) or (kc > 32) and (kc < 256):
@@ -1678,9 +1696,7 @@ class MyCtrl(wxControl):
                 dc.SetFont(cfgGui.getType(l.type).font)
                 dc.DrawText(text, cfg.offsetX + tcfg.indent * cfgGui.fontX, y)
 
-                # FIXME: only do this on platforms where native font
-                # underlining support doesn't work (linux)
-                if tcfg.isUnderlined:
+                if tcfg.isUnderlined and (wxPlatform == "__WXGTK__"):
                     dc.SetPen(cfgGui.textPen)
                     self.myDrawLine(dc, cfg.offsetX + tcfg.indent *
                         cfgGui.fontX, y + cfg.fontYdelta - 1,
@@ -2066,6 +2082,10 @@ class MyApp(wxApp):
         mainFrame = MyFrame(NULL, -1, "Nasp")
         mainFrame.init()
         mainFrame.Show(True)
+
+        # windows needs this for some reason
+        mainFrame.panel.ctrl.SetFocus()
+        
         self.SetTopWindow(mainFrame)
 
         if "--no-splash" not in sys.argv:

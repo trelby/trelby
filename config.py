@@ -105,6 +105,9 @@ class Config:
 
         # whether to auto-capitalize start of sentences
         self.capitalize = True
+
+        # how many lines to scroll per mouse wheel event
+        self.mouseWheelLines = 4
         
         # page break stuff
 
@@ -199,8 +202,12 @@ class Config:
         t.prevTypeTab = CHARACTER
         self.types[t.type] = t
 
-        # FIXME: use a different one in Windows
-        self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
+        if wxPlatform == "__WXGTK__":
+            self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
+        elif wxPlatform == "__WXMSW__":
+            self.nativeFont = "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
+        else:
+            self.nativeFont = ""
 
         self.addColor("textColor", "Text foreground", 0, 0, 0)
         self.addColor("bgColor", "Text background", 204, 204, 204)
@@ -225,7 +232,7 @@ class Config:
         # how many lines on a page. 12-point font = 6 lines per inch, ie.
         # 1 line = 4.2333333 mm
         self.linesOnPage = int(h / 4.2333333)
-        
+
     def getType(self, type):
         return self.types[type]
 

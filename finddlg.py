@@ -24,11 +24,11 @@ class FindDlg(wxDialog):
         gsizer.AddGrowableCol(1)
         
         gsizer.Add(wxStaticText(panel, -1, "Find what:"))
-        self.findEntry = wxTextCtrl(panel, -1)
+        self.findEntry = wxTextCtrl(panel, -1, style = wxTE_PROCESS_ENTER)
         gsizer.Add(self.findEntry, 0, wxEXPAND)
 
         gsizer.Add(wxStaticText(panel, -1, "Replace with:"))
-        self.replaceEntry = wxTextCtrl(panel, -1)
+        self.replaceEntry = wxTextCtrl(panel, -1, style = wxTE_PROCESS_ENTER)
         gsizer.Add(self.replaceEntry, 0, wxEXPAND)
         
         vsizer.Add(gsizer, 0, wxEXPAND | wxBOTTOM, 10)
@@ -37,13 +37,19 @@ class FindDlg(wxDialog):
 
         vsizer2 = wxBoxSizer(wxVERTICAL)
 
+        # wxGTK adds way more space by default than wxMSG between the
+        # items, have to adjust for that
+        pad = 0
+        if wxPlatform == "__WXMSW__":
+            pad = 5
+
         self.matchWholeCb = wxCheckBox(panel, -1, "Match whole word only")
-        vsizer2.Add(self.matchWholeCb)
+        vsizer2.Add(self.matchWholeCb, 0, wxTOP, pad)
 
         self.matchCaseCb = wxCheckBox(panel, -1, "Match case")
-        vsizer2.Add(self.matchCaseCb)
+        vsizer2.Add(self.matchCaseCb, 0, wxTOP, pad)
 
-        hsizer2.Add(vsizer2, 0, wxEXPAND)
+        hsizer2.Add(vsizer2, 0, wxEXPAND | wxRIGHT, 10)
 
         self.direction = wxRadioBox(panel, -1, "Direction",
                                     choices = ["Up", "Down"])
@@ -58,8 +64,13 @@ class FindDlg(wxDialog):
 
         self.elements = wxCheckListBox(panel, -1)
 
+        # sucky wxMSW doesn't support client data for checklistbox items,
+        # so we have to store it ourselves
+        self.elementTypes = []
+        
         for t in cfg.types.values():
-            self.elements.Append(t.name, t.type)
+            self.elements.Append(t.name)
+            self.elementTypes.append(t.type)
 
         for i in range(0, self.elements.GetCount()):
             self.elements.Check(i, True)
@@ -76,7 +87,7 @@ class FindDlg(wxDialog):
         replace = wxButton(panel, -1, "&Replace")
         vsizer.Add(replace, 0, wxBOTTOM, 5)
         
-        replaceAll = wxButton(panel, -1, "Replace &all")
+        replaceAll = wxButton(panel, -1, "Replace all")
         vsizer.Add(replaceAll, 0, wxBOTTOM, 5)
 
         self.moreButton = wxButton(panel, -1, "")
@@ -90,7 +101,10 @@ class FindDlg(wxDialog):
         EVT_BUTTON(self, self.moreButton.GetId(), self.OnMore)
 
         EVT_TEXT(self, self.findEntry.GetId(), self.OnText)
-        
+
+        EVT_TEXT_ENTER(self, self.findEntry.GetId(), self.OnFind)
+        EVT_TEXT_ENTER(self, self.replaceEntry.GetId(), self.OnFind)
+
         EVT_CHAR(panel, self.OnCharMisc)
         EVT_CHAR(self.findEntry, self.OnCharEntry)
         EVT_CHAR(self.replaceEntry, self.OnCharEntry)
@@ -179,7 +193,7 @@ class FindDlg(wxDialog):
         if self.useExtra:
             self.elementMap = {}
             for i in range(0, self.elements.GetCount()):
-                self.elementMap[self.elements.GetClientData(i)] = \
+                self.elementMap[self.elementTypes[i]] = \
                     self.elements.IsChecked(i)
             
     def typeIncluded(self, type):

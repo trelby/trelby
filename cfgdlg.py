@@ -1,4 +1,5 @@
 import config
+import misc
 import util
 from wxPython.wx import *
 
@@ -58,7 +59,7 @@ class CfgDlg(wxDialog):
         EVT_BUTTON(self, ok.GetId(), self.OnOK)
         
         self.Layout()
-        
+
     def OnOK(self, event):
         self.EndModal(wxID_OK)
 
@@ -79,13 +80,13 @@ class FontPanel(wxPanel):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        self.fontLabel = wxStaticText(panel, -1, "")
-        hsizer.Add(self.fontLabel, 0, wxADJUST_MINSIZE |
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-
         btn = wxButton(panel, -1, "Change")
         EVT_BUTTON(self, btn.GetId(), self.OnChangeFont)
         hsizer.Add(btn, 0)
+
+        self.fontLabel = wxStaticText(panel, -1, "")
+        hsizer.Add(self.fontLabel, 0, wxADJUST_MINSIZE |
+                   wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxBOTTOM, 10)
 
@@ -95,8 +96,9 @@ class FontPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
 
         self.spacingEntry = wxSpinCtrl(panel, -1)
-        self.spacingEntry.SetRange(8, 100)
+        self.spacingEntry.SetRange(4, 125)
         EVT_SPINCTRL(self, self.spacingEntry.GetId(), self.OnSpacing)
+        EVT_KILL_FOCUS(self.spacingEntry, self.OnKillFocus)
         hsizer.Add(self.spacingEntry, 0)
 
         hsizer.Add(wxStaticText(panel, -1, "pixels"), 0,
@@ -117,6 +119,13 @@ class FontPanel(wxPanel):
         
         self.SetSizer(vmsizer)
 
+    def OnKillFocus(self, event):
+        self.OnSpacing()
+
+        # if we don't call this, the spin entry on wxGTK gets stuck in
+        # some weird state
+        event.Skip()
+        
     def OnChangeFont(self, event):
         fd = wxFontData()
         nfi = wxNativeFontInfo()
@@ -143,17 +152,21 @@ class FontPanel(wxPanel):
 
         dlg.Destroy()
 
-    def OnSpacing(self, event):
-        self.cfg.fontYdelta = self.spacingEntry.GetValue()
+    def OnSpacing(self, event = None):
+        self.cfg.fontYdelta = util.getSpinValue(self.spacingEntry)
         
     def cfg2gui(self):
         nfi = wxNativeFontInfo()
         nfi.FromString(self.cfg.nativeFont)
+
+        ps = nfi.GetPointSize()
+        if wxPlatform == "__WXGTK__":
+            ps /= 10
+            
         self.fontLabel.SetLabel("Font: '%s', Size: %d" %
-                                (nfi.GetFaceName(), nfi.GetPointSize() / 10))
+                                (nfi.GetFaceName(), ps))
 
         self.spacingEntry.SetValue(self.cfg.fontYdelta)
-
         
 class ElementsPanel(wxPanel):
     def __init__(self, parent, id, cfg):
@@ -185,21 +198,27 @@ class ElementsPanel(wxPanel):
 
         gsizer = wxFlexGridSizer(2, 2, 0, 10)
 
+        # wxGTK adds way more space by default than wxMSG between the
+        # items, have to adjust for that
+        pad = 0
+        if wxPlatform == "__WXMSW__":
+            pad = 5
+        
         self.capsCb = wxCheckBox(panel, -1, "Caps")
         EVT_CHECKBOX(self, self.capsCb.GetId(), self.OnStyleCb)
-        gsizer.Add(self.capsCb, 0)
+        gsizer.Add(self.capsCb, 0, wxTOP, pad)
             
         self.italicCb = wxCheckBox(panel, -1, "Italic")
         EVT_CHECKBOX(self, self.italicCb.GetId(), self.OnStyleCb)
-        gsizer.Add(self.italicCb, 0)
+        gsizer.Add(self.italicCb, 0, wxTOP, pad)
             
         self.boldCb = wxCheckBox(panel, -1, "Bold")
         EVT_CHECKBOX(self, self.boldCb.GetId(), self.OnStyleCb)
-        gsizer.Add(self.boldCb, 0)
+        gsizer.Add(self.boldCb, 0, wxTOP, pad)
             
         self.underlinedCb = wxCheckBox(panel, -1, "Underlined")
         EVT_CHECKBOX(self, self.underlinedCb.GetId(), self.OnStyleCb)
-        gsizer.Add(self.underlinedCb, 0)
+        gsizer.Add(self.underlinedCb, 0, wxTOP, pad)
             
         hsizer.Add(gsizer, 0, wxEXPAND)
         
@@ -213,6 +232,7 @@ class ElementsPanel(wxPanel):
         self.indentEntry = wxSpinCtrl(panel, -1)
         self.indentEntry.SetRange(0, 80)
         EVT_SPINCTRL(self, self.indentEntry.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(self.indentEntry, self.OnKillFocus)
         gsizer.Add(self.indentEntry, 0)
 
         gsizer.Add(wxStaticText(panel, -1, "characters (10 characters"
@@ -224,6 +244,7 @@ class ElementsPanel(wxPanel):
         self.widthEntry = wxSpinCtrl(panel, -1)
         self.widthEntry.SetRange(5, 80)
         EVT_SPINCTRL(self, self.widthEntry.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(self.widthEntry, self.OnKillFocus)
         gsizer.Add(self.widthEntry, 0)
 
         gsizer.Add(wxStaticText(panel, -1, "characters (10 characters"
@@ -266,9 +287,18 @@ class ElementsPanel(wxPanel):
         EVT_COMBOBOX(self, self.prevTabCombo.GetId(), self.OnMisc)
         
         EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
-        self.OnElementCombo(None)
 
-    def OnElementCombo(self, event):
+        self.elementsCombo.SetSelection(0)
+        self.OnElementCombo()
+
+    def OnKillFocus(self, event):
+        self.OnMisc()
+
+        # if we don't call this, the spin entry on wxGTK gets stuck in
+        # some weird state
+        event.Skip()
+
+    def OnElementCombo(self, event = None):
         self.type = self.elementsCombo.GetClientData(self.elementsCombo.
                                                      GetSelection())
         self.cfg2gui()
@@ -281,11 +311,11 @@ class ElementsPanel(wxPanel):
         tcfg.isBold = self.boldCb.GetValue()
         tcfg.isUnderlined = self.underlinedCb.GetValue()
 
-    def OnMisc(self, event):
+    def OnMisc(self, event = None):
         tcfg = self.cfg.types[self.type]
 
-        tcfg.indent = self.indentEntry.GetValue()
-        tcfg.width = self.widthEntry.GetValue()
+        tcfg.indent = util.getSpinValue(self.indentEntry)
+        tcfg.width = util.getSpinValue(self.widthEntry)
 
         tcfg.nextTypeTab = self.nextTabCombo.GetClientData(
             self.nextTabCombo.GetSelection())
@@ -336,11 +366,11 @@ class ColorsPanel(wxPanel):
 
         btn = wxButton(panel, -1, "Change")
         EVT_BUTTON(self, btn.GetId(), self.OnChangeColor)
-        hsizer.Add(btn, 0, wxRIGHT, 10)
-        
-        self.sampleBtn = wxButton(panel, -1, "    ")
-        self.sampleBtn.Disable()
-        hsizer.Add(self.sampleBtn, 0)
+        hsizer.Add(btn, 0, wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.colorSample = misc.MyColorSample(panel, -1,
+            size = wxSize(200, 50))
+        hsizer.Add(self.colorSample)
         
         vsizer.Add(hsizer, 0, wxEXPAND)
 
@@ -364,6 +394,7 @@ class ColorsPanel(wxPanel):
         cd = wxColourData()
         cd.SetColour(getattr(self.cfg, self.color))
         dlg = wxColourDialog(self, cd)
+        dlg.SetTitle(self.colorsLb.GetStringSelection())
         if dlg.ShowModal() == wxID_OK:
             setattr(self.cfg, self.color,
                     dlg.GetColourData().GetColour().Get())
@@ -372,8 +403,8 @@ class ColorsPanel(wxPanel):
         self.cfg2gui()
             
     def cfg2gui(self):
-        self.sampleBtn.SetBackgroundColour(getattr(self.cfg, self.color))
-        self.sampleBtn.Refresh()
+        self.colorSample.SetBackgroundColour(getattr(self.cfg, self.color))
+        self.colorSample.Refresh()
         
 class PaperPanel(wxPanel):
     def __init__(self, parent, id, cfg):

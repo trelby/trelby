@@ -26,6 +26,14 @@ def reverseComboSelect(combo, clientData):
 
     return False
 
+# wxMSW doesn't respect the control's min/max values at all, so we have to
+# implement this ourselves
+def getSpinValue(spinCtrl):
+    tmp = clamp(spinCtrl.GetValue(), spinCtrl.GetMin(), spinCtrl.GetMax())
+    spinCtrl.SetValue(tmp)
+    
+    return tmp
+
 # returns true if c, a single character, is either empty, not an
 # alphanumeric character, or more than one character.
 def isWordBoundary(c):

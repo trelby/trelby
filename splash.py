@@ -9,7 +9,7 @@ class SplashWindow(wxFrame):
                          pos = wxDefaultPosition,
                          size = (100, 100),
                          style = wxFRAME_FLOAT_ON_PARENT | wxSTAY_ON_TOP |
-                         wxNO_BORDER)
+                         wxSIMPLE_BORDER)
 
         if not SplashWindow.inited:
             SplashWindow.inited = True
