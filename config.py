@@ -142,8 +142,8 @@ class Config:
         self.numberVars = {
 
             # confirm non-undoable delete operations that would delete at
-            # least this many lines. (-1 = disabled)
-            "confirmDeletes" : (2, -1, 999),
+            # least this many lines. (0 = disabled)
+            "confirmDeletes" : (2, 0, 500),
             
             # not used perse, but listed here so that we can easily query
             # min/max values for these in various places

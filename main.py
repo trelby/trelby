@@ -2055,7 +2055,7 @@ class MyCtrl(wxControl):
         if not marked:
             return None
 
-        if not copyToClip and (cfg.confirmDeletes != -1) and (
+        if not copyToClip and cfg.confirmDeletes and (
             (marked[1] - marked[0] + 1) >= cfg.confirmDeletes):
             if wxMessageBox("Are you sure you want to delete\n"
                             "the selected text?", "Confirm",

@@ -774,7 +774,7 @@ class AutoCompPanel(wxPanel):
         self.enabledCb.SetValue(tcfg.doAutoComp)
 
         self.itemsEntry.Enable(tcfg.doAutoComp)
-        self.itemsEntry.SetValue(string.join(tcfg.autoCompList, "\n"))
+        self.itemsEntry.SetValue("\n".join(tcfg.autoCompList))
 
 class PaginationPanel(wxPanel):
     def __init__(self, parent, id, cfg):
@@ -874,21 +874,14 @@ class MiscPanel(wxPanel):
                                            "Auto-capitalize sentences")
         EVT_CHECKBOX(self, self.autoCapSentences.GetId(), self.OnMisc)
         vsizer.Add(self.autoCapSentences, 0, wxBOTTOM, 5)
+
+        self.addSpin("confDel", "Confirm deletes >= this many lines\n"
+                     " (0 = disable):", panel, vsizer,
+                     "confirmDeletes")
+        
+        self.addSpin("wheelScroll", "Lines to scroll per mouse wheel event:",
+                     panel, vsizer, "mouseWheelLines")
             
-        hsizer = wxBoxSizer(wxHORIZONTAL)
-        
-        hsizer.Add(wxStaticText(panel, -1,
-            "Lines to scroll per mouse wheel event:"), 0,
-            wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-        
-        self.wheelScrollEntry = wxSpinCtrl(panel, -1)
-        self.wheelScrollEntry.SetRange(*self.cfg.getMinMax("mouseWheelLines"))
-        EVT_SPINCTRL(self, self.wheelScrollEntry.GetId(), self.OnMisc)
-        EVT_KILL_FOCUS(self.wheelScrollEntry, self.OnKillFocus)
-        hsizer.Add(self.wheelScrollEntry)
-        
-        vsizer.Add(hsizer, 0, wxBOTTOM, 10)
-        
         panel.SetSizer(vsizer)
 
         vmsizer = wxBoxSizer(wxVERTICAL)
@@ -900,6 +893,22 @@ class MiscPanel(wxPanel):
 
         EVT_TEXT(self, self.scriptDirEntry.GetId(), self.OnMisc)
 
+    def addSpin(self, name, descr, panel, sizer, cfgName):
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        hsizer.Add(wxStaticText(panel, -1, descr), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        
+        tmp = wxSpinCtrl(panel, -1)
+        tmp.SetRange(*self.cfg.getMinMax(cfgName))
+        EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
+        EVT_KILL_FOCUS(tmp, self.OnKillFocus)
+        hsizer.Add(tmp)
+        
+        sizer.Add(hsizer, 0, wxBOTTOM, 10)
+        
+        setattr(self, name + "Entry", tmp)
+
     def OnKillFocus(self, event):
         self.OnMisc()
 
@@ -910,6 +919,7 @@ class MiscPanel(wxPanel):
     def OnMisc(self, event = None):
         self.cfg.scriptDir = self.scriptDirEntry.GetValue().rstrip("/\\")
         self.cfg.capitalize = self.autoCapSentences.GetValue()
+        self.cfg.confirmDeletes = util.getSpinValue(self.confDelEntry)
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
 
     def OnBrowse(self, event):
@@ -922,8 +932,13 @@ class MiscPanel(wxPanel):
         dlg.Destroy()
             
     def cfg2gui(self):
+        # stupid wxwindows/wxpython displays empty box if the initial
+        # value is zero if we don't do this...
+        self.confDelEntry.SetValue(5)
+
         self.scriptDirEntry.SetValue(self.cfg.scriptDir)
         self.autoCapSentences.SetValue(self.cfg.capitalize)
+        self.confDelEntry.SetValue(self.cfg.confirmDeletes)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
 
 class PDFPanel(wxPanel):
