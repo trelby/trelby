@@ -554,7 +554,6 @@ class ConfigGui:
         # bits of pml.TextOp.flags.
         self.fonts = []
         
-        dc = wxMemoryDC()
         for fname in ["fontNormal", "fontBold", "fontItalic",
                       "fontBoldItalic"]:
             fi = FontInfo()
@@ -565,8 +564,7 @@ class ConfigGui:
 
             fi.font = wxFontFromNativeInfo(nfi)
 
-            dc.SetFont(fi.font)
-            fx, fy = dc.GetTextExtent("O")
+            fx, fy = util.getTextExtent(fi.font, "O")
 
             fi.fx = max(1, fx)
             fi.fy = max(1, fy)

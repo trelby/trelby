@@ -208,10 +208,7 @@ class DisplayPanel(wxPanel):
             if util.isFixedWidth(font):
                 setattr(self.cfg, fname, font.GetNativeFontInfo().ToString())
 
-                dc = wxMemoryDC()
-                dc.SetFont(font)
-                w1, h1, descent, nada = dc.GetFullTextExtent("O")
-                self.cfg.fontYdelta = h1 + descent
+                self.cfg.fontYdelta = util.getFontHeight(font)
                 
                 self.cfg2gui()
                 self.updateFontLb()

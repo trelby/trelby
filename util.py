@@ -47,8 +47,11 @@ _to_lower = ""
 # characters
 _input_tbl = ""
 
+# permanent memory DC to get text extents etc
+permDc = None
+
 def init():
-    global _to_upper, _to_lower, _input_tbl
+    global _to_upper, _to_lower, _input_tbl, permDc
 
     # setup ISO-8859-1 case-conversion stuff
     tmpUpper = []
@@ -73,6 +76,11 @@ def init():
         else:
             _input_tbl += "|"
 
+    # dunno if the bitmap needs to be big enough to contain the text we're
+    # measuring...
+    permDc = wxMemoryDC()
+    permDc.SelectObject(wxEmptyBitmap(512, 32))
+    
 # like string.upper/lower, but we do our own charset-handling that doesn't
 # need locales etc
 def upper(s):
@@ -213,26 +221,21 @@ def _decodeRepl(mo):
         return chr(val)
     else:
         return ""
-    
+
+# return True if given font is a fixed-width one.
 def isFixedWidth(font):
-    dc = wxMemoryDC()
-    dc.SetFont(font)
-    w1, h1 = dc.GetTextExtent("iiiii")
-    w2, h2 = dc.GetTextExtent("OOOOO")
-    
-    return w1 == w2
+    return getTextExtent(font, "iiiii")[0] == getTextExtent(font, "OOOOO")[0]
 
 # get extent of 's' as (w, h) (may or may not include descend values)
 def getTextExtent(font, s):
-    dc = wxMemoryDC()
-    dc.SetFont(font)
-    return dc.GetTextExtent(s)
+    permDc.SetFont(font)
+
+    return permDc.GetTextExtent(s)
 
 # get real height of font, including descend
 def getFontHeight(font):
-    dc = wxMemoryDC()
-    dc.SetFont(font)
-    ext = dc.GetFullTextExtent("_\xC5")
+    permDc.SetFont(font)
+    ext = permDc.GetFullTextExtent("_\xC5")
 
     return ext[1] + ext[2]
 
