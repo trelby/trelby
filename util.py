@@ -15,3 +15,13 @@ def isFixedWidth(font):
     w2, h2 = dc.GetTextExtent("OOOOO")
     
     return w1 == w2
+
+def reverseComboSelect(combo, clientData):
+    for i in range(combo.GetCount()):
+        if combo.GetClientData(i) == clientData:
+            if combo.GetSelection() != i:
+                combo.SetSelection(i)
+
+            return True
+
+    return False

@@ -225,16 +225,8 @@ class MyCtrl(wxControl):
         mainFrame.setTitle(self.fileNameDisplay)
             
     def updateTypeCb(self):
-        if "typeCbRevMap" not in self.__dict__:
-            self.typeCbRevMap = {}
-            for i in range(mainFrame.typeCb.GetCount()):
-                self.typeCbRevMap[mainFrame.typeCb.GetClientData(i)] = i
-                
-        type = self.sp.lines[self.line].type
-        revType = self.typeCbRevMap[type]
-
-        if mainFrame.typeCb.GetSelection() != revType:
-            mainFrame.typeCb.SetSelection(revType)
+        util.reverseComboSelect(mainFrame.typeCb,
+                                self.sp.lines[self.line].type)
 
     def reformatAll(self):
         #t = time.time()

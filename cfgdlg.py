@@ -144,7 +144,7 @@ class ElementsPanel(wxPanel):
 
         self.elementsCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
 
-        for t in cfg.types.values():
+        for t in self.cfg.types.values():
             self.elementsCombo.Append(t.name, t.type)
 
         hsizer.Add(self.elementsCombo, 0)
@@ -202,8 +202,32 @@ class ElementsPanel(wxPanel):
         gsizer.Add(wxStaticText(panel, -1, "characters"), 0,
                    wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
 
+        vsizer.Add(gsizer, 0, wxBOTTOM, 10)
+
+        gsizer = wxFlexGridSizer(2, 2, 5, 0)
+
+        gsizer.Add(wxStaticText(panel, -1, "Next in tab order:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.nextTabCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+
+        for t in self.cfg.types.values():
+            self.nextTabCombo.Append(t.name, t.type)
+
+        gsizer.Add(self.nextTabCombo, 0)
+
+        gsizer.Add(wxStaticText(panel, -1, "Previous in tab order:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.prevTabCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+
+        for t in self.cfg.types.values():
+            self.prevTabCombo.Append(t.name, t.type)
+
+        gsizer.Add(self.prevTabCombo, 0)
+
         vsizer.Add(gsizer, 0, 0)
-        
+
         panel.SetSizer(vsizer)
 
         vmsizer = wxBoxSizer(wxVERTICAL)
@@ -211,6 +235,9 @@ class ElementsPanel(wxPanel):
         
         self.SetSizer(vmsizer)
 
+        EVT_COMBOBOX(self, self.nextTabCombo.GetId(), self.OnMisc)
+        EVT_COMBOBOX(self, self.prevTabCombo.GetId(), self.OnMisc)
+        
         EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
         self.OnElementCombo(None)
 
@@ -232,7 +259,12 @@ class ElementsPanel(wxPanel):
 
         tcfg.indent = self.indentEntry.GetValue()
         tcfg.width = self.widthEntry.GetValue()
-    
+
+        tcfg.nextTypeTab = self.nextTabCombo.GetClientData(
+            self.nextTabCombo.GetSelection())
+        tcfg.prevTypeTab = self.prevTabCombo.GetClientData(
+            self.prevTabCombo.GetSelection())
+            
     def cfg2gui(self):
         tcfg = self.cfg.types[self.type]
         
@@ -247,3 +279,6 @@ class ElementsPanel(wxPanel):
         
         self.indentEntry.SetValue(tcfg.indent)
         self.widthEntry.SetValue(tcfg.width)
+
+        util.reverseComboSelect(self.nextTabCombo, tcfg.nextTypeTab)
+        util.reverseComboSelect(self.prevTabCombo, tcfg.prevTypeTab)
