@@ -236,9 +236,9 @@ class MyCtrl(wxControl):
             if line >= len(self.sp.lines):
                 break
 
-        self.line = 0
-        self.topLine = 0
         self.column = 0
+        self.line = min(self.line, len(self.sp.lines) - 1)
+        self.topLine = min(self.topLine, len(self.sp.lines) - 1)
         
         #t = time.time() - t
         #print "reformatted %d lines in %.2f seconds" % (line, t)
