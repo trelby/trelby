@@ -2,6 +2,7 @@
 # defines found here.
 
 from error import *
+import misc
 import util
 
 from wxPython.wx import *
@@ -152,10 +153,10 @@ class Config:
         self.pbDialogueLines = 2
 
         # PDF viewer program and args
-        if wxPlatform == "__WXGTK__":
+        if misc.isUnix:
             self.pdfViewerPath = "/usr/local/Acrobat5/bin/acroread"
             self.pdfViewerArgs = [ "-tempFile" ]
-        elif wxPlatform == "__WXMSW__":
+        elif misc.isWindows:
             self.pdfViewerPath = "C:\\Program Files\\Adobe\\Acrobat 6.0\\Reader\\AcroRd32.exe"
             self.pdfViewerArgs = [""]
         else:
@@ -296,9 +297,9 @@ class Config:
         t.prevTypeTab = CHARACTER
         self.types[t.lt] = t
 
-        if wxPlatform == "__WXGTK__":
+        if misc.isUnix:
             self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
-        elif wxPlatform == "__WXMSW__":
+        elif misc.isWindows:
             self.nativeFont = "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
         else:
             self.nativeFont = ""

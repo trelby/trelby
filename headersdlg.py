@@ -1,4 +1,5 @@
 import headers
+import misc
 import pdf
 import pml
 import util
@@ -20,7 +21,11 @@ class HeadersDlg(wxDialog):
         if len(self.headers.hdrs) > 0:
             self.hdrIndex = 0
 
-        self.SetClientSizeWH(400, 425);
+        h = 425
+        if misc.isWindows:
+            h = 400
+
+        self.SetClientSizeWH(400, h);
         self.Center()
         
         panel = wxPanel(self, -1)
@@ -116,10 +121,10 @@ class HeadersDlg(wxDialog):
 
         vsizer2 = wxBoxSizer(wxVERTICAL)
 
-        # wxGTK adds way more space by default than wxMSG between the
+        # wxGTK adds way more space by default than wxMSW between the
         # items, have to adjust for that
         pad = 0
-        if wxPlatform == "__WXMSW__":
+        if misc.isWindows:
             pad = 5
         
         self.addCheckBox("Bold", panel, vsizer2, pad)

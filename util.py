@@ -346,7 +346,7 @@ class TimerDev:
 def showTempPDF(pdfData, cfg, mainFrame):
 
     try:
-        st = os.stat(cfg.pdfViewerPath)
+        os.stat(cfg.pdfViewerPath)
     except OSError:
         wxMessageBox("PDF viewer application not found.", "Error", wxOK,
                      mainFrame)
@@ -375,6 +375,6 @@ def showTempPDF(pdfData, cfg, mainFrame):
         except IOError, (errno, strerror):
             raise MiscError("IOError: %s" % strerror)
 
-    except NaspError, e:
+    except BlyteError, e:
         wxMessageBox("Error writing temporary PDF file: %s" % e,
                      "Error", wxOK, mainFrame)

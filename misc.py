@@ -2,6 +2,17 @@ import util
 
 from wxPython.wx import *
 
+def init():
+    global isWindows, isUnix
+    
+    isWindows = False
+    isUnix = False
+
+    if wxPlatform == "__WXMSW__":
+        isWindows = True
+    else:
+        isUnix = True
+
 class MyColorSample(wxWindow):
     def __init__(self, parent, id, size):
         wxWindow.__init__(self, parent, id, size = size)

@@ -1,4 +1,5 @@
 import misc
+
 from wxPython.wx import *
 
 class SplashWindow(wxFrame):
@@ -20,12 +21,14 @@ class SplashWindow(wxFrame):
             self.pic = None
             self.SetClientSizeWH(512, 384)
 
-        # FIXME: check crc32 and w/h of picture, quit if they don't match
-
         self.CenterOnScreen()
 
         self.textColor = wxColour(0, 0, 0)
-        self.font = wxFont(12, wxMODERN, wxNORMAL, wxNORMAL)
+
+        if misc.isUnix:
+            self.font = wxFont(12, wxMODERN, wxNORMAL, wxNORMAL)
+        else:
+            self.font = wxFont(10, wxMODERN, wxNORMAL, wxNORMAL)
 
         if delay != -1:
             self.timer = wxTimer(self)

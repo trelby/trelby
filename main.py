@@ -1705,7 +1705,6 @@ class MyCtrl(wxControl):
         dltTmp = dlt
 
         # now, generate changed-lines for single-line diffs
-        prev = ""
         dlt = []
         for i in range(len(dltTmp)):
             s = dltTmp[i]
@@ -1752,7 +1751,6 @@ class MyCtrl(wxControl):
         
         fs = cfg.fontSize
         ch_y = util.points2y(fs)
-        ch_x = util.points2x(fs)
         
         doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
                            cfg.paperType)
@@ -2361,7 +2359,7 @@ class MyCtrl(wxControl):
                 dc.SetFont(cfgGui.getType(l.lt).font)
                 dc.DrawText(text, cfg.offsetX + tcfg.indent * cfgGui.fontX, y)
 
-                if tcfg.screen.isUnderlined and (wxPlatform == "__WXGTK__"):
+                if tcfg.screen.isUnderlined and misc.isUnix:
                     dc.SetPen(cfgGui.textPen)
                     util.drawLine(dc, cfg.offsetX + tcfg.indent *
                         cfgGui.fontX, y + cfg.fontYdelta - 1,
@@ -2457,9 +2455,9 @@ class MyFrame(wxFrame):
         wxFrame.__init__(self, parent, id, title,
                          wxPoint(100, 100), wxSize(700, 830))
 
-        # FIXME: only do this on unix.
-        # automatically reaps zombies
-        #signal.signal(signal.SIGCHLD, signal.SIG_IGN)
+        if misc.isUnix:
+            # automatically reaps zombies
+            signal.signal(signal.SIGCHLD, signal.SIG_IGN)
         
         self.clipboard = None
         self.showFormatting = False
@@ -2810,6 +2808,7 @@ class MyApp(wxApp):
     def OnInit(self):
         global cfg, mainFrame
 
+        misc.init()
         util.setCharset()
         
         cfg = config.Config()

@@ -1,5 +1,7 @@
 import config
+import misc
 import util
+
 from wxPython.wx import *
 
 class FindDlg(wxDialog):
@@ -37,10 +39,10 @@ class FindDlg(wxDialog):
 
         vsizer2 = wxBoxSizer(wxVERTICAL)
 
-        # wxGTK adds way more space by default than wxMSG between the
+        # wxGTK adds way more space by default than wxMSW between the
         # items, have to adjust for that
         pad = 0
-        if wxPlatform == "__WXMSW__":
+        if misc.isWindows:
             pad = 5
 
         self.matchWholeCb = wxCheckBox(panel, -1, "Match whole word only")

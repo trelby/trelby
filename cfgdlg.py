@@ -213,7 +213,7 @@ class DisplayPanel(wxPanel):
         nfi.FromString(self.cfg.nativeFont)
 
         ps = nfi.GetPointSize()
-        if wxPlatform == "__WXGTK__":
+        if misc.isUnix:
             ps /= 10
             
         self.fontLabel.SetLabel("Font: '%s', Size: %d" %
@@ -322,10 +322,10 @@ class ElementsPanel(wxPanel):
 
         gsizer = wxFlexGridSizer(2, 2, 0, 10)
 
-        # wxGTK adds way more space by default than wxMSG between the
+        # wxGTK adds way more space by default than wxMSW between the
         # items, have to adjust for that
         pad = 0
-        if wxPlatform == "__WXMSW__":
+        if misc.isUnix:
             pad = 5
         
         self.addCheckBox("Caps", prefix, panel, gsizer, pad)

@@ -1,3 +1,4 @@
+import misc
 import pdf
 import pml
 import titles
@@ -20,7 +21,11 @@ class TitlesDlg(wxDialog):
         
         self.setPage(0)
 
-        self.SetClientSizeWH(400, 540);
+        h = 540
+        if misc.isWindows:
+            h = 530
+
+        self.SetClientSizeWH(400, h);
         self.Center()
         
         panel = wxPanel(self, -1)
@@ -151,10 +156,10 @@ class TitlesDlg(wxDialog):
 
         vsizer2 = wxBoxSizer(wxVERTICAL)
 
-        # wxGTK adds way more space by default than wxMSG between the
+        # wxGTK adds way more space by default than wxMSW between the
         # items, have to adjust for that
         pad = 0
-        if wxPlatform == "__WXMSW__":
+        if misc.isWindows:
             pad = 5
         
         self.addCheckBox("Centered", panel, vsizer2, pad)

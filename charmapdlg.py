@@ -1,4 +1,6 @@
+import misc
 import util
+
 from wxPython.wx import *
 
 class CharMapDlg(wxDialog):
@@ -57,7 +59,7 @@ class MyCharMap(wxWindow):
         # size of a single character cell
         self.cellSize = 32
 
-        if wxPlatform == "__WXMSW__":
+        if misc.isWindows:
             self.smallFont = wxFont(12, wxSWISS, wxNORMAL, wxNORMAL)
             self.normalFont = wxFont(18, wxMODERN, wxNORMAL, wxBOLD)
             self.bigFont = wxFont(38, wxMODERN, wxNORMAL, wxBOLD)
