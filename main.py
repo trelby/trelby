@@ -369,7 +369,7 @@ class MyCtrl(wxControl):
                 
             return True
 
-        except NaspError, e:
+        except BlyteError, e:
             wxMessageBox("Error loading file: %s" % e, "Error",
                          wxOK, mainFrame)
 
@@ -1675,8 +1675,8 @@ class MyCtrl(wxControl):
             return
         
         dlg = wxFileDialog(mainFrame, "Filename to save as",
-                           wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
-                           style = wxSAVE | wxOVERWRITE_PROMPT)
+            wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
+            style = wxSAVE | wxOVERWRITE_PROMPT)
         if dlg.ShowModal() == wxID_OK:
             self.saveFile(dlg.GetPath())
 
@@ -1688,8 +1688,8 @@ class MyCtrl(wxControl):
             return
         
         dlg = wxFileDialog(mainFrame, "Filename to export as",
-                           wildcard = "PDF|*.pdf|Formatted text|*.txt",
-                           style = wxSAVE | wxOVERWRITE_PROMPT)
+            wildcard = "PDF|*.pdf|Formatted text|*.txt",
+            style = wxSAVE | wxOVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wxID_OK:
             if dlg.GetFilterIndex() == 0:
@@ -1919,7 +1919,7 @@ class MyCtrl(wxControl):
 
         # FIXME: debug stuff
         elif (kc < 256) and (chr(kc) == "å"):
-            self.loadFile("default.nasp")
+            self.loadFile("default.blyte")
         elif (kc < 256) and (chr(kc) == "Å"):
             self.OnSettings()
         elif (kc < 256) and (chr(kc) == "¤"):
@@ -2260,9 +2260,8 @@ class MyFrame(wxFrame):
         # these are hidden here because they're somewhat harder to find
         # here than in misc.pyo
         misc.isEval = False
-        misc.licensedTo = "Evaluation version."
+        misc.licensedTo = "Evaluation copy."
         misc.version = "0.7"
-        misc.copyright = "© Oskusoft 2004. All rights reserved."
 
         hsizer.Add(self.typeCb)
 
@@ -2330,7 +2329,7 @@ class MyFrame(wxFrame):
         return newPanel
 
     def setTitle(self, text):
-        self.SetTitle("Nasp - %s" % text)
+        self.SetTitle("Blyte - %s" % text)
 
     def setTabText(self, panel, text):
         i = self.findPage(panel)
@@ -2368,8 +2367,8 @@ class MyFrame(wxFrame):
 
     def OnOpen(self, event):
         dlg = wxFileDialog(self, "File to open",
-                           wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
-                           style = wxOPEN)
+            wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
+            style = wxOPEN)
         if dlg.ShowModal() == wxID_OK:
             if not self.notebook.GetPage(self.findPage(self.panel))\
                    .ctrl.isUntouched():
@@ -2467,7 +2466,7 @@ class MyFrame(wxFrame):
         dlg.Show()
 
     def OnAbout(self, event):
-        win = splash.SplashWindow(self, 10000)
+        win = splash.SplashWindow(self, -1)
         win.Show()
         
     def OnTypeCombo(self, event):
@@ -2504,7 +2503,7 @@ class MyApp(wxApp):
         cfg = config.Config()
         refreshGuiConfig()
                 
-        mainFrame = MyFrame(NULL, -1, "Nasp")
+        mainFrame = MyFrame(NULL, -1, "Blyte")
         mainFrame.init()
         mainFrame.Show(True)
 

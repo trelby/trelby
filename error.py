@@ -1,6 +1,6 @@
 # exception classes
 
-class NaspError(Exception):
+class BlyteError(Exception):
     def __init__(self, msg):
         Exception.__init__(self, msg)
         self.msg = msg
@@ -8,10 +8,10 @@ class NaspError(Exception):
     def __str__(self):
         return str(self.msg)
 
-class ConfigError(NaspError):
+class ConfigError(BlyteError):
     def __init__(self, msg):
-        NaspError.__init__(self, msg)
+        BlyteError.__init__(self, msg)
 
-class MiscError(NaspError):
+class MiscError(BlyteError):
     def __init__(self, msg):
-        NaspError.__init__(self, msg)
+        BlyteError.__init__(self, msg)

@@ -105,7 +105,7 @@ class Config:
         self.colors = { }
         
         # prefix used for temp files
-        self.tmpPrefix = "oskusoft-nasp-tmp-"
+        self.tmpPrefix = "oskusoft-blyte-tmp-"
 
         # vertical distance between rows, in pixels
         self.fontYdelta = 18
