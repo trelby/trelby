@@ -234,7 +234,7 @@ class CharInfo:
                 s += ", "
 
             s += str(p)
-            pg = util.str2int(p, -1)
+            pg = util.str2int(str(p), -1)
 
             if pg != -1:
                 endPage = pg
@@ -243,7 +243,7 @@ class CharInfo:
                     if j >= len(self.pages):
                         break
 
-                    pg2 = util.str2int(self.pages[j], -1)
+                    pg2 = util.str2int(str(self.pages[j]), -1)
 
                     if pg2 != (endPage + 1):
                         break
