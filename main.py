@@ -423,6 +423,9 @@ class MyCtrl(wxControl):
 
     def isLastLineOfElem(self, line):
         return self.getElemLastIndexFromLine(line) == self.line
+
+    def isOnlyLineOfElem(self, line):
+        return self.isLastLineOfElem(line) and self.isFirstLineOfElem(line)
         
     def getElemIndexes(self):
         return (self.getElemFirstIndex(), self.getElemLastIndex())
@@ -931,8 +934,7 @@ class MyCtrl(wxControl):
                 
             tmp = str.upper()
             if (tmp == "EXT.") or (tmp == "INT."):
-                if (ls[self.line].lb == cfg.LB_LAST) and\
-                       self.isFirstLineOfElem(self.line):
+                if self.isOnlyLineOfElem(self.line):
                     ls[self.line].type = cfg.SCENE
 
             self.rewrap()
