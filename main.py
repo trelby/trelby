@@ -445,14 +445,14 @@ class MyCtrl(wxControl):
                 tmp = "%d." % p
                 pg.add(pml.TextOp(tmp,
                     cfg.paperWidth - cfg.marginRight - len(tmp) * CH_X,
-                    cfg.marginTop, pml.NORMAL))
+                    cfg.marginTop))
 
                 y += 2
 
                 if self.needsMore(start - 1):
                     pg.add(pml.TextOp("OSKU (cont'd)",
                         cfg.marginLeft + charIndent * CH_X,
-                        cfg.marginTop + y * CH_Y, pml.NORMAL))
+                        cfg.marginTop + y * CH_Y))
 
                     y += 1
 
@@ -485,14 +485,14 @@ class MyCtrl(wxControl):
                 # show line numbers next to each line
                 #pg.add(pml.TextOp("%02d:" % y,
                 #    cfg.marginLeft - 3 * CH_X,
-                #    cfg.marginTop + y * CH_Y, pml.NORMAL))
+                #    cfg.marginTop + y * CH_Y))
 
                 y += 1
 
             if self.needsMore(i):
                 pg.add(pml.TextOp("(MORE)",
                         cfg.marginLeft + charIndent * CH_X,
-                        cfg.marginTop + y * CH_Y, pml.NORMAL))
+                        cfg.marginTop + y * CH_Y))
 
             if misc.isEval:
                 # list of lines which together draw a "DEMO" in

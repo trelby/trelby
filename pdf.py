@@ -62,13 +62,7 @@ class PDFExporter:
 
             cont = util.String()
 
-            currentFont = -1
-
-            # one character takes 7.2 points horizontally
-            CH_X = 7.2
-
-            # ...and 12 points vertically
-            CH_Y = 12
+            currentFont = ""
 
             for op in pg.ops:
                 if op.type == pml.OP_TEXT:
@@ -78,22 +72,21 @@ class PDFExporter:
 
                     # we need to adjust y position since PDF uses baseline
                     # of text as the y pos, but pml uses top of the text
-                    # as y pos. 10.116 is got from the Adobe standard
-                    # Courier family font metrics, which give 157 units in
-                    # 1/1000 point units as the Descender value, thus
-                    # giving (1000 - 157) = 843 units from baseline to top
-                    # of text, and (843 / 1000) * 12 = 10.116.
-                    #
+                    # as y pos. The Adobe standard Courier family font
+                    # metrics give 157 units in 1/1000 point units as the
+                    # Descender value, thus giving (1000 - 157) = 843
+                    # units from baseline to top of text.
+                    
                     # http://partners.adobe.com/asn/tech/type/ftechnotes.jsp
                     # contains the "Font Metrics for PDF Core 14 Fonts"
                     # document.
                     
                     x = self.x(op.x)
-                    y = self.y(op.y) - 10.116
+                    y = self.y(op.y) - 0.843 * op.size
 
-                    newFont = op.flags & 3
+                    newFont = "F%d %d" % (op.flags & 3, op.size)
                     if newFont != currentFont:
-                        cont += "/F%d 12 Tf\n" % newFont
+                        cont += "/%s Tf\n" % newFont
                         currentFont = newFont
                     
                     cont += "BT\n"\
@@ -103,19 +96,19 @@ class PDFExporter:
 
                     if op.flags & pml.UNDERLINED:
 
-                        # Adobe's standard font metrics for Courier
-                        # specify where to put the underline line (100
-                        # units below baseline) and how thick it should be
-                        # (50 units). these are calculated from that for
-                        # 12-point fonts.
+                        # AFM says Courier fonts have a width of 600 units
+                        ch_x = 0.6 * op.size
 
-                        undY = y - 1.2
-                        undLen = len(op.text) * CH_X
+                        # AFM says Courier has the underline line 100
+                        # units below baseline with a thickness of 50
+                        undY = y - 0.1 * op.size
+                        undLen = len(op.text) * ch_x
 
                         cont += "%f w\n"\
                                 "%f %f m\n"\
                                 "%f %f l\n"\
-                                "S\n" % (0.6, x, undY, x + undLen, undY)
+                                "S\n" % (0.05 * op.size, x, undY,
+                                         x + undLen, undY)
                     
                 elif op.type == pml.OP_LINE:
                     p = op.points
@@ -199,7 +192,7 @@ class PDFExporter:
 
     # convert mm to points (1/72 inch).
     def mm2points(self, mm):
-        # 28.34 = 72 / 25.4
+        # 2.834 = 72 / 25.4
         return mm * 2.83464567
 
     # convert x coordinate

@@ -51,16 +51,17 @@ class DrawOp:
         self.type = type
 
 # Draw text string 'text', with upper left corner offsetted (x, y) mm from
-# the upper left corner of the page. Font is always 12-point Courier for
-# now, with it possibly being bold and/or italic as given by the flags.
+# the upper left corner of the page. Font used is 'size'-point Courier,
+# with it possibly being bold/italic/underlined as given by the flags.
 class TextOp(DrawOp):
-    def __init__(self, text, x, y, flags):
+    def __init__(self, text, x, y, flags = NORMAL, size = 12):
         DrawOp.__init__(self, OP_TEXT)
 
         self.text = text
         self.x = x
         self.y = y
         self.flags = flags
+        self.size = size
 
 # Draw consecutive lines. 'points' is a list of (x, y) pairs (minimum 2
 # pairs) and 'width' is the line width, with 0 being the thinnest possible
