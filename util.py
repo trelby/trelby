@@ -57,6 +57,11 @@ def upper(s):
 def lower(s):
     return s.translate(_to_lower)
 
+# returns s with all possible different types of newlines converted to
+# unix newlines, i.e. a single "\n"
+def fixNL(s):
+    return s.replace("\r\n", "\n").replace("\r", "\n")
+
 def clamp(val, min, max):
     if val < min:
         return min

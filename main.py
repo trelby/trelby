@@ -200,7 +200,7 @@ class MyCtrl(wxControl):
             
             i = 0
             for i in range(len(lines)):
-                str = lines[i].strip()
+                str = util.fixNL(lines[i]).rstrip("\n")
 
                 if len(str) == 0:
                     continue
