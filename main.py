@@ -2862,8 +2862,7 @@ class MyCtrl(wxControl):
 class MyFrame(wxFrame):
 
     def __init__(self, parent, id, title):
-        wxFrame.__init__(self, parent, id, title, wxPoint(500, 50),
-                         wxSize(700, 830), name = "Blyte")
+        wxFrame.__init__(self, parent, id, title, name = "Blyte")
 
         if misc.isUnix:
             # automatically reaps zombies
@@ -2884,6 +2883,9 @@ class MyFrame(wxFrame):
         self.cvars.setDefaults(self)
 
         self.SetSizeHints(v.getMin("width"), v.getMin("height"))
+
+        self.height = min(self.height,
+                          wxSystemSettings_GetMetric(wxSYS_SCREEN_Y) - 50)
         
         s = self.loadConfigFile("state", self)
         if s:
