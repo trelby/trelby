@@ -120,6 +120,10 @@ class Config:
         # maximum values
         self.numberVars = {
 
+            # confirm non-undoable delete operations that would delete at
+            # least this many lines. (-1 = disabled)
+            "confirmDeletes" : (2, -1, 999),
+            
             # not used perse, but listed here so that we can easily query
             # min/max values for these in various places
             "elementEmptyLinesBefore" : (0, 0, 5),

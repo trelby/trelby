@@ -87,7 +87,20 @@ class Mark:
     def __init__(self, line, column):
         self.line = line
         self.column = column
-    
+
+# data held in internal clipboard.
+class ClipData:
+    def __init__(self):
+
+        # list of screenplay.Line objects
+        self.lines = []
+
+        # True if this was at start of element
+        self.atStart = False
+
+        # True if this was at end of element
+        #self.atEnd = False
+        
 class Screenplay:
     def __init__(self):
         self.titles = titles.Titles()
@@ -1130,7 +1143,7 @@ class MyCtrl(wxControl):
     # end). returns None if no lines marked.
     def getMarkedLines(self):
         if not self.mark:
-            return (None, None)
+            return None
         
         mark = min(len(self.sp.lines) - 1, self.mark.line)
 
@@ -1202,7 +1215,94 @@ class MyCtrl(wxControl):
     # getMarkedLines.
     def isLineMarked(self, line, marked):
         return (line >= marked[0]) and (line <= marked[1])
+
+    # get selected text as a ClipData object, optionally deleting it from
+    # script. if nothing is selected, returns None.
+    def getSelected(self, doDelete):
+        marked = self.getMarkedLines()
+
+        if not marked:
+            return None
+
+        ls = self.sp.lines
+
+        cd = ClipData()
         
+        for i in xrange(marked[0], marked[1] + 1):
+            c1, c2 = self.getMarkedColumns(i, marked)
+
+            if i == marked[0]:
+                cd.atStart = (c1 == 0) and self.isFirstLineOfElem(i)
+
+            ln = ls[i]
+            
+            cd.lines.append(screenplay.Line(ln.lb, ln.lt, ln.text[c1:c2 + 1]))
+
+        cd.lines[-1].lb = config.LB_LAST
+
+        if doDelete:
+
+            # range of lines, inclusive, that we need to totally delete
+            del1 = sys.maxint
+            del2 = -1
+
+            # delete selected text from the lines
+            for i in xrange(marked[0], marked[1] + 1):
+                c1, c2 = self.getMarkedColumns(i, marked)
+
+                ln = ls[i]
+                ln.text = ln.text[0:c1] + ln.text[c2 + 1:]
+
+                if i == marked[0]:
+                    endCol = c1
+
+                # if we removed all text, mark this line to be deleted
+                if len(ln.text) == 0:
+                    del1 = min(del1, i)
+                    del2 = max(del2, i)
+
+            # adjust linebreaks
+
+            ln = ls[marked[0]]
+            
+            if marked[0] != marked[1]:
+
+                # if we're totally removing the last line selected, and
+                # it's the last line of its element, mark first line
+                # selected as last line of its element so that the
+                # following element is not joined to that one.
+                
+                if self.isLastLineOfElem(marked[1]) and \
+                       not(ls[marked[1]].text):
+                    ln.lb = config.LB_LAST
+                else:
+                    ln.lb = config.LB_AUTO_NONE
+
+            else:
+
+                # if we're totally removing a single line, and that line
+                # is the last line of a multi-line element, mark the
+                # preceding line as the new last line of the element.
+
+                if not ln.text and (marked[0] != 0) and \
+                       not self.isFirstLineOfElem(marked[0]) and \
+                       self.isLastLineOfElem(marked[0]):
+                    ls[marked[0] - 1].lb = config.LB_LAST
+                        
+            del ls[del1:del2 + 1]
+
+            self.mark = None
+
+            if len(ls) == 0:
+                ls.append(screenplay.Line(config.LB_LAST, config.SCENE))
+
+            self.line = min(marked[0], len(ls) - 1)
+            self.column = min(endCol, len(ls[self.line].text))
+
+            self.rewrapPara()
+            
+        return cd
+
     # returns true if there are no contents at all and we're not
     # attached to any file
     def isUntouched(self):
@@ -1929,45 +2029,34 @@ class MyCtrl(wxControl):
             self.loadFile(self.fileName)
             self.updateScreen()
 
-    def OnCut(self, doUpdate = True, copyToClip = True):
-        if self.mark:
-            marked = self.getMarkedLines()
+    def OnCut(self, doUpdate = True, doDelete = True, copyToClip = True):
+        marked = self.getMarkedLines()
 
-            ls = self.sp.lines
+        if not marked:
+            return None
 
-            if copyToClip:
-                mainFrame.clipboard = ls[marked[0] : marked[1] + 1]
-            
-            del ls[marked[0] : marked[1] + 1]
-            
-            if len(ls) == 0:
-                ls.append(screenplay.Line(config.LB_LAST, config.SCENE))
+        if not copyToClip and (cfg.confirmDeletes != -1) and (
+            (marked[1] - marked[0] + 1) >= cfg.confirmDeletes):
+            if wxMessageBox("Are you sure you want to delete\n"
+                            "the selected text?", "Confirm",
+                            wxYES_NO | wxNO_DEFAULT, self) == wxNO:
+                return
 
-            if (marked[0] != 0) and (marked[0] < len(ls)) and\
-                   (ls[marked[0] - 1].lt != ls[marked[0]].lt):
-                ls[marked[0] - 1].lb = config.LB_LAST
-
-            if marked[0] < len(ls):
-                self.line = marked[0]
-                self.column = 0
-            else:
-                self.line = len(ls) - 1
-                self.column = len(ls[self.line].text)
-            
-            self.mark = None
-
-            if doUpdate:
-                self.makeLineVisible(self.line)
-                self.updateScreen()
+        cd = self.getSelected(doDelete)
         
+        if copyToClip:
+            mainFrame.clipboard = cd
+
+        if doUpdate:
+            self.makeLineVisible(self.line)
+            self.updateScreen()
+
     def OnCopy(self):
-        if self.mark:
-            marked = self.getMarkedLines()
+        self.OnCut(doDelete = False)
 
-            mainFrame.clipboard = copy.deepcopy(self.sp.lines[marked[0] :
-                                                              marked[1] + 1])
-        
     def OnPaste(self):
+        # FIXME: make this work again
+        
         if mainFrame.clipboard:
             ls = self.sp.lines
             
@@ -2262,7 +2351,7 @@ class MyCtrl(wxControl):
 
                 self.rewrapPara()
             else:
-                self.OnCut(False, False)
+                self.OnCut(doUpdate = False, copyToClip = False)
 
         elif ev.ControlDown():
             if kc == WXK_SPACE:
@@ -2536,7 +2625,7 @@ class MyCtrl(wxControl):
                 if self.isLastLineOfElem(i):
                     util.drawLine(dc, nx - 1, y + cfg.fontYdelta, nw + 2, 0)
 
-            if self.mark and self.isLineMarked(i, marked):
+            if marked and self.isLineMarked(i, marked):
                 c1, c2 = self.getMarkedColumns(i, marked)
                 
                 dc.SetPen(cfgGui.selectedPen)
@@ -2698,7 +2787,7 @@ class MyCtrl(wxControl):
 class MyFrame(wxFrame):
 
     def __init__(self, parent, id, title):
-        wxFrame.__init__(self, parent, id, title, wxPoint(100, 100),
+        wxFrame.__init__(self, parent, id, title, wxPoint(500, 50),
                          wxSize(700, 830), name = "Blyte")
 
         if misc.isUnix:
