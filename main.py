@@ -5,6 +5,7 @@ from error import *
 import config
 from cfgdlg import CfgDlg
 from commandsdlg import CommandsDlg
+import splash
 import util
 
 import copy
@@ -36,6 +37,7 @@ ID_EDIT_CUT = 9
 ID_EDIT_COPY = 10
 ID_EDIT_PASTE = 11
 ID_HELP_COMMANDS = 12
+ID_HELP_ABOUT = 13
 
 def refreshGuiConfig():
     global cfgGui
@@ -1123,6 +1125,8 @@ class MyFrame(wxFrame):
 
         helpMenu = wxMenu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
+        helpMenu.AppendSeparator()
+        helpMenu.Append(ID_HELP_ABOUT, "&About")
         
         menuBar = wxMenuBar()
         menuBar.Append(fileMenu, "&File")
@@ -1176,6 +1180,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
+        EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
 
         EVT_CLOSE(self, self.OnCloseWindow)
         
@@ -1276,6 +1281,10 @@ class MyFrame(wxFrame):
     def OnHelpCommands(self, event):
         dlg = CommandsDlg(self)
         dlg.Show()
+
+    def OnAbout(self, event):
+        win = splash.SplashWindow(self, 10000)
+        win.Show()
         
     def OnTypeCombo(self, event):
         self.panel.ctrl.OnTypeCombo(event)
@@ -1290,6 +1299,7 @@ class MyFrame(wxFrame):
 
         if doExit:
             self.Destroy()
+            myApp.ExitMainLoop()
         else:
             event.Veto()
 
@@ -1306,14 +1316,20 @@ class MyApp(wxApp):
 
         cfg = config.Config()
         refreshGuiConfig()
-        
+                
         mainFrame = MyFrame(NULL, -1, "Nasp")
         mainFrame.init()
         mainFrame.Show(True)
         self.SetTopWindow(mainFrame)
 
+        win = splash.SplashWindow(mainFrame, 5000)
+        win.Show()
+        
+        win.Raise()
+        
         return True
 
 
-app = MyApp(0)
-app.MainLoop()
+global myApp
+myApp = MyApp(0)
+myApp.MainLoop()
