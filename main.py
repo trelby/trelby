@@ -15,6 +15,7 @@ import namesdlg
 import pdf
 import pml
 import report
+import screenplay
 import splash
 import titles
 import titlesdlg
@@ -77,33 +78,6 @@ def refreshGuiConfig():
 
     cfgGui = config.ConfigGui(cfg)
 
-class Line:
-    def __init__(self, lb = config.LB_LAST, lt = config.ACTION, text = ""):
-        self.lb = lb
-        self.lt = lt
-        self.text = text
-
-    def __eq__(self, other):
-        return (self.lb == other.lb) and (self.lt == other.lt) and\
-               (self.text == other.text)
-    
-    def __ne__(self, other):
-        return not self == other
-        
-    def __str__(self):
-        return config.lb2text(self.lb) + config.lt2text(self.lt)\
-               + self.text
-
-    # replace some words, rendering the script useless except for
-    # evaluation purposes
-    def replace(self):
-        self.text = re.sub(r"\b(\w){3}\b", "BUY", self.text)
-        self.text = re.sub(r"\b(\w){4}\b", "DEMO", self.text)
-        self.text = re.sub(r"\b(\w){5}\b", "TRIAL", self.text)
-        self.text = re.sub(r"\b(\w){6}\b", "*TEST*", self.text)
-        self.text = re.sub(r"\b(\w){7}\b", "LIMITED", self.text)
-        self.text = re.sub(r"\b(\w){10}\b", "EVALUATION", self.text)
-        
 class Screenplay:
     def __init__(self):
         self.titles = titles.Titles()
@@ -154,7 +128,7 @@ class Screenplay:
 
         for i in xrange(len(self.lines)):
             ln = self.lines[i]
-            l.append(Line(ln.lb, ln.lt, ln.text))
+            l.append(screenplay.Line(ln.lb, ln.lt, ln.text))
 
         return sp
             
@@ -222,7 +196,7 @@ class MyCtrl(wxControl):
         self.sp = Screenplay()
         self.sp.titles.addDefaults()
         self.sp.headers.addDefaults()
-        self.sp.lines.append(Line(config.LB_LAST, config.SCENE, ""))
+        self.sp.lines.append(screenplay.Line(config.LB_LAST, config.SCENE))
         self.setFile(None)
         self.makeBackup()
         
@@ -350,7 +324,7 @@ class MyCtrl(wxControl):
                         raise MiscError("Line %d has invalid element type." %
                              (i + 1))
 
-                    line = Line(lb, lt, text)
+                    line = screenplay.Line(lb, lt, text)
                     sp.lines.append(line)
 
                     if lb != config.LB_LAST:
@@ -676,19 +650,19 @@ class MyCtrl(wxControl):
         
         while 1:
             if len(text) <= tcfg.width:
-                ret.append(Line(line.lb, line.lt, text))
+                ret.append(screenplay.Line(line.lb, line.lt, text))
                 break
             else:
                 i = text.rfind(" ", 0, tcfg.width + 1)
 
                 if i >= 0:
-                    ret.append(Line(config.LB_AUTO_SPACE, line.lt,
-                                    text[0:i]))
+                    ret.append(screenplay.Line(config.LB_AUTO_SPACE, line.lt,
+                                               text[0:i]))
                     text = text[i + 1:]
                     
                 else:
-                    ret.append(Line(config.LB_AUTO_NONE, line.lt,
-                                    text[0:tcfg.width]))
+                    ret.append(screenplay.Line(config.LB_AUTO_NONE, line.lt,
+                                               text[0:tcfg.width]))
                     text = text[tcfg.width:]
                     
         return ret
@@ -811,7 +785,7 @@ class MyCtrl(wxControl):
         s = ln.text
         preStr = s[:self.column]
         postStr = s[self.column:]
-        newLine = Line(ln.lb, ln.lt, postStr)
+        newLine = screenplay.Line(ln.lb, ln.lt, postStr)
         ln.text = preStr
         ln.lb = config.LB_FORCED
         self.sp.lines.insert(self.line + 1, newLine)
@@ -1843,7 +1817,7 @@ class MyCtrl(wxControl):
             del ls[marked[0] : marked[1] + 1]
             
             if len(ls) == 0:
-                ls.append(Line(config.LB_LAST, config.SCENE, ""))
+                ls.append(screenplay.Line(config.LB_LAST, config.SCENE))
 
             if (marked[0] != 0) and (marked[0] < len(ls)) and\
                    (ls[marked[0] - 1].lt != ls[marked[0]].lt):
@@ -1950,7 +1924,8 @@ class MyCtrl(wxControl):
             s = util.toInputStr(inLines[i])
 
             if len(s) != 0:
-                lines.extend(self.wrapLine(Line(config.LB_LAST, lt, s)))
+                lines.extend(self.wrapLine(screenplay.Line(config.LB_LAST,
+                                                           lt, s)))
                 lt = cfg.getType(lt).newTypeEnter
 
         self.sp.lines[self.line:self.line] = lines
@@ -2030,7 +2005,7 @@ class MyCtrl(wxControl):
                 lsNew.append(l)
 
         if len(lsNew) == 0:
-            lsNew.append(Line(config.LB_LAST, config.SCENE, ""))
+            lsNew.append(screenplay.Line(config.LB_LAST, config.SCENE))
 
         self.sp.lines = lsNew
         
