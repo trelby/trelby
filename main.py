@@ -782,7 +782,7 @@ class MyCtrl(wxControl):
         return lines
         
     def paginate(self):
-        t = time.time()
+        #t = time.time()
         
         self.pages = [-1]
         self.pagesNoAdjust = [-1]
@@ -804,6 +804,9 @@ class MyCtrl(wxControl):
             # on top of the page. problem is it can take n lines if the
             # character's name is long, and the (cont'd) itself can change
             # the number of lines needed...
+
+            # FIXME: decrease lp by 2 for every page but the first to
+            # account for the page number
             
             #print "starting page %d at %d" % (len(self.pages), i)
             if i < length:
@@ -917,8 +920,8 @@ class MyCtrl(wxControl):
 
             i += 1
 
-        t = time.time() - t
-        print "paginate took %.4f seconds" % t
+        #t = time.time() - t
+        #print "paginate took %.4f seconds" % t
 
     def removeDanglingElement(self, line, type, lastBreak):
         while (self.sp.lines[line].type == type) and\
