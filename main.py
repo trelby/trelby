@@ -42,6 +42,7 @@ KC_CTRL_V = 22
 
 ID_EDIT_COPY,\
 ID_EDIT_CUT,\
+ID_EDIT_DELETE_ELEMENTS,\
 ID_EDIT_FIND,\
 ID_EDIT_PASTE,\
 ID_EDIT_SELECT_SCENE,\
@@ -67,7 +68,8 @@ ID_SCRIPT_REFORMAT,\
 ID_SCRIPT_TITLES,\
 ID_TOOLS_CHARMAP,\
 ID_TOOLS_COMPARE_SCRIPTS,\
-ID_TOOLS_NAME_DB = range(28)
+ID_TOOLS_NAME_DB,\
+= range(29)
 
 def refreshGuiConfig():
     global cfgGui
@@ -1928,7 +1930,51 @@ class MyCtrl(wxControl):
             self.reformatAll()
             
         self.updateScreen()
+
+    def OnDeleteElements(self):
+        types = []
+        for t in cfg.types.values():
+            types.append(misc.CheckBoxItem(t.name, False, t.lt))
+
+        dlg = misc.CheckBoxDlg(mainFrame, "Delete elements", (280, 250),
+            types, "Element types to delete:", True)
+
+        ok = False
+        if dlg.ShowModal() == wxID_OK:
+            ok = True
+
+            tdict = misc.CheckBoxItem.getClientData(types)
+            
+        dlg.Destroy()
+
+        if not ok or (len(tdict) == 0):
+            return
+
+        if wxMessageBox("Are you sure you want to delete\n"
+                        "the selected elements?", "Confirm",
+                        wxYES_NO | wxNO_DEFAULT, self) == wxNO:
+            return
+
+        lsNew = []
+        lsOld = self.sp.lines
+
+        for l in lsOld:
+            if l.lt not in tdict:
+                lsNew.append(l)
+
+        if len(lsNew) == 0:
+            lsNew.append(Line(config.LB_LAST, config.SCENE, ""))
+
+        self.sp.lines = lsNew
         
+        self.line = 0
+        self.column = 0
+        self.topLine = 0
+        self.mark = -1
+        
+        self.paginate()
+        self.updateScreen()
+
     def OnSave(self):
         if self.checkEval():
             return
@@ -2480,6 +2526,8 @@ class MyFrame(wxFrame):
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
         editMenu.AppendSeparator()
+        editMenu.Append(ID_EDIT_DELETE_ELEMENTS, "&Remove elements...")
+        editMenu.AppendSeparator()
         editMenu.AppendCheckItem(ID_EDIT_SHOW_FORMATTING, "S&how formatting")
         
         scriptMenu = wxMenu()
@@ -2570,6 +2618,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
+        EVT_MENU(self, ID_EDIT_DELETE_ELEMENTS, self.OnDeleteElements)
         EVT_MENU(self, ID_EDIT_SHOW_FORMATTING, self.OnShowFormatting)
         EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindError)
         EVT_MENU(self, ID_SCRIPT_REFORMAT, self.OnReformat)
@@ -2720,6 +2769,9 @@ class MyFrame(wxFrame):
 
     def OnFind(self, event):
         self.panel.ctrl.OnFind()
+
+    def OnDeleteElements(self, event):
+        self.panel.ctrl.OnDeleteElements()
 
     def OnShowFormatting(self, event):
         self.showFormatting = self.menuBar.IsChecked(ID_EDIT_SHOW_FORMATTING)
