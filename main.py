@@ -936,7 +936,12 @@ class MyCtrl(wxControl):
             if (tmp == "EXT.") or (tmp == "INT."):
                 if self.isOnlyLineOfElem(self.line):
                     ls[self.line].type = cfg.SCENE
-
+            elif (tmp == "(") and\
+                 ls[self.line].type in (cfg.DIALOGUE, cfg.CHARACTER) and\
+                 self.isOnlyLineOfElem(self.line):
+                ls[self.line].type = cfg.PAREN
+                ls[self.line].text = "()"
+                
             self.rewrap()
             doAutoComp = AC_REDO
 
