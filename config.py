@@ -143,8 +143,8 @@ class Config:
             "paginateInterval" : (5, 0, 60),
 
             # paper size
-            "paperHeight" : (210.0, 100.0, 1000.0),
-            "paperWidth" : (297.0, 50.0, 1000.0),
+            "paperHeight" : (297.0, 100.0, 1000.0),
+            "paperWidth" : (210.0, 50.0, 1000.0),
             
             # leave at least this many action lines on the end of a page
             "pbActionLines" : (2, 1, 30),
