@@ -1219,6 +1219,11 @@ class MyCtrl(wxControl):
     def isModified(self):
         return self.sp != self.backup
 
+    # if doIt is True and mark is not yet set, set it at current position.
+    def maybeMark(self, doIt):
+        if doIt and not self.mark:
+            self.mark = Mark(self.line, self.column)
+
     # returns true if a character, inserted at current position, would
     # need to be capitalized as a start of a sentence.
     def capitalizeNeeded(self):
@@ -2264,15 +2269,21 @@ class MyCtrl(wxControl):
                 self.mark = Mark(self.line, self.column)
                 
             elif kc == WXK_HOME:
+                self.maybeMark(ev.ShiftDown())
+                
                 self.line = 0
                 self.topLine = 0
                 self.column = 0
                 
             elif kc == WXK_END:
+                self.maybeMark(ev.ShiftDown())
+                
                 self.line = len(ls) - 1
                 self.column = len(ls[self.line].text)
 
             elif kc == WXK_UP:
+                self.maybeMark(ev.ShiftDown())
+                
                 tmpUp, nothing = self.getSceneIndexes()
 
                 if self.line != tmpUp:
@@ -2286,6 +2297,8 @@ class MyCtrl(wxControl):
                 self.column = 0
 
             elif kc == WXK_DOWN:
+                self.maybeMark(ev.ShiftDown())
+                
                 nothing, tmpBottom = self.getSceneIndexes()
                 self.line = min(len(ls) - 1, tmpBottom + 1)
                 self.column = 0
@@ -2295,13 +2308,19 @@ class MyCtrl(wxControl):
                 return
                 
         elif kc == WXK_LEFT:
+            self.maybeMark(ev.ShiftDown())
+            
             self.column = max(self.column - 1, 0)
             
         elif kc == WXK_RIGHT:
+            self.maybeMark(ev.ShiftDown())
+            
             self.column = min(self.column + 1, len(ls[self.line].text))
             
         elif kc == WXK_DOWN:
             if not self.autoComp:
+                self.maybeMark(ev.ShiftDown())
+                
                 if self.line < (len(ls) - 1):
                     self.line += 1
                     if self.line >= (self.topLine + self.getLinesOnScreen()):
@@ -2314,6 +2333,8 @@ class MyCtrl(wxControl):
                         
         elif kc == WXK_UP:
             if not self.autoComp:
+                self.maybeMark(ev.ShiftDown())
+                
                 if self.line > 0:
                     self.line -= 1
                     if self.line < self.topLine:
@@ -2325,16 +2346,22 @@ class MyCtrl(wxControl):
                 doAutoComp = AC_KEEP
                     
         elif kc == WXK_HOME:
+            self.maybeMark(ev.ShiftDown())
+            
             self.column = 0
             
         elif kc == WXK_END:
             if self.autoComp:
                 ls[self.line].text = self.autoComp[self.autoCompSel]
+            else:
+                self.maybeMark(ev.ShiftDown())
                 
             self.column = len(ls[self.line].text)
                 
         elif kc == WXK_PRIOR:
             if not self.autoComp:
+                self.maybeMark(ev.ShiftDown())
+                
                 self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
                     0)
                 self.line = min(self.topLine + 5, len(ls) - 1)
@@ -2348,6 +2375,8 @@ class MyCtrl(wxControl):
             
         elif kc == WXK_NEXT:
             if not self.autoComp:
+                self.maybeMark(ev.ShiftDown())
+                
                 oldTop = self.topLine
 
                 self.topLine += self.getLinesOnScreen() - 2

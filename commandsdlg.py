@@ -40,7 +40,8 @@ SHIFT + TAB            Change element to previous style
 
 SHIFT/CTRL + ENTER     Insert forced linebreak
 
-CTRL + SPACE           Start selection
+CTRL + SPACE /         Start selection
+ SHIFT + Movement
 CTRL + A               Select current scene
 ESCAPE                 Unselect
 
