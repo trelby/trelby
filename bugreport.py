@@ -47,15 +47,13 @@ class BugReportDlg(wxDialog):
             " what you were doing and what went wrong. If possible, include" \
             " data needed to reproduce the problem.\n\n" \
             "" \
-            "Also, and this is very important, press the \"Copy\" button" \
-            " below to copy additional information about the problem to the" \
-            " clipboard, and then paste that information at the end of your" \
-            " mail. Don't close this window until you've safely copied this" \
-            " extra information to another program.\n\n" \
+            "Also, and this is very important, press the \"Save\" button" \
+            " below to save additional information about the problem to a" \
+            " file, and then attach that file to your mail.\n\n" \
             "" \
             "If you have other windows besides the main window open in" \
-            " this program, you need to close them before being able to" \
-            " press \"Copy\".\n\n" \
+            " this program, you may need to close them before being able to" \
+            " press \"Save\".\n\n" \
             "" \
             "After doing all this, save your work (if possible), and" \
             " restart the program."
@@ -64,8 +62,8 @@ class BugReportDlg(wxDialog):
             size = wxSize(400, 300), style = wxTE_MULTILINE | wxTE_READONLY),
             1, wxEXPAND)
         
-        btn = wxButton(self, -1, "Copy")
-        EVT_BUTTON(self, btn.GetId(), self.OnCopyCb)
+        btn = wxButton(self, -1, "Save")
+        EVT_BUTTON(self, btn.GetId(), self.OnSave)
         vsizer.Add(btn, 0, wxALIGN_CENTER | wxTOP, 10)
 
         util.finishWindow(self, vsizer)
@@ -79,28 +77,13 @@ class BugReportDlg(wxDialog):
         self.brh.data = util.String(str(self.brh.data)[self.brh.copyPos:])
         self.brh.copyPos = 0
         
-    # FIXME: make this write the information to a file instead of using
-    # the clipboard
-    def OnCopyCb(self, event):
-        if wxTheClipboard.Open():
-            wxTheClipboard.UsePrimarySelection(True)
-            
-            wxTheClipboard.Clear()
+    def OnSave(self, event):
+        dlg = wxFileDialog(self, "Filename to save as",
+            defaultFile = "error_report.dat",
+            style = wxSAVE | wxOVERWRITE_PROMPT)
 
+        if dlg.ShowModal() == wxID_OK:
             self.brh.copyPos = len(self.brh.data)
-            s1 = str(self.brh.data).encode("base64").encode("rot13")
-            s2 = "---start info---\n1 "
-
-            # FIXME: put whole license string here
-            if misc.isEval:
-                s2 += "0\n"
-            else:
-                s2 += "1\n%s" % misc.license
-
-            s2 += "%s---end info---\n" % s1
-            s2 = s2.replace("\n", os.linesep)
-
-            wxTheClipboard.AddData(wxTextDataObject(s2))
-            wxTheClipboard.Flush()
-                
-            wxTheClipboard.Close()
+            s = str(self.brh.data).encode("base64").encode("rot13")
+            
+            util.writeToFile(dlg.GetPath(), s, self)
