@@ -1422,6 +1422,13 @@ class MyFrame(wxFrame):
         for t in cfg.types.values():
             self.typeCb.Append(t.name, t.type)
 
+        # these are hidden here because they're much harder to find here
+        # than in misc.pyo
+        misc.isEval = False
+        misc.licensedTo = "Evaluation version."
+        misc.version = "0.43"
+        misc.copyright = "© Oskusoft 2004. All rights reserved."
+
         hsizer.Add(self.typeCb)
 
         vsizer.Add(hsizer, 0, wxALL, 5)
