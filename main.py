@@ -333,9 +333,9 @@ class MyCtrl(wxControl):
                     lt = config.text2lt(s[1], False)
                     text = s[2:]
 
-                    # convert unknown lb types into LB_AUTO_SPACE
+                    # convert unknown lb types into LB_SPACE
                     if lb == None:
-                        lb = config.LB_AUTO_SPACE
+                        lb = config.LB_SPACE
                         unknownLb = True
                         
                     # convert unknown types into ACTION
@@ -736,17 +736,17 @@ class MyCtrl(wxControl):
 
                 if (i == w) and (text[w + 1:w + 2] == " "):
                     
-                    ret.append(screenplay.Line(config.LB_AUTO_SPACE2, line.lt,
+                    ret.append(screenplay.Line(config.LB_SPACE2, line.lt,
                                                text[0:i]))
                     text = text[i + 2:]
 
                 elif i >= 0:
-                    ret.append(screenplay.Line(config.LB_AUTO_SPACE, line.lt,
+                    ret.append(screenplay.Line(config.LB_SPACE, line.lt,
                                                text[0:i]))
                     text = text[i + 1:]
                     
                 else:
-                    ret.append(screenplay.Line(config.LB_AUTO_NONE, line.lt,
+                    ret.append(screenplay.Line(config.LB_NONE, line.lt,
                                                text[0:w]))
                     text = text[w:]
                     
@@ -1299,7 +1299,7 @@ class MyCtrl(wxControl):
                        not(ls[marked[1]].text):
                     ln.lb = config.LB_LAST
                 else:
-                    ln.lb = config.LB_AUTO_NONE
+                    ln.lb = config.LB_NONE
 
             else:
 
@@ -1381,7 +1381,7 @@ class MyCtrl(wxControl):
                 if lb == config.LB_LAST:
                     return True
 
-                elif lb in (config.LB_AUTO_SPACE, config.LB_AUTO_SPACE2):
+                elif lb in (config.LB_SPACE, config.LB_SPACE2):
                     char = " "
                     column = len(ls[line].text)
 
@@ -2402,10 +2402,10 @@ class MyCtrl(wxControl):
                 if (self.line != 0):
                     ln = ls[self.line - 1]
 
-                    if ln.lb == config.LB_AUTO_SPACE2:
-                        ln.lb = config.LB_AUTO_SPACE
+                    if ln.lb == config.LB_SPACE2:
+                        ln.lb = config.LB_SPACE
                     else:
-                        if ln.lb == config.LB_AUTO_NONE:
+                        if ln.lb == config.LB_NONE:
                             self.deleteChar(self.line - 1, len(ln.text) - 1,
                                             False)
                         
@@ -2422,10 +2422,10 @@ class MyCtrl(wxControl):
                     if self.line != (len(ls) - 1):
                         ln = ls[self.line]
 
-                        if ln.lb == config.LB_AUTO_SPACE2:
-                            ln.lb = config.LB_AUTO_SPACE
+                        if ln.lb == config.LB_SPACE2:
+                            ln.lb = config.LB_SPACE
                         else:
-                            if ln.lb == config.LB_AUTO_NONE:
+                            if ln.lb == config.LB_NONE:
                                 self.deleteChar(self.line + 1, 0, False)
 
                             self.joinLines(self.line)

@@ -144,7 +144,7 @@ def importTextFile(fileName, frame):
                     s = ""
 
             if s:
-                line = screenplay.Line(config.LB_AUTO_SPACE, lt, s)
+                line = screenplay.Line(config.LB_SPACE, lt, s)
                 ret.append(line)
 
         elif ret:
