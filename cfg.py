@@ -2,6 +2,7 @@
 # defines found here.
 
 from error import *
+from wxPython.wx import *
 
 # linebreak types
 LB_AUTO_SPACE = 1
@@ -81,12 +82,6 @@ fontYdelta = 18
 offsetY = 10
 offsetX = 10
 
-# base font from which style-specific fonts are constructed
-baseFont = None
-
-# FIXME: ugly hack, remove
-sceneFont = None
-
 class Type:
     def __init__(self):
         self.linetype = None
@@ -95,7 +90,7 @@ class Type:
         self.width = 0
         self.isCaps = False
 
-def _init():
+def init():
     for k, v in _text2lb.items():
         _lb2text[v] = k
 
@@ -146,9 +141,29 @@ def _init():
     t.width = 15
     t.isCaps = True
     _types[t.linetype] = t
-    
 
-_init()
+    # TODO: world's ugliest hack, but it'll do for now
+    global baseFont, sceneFont,  bluePen, redColor, blackColor, bgColor, \
+    bgBrush, bgPen,  cursorColor, cursorBrush, cursorPen,  pagebreakPen
+    
+    baseFont = wxFont(fontY, wxMODERN, wxNORMAL, wxNORMAL)
+    sceneFont = wxFont(fontY, wxMODERN, wxNORMAL, wxBOLD)
+
+    bluePen = wxPen(wxColour(0, 0, 255))
+    redColor = wxColour(255, 0, 0)
+    blackColor = wxColour(0, 0, 0)
+
+    global bgBrush
+    
+    bgColor = wxColour(204, 204, 204)
+    bgBrush = wxBrush(bgColor)
+    bgPen = wxPen(bgColor)
+
+    cursorColor = wxColour(205, 0, 0)
+    cursorBrush = wxBrush(cursorColor)
+    cursorPen = wxPen(cursorColor)
+
+    pagebreakPen = wxPen(wxColour(128, 128, 128), style = wxSHORT_DASH)
 
 def _conv(dict, key):
     val = dict.get(key)

@@ -8,6 +8,7 @@ from cfgdlg import CfgDlg
 import copy
 import string
 import time
+import os.path
 from wxPython.wx import *
 
 #keycodes
@@ -27,6 +28,7 @@ ID_FILE_EXIT = 3
 ID_REFORMAT = 4
 ID_FILE_NEW = 5
 ID_FILE_SETTINGS = 6
+ID_FILE_CLOSE = 7
 
 def clamp(val, min, max):
     if val < min:
@@ -57,39 +59,41 @@ class Screenplay:
             return cfg.getTypeCfg(self.lines[i].type).emptyLinesBefore
         else:
             return 0
+
+class MyPanel(wxPanel):
+
+    def __init__(self, parent, id):
+        wxPanel.__init__(self, parent, id)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        self.scrollBar = wxScrollBar(self, -1, style = wxSB_VERTICAL)
+        self.ctrl = MyCtrl(self, -1)
+
+        hsizer.Add(self.ctrl, 1, wxEXPAND)
+        hsizer.Add(self.scrollBar, 0, wxEXPAND)
+        
+        EVT_COMMAND_SCROLL(self, self.scrollBar.GetId(),
+                           self.ctrl.OnScroll)
+                           
+        self.SetSizer(hsizer)
+
     
 class MyCtrl(wxControl):
 
     def __init__(self, parent, id):
         wxControl.__init__(self, parent, id, style=wxWANTS_CHARS)
 
+        self.panel = parent
+        
         EVT_SIZE(self, self.OnSize)
         EVT_PAINT(self, self.OnPaint)
+        EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
         EVT_LEFT_DOWN(self, self.OnLeftDown)
         EVT_LEFT_DCLICK(self, self.OnLeftDown)
         EVT_CHAR(self, self.OnKeyChar)
 
-    def init(self):
-        self.bluePen = wxPen(wxColour(0, 0, 255))
-        self.redColor = wxColour(255, 0, 0)
-        self.blackColor = wxColour(0, 0, 0)
-
-        self.bgColor = wxColour(204, 204, 204)
-        self.bgBrush = wxBrush(self.bgColor)
-        self.bgPen = wxPen(self.bgColor)
-
-        self.cursorColor = wxColour(205, 0, 0)
-        self.cursorBrush = wxBrush(self.cursorColor)
-        self.cursorPen = wxPen(self.cursorColor)
-        
-        self.pagebreakPen = wxPen(wxColour(128, 128, 128),
-            style = wxSHORT_DASH)
-        
-        cfg.baseFont = wxFont(cfg.fontY, wxMODERN, wxNORMAL, wxNORMAL)
-        cfg.sceneFont = wxFont(cfg.fontY, wxMODERN, wxNORMAL, wxBOLD)
-
-        self.OnNew(redraw = False)
-        
+        self.createEmptySp()
         self.updateScreen(redraw = False)
         
     def loadFile(self, fileName):
@@ -133,10 +137,14 @@ class MyCtrl(wxControl):
             self.topLine = 0
             self.setFile(fileName)
 
+            return True
+
         except NaspError, e:
             dlg = wxMessageDialog(self, "Error loading file: %s" % e, "Error",
                                   wxOK)
             dlg.ShowModal()
+
+            return False
 
     def saveFile(self, fileName):
         try:
@@ -166,10 +174,11 @@ class MyCtrl(wxControl):
     def setFile(self, fileName):
         self.fileName = fileName
         if fileName:
-            t = fileName
+            t = os.path.basename(fileName)
         else:
             t = "<new>"
             
+        mainFrame.setTabText(self.panel, t)
         mainFrame.SetTitle("Nasp - %s" % t)
             
     def updateTypeCb(self):
@@ -415,8 +424,8 @@ class MyCtrl(wxControl):
         
     def adjustScrollBar(self):
         pageSize = self.getLinesOnScreen()
-        mainFrame.scrollBar.SetScrollbar(self.topLine, pageSize,
-                                         len(self.sp.lines), pageSize) 
+        self.panel.scrollBar.SetScrollbar(self.topLine, pageSize,
+                                          len(self.sp.lines), pageSize) 
 
     def isFixedWidth(self, font):
         dc = wxMemoryDC()
@@ -425,16 +434,29 @@ class MyCtrl(wxControl):
         w2, h2 = dc.GetTextExtent("OOOOO")
 
         return w1 == w2
+
+    def isUntouched(self):
+        if self.fileName or (len(self.sp.lines) > 1) or \
+           (len(self.sp.lines[0].text) > 0):
+            return False
+        else:
+            return True
         
-    def updateScreen(self, redraw = True):
+    def updateScreen(self, redraw = True, setFull = False):
         mainFrame.statusBar.SetStatusText("Page: %3d / %3d" %
             (self.line / 55 + 1, len(self.sp.lines)/55 + 1), 0)
                                                            
         self.updateTypeCb()
         self.adjustScrollBar()
+        if setFull:
+            self.setFile(self.fileName)
+            
         if redraw:
             self.Refresh(False)
 
+    def OnEraseBackground(self, event):
+        pass
+        
     def OnSize(self, event):
         size = self.GetClientSize()
         self.screenBuf = wxEmptyBitmap(size.width, size.height)
@@ -455,7 +477,7 @@ class MyCtrl(wxControl):
         self.updateScreen()
 
     def OnScroll(self, event):
-        pos = mainFrame.scrollBar.GetThumbPosition()
+        pos = self.panel.scrollBar.GetThumbPosition()
         self.topLine = pos
         self.updateScreen()
 
@@ -463,25 +485,14 @@ class MyCtrl(wxControl):
         self.reformatAll()
         self.updateScreen()
 
-    def OnNew(self, event = None, redraw = True):
+    def createEmptySp(self):
         self.sp = Screenplay()
         self.sp.lines.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
         self.line = 0
         self.column = 0
         self.topLine = 0
         self.setFile(None)
-
-        if redraw:
-            self.updateScreen()
         
-    def OnOpen(self, event):
-        dlg = wxFileDialog(self, "File to open",
-                           wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
-                           style = wxOPEN)
-        if dlg.ShowModal() == wxID_OK:
-            self.loadFile(dlg.GetPath())
-            self.updateScreen()
-
     def OnSave(self, event):
         if self.fileName:
             self.saveFile(self.fileName)
@@ -568,6 +579,7 @@ class MyCtrl(wxControl):
                 self.column = 0
             elif kc == WXK_END:
                 self.line = len(self.sp.lines) - 1
+                self.column = len(ls[self.line].text)
             else:
                 event.Skip()
                 return
@@ -684,8 +696,8 @@ class MyCtrl(wxControl):
         dc = wxBufferedPaintDC(self, self.screenBuf)
 
         size = self.GetClientSize()
-        dc.SetBrush(self.bgBrush)
-        dc.SetPen(self.bgPen)
+        dc.SetBrush(cfg.bgBrush)
+        dc.SetPen(cfg.bgPen)
         dc.DrawRectangle(0, 0, size.width, size.height)
         dc.SetFont(cfg.baseFont)
 
@@ -704,23 +716,23 @@ class MyCtrl(wxControl):
 
             # FIXME: debug code, make a hidden config-option
             if 0:
-                dc.SetPen(self.bluePen)
+                dc.SetPen(cfg.bluePen)
                 dc.DrawLine(cfg.offsetX + tcfg.indent * cfg.fontX, y,
                     cfg.offsetX + tcfg.indent * cfg.fontX, y + cfg.fontYdelta)
                 dc.DrawLine(cfg.offsetX + (tcfg.indent + tcfg.width)
                     * cfg.fontX, y, cfg.offsetX + (tcfg.indent + tcfg.width)
                     * cfg.fontX, y + cfg.fontYdelta)
-                dc.SetTextForeground(self.redColor)
+                dc.SetTextForeground(cfg.redColor)
                 dc.DrawText(cfg.lb2text(l.lb), 0, y)
-                dc.SetTextForeground(self.blackColor)
+                dc.SetTextForeground(cfg.blackColor)
 
             if (i != 0) and (self.line2page(i - 1) != self.line2page(i)):
-                dc.SetPen(self.pagebreakPen)
+                dc.SetPen(cfg.pagebreakPen)
                 dc.DrawLine(0, y, size.width, y)
                 
             if i == self.line:
-                dc.SetPen(self.cursorPen)
-                dc.SetBrush(self.cursorBrush)
+                dc.SetPen(cfg.cursorPen)
+                dc.SetBrush(cfg.cursorBrush)
                 dc.DrawRectangle(cfg.offsetX + (self.column + tcfg.indent)
                     * cfg.fontX, y, cfg.fontX, cfg.fontY)
                 
@@ -761,6 +773,7 @@ class MyFrame(wxFrame):
         fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
         fileMenu.Append(ID_FILE_SAVE, "&Save\tCTRL-S")
         fileMenu.Append(ID_FILE_SAVE_AS, "Save &As...")
+        fileMenu.Append(ID_FILE_CLOSE, "&Close")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_SETTINGS, "Se&ttings...")
         fileMenu.AppendSeparator()
@@ -794,41 +807,91 @@ class MyFrame(wxFrame):
         vsizer.Add(hsizer, 0, wxALL, 5)
         vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        self.notebook = wxNotebook(self, -1, style = wxCLIP_CHILDREN)
+        vsizer.Add(self.notebook, 1, wxEXPAND)
 
-        self.ctrl = MyCtrl(self, -1)
-        size = self.GetSize()
-        self.ctrl.SetSize(wxSize(size.width, size.height-30))
-        self.ctrl.SetFocus()
-        hsizer.Add(self.ctrl, 1, wxEXPAND)
-
-        self.scrollBar = wxScrollBar(self, -1, style = wxSB_VERTICAL)
-        hsizer.Add(self.scrollBar, 0, wxEXPAND)
-        
-        vsizer.Add(hsizer, 1, wxEXPAND)
         vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND)
 
         self.statusBar = wxStatusBar(self)
         self.statusBar.SetFieldsCount(2)
         self.statusBar.SetStatusWidths([-1, -1])
         self.SetStatusBar(self.statusBar)
-        
-        EVT_COMBOBOX(self, self.typeCb.GetId(), self.ctrl.OnTypeCombo)
 
-        EVT_COMMAND_SCROLL(self, self.scrollBar.GetId(), self.ctrl.OnScroll)
-                           
-        EVT_MENU(self, ID_FILE_NEW, self.ctrl.OnNew)
-        EVT_MENU(self, ID_FILE_OPEN, self.ctrl.OnOpen)
-        EVT_MENU(self, ID_FILE_SAVE, self.ctrl.OnSave)
-        EVT_MENU(self, ID_FILE_SAVE_AS, self.ctrl.OnSaveAs)
-        EVT_MENU(self, ID_FILE_SETTINGS, self.ctrl.OnSettings)
+        EVT_NOTEBOOK_PAGE_CHANGED(self, self.notebook.GetId(),
+                                  self.OnPageChange)
+        
+        EVT_COMBOBOX(self, self.typeCb.GetId(), self.OnTypeCombo)
+
+        EVT_MENU(self, ID_FILE_NEW, self.OnNew)
+        EVT_MENU(self, ID_FILE_OPEN, self.OnOpen)
+        EVT_MENU(self, ID_FILE_SAVE, self.OnSave)
+        EVT_MENU(self, ID_FILE_SAVE_AS, self.OnSaveAs)
+        EVT_MENU(self, ID_FILE_CLOSE, self.OnClose)
+        EVT_MENU(self, ID_FILE_SETTINGS, self.OnSettings)
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
-        EVT_MENU(self, ID_REFORMAT, self.ctrl.OnReformat)
+        EVT_MENU(self, ID_REFORMAT, self.OnReformat)
 
         self.Layout()
         
     def init(self):
-        self.ctrl.init()
+        self.panel = self.createNewPanel()
+
+    def createNewPanel(self):
+        newPanel = MyPanel(self.notebook, -1)
+        self.notebook.AddPage(newPanel, "<new>", True)
+        newPanel.ctrl.SetFocus()
+
+        return newPanel
+
+    def setTabText(self, panel, text):
+        for i in range(self.notebook.GetPageCount()):
+            p = self.notebook.GetPage(i)
+            if p == panel:
+                self.notebook.SetPageText(i, text)
+
+                return
+        
+    def OnPageChange(self, event):
+        newPage = event.GetSelection()
+        self.panel = self.notebook.GetPage(newPage)
+        self.panel.ctrl.SetFocus()
+        self.panel.ctrl.updateScreen(setFull = True)
+        
+    def OnNew(self, event = None):
+        self.panel = self.createNewPanel()
+
+    def OnOpen(self, event):
+        oldPage = self.notebook.GetSelection()
+        dlg = wxFileDialog(self, "File to open",
+                           wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
+                           style = wxOPEN)
+        if dlg.ShowModal() == wxID_OK:
+            self.panel = self.createNewPanel()
+            if self.panel.ctrl.loadFile(dlg.GetPath()):
+                if self.notebook.GetPage(oldPage).ctrl.isUntouched():
+                    self.notebook.DeletePage(oldPage)
+            else:
+                self.OnClose()
+
+    def OnSave(self, event):
+        self.panel.ctrl.OnSave(event)
+
+    def OnSaveAs(self, event):
+        self.panel.ctrl.OnSaveAs(event)
+
+    def OnClose(self, event = None):
+        self.notebook.DeletePage(self.notebook.GetSelection())
+        if self.notebook.GetPageCount() == 0:
+            self.OnNew()
+
+    def OnSettings(self, event):
+        self.panel.ctrl.OnSettings(event)
+
+    def OnTypeCombo(self, event):
+        self.panel.ctrl.OnTypeCombo(event)
+
+    def OnReformat(self, event):
+        self.panel.ctrl.OnReformat(event)
 
     def OnCloseWindow(self, event):
         self.Destroy()
@@ -844,7 +907,8 @@ class MyApp(wxApp):
     def OnInit(self):
 
         global mainFrame
-        
+
+        cfg.init()
         mainFrame = MyFrame(NULL, -1, "Nasp")
         mainFrame.init()
         mainFrame.Show(True)
