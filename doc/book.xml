@@ -18,16 +18,11 @@
 	  <corpauthor>Oskusoft</corpauthor>
     </authorgroup>
 
-    <pubdate>2004, October 17.</pubdate>
-
     <copyright>
       <year>2004</year>
       <holder>Oskusoft</holder>
     </copyright>
 
-	<legalnotice><para>TODO: Insert legal stuff
-	here.</para></legalnotice>
-	
   </bookinfo>
 
   <chapter>
@@ -224,7 +219,7 @@
 		
 	  </sect2>
 
-	  <sect2>
+	  <sect2 id="add_element">
 		<title>Adding elements and changing their style</title>
 
 		<para>The Enter key will always create a new element. If the
@@ -239,11 +234,11 @@
 
 		<para>What kind of element Enter/Tab/Shift + Tab will
 		create/switch to is dependent on the current style of the element,
-		and is configurable by the user. These values for Enter/Tab are
-		always shown at the bottom of the window at the status bar.
-		Additionally the Tab section will have a "[change]" at the end if
-		pressing Tab would switch the element's style, not create a new
-		one.</para>
+		and is configurable by the user (see <xref
+		linkend="elements_cfg"/>). These values for Enter/Tab are always
+		shown at the bottom of the window at the status bar. Additionally
+		the Tab section will have a "[change]" at the end if pressing Tab
+		would switch the element's style, not create a new one.</para>
 
 		<para>Other ways to change an element's style are using the combo
 		box at the top of the window, or pressing a short-cut key for each
@@ -392,7 +387,16 @@
 	  press the "More" button, you can select the styles it operates on,
 	  which is useful renaming a character and so on.</para>
 
-	  <para>FIXME: document F/R keys.</para>
+	  <para>Pressing Enter while the cursor is either the text box is
+	  equivalent to pressing the 'Find next' button. The Esc key will
+	  close the dialog.</para>
+	  
+	  <para>If you're doing partial replacing, i.e. replacing some, but
+	  not all, occurrences of 'foo' with 'bar', the efficient way to do
+	  that is to press Tab until the focus is on the 'Find next' button,
+	  and then use the 'F' (Find next) and 'R' (Replace) keys on the
+	  keyboard. Press 'F' whenever you don't want to replace that
+	  occurrence, and 'R' when you do want to replace it.</para>
 	  
 	</sect1>
 
@@ -686,7 +690,213 @@
   <chapter id="settings">
 	<title>Settings</title>
 
-	<para>FIXME: describe settings.</para>
+	<para>&blyte; has many settings you can configure to adjust the
+	  program's functioning to your preferences. Some of the settings just
+	  modify the user interface, and have no effect on the output of the
+	  program, while others have.</para>
+
+	<para>It's important to notice that these settings are not per-script;
+	any changes you make affect all scripts that you open. If you want
+	different settings for different scripts, you'll have to create
+	separate configuration files.</para>
+
+	<para>The settings dialog is found under File/Settings. It has a list
+	of categories on the left, the selected category's settings on the
+	right, and three buttons, Apply, Cancel and OK on the bottom. Apply
+	updates the settings to the ones given in the dialog and updates all
+	open scripts to them, so you can easily preview your changes without
+	closing the dialog. Note that you pressing Cancel after Apply has no
+	effect, it only cancels changes that haven't yet been
+	committed.</para>
+	
+	<para>The following sections detail the various settings.</para>
+
+	<sect1>
+	  <title>Auto-completion</title>
+
+	  <para>Here you can define items to be added to the auto-completion
+	  lists for Scene, Character and Transition elements, and optionally
+	  disable auto-completion for any one of them.</para>
+
+	  <para>Transition auto-completes are pretty generic so by default
+	  there are a few of them here, but the Scene and Character lists are
+	  empty. The main use for them are episodic TV shows, where you have a
+	  recurring cast of characters and locations, and it's nice to have
+	  them always available, even if they haven't yet been used in the
+	  current episode's script.</para>
+	  
+	</sect1>
+	
+	<sect1>
+	  <title>Colors</title>
+
+	  <para>Color configuration; not much to explain here, besides the
+	  fact that these only affect the display, the PDF output is always
+	  black on white.</para>
+	  
+	</sect1>
+	
+	<sect1>
+	  <title>Display</title>
+
+	  <para>The topmost listbox allows you to configure what font you want
+	  to use for normal, bold, italic, and bold + italic text. Note that
+	  you should use the same size fonts for each one.</para>
+
+	  <para>The row spacing setting affects how many pixels there are
+	  between each row.</para>
+
+	  <para>The 'Page break lines to show' setting affects how page breaks
+	  are shown. If you select 'None', they are not shown at all.
+	  'Normal', you see solid gray lines in the scripts indicating actual
+	  page break positions. 'Normal + unadjusted', you see the solid
+	  lines, but you also see a dotted gray line, that shows where the
+	  page could have ended, but that the page break position was adjusted
+	  backwards to honor the settings in <xref
+	  linkend="pagination_cfg"/>.</para>
+
+	  <para>This is useful when you've finished your script and you're
+	  going through it trying to reduce the page count. If, for example,
+	  you have three lines, a Character, a Parenthetical, and a Dialogue
+	  element, all one line, and the unadjusted page break line is after
+	  the Parenthetical line, and the actual page break line is above the
+	  character line, you know that if you can trim just one line from the
+	  page, all three lines will then fit on the page instead of being
+	  pushed to the next page.</para>
+	  
+	</sect1>
+	
+	<sect1 id="elements_cfg">
+	  <title>Elements</title>
+
+	  <para>This is where you configure the formatting (and interaction)
+	  parameters for each element style.</para>
+
+	  <para>At the top is a combo box where you specify what element style
+	  you're configuring. All things below that are element-specific
+	  settings.</para>
+
+	  <para>The Screen/Print areas hold four checkboxes,
+	  Caps/Bold/Italic/Underlined, affecting the text style for the
+	  element. Screen affects your screen only, while Print affects PDF
+	  output.</para>
+
+	  <para>The 'Empty lines / 10 before' setting is linespacing before
+	  the element, divided by 10. So a value of 10 means normal
+	  linespacing, 15 means 1.5 linespacing, 20 is double linespacing,
+	  etc.</para>
+
+	  <para>The 'Empty lines / 10 between' is the same, but for
+	  intra-element linespacing, i.e. consecutive lines of the same
+	  element have this much space between them.</para>
+
+	  <para>The Indent and Width settings specify in characters how much
+	  the element is indented (i.e. set off from the left margin) and how
+	  wide it is. 10 characters (in the default 12-point font) equal one
+	  inch.</para>
+
+	  <para>The 'Enter/Tab creates' and 'Tab/Shift+Tab switches to' affect
+	  what element is created when Enter or Tab is pressed in this element
+	  style, or what element style Tab/Shift+Tab switches the element to.
+	  See <xref linkend="add_element"/> for more information.</para>
+	  
+	</sect1>
+	
+	<sect1>
+	  <title>Misc</title>
+
+	  <para>The default script directory setting allows you to specify the
+	  default directory for File/Open dialog on program startup.</para>
+
+	  <para>'Auto-capitalize sentences', if on, well, auto-capitalizes
+	  sentences as you write them. If it capitalizes something you don't
+	  want capitalized, write another letter, and then replace the
+	  capitalized letter by a lowercase one.</para>
+
+	  <para>The 'Confirm deletes' setting allows you to configure how many
+	  lines you can delete without confirmation. It exists because
+	  otherwise it'd be too easy to select a large block of text, press
+	  Delete, and see all your work disappear.</para>
+
+	  <para>'Lines to scroll per mouse wheel event' needs no
+	  explaining.</para>
+	  
+	</sect1>
+	
+	<sect1 id="pagination_cfg">
+	  <title>Pagination</title>
+
+	  <para>This category contains settings that affect pagination of the
+	  script.</para>
+
+	  <para>The first two settings affect how many Action and Dialogue
+	  lines there must be left at the end of a page to allow breaking at
+	  that position. Note that this only affects elements that are broken
+	  in the middle, i.e. if you have a one-line element, the page can
+	  always end after that.</para>
+
+	  <para>'Include scene continueds', if enabled, inserts "(CONTINUED)"
+	  at the end of each page that has a scene that continues to the next
+	  page, and "CONTINUED: (n)" (n = number of CONTINUED pages for
+	  current scene, omitted if n = 1) for each page that continues a
+	  scene from previous page(s).</para>
+
+	  <para>'Auto-paginate interval' defines how often to repaginate the
+	  script automatically. If you have a particularly slow machine, you
+	  might want to increase this number. Note that automatic repagination
+	  is only done when you modify the script, so you can't just sit back
+	  and wait for the repagination to happen, you have to keep making
+	  changes. (You can always use Script/Paginate if you want immediate
+	  repagination.)</para>
+	  
+	</sect1>
+	
+	<sect1>
+	  <title>Paper</title>
+
+	  <para>Here you can configure your output paper size and margins. You
+	  can use A4, Letter, or a custom paper size. At the bottom of the
+	  page is shown the number of lines that will fit on a page with the
+	  given settings.</para>
+	  
+	</sect1>
+	
+	<sect1>
+	  <title>PDF</title>
+
+	  <para>Here you can configure parameters affecting the PDF
+	  output.</para>
+
+	  <para>First you need to specify what application you want to use as
+	  your PDF viewer. On Windows, this is usually Adobe Acrobat, and the
+	  path is something like "C:\Program Files\Adobe\Acrobat
+	  6.0\Reader\AcroRd32.exe". On Linux, you can also use Adobe Acrobat,
+	  path being something like "/usr/local/Acrobat5/bin/acroread". xpdf
+	  is another program you could use if you want, but it's not as good
+	  as Adobe Acrobat.</para>
+
+	  <para>You can also specify arguments to give to the program.</para>
+
+	  <para>The font size specifies the font size to use. 12 is the
+	  default, and you should only deviate from this if you have a very
+	  good reason.</para>
+
+	  <para>'Check script for errors before print, export or compare', if
+	  checked, causes the program to run 'Script/Find next error' for the
+	  whole script automatically before print/export/compare operations.
+	  This is to avoid printing 100 pages and then finding there's an
+	  error on one of them, fixing of which causes repagination of the
+	  whole script, and having to print all the 100 pages again.</para>
+
+	  <para>'Include scene numbers' causes scene numbers to be inserted to
+	  the left and right of each Scene element. This is usually only done
+	  for scripts in production.</para>
+
+	  <para>Show margins/line numbers can be considered debug options, for
+	  they have no use in normal operation, but can be useful if you're
+	  trying to figure out printing related errors.</para>
+	  
+	</sect1>
 	
   </chapter>
   
@@ -884,4 +1094,21 @@ Something starts beeping.
 	</sect1>
 	
   </chapter>
+
+  <appendix>
+	<title>File format</title>
+
+	<para>The file format used by &blyte; for scripts is open and
+	documented, and third parties are encouraged to add support for the
+	format in their programs and/or write utility programs that use the
+	file format in some way, e.g. for generating detailed reports from
+	scripts.</para>
+
+	<para>For more information, see the file 'fileformat.txt' in the
+	program's installation directory, and read through the sample script
+	file provided. If you still have questions about the file format, feel
+	free to contact us by email.</para>
+	
+  </appendix>
+  
 </book>
