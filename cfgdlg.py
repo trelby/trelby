@@ -500,6 +500,14 @@ class PaperPanel(wxPanel):
         vsizer.Add(wxStaticText(panel, -1, "(1 inch = 25.4 mm)"), 0,
                    wxLEFT, 25)
 
+        self.linesLabel = wxStaticText(panel, -1, "")
+
+        # wxwindows doesn't recalculate sizer size correctly at startup so
+        # set initial text
+        self.setLines()
+        
+        vsizer.Add(self.linesLabel, 0, wxTOP, 20)
+        
         panel.SetSizer(vsizer)
 
         vmsizer = wxBoxSizer(wxVERTICAL)
@@ -544,6 +552,11 @@ class PaperPanel(wxPanel):
 
         EVT_TEXT(self, entry.GetId(), self.OnMarginMm)
         EVT_TEXT(self, entry2.GetId(), self.OnMarginInch)
+
+    def setLines(self):
+        self.cfg.recalc()
+        self.linesLabel.SetLabel("Lines per page: %d\n"
+            " (of which 2 are used for headers)" % self.cfg.linesOnPage)
         
     def OnPaperCombo(self, event):
         w, h = self.paperCombo.GetClientData(self.paperCombo.GetSelection())
@@ -562,6 +575,8 @@ class PaperPanel(wxPanel):
         
         self.widthEntry.SetValue(str(w))
         self.heightEntry.SetValue(str(h))
+
+        self.setLines()
                          
     def OnMisc(self, event):
         if self.blockEvents > 0:
@@ -570,6 +585,8 @@ class PaperPanel(wxPanel):
         self.entry2float(self.widthEntry, "paperWidth", 100.0)
         self.entry2float(self.heightEntry, "paperHeight", 100.0)
     
+        self.setLines()
+        
     def OnMarginMm(self, event):
         if self.blockEvents > 0:
             return
@@ -582,6 +599,8 @@ class PaperPanel(wxPanel):
         self.entry2float(self.rightEntryMm, "marginRight", 0.0)
 
         self.cfg2inch()
+
+        self.setLines()
 
         self.blockEvents -= 1
         
@@ -598,6 +617,8 @@ class PaperPanel(wxPanel):
 
         self.cfg2mm()
 
+        self.setLines()
+        
         self.blockEvents -= 1
 
     def cfg2mm(self):
