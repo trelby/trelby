@@ -2757,8 +2757,8 @@ class MyFrame(wxFrame):
 
         ib = wxIconBundle()
         
-        img = wxImage("logo32.png", wxBITMAP_TYPE_PNG)
-        imgS = wxImage("logo16.png", wxBITMAP_TYPE_PNG)
+        img = wxImage("icon32.png", wxBITMAP_TYPE_PNG)
+        imgS = wxImage("icon16.png", wxBITMAP_TYPE_PNG)
 
         bitmap = wxBitmapFromImage(img)
         icon = wxIconFromBitmap(bitmap)
