@@ -1,11 +1,12 @@
+import namearray
 import array
 
 luc = []
+lu = []
+
 for i in range(0, 256):
     luc.append(chr(i))
-
-lu = []
-for i in range(0, 256):
+    
     tmp = []
     for i2 in range(8):
         if i & (0x80 >> i2):
@@ -14,20 +15,7 @@ for i in range(0, 256):
             tmp.append(0)
 
     lu.append(tmp)
-
-# FIXME: this isn't decode-specific, but dunno...
-class name:
-    def __init__(self, name, type, isMale):
-        self.name = name
-        self.type = type
-        self.isMale = isMale
-
-    def __str__(self):
-        if self.isMale:
-            return "%s\t%s\tM" % (self.name, self.type)
-        else:
-            return "%s\t%s\tF" % (self.name, self.type)
-
+    
 def initBb(data):
     global bo, bio, d
 
@@ -98,9 +86,9 @@ class hn:
 # Huffman tree.
 class ht:
 
-    # loads the huffman tree. if doChs, values for this string are
-    # Huffman-coded strings.
-    def __init__(self, doChs = False):
+    # loads the huffman tree. if nameArr, read types as strings and record
+    # them there
+    def __init__(self, nameArr = None):
 
         # root node
         self.r = hn()
@@ -130,10 +118,12 @@ class ht:
             if n.v != None:
                 raise Exception()
 
-            if not doChs:
+            if not nameArr:
                 n.v = gby()
             else:
-                n.v = gs()
+                nameArr.typeNames.append(gs())
+                nameArr.typeFreqs.append(0)
+                n.v = len(nameArr.typeNames) - 1
                 
     # get value by reading bits from bitbuffer and going down the tree
     def gv(self):
@@ -144,10 +134,10 @@ class ht:
 
         return n.v
             
-# read the name database from 'filename' and return a list of 'name'
-# objects. on any error, returns an empty list.
+# read the name database from 'filename' and return a NameArray object. on
+# any error, the item count in it will be zero.
 def readNames(filename):
-    names = []
+    names = namearray.NameArray()
     
     try:
         f = open(filename, "rb")
@@ -168,7 +158,7 @@ def readNames(filename):
         chs = ht()
 
         # types
-        tps = ht(True)
+        tps = ht(names)
 
         prev = ""
 
@@ -183,17 +173,22 @@ def readNames(filename):
                     raise Exception()
 
             t = tps.gv()
-            ism = gbi()
+            ism = gbi() == 1
 
             le = len(prev)
             if dc > le:
                 raise Exception()
 
             nn = prev[0 : le - dc] + a
-            names.append(name(nn, t, ism))
+            names.append(nn, t, ism)
+            names.typeFreqs[t] += 1
 
             prev = nn
+
+        global d
+        del d, chs
+
     except:
-        names = []
-        
+        names = namearray.NameArray()
+
     return names
