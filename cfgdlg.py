@@ -952,7 +952,7 @@ class PDFPanel(wxPanel):
         vsizer.Add(hsizer, 0, wxTOP, 20)
 
         self.checkErrorsCb = wxCheckBox(panel, -1,
-            "Check script for errors before print or export")
+            "Check script for errors before print, export or compare")
         EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
         vsizer.Add(self.checkErrorsCb, 0, wxTOP, 10)
 

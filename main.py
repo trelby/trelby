@@ -18,6 +18,7 @@ import util
 
 import codecs
 import copy
+import difflib
 import os.path
 import re
 import signal
@@ -59,6 +60,7 @@ ID_TOOLS_NAME_DB = 20
 ID_REPORTS_DIALOGUE_CHART = 21
 ID_TOOLS_CHARMAP = 22
 ID_FILE_PRINT = 23
+ID_TOOLS_COMPARE_SCRIPTS = 24
 
 def refreshGuiConfig():
     global cfgGui
@@ -423,7 +425,7 @@ class MyCtrl(wxControl):
                 else:
                     text = line.text
 
-                if i != start:
+                if (i != 0) and (not doPages or (i != start)):
                     output += sp.getEmptyLinesBefore(i) * "\n"
 
                 output += " " * tcfg.indent + text + "\n"
@@ -1543,6 +1545,166 @@ class MyCtrl(wxControl):
         dlg.ShowModal()
         dlg.Destroy()
 
+    def OnCompareScripts(self):
+        if mainFrame.notebook.GetPageCount() < 2:
+            wxMessageBox("You need two scripts open to compare them.",
+                         "Error", wxOK, mainFrame)
+
+            return
+
+        # FIXME: show dialog allowing user to select the two open scripts
+        # to compare
+        
+        c1 = mainFrame.notebook.GetPage(0).ctrl
+        c2 = mainFrame.notebook.GetPage(1).ctrl
+        
+        sp1 = c1.getExportable("compare")
+        sp2 = c2.getExportable("compare")
+
+        if not sp1 or not sp2:
+            return
+
+        s1 = c1.generateText(sp1, False).split("\n")
+        s2 = c2.generateText(sp2, False).split("\n")
+
+        dltTmp = difflib.unified_diff(s1, s2, lineterm = "")
+
+        # get rid of stupid delta generator object that doesn't allow
+        # subscription or anything else really. also expands hunk
+        # separators into three lines.
+        dlt = []
+        i = 0
+        for s in dltTmp:
+            if i >= 3:
+                if s[0] == "@":
+                    dlt.extend(["1", "2", "3"])
+                else:
+                    dlt.append(s)
+                    
+            i += 1
+
+        if len(dlt) == 0:
+            wxMessageBox("The scripts are identical.", "Results", wxOK,
+                         mainFrame)
+
+            return
+        
+        dltTmp = dlt
+
+        # now, generate changed-lines for single-line diffs
+        prev = ""
+        dlt = []
+        for i in range(len(dltTmp)):
+            s = dltTmp[i]
+            
+            dlt.append(s)
+
+            # this checks that we've just added a sequence of lines whose
+            # first characters are " -+", where " " means '"not -" or
+            # missing line', and that we're either at end of list or next
+            # line does not start with "+".
+            
+            if (s[0] == "+") and \
+               (i != 0) and (dltTmp[i - 1][0] == "-") and (
+                (i == 1) or (dltTmp[i - 2][0] != "-")) and (
+                (i == (len(dltTmp) - 1)) or (dltTmp[i + 1][0] != "+")):
+
+                # generate line with "^" character at every position that
+                # the lines differ
+                
+                s1 = dltTmp[i - 1]
+                s2 = dltTmp[i]
+                
+                minCnt = min(len(s1), len(s2))
+                maxCnt = max(len(s1), len(s2))
+
+                res = "^"
+                
+                for i in range(1, minCnt):
+                    if s1[i] != s2[i]:
+                        res += "^"
+                    else:
+                        res += " "
+
+                res += "^" * (maxCnt - minCnt)
+                
+                dlt.append(res)
+
+        tmp = ["  Color information:", "1", "-  Deleted lines",
+               "+  Added lines",
+               "^  Positions of single-line changes (marked with ^)", "1",
+               "2", "2", "3"]
+        tmp.extend(dlt)
+        dlt = tmp
+        
+        fs = cfg.fontSize
+        ch_y = util.points2y(fs)
+        ch_x = util.points2x(fs)
+        
+        doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
+                           cfg.paperType)
+
+        # how many lines put on current page
+        y = 0
+
+        pg = pml.Page(doc)
+
+        # we need to gather text ops for each page into a separate list
+        # and add that list to the page only after all other ops are
+        # added, otherwise the colored bars will be drawn partially over
+        # some characters.
+        textOps = []
+        
+        for s in dlt:
+
+            if y >= cfg.linesOnPage:
+                pg.ops.extend(textOps)
+                doc.add(pg)
+
+                pg = pml.Page(doc)
+                textOps = []
+                y = 0
+
+            if s[0] == "1":
+                pass
+
+            elif s[0] == "3":
+                pass
+
+            elif s[0] == "2":
+                pg.add(pml.PDFOp("0.75 g"))
+                w = 50.0
+                pg.add(pml.RectOp(doc.w / 2.0 - w /2.0, cfg.marginTop +
+                    y * ch_y + ch_y / 4, w, ch_y / 2, -1, True))
+                pg.add(pml.PDFOp("0.0 g"))
+
+            else:
+                color = ""
+
+                if s[0] == "-":
+                    color = "1.0 0.667 0.667"
+                elif s[0] == "+":
+                    color = "0.667 1.0 0.667"
+                elif s[0] == "^":
+                    color = "1.0 1.0 0.467"
+
+                if color:
+                    pg.add(pml.PDFOp("%s rg" % color))
+                    pg.add(pml.RectOp(cfg.marginLeft, cfg.marginTop + y * ch_y,
+                        doc.w - cfg.marginLeft - 5.0, ch_y, -1, True))
+                    pg.add(pml.PDFOp("0.0 g"))
+
+                textOps.append(pml.TextOp(s[1:], cfg.marginLeft,
+                    cfg.marginTop + y * ch_y, fs))
+
+            y += 1
+
+        pg.ops.extend(textOps)
+        doc.add(pg)
+
+        tmp = pdf.generate(doc)
+        util.showTempPDF(tmp, cfg, mainFrame)
+
     def canBeClosed(self):
         if self.isModified():
             if wxMessageBox("The script has been modified. Are you sure\n"
@@ -2230,6 +2392,7 @@ class MyFrame(wxFrame):
         toolsMenu = wxMenu()
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
         toolsMenu.Append(ID_TOOLS_CHARMAP, "&Character map...")
+        toolsMenu.Append(ID_TOOLS_COMPARE_SCRIPTS, "C&ompare scripts...")
 
         helpMenu = wxMenu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
@@ -2305,6 +2468,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnDialogueChart)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharMap)
+        EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
 
@@ -2460,6 +2624,9 @@ class MyFrame(wxFrame):
 
     def OnCharMap(self, event):
         self.panel.ctrl.OnCharMap()
+
+    def OnCompareScripts(self, event):
+        self.panel.ctrl.OnCompareScripts()
 
     def OnHelpCommands(self, event):
         dlg = commandsdlg.CommandsDlg(self)
