@@ -86,9 +86,9 @@ def isValidInputChar(kc):
            ((kc >= 0x7F) and (kc <= 0xA0)) and (kc != 0xAD)
 
 # return s with all non-valid input characters converted to valid input
-# characters.
+# characters, except form feeds, which are just deleted.
 def toInputStr(s):
-    return s.translate(_input_tbl)
+    return s.translate(_input_tbl, "\f")
 
 # returns s with all possible different types of newlines converted to
 # unix newlines, i.e. a single "\n"
