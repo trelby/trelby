@@ -1462,8 +1462,25 @@ class MyCtrl(wxControl):
             i += 1
 
     def removeDanglingElement(self, line, lt, lastBreak):
-        while (self.sp.lines[line].lt == lt) and\
-                  (line >= (lastBreak + 2)):
+        ls = self.sp.lines
+        startLine = line
+        
+        while 1:
+            if line < (lastBreak + 2):
+                break
+
+            ln = ls[line]
+            
+            if ln.lt != lt:
+                break
+
+            # only remove one element at most, to avoid generating
+            # potentially thousands of pages in degenerate cases when
+            # script only contains scenes or characters or something like
+            # that.
+            if (line != startLine) and (ln.lb == config.LB_LAST):
+                break
+            
             line -= 1
 
         return line
