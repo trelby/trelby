@@ -12,10 +12,10 @@ import namesdlg
 import splash
 import util
 
+import codecs
 import copy
 import os.path
 import re
-import string
 import sys
 import time
 from wxPython.wx import *
@@ -200,6 +200,11 @@ class MyCtrl(wxControl):
                 f = open(fileName, "rb")
 
                 try:
+                    bom = f.read(3)
+                    if bom != codecs.BOM_UTF8:
+                        raise MiscError(
+                            "File does not start with Unicode BOM marker.")
+                    
                     lines = f.readlines()
                 finally:
                     f.close()
@@ -213,13 +218,28 @@ class MyCtrl(wxControl):
             # LB_LAST line.
             prevType = None
 
-            # remove newlines
+            # did we encounter characters not in ISO-8859-1
+            invalidChars = False
+            
+            # convert to ISO-8859-1, remove newlines
             for i in range(len(lines)):
-                lines[i] = util.fixNL(lines[i]).rstrip("\n")
+                try:
+                    s = unicode(lines[i], "UTF-8")
+                except ValueError:
+                    raise MiscError("Line %d contains invalid UTF-8 data."
+                                    % (i + 1))
 
-            if len(lines) < 3:
+                try:
+                    s = s.encode("ISO-8859-1")
+                except ValueError:
+                    invalidChars = True
+                    s = s.encode("ISO-8859-1", "backslashreplace")
+                
+                lines[i] = util.fixNL(s.rstrip("\n"))
+
+            if len(lines) < 2:
                 raise MiscError("File has too few lines to be a valid"
-                                " screenplay file")
+                                " screenplay file.")
 
             key, version = self.parseConfigLine(lines[0])
             if not key or (key != "Version"):
@@ -231,20 +251,10 @@ class MyCtrl(wxControl):
                                 "while this version of the program only"
                                 " supports version '1'." % version)
 
-            key, charset = self.parseConfigLine(lines[1])
-            if not key or (key != "Character-Set"):
-                raise MiscError("File doesn't seem to be a proper"
-                                " screenplay file.")
-
-            if charset != "ISO-8859-1":
-                raise MiscError("File is coded in character set '%s'\n"
-                                "while this version of the program only"
-                                " supports ISO-8859-1." % charset)
-            
             # did we encounter unknown element types
             unknownTypes = False
             
-            for i in range(2, len(lines)):
+            for i in range(1, len(lines)):
                 s = lines[i]
 
                 if len(s) < 2:
@@ -254,7 +264,7 @@ class MyCtrl(wxControl):
                     key, val = self.parseConfigLine(s)
                     if not key:
                         raise MiscError("Line %d has invalid syntax for"
-                            " config line" % (i + 1))
+                            " config line." % (i + 1))
                     
                     # TODO: handle different config values once we have some
                     
@@ -273,7 +283,7 @@ class MyCtrl(wxControl):
                         unknownTypes = True
                     
                     if prevType and (type != prevType):
-                        raise MiscError("Line %d has invalid element type" %
+                        raise MiscError("Line %d has invalid element type." %
                              (i + 1))
 
                     line = Line(lb, type, text)
@@ -288,7 +298,7 @@ class MyCtrl(wxControl):
                 raise MiscError("Empty file.")
 
             if sp.lines[-1].lb != config.LB_LAST:
-                raise MiscError("Last line doesn't end an element")
+                raise MiscError("Last line doesn't end an element.")
 
             self.clearVars()
             self.sp = sp
@@ -297,10 +307,18 @@ class MyCtrl(wxControl):
             self.paginate()
 
             if unknownTypes:
-                wxMessageBox("Warning: Screenplay contained unknown\n"
-                             "element types; these have been converted\n"
-                             "to Action elements.", "Warning",
+                wxMessageBox("Screenplay contained unknown element types.\n"
+                             "These have been converted to Action elements.",
+                             "Warning",
                              wxOK, mainFrame)
+
+            if invalidChars:
+                wxMessageBox("Screenplay contained characters not in the\n"
+                             "ISO-8859-1 character set, which is all that\n"
+                             "this version of the program supports.\n\n"
+                             "These characters have been converted to their\n"
+                             "Unicode escape sequences. Search for '\u' to\n"
+                             "find them.", "Warning", wxOK, mainFrame)
                 
             return True
 
@@ -315,14 +333,15 @@ class MyCtrl(wxControl):
             output = []
             ls = self.sp.lines
             for i in range(0, len(ls)):
-                output.append(str(ls[i]) + "\n")
+                s = unicode(str(ls[i]) + "\n", "ISO-8859-1").encode("UTF-8")
+                output.append(s)
         
             try:
                 f = open(fileName, "wb")
 
                 try:
+                    f.write(codecs.BOM_UTF8)
                     f.write("#Version 1\n")
-                    f.write("#Character-Set ISO-8859-1\n")
                     f.writelines(output)
                 finally:
                     f.close()
@@ -1668,7 +1687,7 @@ class MyCtrl(wxControl):
                 doAutoComp = AC_KEEP
             
         elif ev.AltDown() and (kc < 256):
-            ch = string.upper(chr(kc))
+            ch = chr(kc).upper()
             type = None
             if ch == "S":
                 type = config.SCENE

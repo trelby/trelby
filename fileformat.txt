@@ -1,19 +1,17 @@
 The screenplay is represented as a series of lines. Lines are separated by
-a single byte 0x0A. There are two kinds of lines: Normal lines and config
-lines.
+a single byte 0x0A. The file is encoded in UTF-8, and begins with the
+Unicode BOM marker, i.e. the bytes "EF BB BF".
 
-Config lines are of the form: "#", "Config-Name", " ", (space),
-"Config-Value". Config-Value can be empty. Example: "#Version 1". Each
-script's first two lines must contain "Version" and "Character-Set" config
-values.
+There are two kinds of lines: Normal lines and config lines.
+
+Config lines are of the form: "#", "Config-Name", " " (space),
+"Config-Value". Config-Value can be empty. Example: "#Version 1". The
+file's first line must contain the "Version" config value.
 
 Config values:
 
-"Version". Required. Value: (\d)+. The fileformat version that the file
+"Version". Required. Value: (digit)+. The fileformat version that the file
 uses. Currently only version 1 exists.
-
-"Character-Set". Required. Value: ISO-8859-1. The character set the file
-uses. ISO-8859-1 is the only one supported in version 1 files.
 
 Normal lines:
 
@@ -57,8 +55,7 @@ converted to Action, and a warning given to user about this.
 
 An example screenplay using this format:
 
-#Version 1
-#Character-Set ISO-8859-1
+﻿#Version 1
 .\INT. WAREHOUSE - NIGHT
 >.JIM and JASON, two men in their thirties, are standing in
 >.the middle of an empty warehouse. The place looks like it was
