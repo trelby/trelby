@@ -75,18 +75,15 @@ everything after that is the text of the line.
 
 Linebreak types:
 
-'>' - Automatic linebreak, and a space between this line and the next
-that's missing now since there's a linebreak. Used for normal breaks where
-the program broke the line between words.
+'>' - A single space.
 
-'&' - Automatic linebreak, with nothing missing between this line and the
-next. Used for breaks where the program broke the line in the middle of a
-word.
+'+' - Two spaces.
 
-'|' - Forced linebreak. Used when the user has inserted a forced line
-break.
+'&' - Nothing.
 
-'.' - No linebreak. This is the last line of the element.
+'|' - Forced.
+
+'.' - Last line of the element.
 
 Line types:
 

@@ -722,7 +722,14 @@ class MyCtrl(wxControl):
             else:
                 i = text.rfind(" ", 0, tcfg.width + 1)
 
-                if i >= 0:
+                if (i == tcfg.width) and (
+                    text[tcfg.width + 1:tcfg.width + 2] == " "):
+                    
+                    ret.append(screenplay.Line(config.LB_AUTO_SPACE2, line.lt,
+                                               text[0:i]))
+                    text = text[i + 2:]
+
+                elif i >= 0:
                     ret.append(screenplay.Line(config.LB_AUTO_SPACE, line.lt,
                                                text[0:i]))
                     text = text[i + 1:]
@@ -761,18 +768,20 @@ class MyCtrl(wxControl):
 
                     break
                 else:
-                    cursorOffset += len(ls[i].text)
-                    if ls[i].lb == config.LB_AUTO_SPACE:
-                        cursorOffset += 1
+                    cursorOffset += len(ls[i].text) + \
+                                    len(config.lb2str(ls[i].lb))
         else:
             cursorOffset = -1
 
         s = ls[line1].text
         for i in range(line1 + 1, line2 + 1):
-            if ls[i - 1].lb == config.LB_AUTO_SPACE:
-                s += " "
+            s += config.lb2str(ls[i - 1].lb)
             s += ls[i].text
 
+        # FIXME: don't delete old range, replace it with new one instead.
+        # if nothing has changed saves 2 vector modifies, if something has
+        # changed saves one.
+        
         ls[line1].text = s
         ls[line1].lb = ls[line2].lb
         del ls[line1 + 1:line2 + 1]
@@ -789,9 +798,9 @@ class MyCtrl(wxControl):
 
                     break
                 else:
-                    cursorOffset -= len(ls[i].text)
-                    if ls[i].lb == config.LB_AUTO_SPACE:
-                        cursorOffset -= 1
+                    cursorOffset -= len(ls[i].text) + \
+                                    len(config.lb2str(ls[i].lb))
+                    
         elif self.line >= line1:
             # cursor position is below current paragraph, modify its
             # linenumber appropriately
@@ -1367,10 +1376,9 @@ class MyCtrl(wxControl):
                 lb = ls[line].lb
 
                 if lb == config.LB_LAST:
-                    # start of an element
                     return True
 
-                elif lb == config.LB_AUTO_SPACE:
+                elif lb in (config.LB_AUTO_SPACE, config.LB_AUTO_SPACE2):
                     char = " "
                     column = len(ls[line].text)
 
@@ -2387,10 +2395,16 @@ class MyCtrl(wxControl):
         elif kc == WXK_BACK:
             if self.column == 0:
                 if (self.line != 0):
-                    if ls[self.line - 1].lb == config.LB_AUTO_NONE:
-                        self.deleteChar(self.line - 1,
-                            len(ls[self.line - 1].text) - 1, False)
-                    self.joinLines(self.line - 1)
+                    ln = ls[self.line - 1]
+
+                    if ln.lb == config.LB_AUTO_SPACE2:
+                        ln.lb = config.LB_AUTO_SPACE
+                    else:
+                        if ln.lb == config.LB_AUTO_NONE:
+                            self.deleteChar(self.line - 1, len(ln.text) - 1,
+                                            False)
+                        
+                        self.joinLines(self.line - 1)
             else:
                 self.deleteChar(self.line, self.column - 1)
                 doAutoComp = AC_REDO
@@ -2401,9 +2415,15 @@ class MyCtrl(wxControl):
             if not self.mark:
                 if self.column == len(ls[self.line].text):
                     if self.line != (len(ls) - 1):
-                        if ls[self.line].lb == config.LB_AUTO_NONE:
-                            self.deleteChar(self.line + 1, 0, False)
-                        self.joinLines(self.line)
+                        ln = ls[self.line]
+
+                        if ln.lb == config.LB_AUTO_SPACE2:
+                            ln.lb = config.LB_AUTO_SPACE
+                        else:
+                            if ln.lb == config.LB_AUTO_NONE:
+                                self.deleteChar(self.line + 1, 0, False)
+
+                            self.joinLines(self.line)
                 else:
                     self.deleteChar(self.line, self.column)
                     doAutoComp = AC_REDO
@@ -2610,11 +2630,7 @@ class MyCtrl(wxControl):
                 ls[self.line].lt = config.PAREN
                 ls[self.line].text = "()"
 
-            # no need to wrap if we're adding a character to the end of
-            # the line and line length is <= tcfg.width
-            if (self.column != len(ls[self.line].text)) or\
-                   (self.column > tcfg.width):
-                self.rewrapPara()
+            self.rewrapPara()
 
             doAutoComp = AC_REDO
 

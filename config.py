@@ -9,13 +9,15 @@ from wxPython.wx import *
 
 # linebreak types
 LB_AUTO_SPACE = 1
-LB_AUTO_NONE = 2
-LB_FORCED = 3
-LB_LAST = 4
+LB_AUTO_SPACE2 = 2
+LB_AUTO_NONE = 3
+LB_FORCED = 4
+LB_LAST = 5
 
 # mapping from character to linebreak
 _text2lb = {
     '>' : LB_AUTO_SPACE,
+    '+' : LB_AUTO_SPACE2,
     '&' : LB_AUTO_NONE,
     '|' : LB_FORCED,
     '.' : LB_LAST
@@ -27,6 +29,7 @@ _lb2text = {}
 # what string each linebreak type should be mapped to.
 _lb2str = {
     LB_AUTO_SPACE : " ",
+    LB_AUTO_SPACE2 : "  ",
     LB_AUTO_NONE : "",
     LB_FORCED : "\n",
     LB_LAST : "\n"
