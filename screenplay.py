@@ -89,10 +89,4 @@ class Line:
     # replace some words, rendering the script useless except for
     # evaluation purposes
     def replace(self):
-        ch = "x"
-        
-        self.text = re.sub(r"\b(\w){5}\b", ch * 5, self.text)
-        self.text = re.sub(r"\b(\w){6}\b", ch * 6, self.text)
-        self.text = re.sub(r"\b(\w){7}\b", ch * 7, self.text)
-        self.text = re.sub(r"\b(\w){10}\b", ch * 10, self.text)
-        
+        self.text = re.sub(r"\b(\w){5}\b", "x" * 5, self.text)
