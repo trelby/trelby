@@ -203,7 +203,6 @@ class Config:
         t.screen.isCaps = True
         t.screen.isBold = True
         t.export.isCaps = True
-        t.export.isBold = True
         t.newTypeEnter = ACTION
         t.newTypeTab = CHARACTER
         t.nextTypeTab = ACTION
@@ -227,8 +226,8 @@ class Config:
         t.lt = CHARACTER
         t.name = "Character"
         t.emptyLinesBefore = 1
-        t.indent = 25
-        t.width = 30
+        t.indent = 22
+        t.width = 38
         t.screen.isCaps = True
         t.export.isCaps = True
         t.newTypeEnter = DIALOGUE
@@ -254,7 +253,7 @@ class Config:
         t.lt = PAREN
         t.name = "Parenthetical"
         t.emptyLinesBefore = 0
-        t.indent = 20
+        t.indent = 16
         t.width = 25
         t.newTypeEnter = DIALOGUE
         t.newTypeTab = ACTION
