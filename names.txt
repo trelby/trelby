@@ -89939,7 +89939,7 @@ Jannardhana	Indian	M
 Jannat	Indian	F
 Jannavi	Indian	M
 Jannay	Biblical	F
-Janne	Finnish	F
+Janne	Finnish	M
 Janneau	French	M
 Jannec	Danish	M
 Janneche	Swedish	F
