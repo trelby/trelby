@@ -16,6 +16,16 @@ import time
 import os.path
 from wxPython.wx import *
 
+#keycodes
+KC_CTRL_A = 1
+KC_CTRL_B = 2
+KC_CTRL_D = 4
+KC_CTRL_E = 5
+KC_CTRL_F = 6
+KC_CTRL_N = 14
+KC_CTRL_P = 16
+KC_CTRL_V = 22
+
 ID_FILE_OPEN = 0
 ID_FILE_SAVE = 1
 ID_FILE_SAVE_AS = 2
