@@ -73,7 +73,7 @@ Alt + T                Change element to transition
 CTRL + O               Open file
 CTRL + S               Save file
 
-CTRL + X               Cut
+CTRL + X / Delete      Cut
 CTRL + C               Copy
 CTRL + V               Paste
 

@@ -1380,7 +1380,7 @@ class MyCtrl(wxControl):
             self.loadFile(self.fileName)
             self.updateScreen()
 
-    def OnCut(self):
+    def OnCut(self, doUpdate = True):
         if self.mark != -1:
             marked = self.getMarkedLines()
 
@@ -1404,8 +1404,10 @@ class MyCtrl(wxControl):
                 self.column = len(ls[self.line].text)
             
             self.mark = -1
-            self.makeLineVisible(self.line)
-            self.updateScreen()
+
+            if doUpdate:
+                self.makeLineVisible(self.line)
+                self.updateScreen()
         
     def OnCopy(self):
         if self.mark != -1:
@@ -1568,16 +1570,19 @@ class MyCtrl(wxControl):
             self.rewrapPara()
             
         elif kc == WXK_DELETE:
-            if self.column == len(ls[self.line].text):
-                if self.line != (len(ls) - 1):
-                    if ls[self.line].lb == config.LB_AUTO_NONE:
-                        self.deleteChar(self.line + 1, 0, False)
-                    self.joinLines(self.line)
-            else:
-                self.deleteChar(self.line, self.column)
-                doAutoComp = AC_REDO
+            if self.mark == -1:
+                if self.column == len(ls[self.line].text):
+                    if self.line != (len(ls) - 1):
+                        if ls[self.line].lb == config.LB_AUTO_NONE:
+                            self.deleteChar(self.line + 1, 0, False)
+                        self.joinLines(self.line)
+                else:
+                    self.deleteChar(self.line, self.column)
+                    doAutoComp = AC_REDO
 
-            self.rewrapPara()
+                self.rewrapPara()
+            else:
+                self.OnCut(False)
 
         elif ev.ControlDown():
             if kc == WXK_SPACE:

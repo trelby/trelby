@@ -104,7 +104,7 @@ class Config:
         self.paperHeight = 297.0
 
         # margins
-        self.marginTop = 25.4
+        self.marginTop = 12.7
         self.marginBottom = 25.4
         self.marginLeft = 38.1
         self.marginRight = 25.4
