@@ -14,6 +14,7 @@ import misc
 import namesdlg
 import pdf
 import pml
+import report
 import splash
 import titles
 import titlesdlg
@@ -1615,7 +1616,8 @@ class MyCtrl(wxControl):
         
     def OnDialogueChart(self):
         self.paginate()
-        dialoguechart.show(mainFrame, self, cfg)
+        #dialoguechart.show(mainFrame, self, cfg)
+        report.genCharacterReport(mainFrame, self, cfg)
 
     def OnCharMap(self):
         dlg = charmapdlg.CharMapDlg(mainFrame, self)
