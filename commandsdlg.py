@@ -6,7 +6,7 @@ class CommandsDlg(wxDialog):
         wxDialog.__init__(self, parent, -1, "Commands",
                           pos = wxDefaultPosition,
                           size = (550, 600),
-                          style = wxDEFAULT_DIALOG_STYLE)
+                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 
         vsizer = wxBoxSizer(wxVERTICAL)
         self.SetSizer(vsizer)

@@ -6,7 +6,7 @@ class NamesDlg(wxDialog):
         wxDialog.__init__(self, parent, -1, "Character name database",
                           pos = wxDefaultPosition,
                           size = (530, 500),
-                          style = wxDEFAULT_DIALOG_STYLE)
+                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 
         self.nameArr = nameArr
         
