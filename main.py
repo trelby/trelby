@@ -505,8 +505,7 @@ class MyCtrl(wxControl):
         ls = sp.lines
         fs = cfg.fontSize
 
-        doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
-                           cfg.paperType)
+        doc = pml.Document(cfg.paperWidth, cfg.paperHeight)
 
         sp.titles.generatePages(doc)
         
@@ -1966,8 +1965,7 @@ class MyCtrl(wxControl):
         fs = cfg.fontSize
         ch_y = util.getTextHeight(fs)
         
-        doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
-                           cfg.paperType)
+        doc = pml.Document(cfg.paperWidth, cfg.paperHeight)
 
         # how many lines put on current page
         y = 0

@@ -170,8 +170,7 @@ class DialogueChart:
         self.chartWidth = self.cfg.paperHeight - self.chartX - self.margin
 
     def generate(self, cbil):
-        doc = pml.Document(self.cfg.paperHeight, self.cfg.paperWidth,
-                           self.cfg.paperType)
+        doc = pml.Document(self.cfg.paperHeight, self.cfg.paperWidth)
 
         for it in cbil:
             if it.selected:

@@ -566,7 +566,13 @@ class PaperPanel(wxPanel):
         
         util.finishWindow(self, vsizer, center = False)
 
-        idx = self.paperCombo.FindString(self.cfg.paperType)
+        ptype = "Custom"
+        for k, v in self.paperSizes.items():
+            if self.eqFloat(self.cfg.paperWidth, v[0]) and \
+               self.eqFloat(self.cfg.paperHeight, v[1]):
+                ptype = k
+            
+        idx = self.paperCombo.FindString(ptype)
         if idx != -1:
             self.paperCombo.SetSelection(idx)
         
@@ -581,6 +587,9 @@ class PaperPanel(wxPanel):
         
         self.blockEvents -= 1
 
+    def eqFloat(self, f1, f2):
+        return round(f1, 2) == round(f2, 2)
+        
     def addMarginCtrl(self, name, parent, sizer):
         sizer.Add(wxStaticText(parent, -1, name + ":"), 0,
                   wxALIGN_CENTER_VERTICAL)
@@ -608,14 +617,13 @@ class PaperPanel(wxPanel):
         self.setLines()
 
     def setLines(self):
-        self.cfg.recalc()
+        self.cfg.recalc(False)
         self.linesLabel.SetLabel("Lines per page: %d" % self.cfg.linesOnPage)
         
     def OnPaperCombo(self, event):
         w, h = self.paperCombo.GetClientData(self.paperCombo.GetSelection())
 
         ptype = self.paperCombo.GetStringSelection()
-        self.cfg.paperType = ptype
         
         if ptype == "Custom":
             self.widthEntry.Enable(True)

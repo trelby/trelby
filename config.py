@@ -184,9 +184,6 @@ class Config:
         for k, v in self.numberVars.iteritems():
             setattr(self, k, v[0])
             
-        # paper type
-        self.paperType = "A4"
-
         # whether to check script for errors before export / print
         self.checkOnExport = True
         
@@ -359,6 +356,10 @@ class Config:
 
         self.recalc()
 
+    def addColor(self, name, descr, r, g, b):
+        setattr(self, name, wxColour(r, g, b))
+        self.colors[descr] = name
+        
     # get default value of a numeric setting
     def getDefault(self, name):
         return self.numberVars[name][0]
@@ -378,7 +379,14 @@ class Config:
         
     # fix up all invalid config values and recalculate all variables
     # dependent on other variables.
-    def recalc(self):
+    #
+    # if doAll is False, enforces restrictions only on a per-variable
+    # basis, e.g. doesn't modify variable v2 based on v1's value. this is
+    # useful when user is interactively modifying v1, and it temporarily
+    # strays out of bounds (e.g. when deleting the old text in an entry
+    # box, thus getting the minimum value), which would then possibly
+    # modify the value of other variables which is not what we want.
+    def recalc(self, doAll = True):
         for k, v in self.numberVars.iteritems():
             util.clampObj(self, k, v[1], v[2])
 
@@ -389,7 +397,8 @@ class Config:
             util.clampObj(el, "width", *self.getMinMax("elementWidth"))
             
         # make sure usable space on the page isn't too small
-        if (self.marginTop + self.marginBottom) >= (self.paperHeight - 100.0):
+        if doAll and (self.marginTop + self.marginBottom) >= \
+               (self.paperHeight - 100.0):
             self.marginTop = 0.0
             self.marginBottom = 0.0
             
@@ -401,10 +410,6 @@ class Config:
     def getType(self, lt):
         return self.types[lt]
 
-    def addColor(self, name, descr, r, g, b):
-        setattr(self, name, wxColour(r, g, b))
-        self.colors[descr] = name
-        
 # config stuff that are wxwindows objects, so can't be in normal
 # Config (deepcopy dies)
 class ConfigGui:

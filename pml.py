@@ -32,12 +32,10 @@ UNDERLINED = 16
 # A single document.
 class Document:
 
-    # (w, h) is size of each page, with pageName being a descriptive name
-    # for the size, basically one of "A4", "Letter", or "Custom" for now.
-    def __init__(self, w, h, pageName):
+    # (w, h) is the size of each page.
+    def __init__(self, w, h):
         self.w = w
         self.h = h
-        self.pageName = pageName
         
         # a collection of Page objects
         self.pages = []

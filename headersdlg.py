@@ -173,8 +173,7 @@ class HeadersDlg(wxDialog):
         self.EndModal(wxID_CANCEL)
 
     def OnPreview(self, event):
-        doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight,
-                           self.cfg.paperType)
+        doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight)
 
         pg = pml.Page(doc)
         self.headers.generatePML(pg, "42", self.cfg)

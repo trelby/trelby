@@ -118,8 +118,7 @@ class CharacterReport:
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
         
     def generate(self):
-        self.doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight,
-                           self.cfg.paperType)
+        self.doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight)
 
         # how much to leave empty on each side (mm)
         self.margin = 20.0

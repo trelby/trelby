@@ -210,8 +210,7 @@ class TitlesDlg(wxDialog):
         self.EndModal(wxID_CANCEL)
 
     def OnPreview(self, event):
-        doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight,
-                           self.cfg.paperType)
+        doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight)
 
         self.titles.generatePages(doc)
         tmp = pdf.generate(doc)
