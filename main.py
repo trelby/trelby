@@ -2600,6 +2600,8 @@ class MyFrame(wxFrame):
         self.showFormatting = False
 
         util.removeTempFiles(cfg.tmpPrefix)
+
+        self.mySetIcons()
         
         fileMenu = wxMenu()
         fileMenu.Append(ID_FILE_NEW, "&New")
@@ -2749,6 +2751,24 @@ class MyFrame(wxFrame):
         
     def init(self):
         self.panel = self.createNewPanel()
+
+    def mySetIcons(self):
+        wxImage_AddHandler(wxPNGHandler())
+
+        ib = wxIconBundle()
+        
+        img = wxImage("logo32.png", wxBITMAP_TYPE_PNG)
+        imgS = wxImage("logo16.png", wxBITMAP_TYPE_PNG)
+
+        bitmap = wxBitmapFromImage(img)
+        icon = wxIconFromBitmap(bitmap)
+        ib.AddIcon(icon)
+
+        bitmap = wxBitmapFromImage(imgS)
+        icon = wxIconFromBitmap(bitmap)
+        ib.AddIcon(icon)
+
+        self.SetIcons(ib)
 
     def createNewPanel(self):
         newPanel = MyPanel(self.notebook, -1)
