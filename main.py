@@ -418,16 +418,14 @@ class MyCtrl(wxControl):
     # generate PDF file from given screenplay and return it as a string.
     def generatePDF(self, sp):
         ls = sp.lines
+        fs = cfg.fontSize
 
         doc = pml.Document(cfg.paperWidth, cfg.paperHeight,
                            cfg.paperType)
 
-        # one character takes 2.54 mm horizontally
-        CH_X = 2.54
-
-        # ...and 4.233333 mm vertically
-        CH_Y = 4.2333333
-
+        ch_x = util.points2x(fs)
+        ch_y = util.points2y(fs)
+        
         # used in several places, so keep around
         charIndent = cfg.getType(config.CHARACTER).indent
 
@@ -444,15 +442,15 @@ class MyCtrl(wxControl):
             if p != 1:
                 tmp = "%d." % p
                 pg.add(pml.TextOp(tmp,
-                    cfg.paperWidth - cfg.marginRight - len(tmp) * CH_X,
-                    cfg.marginTop))
+                    cfg.paperWidth - cfg.marginRight - len(tmp) * ch_x,
+                    cfg.marginTop, fs))
 
                 y += 2
 
                 if self.needsMore(start - 1):
                     pg.add(pml.TextOp("OSKU (cont'd)",
-                        cfg.marginLeft + charIndent * CH_X,
-                        cfg.marginTop + y * CH_Y))
+                        cfg.marginLeft + charIndent * ch_x,
+                        cfg.marginTop + y * ch_y, fs))
 
                     y += 1
 
@@ -477,22 +475,22 @@ class MyCtrl(wxControl):
                     typ |= pml.UNDERLINED
 
                 pg.add(pml.TextOp(text,
-                    cfg.marginLeft + tcfg.indent * CH_X,
-                    cfg.marginTop + y * CH_Y, typ))
+                    cfg.marginLeft + tcfg.indent * ch_x,
+                    cfg.marginTop + y * ch_y, fs, typ))
 
                 # FIXME: either remove or make an option
 
                 # show line numbers next to each line
                 #pg.add(pml.TextOp("%02d:" % y,
-                #    cfg.marginLeft - 3 * CH_X,
-                #    cfg.marginTop + y * CH_Y))
+                #    cfg.marginLeft - 3 * ch_x,
+                #    cfg.marginTop + y * ch_y, fs))
 
                 y += 1
 
             if self.needsMore(i):
                 pg.add(pml.TextOp("(MORE)",
-                        cfg.marginLeft + charIndent * CH_X,
-                        cfg.marginTop + y * CH_Y))
+                        cfg.marginLeft + charIndent * ch_x,
+                        cfg.marginTop + y * ch_y, fs))
 
             if misc.isEval:
                 # list of lines which together draw a "DEMO" in

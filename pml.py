@@ -54,14 +54,14 @@ class DrawOp:
 # the upper left corner of the page. Font used is 'size'-point Courier,
 # with it possibly being bold/italic/underlined as given by the flags.
 class TextOp(DrawOp):
-    def __init__(self, text, x, y, flags = NORMAL, size = 12):
+    def __init__(self, text, x, y, size, flags = NORMAL):
         DrawOp.__init__(self, OP_TEXT)
 
         self.text = text
         self.x = x
         self.y = y
-        self.flags = flags
         self.size = size
+        self.flags = flags
 
 # Draw consecutive lines. 'points' is a list of (x, y) pairs (minimum 2
 # pairs) and 'width' is the line width, with 0 being the thinnest possible

@@ -2,6 +2,8 @@
 # defines found here.
 
 from error import *
+import util
+
 from wxPython.wx import *
 
 # linebreak types
@@ -105,6 +107,9 @@ class Config:
         self.paperWidth = 210.0
         self.paperHeight = 297.0
 
+        # font size used for PDF generation, in points
+        self.fontSize = 12
+        
         # margins
         self.marginTop = 12.7
         self.marginBottom = 25.4
@@ -290,9 +295,8 @@ class Config:
     def recalc(self):
         h = self.paperHeight - self.marginTop - self.marginBottom
 
-        # how many lines on a page. 12-point font = 6 lines per inch, ie.
-        # 1 line = 4.2333333 mm
-        self.linesOnPage = int(h / 4.2333333)
+        # how many lines on a page
+        self.linesOnPage = int(h / util.points2y(self.fontSize))
 
     def getType(self, type):
         return self.types[type]

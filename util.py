@@ -88,6 +88,15 @@ def isFixedWidth(font):
     
     return w1 == w2
 
+# return how many mm tall 'points' size font is
+def points2y(points):
+    return (points / 72.0) * 25.4
+
+# return how many mm wide 'points' size font is. this assumes standard PDF
+# Courier font, which has a width of 0.6 units for each character.
+def points2x(points):
+    return ((points * 0.6) / 72.0) * 25.4
+    
 def reverseComboSelect(combo, clientData):
     for i in range(combo.GetCount()):
         if combo.GetClientData(i) == clientData:
