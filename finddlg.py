@@ -70,7 +70,7 @@ class FindDlg(wxDialog):
         
         for t in cfg.types.values():
             self.elements.Append(t.name)
-            self.elementTypes.append(t.type)
+            self.elementTypes.append(t.lt)
 
         for i in range(0, self.elements.GetCount()):
             self.elements.Check(i, True)
@@ -196,11 +196,11 @@ class FindDlg(wxDialog):
                 self.elementMap[self.elementTypes[i]] = \
                     self.elements.IsChecked(i)
             
-    def typeIncluded(self, type):
+    def typeIncluded(self, lt):
         if not self.useExtra:
             return True
 
-        return self.elementMap[type]
+        return self.elementMap[lt]
         
     def OnFind(self, event = None, autoFind = False):
         if not autoFind:
@@ -253,7 +253,7 @@ class FindDlg(wxDialog):
                 if (line >= len(ls)) or (line < 0):
                     break
 
-                if self.typeIncluded(ls[line].type):
+                if self.typeIncluded(ls[line].lt):
                     text = ls[line].text
                     if not self.matchCase:
                         text = util.upper(text)

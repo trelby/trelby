@@ -51,15 +51,15 @@ class DialogueChart:
                 totalLines = 0
 
             totalLines += 1
-            if line.type in diagTypes:
+            if line.lt in diagTypes:
                 diagLines += 1
             
-            if (line.type == config.CHARACTER) and\
+            if (line.lt == config.CHARACTER) and\
                    (line.lb == config.LB_LAST):
                 name = util.upper(line.text)
                 self.characters[name] = None
                 
-            elif line.type in (config.DIALOGUE, config.PAREN):
+            elif line.lt in (config.DIALOGUE, config.PAREN):
                 self.pages[page][name] = None
 
         self.diagDens.append((float(diagLines) / totalLines))

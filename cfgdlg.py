@@ -239,7 +239,7 @@ class ElementsPanel(wxPanel):
         self.elementsCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
 
         for t in self.cfg.types.values():
-            self.elementsCombo.Append(t.name, t.type)
+            self.elementsCombo.Append(t.name, t.lt)
 
         hsizer.Add(self.elementsCombo, 0)
 
@@ -350,7 +350,7 @@ class ElementsPanel(wxPanel):
         combo = wxComboBox(panel, -1, style = wxCB_READONLY)
 
         for t in self.cfg.types.values():
-            combo.Append(t.name, t.type)
+            combo.Append(t.name, t.lt)
 
         sizer.Add(combo)
 
@@ -366,12 +366,12 @@ class ElementsPanel(wxPanel):
         event.Skip()
 
     def OnElementCombo(self, event = None):
-        self.type = self.elementsCombo.GetClientData(self.elementsCombo.
+        self.lt = self.elementsCombo.GetClientData(self.elementsCombo.
                                                      GetSelection())
         self.cfg2gui()
                          
     def OnStyleCb(self, event):
-        tcfg = self.cfg.types[self.type]
+        tcfg = self.cfg.types[self.lt]
         
         tcfg.screen.isCaps = self.screenCapsCb.GetValue()
         tcfg.screen.isItalic = self.screenItalicCb.GetValue()
@@ -384,7 +384,7 @@ class ElementsPanel(wxPanel):
         tcfg.export.isUnderlined = self.exportUnderlinedCb.GetValue()
 
     def OnMisc(self, event = None):
-        tcfg = self.cfg.types[self.type]
+        tcfg = self.cfg.types[self.lt]
 
         tcfg.emptyLinesBefore = util.getSpinValue(self.emptyLinesEntry)
         tcfg.indent = util.getSpinValue(self.indentEntry)
@@ -400,7 +400,7 @@ class ElementsPanel(wxPanel):
             self.prevTabCombo.GetSelection())
             
     def cfg2gui(self):
-        tcfg = self.cfg.types[self.type]
+        tcfg = self.cfg.types[self.lt]
         
         self.screenCapsCb.SetValue(tcfg.screen.isCaps)
         self.screenItalicCb.SetValue(tcfg.screen.isItalic)
@@ -622,10 +622,10 @@ class PaperPanel(wxPanel):
     def OnPaperCombo(self, event):
         w, h = self.paperCombo.GetClientData(self.paperCombo.GetSelection())
 
-        type = self.paperCombo.GetStringSelection()
-        self.cfg.paperType = type
+        ptype = self.paperCombo.GetStringSelection()
+        self.cfg.paperType = ptype
         
-        if type == "Custom":
+        if ptype == "Custom":
             self.widthEntry.Enable(True)
             self.heightEntry.Enable(True)
             w = self.cfg.paperWidth
@@ -751,12 +751,12 @@ class AutoCompPanel(wxPanel):
         self.OnElementCombo()
 
     def OnElementCombo(self, event = None):
-        self.type = self.elementsCombo.GetClientData(self.elementsCombo.
+        self.lt = self.elementsCombo.GetClientData(self.elementsCombo.
                                                      GetSelection())
         self.cfg2gui()
                          
     def OnMisc(self, event = None):
-        tcfg = self.cfg.types[self.type]
+        tcfg = self.cfg.types[self.lt]
 
         tcfg.doAutoComp = self.enabledCb.IsChecked()
         self.itemsEntry.Enable(tcfg.doAutoComp)
@@ -772,7 +772,7 @@ class AutoCompPanel(wxPanel):
         tcfg.autoCompList = l2
         
     def cfg2gui(self):
-        tcfg = self.cfg.types[self.type]
+        tcfg = self.cfg.types[self.lt]
         
         self.enabledCb.SetValue(tcfg.doAutoComp)
 

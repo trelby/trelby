@@ -34,7 +34,7 @@ SHOT = 7
 NOTE = 8
 
 # mapping from character to line type
-_text2linetype = {
+_text2lt = {
     '\\' : SCENE,
     '.' : ACTION,
     '_' : CHARACTER,
@@ -46,7 +46,7 @@ _text2linetype = {
     }
 
 # reverse to above, filled in init
-_linetype2text = { }
+_lt2text = { }
 
 # page break indicators
 PBI_NONE = 0
@@ -62,8 +62,12 @@ class TextType:
 
 class Type:
     def __init__(self):
-        self.type = None
+        # line type
+        self.lt = None
+
+        # textual description
         self.name = None
+
         self.emptyLinesBefore = 0
 
         self.indent = 0
@@ -169,12 +173,12 @@ class Config:
         for k, v in _text2lb.items():
             _lb2text[v] = k
 
-        for k, v in _text2linetype.items():
-            _linetype2text[v] = k
+        for k, v in _text2lt.items():
+            _lt2text[v] = k
 
         # element types
         t = Type()
-        t.type = SCENE
+        t.lt = SCENE
         t.name = "Scene"
         t.emptyLinesBefore = 1
         t.indent = 0 
@@ -188,10 +192,10 @@ class Config:
         t.nextTypeTab = ACTION
         t.prevTypeTab = TRANSITION
         t.doAutoComp = True
-        self.types[t.type] = t
+        self.types[t.lt] = t
 
         t = Type()
-        t.type = ACTION
+        t.lt = ACTION
         t.name = "Action"
         t.emptyLinesBefore = 1
         t.indent = 0
@@ -200,10 +204,10 @@ class Config:
         t.newTypeTab = CHARACTER
         t.nextTypeTab = CHARACTER
         t.prevTypeTab = CHARACTER
-        self.types[t.type] = t
+        self.types[t.lt] = t
 
         t = Type()
-        t.type = CHARACTER
+        t.lt = CHARACTER
         t.name = "Character"
         t.emptyLinesBefore = 1
         t.indent = 25
@@ -215,10 +219,10 @@ class Config:
         t.nextTypeTab = ACTION
         t.prevTypeTab = ACTION
         t.doAutoComp = True
-        self.types[t.type] = t
+        self.types[t.lt] = t
 
         t = Type()
-        t.type = DIALOGUE
+        t.lt = DIALOGUE
         t.name = "Dialogue"
         t.emptyLinesBefore = 0
         t.indent = 10
@@ -227,10 +231,10 @@ class Config:
         t.newTypeTab = ACTION
         t.nextTypeTab = PAREN
         t.prevTypeTab = ACTION
-        self.types[t.type] = t
+        self.types[t.lt] = t
 
         t = Type()
-        t.type = PAREN
+        t.lt = PAREN
         t.name = "Parenthetical"
         t.emptyLinesBefore = 0
         t.indent = 20
@@ -239,10 +243,10 @@ class Config:
         t.newTypeTab = ACTION
         t.nextTypeTab = CHARACTER
         t.prevTypeTab = DIALOGUE
-        self.types[t.type] = t
+        self.types[t.lt] = t
 
         t = Type()
-        t.type = TRANSITION
+        t.lt = TRANSITION
         t.name = "Transition"
         t.emptyLinesBefore = 1
         t.indent = 45
@@ -262,10 +266,10 @@ class Config:
             "FADE TO BLACK",
             "MATCH CUT TO:"
             ]
-        self.types[t.type] = t
+        self.types[t.lt] = t
 
         t = Type()
-        t.type = SHOT
+        t.lt = SHOT
         t.name = "Shot"
         t.emptyLinesBefore = 1
         t.indent = 0
@@ -276,10 +280,10 @@ class Config:
         t.newTypeTab = CHARACTER
         t.nextTypeTab = ACTION
         t.prevTypeTab = SCENE
-        self.types[t.type] = t
+        self.types[t.lt] = t
         
         t = Type()
-        t.type = NOTE
+        t.lt = NOTE
         t.name = "Note"
         t.emptyLinesBefore = 1
         t.indent = 5
@@ -290,7 +294,7 @@ class Config:
         t.newTypeTab = CHARACTER
         t.nextTypeTab = ACTION
         t.prevTypeTab = CHARACTER
-        self.types[t.type] = t
+        self.types[t.lt] = t
 
         if wxPlatform == "__WXGTK__":
             self.nativeFont = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
@@ -322,8 +326,8 @@ class Config:
         # how many lines on a page
         self.linesOnPage = int(h / util.points2y(self.fontSize))
 
-    def getType(self, type):
-        return self.types[type]
+    def getType(self, lt):
+        return self.types[lt]
 
     def addColor(self, name, descr, r, g, b):
         setattr(self, name, wxColour(r, g, b))
@@ -404,10 +408,10 @@ class ConfigGui:
             nfi.SetUnderlined(t.screen.isUnderlined)
             
             tg.font = wxFontFromNativeInfo(nfi)
-            self.types[t.type] = tg
+            self.types[t.lt] = tg
 
-    def getType(self, type):
-        return self.types[type]
+    def getType(self, lt):
+        return self.types[lt]
 
 def _conv(dict, key, raiseException = True):
     val = dict.get(key)
@@ -422,8 +426,8 @@ def text2lb(str, raiseException = True):
 def lb2text(lb):
     return _conv(_lb2text, lb)
 
-def text2linetype(str, raiseException = True):
-    return _conv(_text2linetype, str, raiseException)
+def text2lt(str, raiseException = True):
+    return _conv(_text2lt, str, raiseException)
 
-def linetype2text(type):
-    return _conv(_linetype2text, type)
+def lt2text(lt):
+    return _conv(_lt2text, lt)
