@@ -2589,8 +2589,8 @@ class MyCtrl(wxControl):
 class MyFrame(wxFrame):
 
     def __init__(self, parent, id, title):
-        wxFrame.__init__(self, parent, id, title,
-                         wxPoint(100, 100), wxSize(700, 830))
+        wxFrame.__init__(self, parent, id, title, wxPoint(100, 100),
+                         wxSize(700, 830), name = "Blyte")
 
         if misc.isUnix:
             # automatically reaps zombies
