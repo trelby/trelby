@@ -153,8 +153,6 @@ class FindDlg(wxDialog):
                     self.OnFind()
                 elif chr(kc) == "r":
                     self.OnReplace()
-                elif chr(kc) == "a":
-                    self.OnReplaceAll()
                 else:
                     event.Skip()
             else:
