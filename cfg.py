@@ -143,8 +143,12 @@ def init():
     _types[t.linetype] = t
 
     # TODO: world's ugliest hack, but it'll do for now
-    global baseFont, sceneFont,  bluePen, redColor, blackColor, bgColor, \
-    bgBrush, bgPen,  cursorColor, cursorBrush, cursorPen,  pagebreakPen
+    global baseFont, sceneFont, \
+           redColor, blackColor, bluePen, \
+           bgColor, bgBrush, bgPen, \
+           selectedColor, selectedBrush, selectedPen, \
+           cursorColor, cursorBrush, cursorPen, \
+           pagebreakPen
     
     baseFont = wxFont(fontY, wxMODERN, wxNORMAL, wxNORMAL)
     sceneFont = wxFont(fontY, wxMODERN, wxNORMAL, wxBOLD)
@@ -153,11 +157,13 @@ def init():
     redColor = wxColour(255, 0, 0)
     blackColor = wxColour(0, 0, 0)
 
-    global bgBrush
-    
     bgColor = wxColour(204, 204, 204)
     bgBrush = wxBrush(bgColor)
     bgPen = wxPen(bgColor)
+
+    selectedColor = wxColour(128, 192, 192)
+    selectedBrush = wxBrush(selectedColor)
+    selectedPen = wxPen(selectedColor)
 
     cursorColor = wxColour(205, 0, 0)
     cursorBrush = wxBrush(cursorColor)

@@ -156,6 +156,7 @@ class MyCtrl(wxControl):
             self.line = 0
             self.column = 0
             self.topLine = 0
+            self.mark = -1
             self.setFile(fileName)
             self.makeBackup()
 
@@ -451,6 +452,28 @@ class MyCtrl(wxControl):
         self.panel.scrollBar.SetScrollbar(self.topLine, pageSize,
                                           len(self.sp.lines), pageSize) 
 
+    # returns pair (start, end) of marked lines, inclusive. if mark is
+    # after the end of the script (text has been deleted since setting
+    # it), returns a valid pair (by truncating selection to current
+    # end). returns (-1, -1) if no lines marked.
+    def getMarkedLines(self):
+        if self.mark != -1:
+            mark = min(len(self.sp.lines) - 1, self.mark)
+            if self.line < mark:
+                return (self.line, mark)
+            else:
+                return (mark, self.line)
+        else:
+            return (-1, -1)
+
+    # checks if a line is marked. marked is the pair of the type
+    # returned by the above function.
+    def isLineMarked(self, line, marked):
+        if (line >= marked[0]) and (line <= marked[1]):
+            return True
+        else:
+            return False
+        
     def isFixedWidth(self, font):
         dc = wxMemoryDC()
         dc.SetFont(font)
@@ -527,6 +550,7 @@ class MyCtrl(wxControl):
         self.line = 0
         self.column = 0
         self.topLine = 0
+        self.mark = -1
         self.setFile(None)
         self.makeBackup()
 
@@ -584,16 +608,18 @@ class MyCtrl(wxControl):
 
         dlg.Destroy()
         
-    def OnKeyChar(self, event):
-        kc = event.GetKeyCode()
-
+    def OnKeyChar(self, ev):
+        kc = ev.GetKeyCode()
+        
+        #print "kc: %d, ctrldown: %d" % (kc, ev.ControlDown())
+        
         ls = self.sp.lines
         tcfg = cfg.getTypeCfg(ls[self.line].type)
 
         # FIXME: call ensureCorrectLine()
         
         if kc == WXK_RETURN:
-            if event.ShiftDown() or event.ControlDown():
+            if ev.ShiftDown() or ev.ControlDown():
                 self.splitLine()
                 
                 self.rewrap()
@@ -631,16 +657,20 @@ class MyCtrl(wxControl):
 
             self.rewrap()
 
-        elif event.ControlDown():
-            if kc == WXK_HOME:
+        elif ev.ControlDown():
+            if kc == WXK_SPACE:
+                self.mark = self.line
+                
+            elif kc == WXK_HOME:
                 self.line = 0
                 self.topLine = 0
                 self.column = 0
+                
             elif kc == WXK_END:
                 self.line = len(self.sp.lines) - 1
                 self.column = len(ls[self.line].text)
             else:
-                event.Skip()
+                ev.Skip()
                 return
                 
         elif (kc == WXK_LEFT) or (kc == KC_CTRL_B):
@@ -669,7 +699,7 @@ class MyCtrl(wxControl):
         elif (kc == WXK_END) or (kc == KC_CTRL_E):
             self.column = len(ls[self.line].text)
 
-        elif (kc == WXK_PRIOR) or (event.AltDown() and chr(kc) == "v"):
+        elif (kc == WXK_PRIOR) or (ev.AltDown() and chr(kc) == "v"):
             self.topLine = max(self.topLine - self.getLinesOnScreen() - 2,
                 0)
             self.line = min(self.topLine + 5, len(self.sp.lines) - 1)
@@ -687,7 +717,7 @@ class MyCtrl(wxControl):
             self.line += self.topLine - oldTop
             self.line = clamp(self.line, 0, len(ls) - 1)
             
-        elif event.AltDown():
+        elif ev.AltDown():
             ch = string.upper(chr(kc))
             type = None
             if ch == "S":
@@ -706,19 +736,22 @@ class MyCtrl(wxControl):
             if type != None:
                 self.convertCurrentTo(type)
             else:
-                event.Skip()
+                ev.Skip()
                 return
             
         elif kc == WXK_TAB:
             type = ls[self.line].type
 
-            if not event.ShiftDown():
+            if not ev.ShiftDown():
                 type = cfg.getNextTypeTab(type)
             else:
                 type = cfg.getPrevTypeTab(type)
                 
             self.convertCurrentTo(type)
 
+        elif (kc == WXK_ESCAPE):
+            self.mark = -1
+            
         # FIXME: debug stuff
         elif (chr(kc) == "å"):
             self.loadFile("default.nasp")
@@ -740,7 +773,8 @@ class MyCtrl(wxControl):
             self.rewrap()
 
         else:
-            print "something other than printable/handled character (%d)" % kc
+            ev.Skip()
+            return
 
         # FIXME: call ensureCorrectLine()
         self.column = min(self.column, len(ls[self.line].text))
@@ -763,6 +797,8 @@ class MyCtrl(wxControl):
         y = cfg.offsetY
         length = len(ls)
 
+        marked = self.getMarkedLines()
+        
         i = self.topLine
         while (y < size.height) and (i < length):
             y += self.sp.getEmptyLinesBefore(i) * cfg.fontYdelta
@@ -785,6 +821,11 @@ class MyCtrl(wxControl):
                 dc.DrawText(cfg.lb2text(l.lb), 0, y)
                 dc.SetTextForeground(cfg.blackColor)
 
+            if (self.mark != -1) and self.isLineMarked(i, marked):
+                dc.SetPen(cfg.selectedPen)
+                dc.SetBrush(cfg.selectedBrush)
+                dc.DrawRectangle(0, y, size.width, cfg.fontYdelta)
+            
             if (i != 0) and (self.line2page(i - 1) != self.line2page(i)):
                 dc.SetPen(cfg.pagebreakPen)
                 dc.DrawLine(0, y, size.width, y)
@@ -795,11 +836,6 @@ class MyCtrl(wxControl):
                 dc.DrawRectangle(cfg.offsetX + (self.column + tcfg.indent)
                     * cfg.fontX, y, cfg.fontX, cfg.fontY)
                 
-#             savedFont = None
-#             if l.type == cfg.SCENE:
-#                 savedFont = dc.GetFont()
-#                 dc.SetFont(wxFont(cfg.fontY, wxMODERN, wxNORMAL, wxBOLD))
-
             savedFont = False
             if l.type == cfg.SCENE:
                 savedFont = True
