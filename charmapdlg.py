@@ -5,31 +5,20 @@ from wxPython.wx import *
 
 class CharMapDlg(wxDialog):
     def __init__(self, parent, ctrl):
-        wxDialog.__init__(self, parent, -1, "Character map",
-            pos = wxDefaultPosition,
-            style = wxDEFAULT_DIALOG_STYLE)
+        wxDialog.__init__(self, parent, -1, "Character map")
 
         self.ctrl = ctrl
         
         hsizer = wxBoxSizer(wxHORIZONTAL)
-        self.SetSizer(hsizer)
 
         self.charMap = MyCharMap(self)
         hsizer.Add(self.charMap)
 
-        self.SetClientSizeWH(630, self.charMap.GetClientSize().height)
-
-        self.CenterOnScreen()
-        
-        vsizer = wxBoxSizer(wxVERTICAL)
-        
-        self.insertButton = wxButton(self, -1, "Insert character")
-        vsizer.Add(self.insertButton)
+        self.insertButton = wxButton(self, -1, " Insert character ")
+        hsizer.Add(self.insertButton, 0, wxALL, 10)
         EVT_BUTTON(self, self.insertButton.GetId(), self.OnInsert)
 
-        hsizer.Add(vsizer, 0, wxLEFT | wxTOP, 5)
-        
-        self.Layout()
+        util.finishWindow(self, hsizer, 0)
 
     def OnInsert(self, event):
         if self.charMap.selected:
@@ -59,21 +48,21 @@ class MyCharMap(wxWindow):
         # size of a single character cell
         self.cellSize = 32
 
-        if misc.isWindows:
-            self.smallFont = wxFont(12, wxSWISS, wxNORMAL, wxNORMAL)
-            self.normalFont = wxFont(18, wxMODERN, wxNORMAL, wxBOLD)
-            self.bigFont = wxFont(38, wxMODERN, wxNORMAL, wxBOLD)
-        else:
-            self.smallFont = wxFont(14, wxSWISS, wxNORMAL, wxNORMAL)
-            self.normalFont = wxFont(26, wxMODERN, wxNORMAL, wxBOLD)
-            self.bigFont = wxFont(48, wxMODERN, wxNORMAL, wxBOLD)
+        # size of the zoomed-in character boxes
+        self.boxSize = 60
+        
+        self.smallFont = util.createPixelFont(20, wxSWISS, wxNORMAL, wxNORMAL)
+        self.normalFont = util.createPixelFont(self.cellSize, wxMODERN,
+                                               wxNORMAL, wxBOLD)
+        self.bigFont = util.createPixelFont(self.boxSize, wxMODERN,
+                                            wxNORMAL, wxBOLD)
         
         EVT_PAINT(self, self.OnPaint)
         EVT_LEFT_DOWN(self, self.OnLeftDown)
         EVT_MOTION(self, self.OnMotion)
         EVT_SIZE(self, self.OnSize)
 
-        self.SetClientSizeWH(523, 460)
+        self.SetClientSizeWH(self.cols * self.cellSize + 2 * self.offset, 460)
 
     def OnSize(self, event):
         size = self.GetClientSize()
@@ -111,7 +100,7 @@ class MyCharMap(wxWindow):
         
         for y in range(self.rows + 1):
             util.drawLine(dc, self.offset, self.offset + y * self.cellSize,
-                          self.cols * self.cellSize, 0)
+                          self.cols * self.cellSize + 1, 0)
 
         for x in range(self.cols + 1):
             util.drawLine(dc, self.offset + x * self.cellSize,
@@ -159,10 +148,9 @@ class MyCharMap(wxWindow):
         dc.DrawText(text, x, y)
 
         boxX = x + xinc
-        boxSize = 60
 
-        dc.DrawRectangle(boxX, y, boxSize, boxSize)
+        dc.DrawRectangle(boxX, y, self.boxSize, self.boxSize)
 
         dc.SetFont(self.bigFont)
-        util.drawText(dc, char, boxX + boxSize / 2, y + boxSize / 2,
+        util.drawText(dc, char, boxX + self.boxSize / 2, y + self.boxSize / 2,
                       util.ALIGN_CENTER, util.VALIGN_CENTER)

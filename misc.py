@@ -36,7 +36,7 @@ class MyColorSample(wxWindow):
         br = wxBrush(self.GetBackgroundColour())
         dc.SetBrush(br)
         dc.DrawRectangle(0, 0, w, h)
-
+        
 # dialog that shows two lists of script names, allowing user to choose one
 # from both. stores indexes of selections in members named 'sel1' and
 # 'sel2' when OK is pressed. 'items' must have at least two items.
@@ -45,17 +45,12 @@ class ScriptChooserDlg(wxDialog):
         wxDialog.__init__(self, parent, -1, "Choose scripts",
                           style = wxDEFAULT_DIALOG_STYLE)
 
-        self.SetClientSizeWH(325, 115);
-        self.Center()
-        
-        panel = wxPanel(self, -1)
-        
         vsizer = wxBoxSizer(wxVERTICAL)
 
         gsizer = wxFlexGridSizer(2, 2, 5, 0)
 
-        self.addCombo("first", "Compare script", panel, gsizer, items, 0)
-        self.addCombo("second", "to", panel, gsizer, items, 1)
+        self.addCombo("first", "Compare script", self, gsizer, items, 0)
+        self.addCombo("second", "to", self, gsizer, items, 1)
 
         vsizer.Add(gsizer)
 
@@ -63,32 +58,27 @@ class ScriptChooserDlg(wxDialog):
 
         hsizer.Add(1, 1, 1)
         
-        cancelBtn = wxButton(panel, -1, "Cancel")
+        cancelBtn = wxButton(self, -1, "Cancel")
         hsizer.Add(cancelBtn)
         
-        okBtn = wxButton(panel, -1, "OK")
+        okBtn = wxButton(self, -1, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
 
-        panel.SetSizer(vsizer)
-
-        vmsizer = wxBoxSizer(wxVERTICAL)
-        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
-        
-        self.SetSizer(vmsizer)
+        util.finishWindow(self, vsizer)
 
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
         EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
-    def addCombo(self, name, descr, panel, sizer, items, sel):
+    def addCombo(self, name, descr, parent, sizer, items, sel):
         al = wxALIGN_CENTER_VERTICAL | wxRIGHT
         if sel == 1:
             al |= wxALIGN_RIGHT
             
-        sizer.Add(wxStaticText(panel, -1, descr), 0, al, 10)
+        sizer.Add(wxStaticText(parent, -1, descr), 0, al, 10)
         
-        combo = wxComboBox(panel, -1, style = wxCB_READONLY)
+        combo = wxComboBox(parent, -1, style = wxCB_READONLY)
         util.setWH(combo, w = 200)
         
         for s in items:
@@ -134,60 +124,46 @@ class CheckBoxItem:
 
 # shows one or two (one is cbil2 = None) checklistbox widgets with
 # contents from cbil1 and possibly cbil2, which are lists of
-# CheckBoxItems. size is the size of the dialog as an (x,y) tuple.
-# btns[12] are bools for whether or not to include helper buttons.
-# port[12] are the portions that the listboxes are given. cdata[12] are
-# the optional client data lists. if OK is pressed, the incoming lists'
-# items' selection status will be modified.
+# CheckBoxItems. btns[12] are bools for whether or not to include helper
+# buttons. cdata[12] are the optional client data lists. if OK is pressed,
+# the incoming lists' items' selection status will be modified.
 class CheckBoxDlg(wxDialog):
-    def __init__(self, parent, title, size, cbil1, descr1, btns1, port1 = 1,
-                 cbil2 = None, descr2 = None, btns2 = None, port2 = None):
+    def __init__(self, parent, title, cbil1, descr1, btns1,
+                 cbil2 = None, descr2 = None, btns2 = None):
         wxDialog.__init__(self, parent, -1, title,
                           style = wxDEFAULT_DIALOG_STYLE)
 
-        self.SetClientSizeWH(*size);
-        self.Center()
-
-        panel = wxPanel(self, -1)
-        
         vsizer = wxBoxSizer(wxVERTICAL)
 
         self.cbil1 = cbil1
-        self.list1 = self.addList(descr1, panel, vsizer, cbil1, btns1, port1,
-                                  True)
+        self.list1 = self.addList(descr1, self, vsizer, cbil1, btns1, True)
         
         if cbil2 != None:
             self.cbil2 = cbil2
-            self.list2 = self.addList(descr2, panel, vsizer, cbil2, btns2,
-                                      port2, False, 20)
+            self.list2 = self.addList(descr2, self, vsizer, cbil2, btns2,
+                                      False, 20)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
         hsizer.Add(1, 1, 1)
         
-        cancelBtn = wxButton(panel, -1, "Cancel")
+        cancelBtn = wxButton(self, -1, "Cancel")
         hsizer.Add(cancelBtn)
         
-        okBtn = wxButton(panel, -1, "OK")
+        okBtn = wxButton(self, -1, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
 
-        panel.SetSizer(vsizer)
-
-        vmsizer = wxBoxSizer(wxVERTICAL)
-        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
-        
-        self.SetSizer(vmsizer)
+        util.finishWindow(self, vsizer)
 
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
         EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
         okBtn.SetFocus()
         
-    def addList(self, descr, panel, sizer, items, doBtns, portion, isFirst,
-                pad = 0):
-        sizer.Add(wxStaticText(panel, -1, descr), 0, wxTOP, pad)
+    def addList(self, descr, parent, sizer, items, doBtns, isFirst, pad = 0):
+        sizer.Add(wxStaticText(parent, -1, descr), 0, wxTOP, pad)
 
         if doBtns:
             hsizer = wxBoxSizer(wxHORIZONTAL)
@@ -197,29 +173,51 @@ class CheckBoxDlg(wxDialog):
             else:
                 funcs = [ self.OnSet2, self.OnClear2, self.OnToggle2 ]
 
-            tmp = wxButton(panel, -1, "Set")
+            tmp = wxButton(parent, -1, "Set")
             hsizer.Add(tmp)
             EVT_BUTTON(self, tmp.GetId(), funcs[0])
 
-            tmp = wxButton(panel, -1, "Clear")
+            tmp = wxButton(parent, -1, "Clear")
             hsizer.Add(tmp, 0, wxLEFT, 10)
             EVT_BUTTON(self, tmp.GetId(), funcs[1])
 
-            tmp = wxButton(panel, -1, "Toggle")
+            tmp = wxButton(parent, -1, "Toggle")
             hsizer.Add(tmp, 0, wxLEFT, 10)
             EVT_BUTTON(self, tmp.GetId(), funcs[2])
 
             sizer.Add(hsizer, 0, wxTOP | wxBOTTOM, 5)
         
-        tmp = wxCheckListBox(panel, -1)
+        tmp = wxCheckListBox(parent, -1)
 
+        longest = -1
         for i in range(len(items)):
             it = items[i]
 
             tmp.Append(it.text)
             tmp.Check(i, it.selected)
-            
-        sizer.Add(tmp, portion, wxEXPAND)
+
+            if isFirst:
+                if longest != -1:
+                    if len(it.text) > len(items[longest].text):
+                        longest = i
+                else:
+                    longest = 0
+
+        w = -1
+        if isFirst:
+            h = len(items)
+            if longest != -1:
+                w = util.getTextExtent(tmp.GetFont(),
+                                       "[x] " + items[longest].text)[0] + 15
+        else:
+            h = min(10, len(items))
+
+        h *= util.getFontHeight(tmp.GetFont())
+        h += 5
+        h = max(25, h)
+        
+        util.setWH(tmp, w, h)
+        sizer.Add(tmp, 0, wxEXPAND)
 
         return tmp
 

@@ -188,6 +188,20 @@ def isFixedWidth(font):
     
     return w1 == w2
 
+# get extent of 's' as (w, h) (may or may not include descend values)
+def getTextExtent(font, s):
+    dc = wxMemoryDC()
+    dc.SetFont(font)
+    return dc.GetTextExtent(s)
+
+# get real height of font, including descend
+def getFontHeight(font):
+    dc = wxMemoryDC()
+    dc.SetFont(font)
+    ext = dc.GetFullTextExtent("_\xC5")
+
+    return ext[1] + ext[2]
+
 # return how many mm tall given font size is.
 def getTextHeight(size):
     return (size / 72.0) * 25.4
@@ -195,6 +209,34 @@ def getTextHeight(size):
 # return how many mm wide given text is at given style with given size.
 def getTextWidth(text, style, size):
     return (fontinfo.getTextWidth(text, style, size) / 72.0) * 25.4
+
+# create font that's height is <= 'height' pixels. other parameters are
+# the same as in wxFont's constructor.
+def createPixelFont(height, family, style, weight):
+    fs = 6
+
+    selected = fs
+    closest = 1000
+    over = 0
+    
+    while 1:
+        fn = wxFont(fs, family, style, weight)
+        h = getFontHeight(fn)
+        diff = height -h
+
+        if diff >= 0:
+            if diff < closest:
+                closest = diff
+                selected = fs
+        else:
+            over += 1
+
+        if (over >= 3) or (fs > 144):
+            break
+
+        fs += 2
+
+    return wxFont(selected, family, style, weight)
     
 def reverseComboSelect(combo, clientData):
     for i in range(combo.GetCount()):
@@ -292,6 +334,18 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
         y -= h
         
     dc.DrawText(text, x, y)
+
+# create pad sizer for given window whose controls are in topSizer, with
+# 'pad' pixels of padding on each side, resize window to correct size, and
+# optionally center it.
+def finishWindow(window, topSizer, pad = 10, center = True):
+    padSizer = wxBoxSizer(wxVERTICAL)
+    padSizer.Add(topSizer, 1, wxEXPAND | wxALL, pad)
+    window.SetSizerAndFit(padSizer)
+    window.Layout()
+    
+    if center:
+        window.Center()
 
 # fake key event, supports same operations as the real one
 class MyKeyEvent:

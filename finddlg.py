@@ -7,30 +7,23 @@ from wxPython.wx import *
 class FindDlg(wxDialog):
     def __init__(self, parent, ctrl, cfg):
         wxDialog.__init__(self, parent, -1, "Find & Replace",
-                          pos = wxDefaultPosition,
-                          size = (400, 130),
                           style = wxDEFAULT_DIALOG_STYLE | wxWANTS_CHARS)
 
         self.ctrl = ctrl
         
-        self.Center()
-
-        panel = wxPanel(self, -1)
-        
         hsizer = wxBoxSizer(wxHORIZONTAL)
-        panel.SetSizer(hsizer)
-
+        
         vsizer = wxBoxSizer(wxVERTICAL)
         
         gsizer = wxFlexGridSizer(2, 2, 5, 20)
         gsizer.AddGrowableCol(1)
         
-        gsizer.Add(wxStaticText(panel, -1, "Find what:"))
-        self.findEntry = wxTextCtrl(panel, -1, style = wxTE_PROCESS_ENTER)
+        gsizer.Add(wxStaticText(self, -1, "Find what:"))
+        self.findEntry = wxTextCtrl(self, -1, style = wxTE_PROCESS_ENTER)
         gsizer.Add(self.findEntry, 0, wxEXPAND)
 
-        gsizer.Add(wxStaticText(panel, -1, "Replace with:"))
-        self.replaceEntry = wxTextCtrl(panel, -1, style = wxTE_PROCESS_ENTER)
+        gsizer.Add(wxStaticText(self, -1, "Replace with:"))
+        self.replaceEntry = wxTextCtrl(self, -1, style = wxTE_PROCESS_ENTER)
         gsizer.Add(self.replaceEntry, 0, wxEXPAND)
         
         vsizer.Add(gsizer, 0, wxEXPAND | wxBOTTOM, 10)
@@ -45,15 +38,15 @@ class FindDlg(wxDialog):
         if misc.isWindows:
             pad = 5
 
-        self.matchWholeCb = wxCheckBox(panel, -1, "Match whole word only")
+        self.matchWholeCb = wxCheckBox(self, -1, "Match whole word only")
         vsizer2.Add(self.matchWholeCb, 0, wxTOP, pad)
 
-        self.matchCaseCb = wxCheckBox(panel, -1, "Match case")
+        self.matchCaseCb = wxCheckBox(self, -1, "Match case")
         vsizer2.Add(self.matchCaseCb, 0, wxTOP, pad)
 
         hsizer2.Add(vsizer2, 0, wxEXPAND | wxRIGHT, 10)
 
-        self.direction = wxRadioBox(panel, -1, "Direction",
+        self.direction = wxRadioBox(self, -1, "Direction",
                                     choices = ["Up", "Down"])
         self.direction.SetSelection(1)
         
@@ -61,10 +54,10 @@ class FindDlg(wxDialog):
         
         vsizer.Add(hsizer2, 0, wxEXPAND | wxBOTTOM, 10)
 
-        self.extraLabel = wxStaticText(panel, -1, "Search in:")
+        self.extraLabel = wxStaticText(self, -1, "Search in:")
         vsizer.Add(self.extraLabel)
 
-        self.elements = wxCheckListBox(panel, -1)
+        self.elements = wxCheckListBox(self, -1)
 
         # sucky wxMSW doesn't support client data for checklistbox items,
         # so we have to store it ourselves
@@ -83,17 +76,17 @@ class FindDlg(wxDialog):
         
         vsizer = wxBoxSizer(wxVERTICAL)
         
-        find = wxButton(panel, -1, "&Find next")
-        vsizer.Add(find, 0, wxBOTTOM, 5)
+        find = wxButton(self, -1, "&Find next")
+        vsizer.Add(find, 0, wxEXPAND | wxBOTTOM, 5)
 
-        replace = wxButton(panel, -1, "&Replace")
-        vsizer.Add(replace, 0, wxBOTTOM, 5)
+        replace = wxButton(self, -1, "&Replace")
+        vsizer.Add(replace, 0, wxEXPAND | wxBOTTOM, 5)
         
-        replaceAll = wxButton(panel, -1, "Replace all")
-        vsizer.Add(replaceAll, 0, wxBOTTOM, 5)
+        replaceAll = wxButton(self, -1, " Replace all ")
+        vsizer.Add(replaceAll, 0, wxEXPAND | wxBOTTOM, 5)
 
-        self.moreButton = wxButton(panel, -1, "")
-        vsizer.Add(self.moreButton, 0, wxBOTTOM, 5)
+        self.moreButton = wxButton(self, -1, "")
+        vsizer.Add(self.moreButton, 0, wxEXPAND | wxBOTTOM, 5)
 
         hsizer.Add(vsizer, 0, wxEXPAND | wxLEFT, 30)
 
@@ -107,7 +100,7 @@ class FindDlg(wxDialog):
         EVT_TEXT_ENTER(self, self.findEntry.GetId(), self.OnFind)
         EVT_TEXT_ENTER(self, self.replaceEntry.GetId(), self.OnFind)
 
-        EVT_CHAR(panel, self.OnCharMisc)
+        EVT_CHAR(self, self.OnCharMisc)
         EVT_CHAR(self.findEntry, self.OnCharEntry)
         EVT_CHAR(self.replaceEntry, self.OnCharEntry)
         EVT_CHAR(find, self.OnCharButton)
@@ -119,16 +112,13 @@ class FindDlg(wxDialog):
         EVT_CHAR(self.direction, self.OnCharMisc)
         EVT_CHAR(self.elements, self.OnCharMisc)
         
-        vmsizer = wxBoxSizer(wxVERTICAL)
-        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
-
+        util.finishWindow(self, hsizer, center = False)
+        
         self.showExtra(False)
-        
-        self.SetSizer(vmsizer)
-        self.Layout()
-        
-        self.findEntry.SetFocus()
+        self.Center()
 
+        self.findEntry.SetFocus()
+        
     def OnMore(self, event):
         self.showExtra(not self.useExtra)
 
@@ -182,11 +172,17 @@ class FindDlg(wxDialog):
 
         if flag:
             self.moreButton.SetLabel("<<< Less")
-            util.setWH(self, h = 260)
+            pos = self.elements.GetPosition()
+            h = pos.y + len(self.elementTypes) * \
+                util.getFontHeight(self.elements.GetFont()) + 10
         else:
             self.moreButton.SetLabel("More >>>")
-            util.setWH(self, h = 130)
-            
+            pos = self.extraLabel.GetPosition()
+            h = pos.y
+
+        self.SetSizeHints(self.GetClientSize().width, h)
+        util.setWH(self, h = h)
+
     def getParams(self):
         self.dirUp = self.direction.GetSelection() == 0
         self.matchWhole = self.matchWholeCb.IsChecked()

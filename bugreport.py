@@ -35,51 +35,39 @@ class BugReportHandler:
         
 class BugReportDlg(wxDialog):
     def __init__(self, parent, brh):
-        wxDialog.__init__(self, parent, -1, "Error",
-            pos = wxDefaultPosition, size = (400, 300),
-            style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+        wxDialog.__init__(self, parent, -1, "Error")
 
         self.brh = brh
 
-        self.Center()
-
-        panel = wxPanel(self, -1)
-
         vsizer = wxBoxSizer(wxVERTICAL)
 
-        s = """
-An error has occurred in the program. To help us fix it,
-please send a report to bugreport@oskusoft.com explaining
-what you were doing and what went wrong. If possible, include
-data needed to reproduce the problem.
+        s = "An error has occurred in the program. To help us fix it," \
+            " please send a report to bugreport@oskusoft.com explaining" \
+            " what you were doing and what went wrong. If possible, include" \
+            " data needed to reproduce the problem.\n\n" \
+            "" \
+            "Also, and this is very important, press the \"Copy\" button" \
+            " below to copy additional information about the problem to the" \
+            " clipboard, and then paste that information at the end of your" \
+            " mail. Don't close this window until you've safely copied this" \
+            " extra information to another program.\n\n" \
+            "" \
+            "If you have other windows besides the main window open in" \
+            " this program, you need to close them before being able to" \
+            " press \"Copy\".\n\n" \
+            "" \
+            "After doing all this, save your work (if possible), and" \
+            " restart the program."
 
-Also, and this is very important, press the "Copy" button
-below to copy additional information about the problem to the
-clipboard, and then paste that information at the end of your
-mail. Don't close this window until you've safely copied this
-extra information to another program.
-
-If you have other windows besides the main window open in
-this program, you need to close them before being able to
-press "Copy".
-
-After doing all this, save your work (if possible), and
-restart the program.
-"""
-
-        vsizer.Add(wxTextCtrl(panel, -1, s.strip(),
-            style = wxTE_MULTILINE | wxTE_READONLY), 1, wxEXPAND)
+        vsizer.Add(wxTextCtrl(self, -1, s,
+            size = wxSize(400, 300), style = wxTE_MULTILINE | wxTE_READONLY),
+            1, wxEXPAND)
         
-        btn = wxButton(panel, -1, "Copy")
+        btn = wxButton(self, -1, "Copy")
         EVT_BUTTON(self, btn.GetId(), self.OnCopyCb)
         vsizer.Add(btn, 0, wxALIGN_CENTER | wxTOP, 10)
 
-        panel.SetSizer(vsizer)
-
-        vmsizer = wxBoxSizer(wxVERTICAL)
-        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
-        
-        self.SetSizer(vmsizer)
+        util.finishWindow(self, vsizer)
 
         EVT_CLOSE(self, self.OnCloseWindow)
 

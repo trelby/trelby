@@ -458,8 +458,8 @@ class MyCtrl(wxControl):
         inf = []
         inf.append(misc.CheckBoxItem("Include page markers"))
 
-        dlg = misc.CheckBoxDlg(mainFrame, "Output options", (200, 100),
-                               inf, "Options:", False)
+        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf,
+                               "Options:", False)
 
         if dlg.ShowModal() != wxID_OK:
             dlg.Destroy()
@@ -2265,8 +2265,8 @@ class MyCtrl(wxControl):
         for t in cfg.types.values():
             types.append(misc.CheckBoxItem(t.name, False, t.lt))
 
-        dlg = misc.CheckBoxDlg(mainFrame, "Delete elements", (280, 250),
-            types, "Element types to delete:", True)
+        dlg = misc.CheckBoxDlg(mainFrame, "Delete elements", types,
+                               "Element types to delete:", True)
 
         ok = False
         if dlg.ShowModal() == wxID_OK:

@@ -4,7 +4,6 @@ from wxPython.html import *
 class CommandsDlg(wxDialog):
     def __init__(self, parent):
         wxDialog.__init__(self, parent, -1, "Commands",
-                          pos = wxDefaultPosition,
                           size = (650, 600),
                           style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
 

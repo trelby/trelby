@@ -21,60 +21,51 @@ class TitlesDlg(wxDialog):
         
         self.setPage(0)
 
-        h = 540
-        if misc.isWindows:
-            h = 530
-
-        self.SetClientSizeWH(400, h);
-        self.Center()
-        
-        panel = wxPanel(self, -1)
-        
         vsizer = wxBoxSizer(wxVERTICAL)
 
-        self.pageLabel = wxStaticText(panel, -1, "")
+        self.pageLabel = wxStaticText(self, -1, "")
         vsizer.Add(self.pageLabel, 0, wxADJUST_MINSIZE)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
-        tmp = wxButton(panel, -1, "Add")
+        tmp = wxButton(self, -1, "Add")
         hsizer.Add(tmp)
         EVT_BUTTON(self, tmp.GetId(), self.OnAddPage)
 
-        self.delPageBtn = wxButton(panel, -1, "Delete")
+        self.delPageBtn = wxButton(self, -1, "Delete")
         hsizer.Add(self.delPageBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delPageBtn.GetId(), self.OnDeletePage)
 
-        self.moveBtn = wxButton(panel, -1, "Move")
+        self.moveBtn = wxButton(self, -1, "Move")
         hsizer.Add(self.moveBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.moveBtn.GetId(), self.OnMovePage)
 
-        self.nextBtn = wxButton(panel, -1, "Next")
+        self.nextBtn = wxButton(self, -1, "Next")
         hsizer.Add(self.nextBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.nextBtn.GetId(), self.OnNextPage)
 
         vsizer.Add(hsizer, 0, wxTOP, 5)
         
-        vsizer.Add(wxStaticLine(panel, -1), 0, wxEXPAND | wxTOP | wxBOTTOM,
+        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM,
                    10)
         
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
         vsizer2 = wxBoxSizer(wxVERTICAL)
         
-        tmp = wxStaticText(panel, -1, "Strings:")
+        tmp = wxStaticText(self, -1, "Strings:")
         vsizer2.Add(tmp)
         
-        self.stringsLb = wxListBox(panel, -1, size = (200, 200))
+        self.stringsLb = wxListBox(self, -1, size = (200, 150))
         vsizer2.Add(self.stringsLb)
 
         hsizer2 = wxBoxSizer(wxHORIZONTAL)
         
-        self.addBtn = wxButton(panel, -1, "Add")
+        self.addBtn = wxButton(self, -1, "Add")
         hsizer2.Add(self.addBtn)
         EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
 
-        self.delBtn = wxButton(panel, -1, "Delete")
+        self.delBtn = wxButton(self, -1, "Delete")
         hsizer2.Add(self.delBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
 
@@ -82,16 +73,17 @@ class TitlesDlg(wxDialog):
 
         hsizer.Add(vsizer2)
         
-        self.previewCtrl = TitlesPreview(panel, self, self.cfg)
+        self.previewCtrl = TitlesPreview(self, self, self.cfg)
+        self.previewCtrl.SetClientSizeWH(150, 150)
         hsizer.Add(self.previewCtrl, 1, wxEXPAND | wxLEFT, 10)
         
         vsizer.Add(hsizer, 0, wxEXPAND)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(wxStaticText(panel, -1, "Text:"), 0,
+        hsizer.Add(wxStaticText(self, -1, "Text:"), 0,
                    wxALIGN_CENTER_VERTICAL)
-        self.textEntry = wxTextCtrl(panel, -1)
+        self.textEntry = wxTextCtrl(self, -1)
         hsizer.Add(self.textEntry, 1, wxLEFT, 10)
         EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
 
@@ -103,9 +95,9 @@ class TitlesDlg(wxDialog):
         
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(wxStaticText(panel, -1, "X-Pos (mm):"), 0,
+        hsizer.Add(wxStaticText(self, -1, "X-Pos (mm):"), 0,
                    wxALIGN_CENTER_VERTICAL)
-        self.xEntry = wxTextCtrl(panel, -1)
+        self.xEntry = wxTextCtrl(self, -1)
         hsizer.Add(self.xEntry, 0, wxLEFT, 10)
         EVT_TEXT(self, self.xEntry.GetId(), self.OnMisc)
 
@@ -113,9 +105,9 @@ class TitlesDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(wxStaticText(panel, -1, "Y-Pos (mm):"), 0,
+        hsizer.Add(wxStaticText(self, -1, "Y-Pos (mm):"), 0,
                    wxALIGN_CENTER_VERTICAL)
-        self.yEntry = wxTextCtrl(panel, -1)
+        self.yEntry = wxTextCtrl(self, -1)
         hsizer.Add(self.yEntry, 0, wxLEFT, 10)
         EVT_TEXT(self, self.yEntry.GetId(), self.OnMisc)
 
@@ -123,9 +115,9 @@ class TitlesDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
-        hsizer.Add(wxStaticText(panel, -1, "Font:"), 0,
+        hsizer.Add(wxStaticText(self, -1, "Font:"), 0,
                    wxALIGN_CENTER_VERTICAL)
-        self.fontCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+        self.fontCombo = wxComboBox(self, -1, style = wxCB_READONLY)
 
         for it in [ ("Courier", pml.COURIER), ("Helvetica", pml.HELVETICA),
                     ("Times-Roman", pml.TIMES_ROMAN) ]:
@@ -138,10 +130,10 @@ class TitlesDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(wxStaticText(panel, -1, "Size:"), 0,
+        hsizer.Add(wxStaticText(self, -1, "Size:"), 0,
                    wxALIGN_CENTER_VERTICAL)
         
-        self.sizeEntry = wxSpinCtrl(panel, -1)
+        self.sizeEntry = wxSpinCtrl(self, -1)
         self.sizeEntry.SetRange(4, 288)
         EVT_SPINCTRL(self, self.sizeEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.sizeEntry, self.OnKillFocus)
@@ -151,7 +143,7 @@ class TitlesDlg(wxDialog):
 
         hsizerTop.Add(vsizer2)
         
-        bsizer = wxStaticBoxSizer(wxStaticBox(panel, -1, "Style"),
+        bsizer = wxStaticBoxSizer(wxStaticBox(self, -1, "Style"),
                                   wxHORIZONTAL)
 
         vsizer2 = wxBoxSizer(wxVERTICAL)
@@ -162,10 +154,10 @@ class TitlesDlg(wxDialog):
         if misc.isWindows:
             pad = 5
         
-        self.addCheckBox("Centered", panel, vsizer2, pad)
-        self.addCheckBox("Bold", panel, vsizer2, pad)
-        self.addCheckBox("Italic", panel, vsizer2, pad)
-        self.addCheckBox("Underlined", panel, vsizer2, pad)
+        self.addCheckBox("Centered", self, vsizer2, pad)
+        self.addCheckBox("Bold", self, vsizer2, pad)
+        self.addCheckBox("Italic", self, vsizer2, pad)
+        self.addCheckBox("Underlined", self, vsizer2, pad)
             
         bsizer.Add(vsizer2)
 
@@ -177,23 +169,18 @@ class TitlesDlg(wxDialog):
 
         hsizer.Add(1, 1, 1)
         
-        self.previewBtn = wxButton(panel, -1, "Preview")
+        self.previewBtn = wxButton(self, -1, "Preview")
         hsizer.Add(self.previewBtn)
 
-        cancelBtn = wxButton(panel, -1, "Cancel")
+        cancelBtn = wxButton(self, -1, "Cancel")
         hsizer.Add(cancelBtn, 0, wxLEFT, 10)
         
-        okBtn = wxButton(panel, -1, "OK")
+        okBtn = wxButton(self, -1, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
 
-        panel.SetSizer(vsizer)
-
-        vmsizer = wxBoxSizer(wxVERTICAL)
-        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
-        
-        self.SetSizer(vmsizer)
+        util.finishWindow(self, vsizer)
 
         EVT_BUTTON(self, self.previewBtn.GetId(), self.OnPreview)
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
@@ -210,8 +197,8 @@ class TitlesDlg(wxDialog):
 
         self.textEntry.SetFocus()
 
-    def addCheckBox(self, name, panel, sizer, pad):
-        cb = wxCheckBox(panel, -1, name)
+    def addCheckBox(self, name, parent, sizer, pad):
+        cb = wxCheckBox(parent, -1, name)
         EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
         sizer.Add(cb, 0, wxTOP, pad)
         setattr(self, name.lower() + "Cb", cb)

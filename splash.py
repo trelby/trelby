@@ -11,7 +11,6 @@ class SplashWindow(wxFrame):
     
     def __init__(self, parent, delay):
         wxFrame.__init__(self, parent, -1, "Splash",
-            pos = wxDefaultPosition, size = (100, 100),
             style = wxFRAME_FLOAT_ON_PARENT | wxSTAY_ON_TOP | wxSIMPLE_BORDER)
 
         if not SplashWindow.inited:

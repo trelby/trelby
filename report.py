@@ -21,9 +21,9 @@ def genCharacterReport(mainFrame, ctrl, cfg):
     for s in util.listify(report.cinfo, "name"):
         charNames.append(misc.CheckBoxItem(s))
     
-    dlg = misc.CheckBoxDlg(mainFrame, "Report type", (300, 400),
-        report.inf, "Information to include:", False, 1,
-        charNames, "Characters to include:", True, 4)
+    dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
+        "Information to include:", False, charNames,
+        "Characters to include:", True)
 
     ok = False
     if dlg.ShowModal() == wxID_OK:

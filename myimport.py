@@ -216,30 +216,25 @@ class ImportDlg(wxDialog):
         wxDialog.__init__(self, parent, -1, "Adjust styles",
                           style = wxDEFAULT_DIALOG_STYLE)
 
-        self.SetClientSizeWH(500, 500);
-        self.Center()
-
         indents.sort(lambda i1, i2: -cmp(len(i1.lines), len(i2.lines)))
-        
-        panel = wxPanel(self, -1)
         
         vsizer = wxBoxSizer(wxVERTICAL)
 
-        tmp = wxStaticText(panel, -1, "Input:")
+        tmp = wxStaticText(self, -1, "Input:")
         vsizer.Add(tmp)
         
-        self.inputLb = wxListBox(panel, -1, size = (200, 200))
+        self.inputLb = wxListBox(self, -1, size = (400, 200))
         for it in indents:
             self.inputLb.Append("%d lines (indented %d characters)" %
                                 (len(it.lines), it.indent), it)
             
-        vsizer.Add(self.inputLb, 1, wxEXPAND)
+        vsizer.Add(self.inputLb, 0, wxEXPAND)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
-        hsizer.Add(wxStaticText(panel, -1, "Style:"), 0,
+        hsizer.Add(wxStaticText(self, -1, "Style:"), 0,
                    wxALIGN_CENTER_VERTICAL)
-        self.styleCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+        self.styleCombo = wxComboBox(self, -1, style = wxCB_READONLY)
 
         cfg = config.currentCfg
         
@@ -247,36 +242,31 @@ class ImportDlg(wxDialog):
         for t in cfg.types.values():
             self.styleCombo.Append(t.name, t.lt)
 
-        util.setWH(self.styleCombo, w = 125)
+        util.setWH(self.styleCombo, w = 150)
         
         hsizer.Add(self.styleCombo, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxTOP | wxBOTTOM, 10)
 
-        vsizer.Add(wxStaticText(panel, -1, "Lines:"))
+        vsizer.Add(wxStaticText(self, -1, "Lines:"))
 
-        self.linesEntry = wxTextCtrl(panel, -1, style = wxTE_MULTILINE |
-                                     wxTE_DONTWRAP )
-        vsizer.Add(self.linesEntry, 2, wxEXPAND)
+        self.linesEntry = wxTextCtrl(self, -1, size = (400, 200),
+            style = wxTE_MULTILINE | wxTE_DONTWRAP)
+        vsizer.Add(self.linesEntry, 0, wxEXPAND)
         
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
         hsizer.Add(1, 1, 1)
         
-        cancelBtn = wxButton(panel, -1, "Cancel")
+        cancelBtn = wxButton(self, -1, "Cancel")
         hsizer.Add(cancelBtn)
         
-        okBtn = wxButton(panel, -1, "OK")
+        okBtn = wxButton(self, -1, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
 
-        panel.SetSizer(vsizer)
-
-        vmsizer = wxBoxSizer(wxVERTICAL)
-        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
-        
-        self.SetSizer(vmsizer)
+        util.finishWindow(self, vsizer)
 
         EVT_COMBOBOX(self, self.styleCombo.GetId(), self.OnStyleCombo)
         EVT_LISTBOX(self, self.inputLb.GetId(), self.OnInputLb)
@@ -294,11 +284,11 @@ class ImportDlg(wxDialog):
         self.EndModal(wxID_CANCEL)
 
     def OnInputLb(self, event = None):
-        ind = self.inputLb.GetClientData(self.inputLb.GetSelection())
+        self.selected = self.inputLb.GetClientData(self.inputLb.GetSelection())
 
-        util.reverseComboSelect(self.styleCombo, ind.lt)
-        self.linesEntry.SetValue("\n".join(ind.lines))
+        util.reverseComboSelect(self.styleCombo, self.selected.lt)
+        self.linesEntry.SetValue("\n".join(self.selected.lines))
 
     def OnStyleCombo(self, event):
-        ind = self.inputLb.GetClientData(self.inputLb.GetSelection())
-        ind.lt = self.styleCombo.GetClientData(self.styleCombo.GetSelection())
+        self.selected.lt = self.styleCombo.GetClientData(
+            self.styleCombo.GetSelection())

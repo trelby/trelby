@@ -21,23 +21,14 @@ class HeadersDlg(wxDialog):
         if len(self.headers.hdrs) > 0:
             self.hdrIndex = 0
 
-        h = 425
-        if misc.isWindows:
-            h = 400
-
-        self.SetClientSizeWH(400, h);
-        self.Center()
-        
-        panel = wxPanel(self, -1)
-        
         vsizer = wxBoxSizer(wxVERTICAL)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
-        hsizer.Add(wxStaticText(panel, -1, "Empty lines after headers:"), 0,
+        hsizer.Add(wxStaticText(self, -1, "Empty lines after headers:"), 0,
                    wxALIGN_CENTER_VERTICAL)
         
-        self.elinesEntry = wxSpinCtrl(panel, -1)
+        self.elinesEntry = wxSpinCtrl(self, -1)
         self.elinesEntry.SetRange(0, 5)
         EVT_SPINCTRL(self, self.elinesEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.elinesEntry, self.OnKillFocus)
@@ -45,22 +36,22 @@ class HeadersDlg(wxDialog):
 
         vsizer.Add(hsizer)
         
-        vsizer.Add(wxStaticLine(panel, -1), 0, wxEXPAND | wxTOP | wxBOTTOM,
+        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM,
                    10)
         
-        tmp = wxStaticText(panel, -1, "Strings:")
+        tmp = wxStaticText(self, -1, "Strings:")
         vsizer.Add(tmp)
         
-        self.stringsLb = wxListBox(panel, -1, size = (200, 100))
+        self.stringsLb = wxListBox(self, -1, size = (200, 100))
         vsizer.Add(self.stringsLb, 0, wxEXPAND)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
-        self.addBtn = wxButton(panel, -1, "Add")
+        self.addBtn = wxButton(self, -1, "Add")
         hsizer.Add(self.addBtn)
         EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
 
-        self.delBtn = wxButton(panel, -1, "Delete")
+        self.delBtn = wxButton(self, -1, "Delete")
         hsizer.Add(self.delBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
 
@@ -68,16 +59,16 @@ class HeadersDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(wxStaticText(panel, -1, "Text:"), 0,
+        hsizer.Add(wxStaticText(self, -1, "Text:"), 0,
                    wxALIGN_CENTER_VERTICAL)
 
-        self.textEntry = wxTextCtrl(panel, -1)
+        self.textEntry = wxTextCtrl(self, -1)
         hsizer.Add(self.textEntry, 1, wxLEFT, 10)
         EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
 
-        vsizer.Add(wxStaticText(panel, -1,
+        vsizer.Add(wxStaticText(self, -1,
             "'${PAGE}' will be replaced by the page number."), 0,
             wxALIGN_CENTER | wxTOP, 5)
 
@@ -85,27 +76,27 @@ class HeadersDlg(wxDialog):
 
         gsizer = wxFlexGridSizer(3, 2, 5, 0)
 
-        gsizer.Add(wxStaticText(panel, -1, "Header line:"), 0,
+        gsizer.Add(wxStaticText(self, -1, "Header line:"), 0,
                    wxALIGN_CENTER_VERTICAL)
 
-        self.lineEntry = wxSpinCtrl(panel, -1)
+        self.lineEntry = wxSpinCtrl(self, -1)
         self.lineEntry.SetRange(1, 5)
         EVT_SPINCTRL(self, self.lineEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.lineEntry, self.OnKillFocus)
         gsizer.Add(self.lineEntry)
 
-        gsizer.Add(wxStaticText(panel, -1, "X offset (characters):"), 0,
+        gsizer.Add(wxStaticText(self, -1, "X offset (characters):"), 0,
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
 
-        self.xoffEntry = wxSpinCtrl(panel, -1)
+        self.xoffEntry = wxSpinCtrl(self, -1)
         self.xoffEntry.SetRange(-100, 100)
         EVT_SPINCTRL(self, self.xoffEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.xoffEntry, self.OnKillFocus)
         gsizer.Add(self.xoffEntry)
 
-        gsizer.Add(wxStaticText(panel, -1, "Alignment:"), 0,
+        gsizer.Add(wxStaticText(self, -1, "Alignment:"), 0,
                    wxALIGN_CENTER_VERTICAL)
-        self.alignCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+        self.alignCombo = wxComboBox(self, -1, style = wxCB_READONLY)
 
         for it in [ ("Left", util.ALIGN_LEFT), ("Center", util.ALIGN_CENTER),
                     ("Right", util.ALIGN_RIGHT) ]:
@@ -116,7 +107,7 @@ class HeadersDlg(wxDialog):
 
         hsizerTop.Add(gsizer)
         
-        bsizer = wxStaticBoxSizer(wxStaticBox(panel, -1, "Style"),
+        bsizer = wxStaticBoxSizer(wxStaticBox(self, -1, "Style"),
                                   wxHORIZONTAL)
 
         vsizer2 = wxBoxSizer(wxVERTICAL)
@@ -127,9 +118,9 @@ class HeadersDlg(wxDialog):
         if misc.isWindows:
             pad = 5
         
-        self.addCheckBox("Bold", panel, vsizer2, pad)
-        self.addCheckBox("Italic", panel, vsizer2, pad)
-        self.addCheckBox("Underlined", panel, vsizer2, pad)
+        self.addCheckBox("Bold", self, vsizer2, pad)
+        self.addCheckBox("Italic", self, vsizer2, pad)
+        self.addCheckBox("Underlined", self, vsizer2, pad)
             
         bsizer.Add(vsizer2)
 
@@ -141,23 +132,18 @@ class HeadersDlg(wxDialog):
 
         hsizer.Add(1, 1, 1)
         
-        self.previewBtn = wxButton(panel, -1, "Preview")
+        self.previewBtn = wxButton(self, -1, "Preview")
         hsizer.Add(self.previewBtn)
 
-        cancelBtn = wxButton(panel, -1, "Cancel")
+        cancelBtn = wxButton(self, -1, "Cancel")
         hsizer.Add(cancelBtn, 0, wxLEFT, 10)
         
-        okBtn = wxButton(panel, -1, "OK")
+        okBtn = wxButton(self, -1, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
 
-        panel.SetSizer(vsizer)
-
-        vmsizer = wxBoxSizer(wxVERTICAL)
-        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
-        
-        self.SetSizer(vmsizer)
+        util.finishWindow(self, vsizer)
 
         EVT_BUTTON(self, self.previewBtn.GetId(), self.OnPreview)
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
@@ -174,8 +160,8 @@ class HeadersDlg(wxDialog):
 
         self.textEntry.SetFocus()
 
-    def addCheckBox(self, name, panel, sizer, pad):
-        cb = wxCheckBox(panel, -1, name)
+    def addCheckBox(self, name, parent, sizer, pad):
+        cb = wxCheckBox(parent, -1, name)
         EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
         sizer.Add(cb, 0, wxTOP, pad)
         setattr(self, name.lower() + "Cb", cb)
