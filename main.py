@@ -10,6 +10,7 @@ import dialoguechart
 import finddlg
 import misc
 import namesdlg
+import pdf
 import splash
 import util
 
@@ -213,7 +214,7 @@ class MyCtrl(wxControl):
 
             except IOError, (errno, strerror):
                 raise MiscError("IOError: %s" % strerror)
-                
+            
             sp = Screenplay()
 
             # used to keep track that element type only changes after a
@@ -279,7 +280,7 @@ class MyCtrl(wxControl):
 
                 if len(s) < 2:
                     raise MiscError("Line %d is too short." % (i + 1))
-
+                
                 if s[0] == "#":
                     key, val = self.parseConfigLine(s)
                     if not key:
@@ -430,6 +431,27 @@ class MyCtrl(wxControl):
                 
         except NaspError, e:
             wxMessageBox("Error saving file: %s" % e, "Error",
+                         wxOK, mainFrame)
+
+    # FIXME: take a screenplay object like export above does
+    def exportPDF(self):
+        try:
+            exporter = pdf.PDFExporter()
+            s = exporter.generate()
+            
+            try:
+                f = open("test.pdf", "wb")
+
+                try:
+                    f.write(s)
+                finally:
+                    f.close()
+                    
+            except IOError, (errno, strerror):
+                raise MiscError("IOError: %s" % strerror)
+                
+        except NaspError, e:
+            wxMessageBox("Error exporting PDF: %s" % e, "Error",
                          wxOK, mainFrame)
 
     def makeBackup(self):
@@ -1773,6 +1795,8 @@ class MyCtrl(wxControl):
             self.loadFile("default.nasp")
         elif (kc < 256) and (chr(kc) == "Å"):
             self.OnSettings()
+        elif (kc < 256) and (chr(kc) == "¤"):
+            self.exportPDF()
 
         elif util.isValidInputChar(kc):
             char = chr(kc)

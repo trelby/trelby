@@ -158,3 +158,28 @@ class MyKeyEvent:
 
     def Skip(self):
         pass
+
+# a string-like object that features reasonably fast repeated appends even
+# for large strings, since it keeps each appended string as an item in a
+# list.
+class String:
+    def __init__(self):
+
+        # byte count of data appended
+        self.pos = 0
+
+        # list of strings
+        self.data = []
+
+    def getPos(self):
+        return self.pos
+
+    def __str__(self):
+        return "".join(self.data)
+    
+    def __iadd__(self, s):
+        # should check that s is a string object...
+        self.data.append(s)
+        self.pos += len(s)
+
+        return self
