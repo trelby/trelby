@@ -301,6 +301,23 @@ class String:
 
         return self
 
+# load file, returning it as a string or None on errors.
+def loadFile(filename):
+    ret = None
+    
+    try:
+        f = open(filename, "rb")
+
+        try:
+            ret = f.read()
+        finally:
+            f.close()
+
+    except IOError:
+        ret = None
+
+    return ret
+
 # write 'data' to 'filename', popping up a messagebox using 'frame' as
 # parent on errors. returns True on success.
 def writeToFile(filename, data, frame):

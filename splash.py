@@ -1,4 +1,8 @@
 import misc
+import util
+
+import md5
+import sys
 
 from wxPython.wx import *
 
@@ -13,13 +17,25 @@ class SplashWindow(wxFrame):
         if not SplashWindow.inited:
             SplashWindow.inited = True
             wxImage_AddHandler(wxJPEGHandler())
+
+        fileName = "logo.jpg"
+        fileData = util.loadFile(fileName)
+
+        if not fileData or (len(fileData) != 120900) or \
+               (md5.new(fileData).digest() != \
+          "\x79\xff\x05\x31\x2d\xa8\xdc\x09\x1e\x56\x43\xac\xda\xaf\x7c\xa3"):
+            self.abort()
         
-        self.pic = wxBitmap("logo.jpg", wxBITMAP_TYPE_JPEG)
-        if self.pic.Ok():
-            self.SetClientSizeWH(self.pic.GetWidth(), self.pic.GetHeight())
-        else:
-            self.pic = None
-            self.SetClientSizeWH(512, 384)
+        self.pic = wxBitmap(fileName, wxBITMAP_TYPE_JPEG)
+        if not self.pic.Ok():
+            self.abort()
+
+        w, h = (self.pic.GetWidth(), self.pic.GetHeight())
+
+        if (w != 640) or (h != 440):
+            self.abort()
+
+        self.SetClientSizeWH(w, h)
 
         self.CenterOnScreen()
 
@@ -40,6 +56,11 @@ class SplashWindow(wxFrame):
         EVT_PAINT(self, self.OnPaint)
         EVT_CLOSE(self, self.OnCloseWindow)
 
+    def abort(self):
+        wxMessageBox("Error opening splash screen.", "Error", wxOK,
+                     self.GetParent())
+        sys.exit()
+        
     def OnClick(self, event):
         self.Close()
 
