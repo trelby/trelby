@@ -5,10 +5,12 @@ from error import *
 import config
 from cfgdlg import CfgDlg
 from commandsdlg import CommandsDlg
+import misc
 import splash
 import util
 
 import copy
+import re
 import string
 import time
 import os.path
@@ -61,6 +63,14 @@ class Line:
         return config.lb2text(self.lb) + config.linetype2text(self.type)\
                + self.text
 
+    # replace some words, rendering the script useless except for
+    # evaluation purposes
+    def replace(self):
+        self.text = re.sub(r"\b(\w){3}\b", "BUY", self.text)
+        self.text = re.sub(r"\b(\w){4}\b", "DEMO", self.text)
+        self.text = re.sub(r"\b(\w){5}\b", "TRIAL", self.text)
+        self.text = re.sub(r"\b(\w){10}\b", "EVALUATION", self.text)
+        
 class Screenplay:
     def __init__(self):
         self.lines = []
@@ -87,6 +97,10 @@ class Screenplay:
         else:
             return 0
 
+    def replace(self):
+        for i in range(len(self.lines)):
+            self.lines[i].replace()
+            
 class MyPanel(wxPanel):
 
     def __init__(self, parent, id):
@@ -583,6 +597,15 @@ class MyCtrl(wxControl):
         self.reformatAll()
         self.updateScreen()
 
+    def checkEval(self):
+        if misc.isEval:
+            wxMessageBox("This feature is not supported in the\n"
+                         "evaluation version.", "Notice",
+                         wxOK, self)
+            return True
+
+        return False
+                
     def OnEraseBackground(self, event):
         pass
         
@@ -706,12 +729,18 @@ class MyCtrl(wxControl):
             self.updateScreen()
         
     def OnSave(self):
+        if self.checkEval():
+            return
+        
         if self.fileName:
             self.saveFile(self.fileName)
         else:
             self.OnSaveAs()
 
     def OnSaveAs(self):
+        if self.checkEval():
+            return
+        
         dlg = wxFileDialog(self, "Filename to save as",
                            wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
                            style = wxSAVE | wxOVERWRITE_PROMPT)

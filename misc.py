@@ -2,5 +2,6 @@
 
 version = "0.43"
 
-licensedTo = "Evaluation version with 19 days left."
+isEval = True
+licensedTo = "Evaluation version."
 copyright = "© Oskusoft 2004. All rights reserved."
