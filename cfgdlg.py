@@ -1,5 +1,6 @@
 import config
 import misc
+import string
 import util
 from wxPython.wx import *
 
@@ -32,6 +33,9 @@ class CfgDlg(wxDialog):
 
         p = ElementsPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Elements")
+
+        p = AutoCompPanel(self.notebook, -1, cfg)
+        self.notebook.AddPage(p, "Auto-completion")
 
         p = PaperPanel(self.notebook, -1, cfg)
         self.notebook.AddPage(p, "Paper")
@@ -580,3 +584,79 @@ class PaperPanel(wxPanel):
 
         setattr(self.cfg, name, val)
         
+class AutoCompPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        panel = wxPanel(self, -1)
+        
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        hsizer.Add(wxStaticText(panel, -1, "Element:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.elementsCombo = wxComboBox(panel, -1, style = wxCB_READONLY)
+
+        for t in (config.SCENE, config.CHARACTER, config.TRANSITION):
+            self.elementsCombo.Append(cfg.getType(t).name, t)
+
+        EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
+
+        hsizer.Add(self.elementsCombo, 0)
+
+        vsizer.Add(hsizer, 0, wxEXPAND)
+
+        vsizer.Add(wxStaticLine(panel, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 10)
+
+        self.enabledCb = wxCheckBox(panel, -1, "Auto-completion enabled")
+        EVT_CHECKBOX(self, self.enabledCb.GetId(), self.OnMisc)
+        vsizer.Add(self.enabledCb, 0, wxBOTTOM, 10)
+
+        vsizer.Add(wxStaticText(panel, -1, "Default items:"))
+
+        self.itemsEntry = wxTextCtrl(panel, -1, style = wxTE_MULTILINE |
+                                     wxTE_DONTWRAP )
+        EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
+        vsizer.Add(self.itemsEntry, 1, wxEXPAND)
+
+        panel.SetSizer(vsizer)
+
+        vmsizer = wxBoxSizer(wxVERTICAL)
+        vmsizer.Add(panel, 1, wxEXPAND | wxALL, 10)
+        
+        self.SetSizer(vmsizer)
+
+        self.elementsCombo.SetSelection(0)
+        self.OnElementCombo()
+
+    def OnElementCombo(self, event = None):
+        self.type = self.elementsCombo.GetClientData(self.elementsCombo.
+                                                     GetSelection())
+        self.cfg2gui()
+                         
+    def OnMisc(self, event = None):
+        tcfg = self.cfg.types[self.type]
+
+        tcfg.doAutoComp = self.enabledCb.IsChecked()
+        self.itemsEntry.Enable(tcfg.doAutoComp)
+        
+        l = self.itemsEntry.GetValue().split("\n")
+        l2 = []
+        
+        for i in l:
+            s = i.strip()
+            if len(s) > 0:
+                l2.append(s)
+
+        tcfg.autoCompList = l2
+        
+    def cfg2gui(self):
+        tcfg = self.cfg.types[self.type]
+        
+        self.enabledCb.SetValue(tcfg.doAutoComp)
+
+        self.itemsEntry.Enable(tcfg.doAutoComp)
+        self.itemsEntry.SetValue(string.join(tcfg.autoCompList, "\n"))
