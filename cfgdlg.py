@@ -231,7 +231,7 @@ class DisplayPanel(wxPanel):
 
             ps = nfi.GetPointSize()
             if misc.isUnix:
-                ps /= 10
+                ps //= 10
 
             s = nfi.GetFaceName()
 

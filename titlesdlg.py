@@ -440,8 +440,8 @@ class TitlesPreview(wxWindow):
             h = int(ww / aspect)
 
         # offset of paper
-        ox = (ww - w) / 2
-        oy = (wh - h) / 2
+        ox = (ww - w) // 2
+        oy = (wh - h) // 2
         
         dc.SetPen(wxBLACK_PEN)
         dc.SetBrush(wxWHITE_BRUSH)
@@ -465,7 +465,7 @@ class TitlesPreview(wxWindow):
                 textH = max(1, textH)
                 
                 if ts.isCentered:
-                    xp = w / 2 - textW / 2
+                    xp = w // 2 - textW // 2
                 else:
                     xp = int((ts.x / self.cfg.paperWidth) * w)
                     

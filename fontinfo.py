@@ -1,7 +1,7 @@
 import pml
 
 # character widths for each font. acquired from the PDF font metrics.
-# ((width / 1000) * point_size) / 72 = how many inches wide that character
+# ((width / 1000) * point_size) / 72.0 = how many inches wide that character
 # is.
 #
 # all Courier-* fonts have characters 600 units wide.

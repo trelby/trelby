@@ -363,12 +363,12 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
     w, h = dc.GetTextExtent(text)
 
     if align == ALIGN_CENTER:
-        x -= w / 2
+        x -= w // 2
     elif align == ALIGN_RIGHT:
         x -= w
         
     if valign == VALIGN_CENTER:
-        y -= h / 2
+        y -= h // 2
     elif valign == VALIGN_BOTTOM:
         y -= h
         

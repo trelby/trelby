@@ -101,7 +101,7 @@ class TitleString:
         align = util.ALIGN_LEFT
 
         if self.isCentered:
-            x = page.doc.w / 2
+            x = page.doc.w / 2.0
             align = util.ALIGN_CENTER
 
         page.add(pml.TextOp(self.text, x, self.y, self.size,

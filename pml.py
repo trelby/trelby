@@ -84,7 +84,7 @@ class TextOp(DrawOp):
             w = util.getTextWidth(text, flags, size)
 
             if align == util.ALIGN_CENTER:
-                self.x -= w / 2
+                self.x -= w / 2.0
             elif align == util.ALIGN_RIGHT:
                 self.x -= w
 
@@ -92,7 +92,7 @@ class TextOp(DrawOp):
             h = util.getTextHeight(size)
             
             if valign == util.VALIGN_CENTER:
-                self.y -= h / 2
+                self.y -= h / 2.0
             elif valign == util.VALIGN_BOTTOM:
                 self.y -= h
 

@@ -182,7 +182,7 @@ class DialogueChart:
     def generatePage(self, title, doc):
         pg = pml.Page(doc)
 
-        pg.add(pml.TextOp(title, doc.w / 2, self.margin, 18,
+        pg.add(pml.TextOp(title, doc.w / 2.0, self.margin, 18,
             pml.BOLD | pml.ITALIC | pml.UNDERLINED, util.ALIGN_CENTER))
 
         pageCnt = len(self.pages)
@@ -226,7 +226,7 @@ class DialogueChart:
         pg.add(pml.PDFOp("[] 0 d"))
 
         pg.add(pml.TextOp("Dialogue density: ", self.chartX,
-            self.barY + self.barHeight / 2, 6, align = util.ALIGN_RIGHT,
+            self.barY + self.barHeight / 2.0, 6, align = util.ALIGN_RIGHT,
             valign = util.VALIGN_CENTER))
         pg.add(pml.TextOp("100% ", self.chartX, self.barY, 8,
                           align = util.ALIGN_RIGHT))
@@ -259,7 +259,7 @@ class DialogueChart:
             else:
                 name = "BUY ME"
                 
-            pg.add(pml.TextOp(name, self.margin, y + self.charY / 2,
+            pg.add(pml.TextOp(name, self.margin, y + self.charY / 2.0,
                 self.charFs, valign = util.VALIGN_CENTER))
             
             for i in xrange(pageCnt):
@@ -267,7 +267,7 @@ class DialogueChart:
 
                 if ci.name in m:
                     pg.add(pml.RectOp(self.chartX + i * mmPerPage,
-                        y + (self.charY - barH) / 2, mmPerPage, barH,
+                        y + (self.charY - barH) / 2.0, mmPerPage, barH,
                         -1, True))
                 
         return pg

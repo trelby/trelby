@@ -38,7 +38,7 @@ class MyCharMap(wxWindow):
                 self.chars += chr(i)
 
         self.cols = 16
-        self.rows = len(self.chars) / self.cols
+        self.rows = len(self.chars) // self.cols
         if len(self.chars) % 16:
             self.rows += 1
 
@@ -71,8 +71,8 @@ class MyCharMap(wxWindow):
     def OnLeftDown(self, event):
         pos = event.GetPosition()
 
-        x = (pos.x - self.offset) / self.cellSize
-        y = (pos.y - self.offset) / self.cellSize
+        x = (pos.x - self.offset) // self.cellSize
+        y = (pos.y - self.offset) // self.cellSize
 
         self.selected = None
         
@@ -113,8 +113,8 @@ class MyCharMap(wxWindow):
                 i = y * self.cols + x
                 if i < len(self.chars):
                     util.drawText(dc, self.chars[i],
-                        x * self.cellSize + self.offset + self.cellSize / 2,
-                        y * self.cellSize + self.offset + self.cellSize / 2,
+                        x * self.cellSize + self.offset + self.cellSize // 2,
+                        y * self.cellSize + self.offset + self.cellSize // 2,
                         util.ALIGN_CENTER, util.VALIGN_CENTER)
             
         y = self.offset + self.rows * self.cellSize
@@ -152,5 +152,5 @@ class MyCharMap(wxWindow):
         dc.DrawRectangle(boxX, y, self.boxSize, self.boxSize)
 
         dc.SetFont(self.bigFont)
-        util.drawText(dc, char, boxX + self.boxSize / 2, y + self.boxSize / 2,
-                      util.ALIGN_CENTER, util.VALIGN_CENTER)
+        util.drawText(dc, char, boxX + self.boxSize // 2,
+            y + self.boxSize // 2, util.ALIGN_CENTER, util.VALIGN_CENTER)

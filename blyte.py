@@ -609,7 +609,7 @@ class MyCtrl(wxControl):
                     text = line.text
 
                 if (i != 0) and (not doPages or (i != start)):
-                    output += (sp.getSpacingBefore(i) / 10) * "\n"
+                    output += (sp.getSpacingBefore(i) // 10) * "\n"
 
                 output += " " * tcfg.indent + text + "\n"
 
@@ -1335,7 +1335,7 @@ class MyCtrl(wxControl):
 
             mm2p = gd.mm2p
             fontY = cfgGui.fonts[pml.NORMAL].fy
-            cox = util.clamp((width - gd.pageW) / 2, 0)
+            cox = util.clamp((width - gd.pageW) // 2, 0)
             
             y = 0
             topLine = self.getTopLine()
@@ -1474,7 +1474,7 @@ class MyCtrl(wxControl):
         line = sel.line
         l = self.sp.lines[line]
 
-        column = util.clamp(int((pos.x - sel.x) / sel.fi.fx), 0, len(l.text))
+        column = util.clamp(int((pos.x - sel.x) // sel.fi.fx), 0, len(l.text))
 
         return (line, column)
 
@@ -1489,7 +1489,7 @@ class MyCtrl(wxControl):
         hi = len(p) - 1
 
         while lo != hi:
-            mid = (lo + hi) / 2
+            mid = (lo + hi) // 2
 
             if line <= p[mid]:
                 hi = mid
@@ -2457,8 +2457,8 @@ class MyCtrl(wxControl):
             elif s[0] == "2":
                 pg.add(pml.PDFOp("0.75 g"))
                 w = 50.0
-                pg.add(pml.RectOp(doc.w / 2.0 - w /2.0, cfg.marginTop +
-                    y * chY + chY / 4, w, chY / 2, -1, True))
+                pg.add(pml.RectOp(doc.w / 2.0 - w / 2.0, cfg.marginTop +
+                    y * chY + chY / 4, w, chY / 2.0, -1, True))
                 pg.add(pml.PDFOp("0.0 g"))
 
             else:
@@ -3340,7 +3340,7 @@ class MyCtrl(wxControl):
         show = min(self.maxAutoCompItems, len(self.autoComp))
         doSbw = show < len(self.autoComp)
         
-        startPos = (self.autoCompSel / show) * show
+        startPos = (self.autoCompSel // show) * show
         endPos = min(startPos + show, len(self.autoComp))
         if endPos == len(self.autoComp):
             startPos = max(0, endPos - show)
