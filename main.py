@@ -5,6 +5,7 @@ from error import *
 import config
 from cfgdlg import CfgDlg
 from commandsdlg import CommandsDlg
+import util
 
 import copy
 import string
@@ -35,14 +36,6 @@ ID_EDIT_CUT = 9
 ID_EDIT_COPY = 10
 ID_EDIT_PASTE = 11
 ID_HELP_COMMANDS = 12
-
-def clamp(val, min, max):
-    if val < min:
-        return min
-    elif val > max:
-        return max
-    else:
-        return val
 
 def refreshGuiConfig():
     global cfgGui
@@ -244,14 +237,19 @@ class MyCtrl(wxControl):
             mainFrame.typeCb.SetSelection(revType)
 
     def reformatAll(self):
-        t = time.time()
+        #t = time.time()
         line = 0
         while 1:
             line += self.rewrap(startLine = line, toElemEnd = true)
             if line >= len(self.sp.lines):
                 break
-        t = time.time() - t
-        print "reformatted %d lines in %.2f seconds" % (line, t)
+
+        self.line = 0
+        self.topLine = 0
+        self.column = 0
+        
+        #t = time.time() - t
+        #print "reformatted %d lines in %.2f seconds" % (line, t)
 
     def fillAutoComp(self):
         ls = self.sp.lines
@@ -303,7 +301,6 @@ class MyCtrl(wxControl):
 
     def rewrap(self, startLine = -1, toElemEnd = False):
         ls = self.sp.lines
-        tcfg = cfg.getType(ls[self.line].type)
 
         if startLine == -1:
             line1 = self.line
@@ -553,14 +550,6 @@ class MyCtrl(wxControl):
         else:
             return False
         
-    def isFixedWidth(self, font):
-        dc = wxMemoryDC()
-        dc.SetFont(font)
-        w1, h1 = dc.GetTextExtent("iiiii")
-        w2, h2 = dc.GetTextExtent("OOOOO")
-
-        return w1 == w2
-
     # returns true if there are no contents at all and we're not
     # attached to any file
     def isUntouched(self):
@@ -605,7 +594,7 @@ class MyCtrl(wxControl):
         self.line = self.pos2line(pos)
         tcfg = cfg.getType(self.sp.lines[self.line].type)
         x = pos.x - tcfg.indent * cfgGui.fontX - cfg.offsetX
-        self.column = clamp(x / cfgGui.fontX, 0,
+        self.column = util.clamp(x / cfgGui.fontX, 0,
                             len(self.sp.lines[self.line].text))
 
         if mark and (self.mark == -1):
@@ -730,30 +719,13 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
     def OnSettings(self):
-        dlg = CfgDlg(self, copy.deepcopy(cfg))
-        dlg.ShowModal()
-        dlg.Destroy()
+        global cfg
         
-        fd = wxFontData()
-        nfi = wxNativeFontInfo()
-        nfi.FromString(cfg.nativeFont)
-        font = wxFontFromNativeInfo(nfi)
-        fd.SetInitialFont(font)
-
-        dlg = wxFontDialog(self, fd)
+        dlg = CfgDlg(self, copy.deepcopy(cfg))
         if dlg.ShowModal() == wxID_OK:
-            font = dlg.GetFontData().GetChosenFont()
-            cfg.nativeFont = font.GetNativeFontInfo().ToString()
-
-            # FIXME: do this in config dialog after selecting font and
-            # allow tweaking
-            dc = wxMemoryDC()
-            dc.SetFont(font)
-            w1, h1, descent, nada = dc.GetFullTextExtent("O")
-            cfg.fontYdelta = h1 + descent
-
+            cfg = dlg.cfg
             refreshGuiConfig()
-            
+            self.reformatAll()
             self.updateScreen()
 
         dlg.Destroy()
@@ -897,7 +869,7 @@ class MyCtrl(wxControl):
                 self.topLine = 0
                 
             self.line += self.topLine - oldTop
-            self.line = clamp(self.line, 0, len(ls) - 1)
+            self.line = util.clamp(self.line, 0, len(ls) - 1)
             
         elif ev.AltDown():
             ch = string.upper(chr(kc))
