@@ -14,6 +14,7 @@ import headers
 import headersdlg
 import misc
 import myimport
+import mypager
 import mypickle
 import namesdlg
 import pdf
@@ -24,6 +25,7 @@ import splash
 import titles
 import titlesdlg
 import util
+import viewmode
 
 import codecs
 import copy
@@ -46,6 +48,13 @@ KC_CTRL_F = 6
 KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
+
+VIEWMODE_DRAFT,\
+VIEWMODE_LAYOUT,\
+VIEWMODE_SIDE_BY_SIDE,\
+VIEWMODE_OVERVIEW_SMALL,\
+VIEWMODE_OVERVIEW_LARGE,\
+= range(5)
 
 def refreshGuiConfig():
     global cfgGui
@@ -81,7 +90,8 @@ class GlobalData:
         v.addInt("width", defaultW, "Width", 500, 9999)
         
         v.addInt("height", 830, "Height", 300, 9999)
-        v.addBool("isDraft", False, "IsDraftMode")
+        v.addInt("viewMode", VIEWMODE_LAYOUT, "ViewMode", VIEWMODE_DRAFT,
+                 VIEWMODE_OVERVIEW_LARGE)
         v.addStr("license", "", "License")
         
         v.makeDicts()
@@ -90,14 +100,23 @@ class GlobalData:
         self.height = min(self.height,
             wxSystemSettings_GetMetric(wxSYS_SCREEN_Y) - 50)
 
+        self.vmDraft = viewmode.ViewModeDraft()
+        self.vmLayout = viewmode.ViewModeLayout()
+        self.vmSideBySide = viewmode.ViewModeSideBySide()
+        self.vmOverviewSmall = viewmode.ViewModeOverview(1)
+        self.vmOverviewLarge = viewmode.ViewModeOverview(2)
+
+        self.setViewMode(self.viewMode)
+
         self.makeConfDir()
 
-    # update stuff that depends on configuration / window size etc.
+    # update stuff that depends on configuration / window size / view mode
+    # etc.
     def refresh(self):
         self.chX = util.getTextWidth(" ", pml.COURIER, cfg.fontSize)
         self.chY = util.getTextHeight(cfg.fontSize)
 
-        self.pageW = (cfg.paperWidth / self.chX) * cfgGui.fonts[pml.NORMAL].fx
+        self.pageW = self.vm.getPageWidth(cfg, cfgGui, self)
 
         # conversion factor from mm to pixels
         self.mm2p = self.pageW / cfg.paperWidth
@@ -122,70 +141,20 @@ class GlobalData:
                              "'%s': %s" % (misc.confPath, strerror), "Error",
                              wxOK, None)
 
-# a piece of text on screen.
-class TextString:
-    def __init__(self, line, text, x, y, fi, isUnderlined, partial):
+    # set viewmode, the parameter is one of the VIEWMODE_ defines.
+    def setViewMode(self, viewMode):
+        self.viewMode = viewMode
 
-        # if this object is a screenplay line, this is the index of the
-        # corresponding line in the Screenplay.lines list. otherwise this
-        # is -1 (used for stuff like CONTINUED: etc).
-        self.line = line
-
-        # x,y coordinates in pixels from widget's topleft corner
-        self.x = x
-        self.y = y
-
-        # text and its FontInfo and underline status
-        self.text = text
-        self.fi = fi
-        self.isUnderlined = isUnderlined
-
-        # if True, bottom cut off, i.e. only partially visible
-        self.partial = partial
-
-# a page shown on screen.
-class DisplayPage:
-    def __init__(self, x1 = -1, y1 = -1, x2 = -1, y2 = -1):
-
-        # coordinates in pixels
-        self.x1 = x1
-        self.y1 = y1
-        self.x2 = x2
-        self.y2 = y2
-
-# used to iteratively add PML pages to a document
-class Pager:
-    def __init__(self, sp):
-        self.sp = sp
-        self.doc = pml.Document(cfg.paperWidth, cfg.paperHeight)
-
-        # used in several places, so keep around
-        self.charIndent = cfg.getType(config.CHARACTER).indent
-        self.sceneIndent = cfg.getType(config.SCENE).indent
-
-        # current scene number
-        self.scene = 0
-
-        # number of CONTINUED:'s lines added for current scene
-        self.sceneContNr = 0
-
-# caches pml.Pages for operations that repeatedly construct them over and
-# over again without the page contents changing
-class PageCache:
-    def __init__(self, ctrl):
-        self.ctrl = ctrl
-        
-        # cached pages. key = pageNr, value = pml.Page
-        self.pages = {}
-
-    def getPage(self, pager, pageNr):
-        pg = self.pages.get(pageNr)
-
-        if not pg:
-            pg = self.ctrl.generatePMLPage(pager, pageNr, False, False)
-            self.pages[pageNr] = pg
-            
-        return pg
+        if viewMode == VIEWMODE_DRAFT:
+            self.vm = self.vmDraft
+        elif viewMode == VIEWMODE_LAYOUT:
+            self.vm = self.vmLayout
+        elif viewMode == VIEWMODE_SIDE_BY_SIDE:
+            self.vm = self.vmSideBySide
+        elif viewMode == VIEWMODE_OVERVIEW_SMALL:
+            self.vm = self.vmOverviewSmall
+        else:
+            self.vm = self.vmOverviewLarge
 
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.
@@ -270,6 +239,9 @@ class CommandState:
         # whether to update the screen etc
         self.doUpdate = True
 
+        # True if we need to make current line visible
+        self.needsVisifying = True
+
 class MyPanel(wxPanel):
 
     def __init__(self, parent, id):
@@ -347,7 +319,16 @@ class MyCtrl(wxControl):
         self.sp.lines.append(screenplay.Line(config.LB_LAST, config.SCENE))
         self.setFile(None)
         self.makeBackup()
-        
+
+    def getCfg(self):
+        return cfg
+
+    def getCfgGui(self):
+        return cfgGui
+
+    def getGd(self):
+        return gd
+    
     def loadFile(self, fileName):
         try:
             try:
@@ -604,8 +585,7 @@ class MyCtrl(wxControl):
         output = util.String()
 
         for p in xrange(1, len(self.pages)):
-            start = self.pages[p - 1] + 1
-            end = self.pages[p]
+            start, end = self.page2lines(p)
 
             if doPages and (p != 1):
                 s = "%s %d. " % ("-" * 30, p)
@@ -633,7 +613,7 @@ class MyCtrl(wxControl):
     def generatePDF(self, sp):
         #lsdjflksj = util.TimerDev("generatePDF")
 
-        pager = Pager(sp)
+        pager = mypager.Pager(sp, cfg)
         sp.titles.generatePages(pager.doc)
         
         for i in xrange(1, len(self.pages)):
@@ -1296,201 +1276,6 @@ class MyCtrl(wxControl):
 
         return scene
         
-    # get a description of what the current screen contains. returns
-    # (texts, dpages), where texts = [TextString, ...], dpages =
-    # [DisplayPage, ...]. dpages is None if draft mode is in use or
-    # doExtra is False. doExtra has same meaning as for generatePMLPage
-    # otherwise. pageCache, if given, is used in layout mode to cache PML
-    # pages. it should only be given when doExtra = False as the cached
-    # pages aren't accurate down to that level.
-    def getScreen(self, doExtra, pageCache = None):
-        #lskdjf = util.TimerDev("getScreen")
-        texts = []
-        dpages = []
-
-        width, height = self.GetClientSizeTuple()
-
-        if gd.isDraft:
-            ls = self.sp.lines
-            y = cfg.offsetY
-            i = self.getTopLine()
-            cox = cfg.offsetX
-            fyd = cfg.fontYdelta
-            length = len(ls)
-            
-            while (y < height) and (i < length):
-                y += int((self.sp.getSpacingBefore(i) / 10.0) * fyd)
-
-                if y >= height:
-                    break
-
-                partial = (y + fyd) > height
-
-                l = ls[i]
-                tcfg = cfg.getType(l.lt)
-
-                if tcfg.screen.isCaps:
-                    text = util.upper(l.text)
-                else:
-                    text = l.text
-
-                fi = cfgGui.getType(l.lt)
-                texts.append(TextString(i, text,
-                    cox + tcfg.indent * fi.fx, y, fi,
-                    tcfg.screen.isUnderlined, partial))
-
-                y += fyd
-                i += 1
-        else:
-            # gap between pages (pixels)
-            pageGap = 10
-            pager = Pager(self.sp)
-
-            mm2p = gd.mm2p
-            fontY = cfgGui.fonts[pml.NORMAL].fy
-            cox = util.clamp((width - gd.pageW) // 2, 0)
-            
-            y = 0
-            topLine = self.getTopLine()
-            pageNr = self.line2page(topLine)
-
-            if doExtra and cfg.pdfShowSceneNumbers:
-                pager.scene = self.getSceneNumber(topLine)
-
-            # find out starting place (if something bugs, generatePMLPage
-            # below could return None, but it shouldn't happen...)
-            if pageCache:
-                pg = pageCache.getPage(pager, pageNr)
-            else:
-                pg = self.generatePMLPage(pager, pageNr, False, doExtra)
-
-            topOfPage = True
-            for op in pg.ops:
-                if (op.type != pml.OP_TEXT) or (op.line == -1):
-                    continue
-
-                if op.line == topLine:
-                    if not topOfPage:
-                        y = -int(op.y * mm2p)
-                    else:
-                        y = pageGap
-
-                    break
-                else:
-                    topOfPage = False
-
-            # create pages, convert them to display format, repeat until
-            # script ends or we've filled the display.
-            
-            done = False
-            while 1:
-                if done or (y >= height):
-                    break
-                
-                if not pg:
-                    pageNr += 1
-                    if pageNr >= len(self.pages):
-                        break
-
-                    # we'd have to go back an arbitrary number of pages to
-                    # get an accurate number for this in the worst case,
-                    # so disable it altogether.
-                    pager.sceneContNr = 0
-
-                    if pageCache:
-                        pg = pageCache.getPage(pager, pageNr)
-                    else:
-                        pg = self.generatePMLPage(pager, pageNr, False,
-                                                  doExtra)
-                    if not pg:
-                        break
-
-                dp = DisplayPage(cox, y, cox + gd.pageW, y + gd.pageH)
-                dpages.append(dp)
-
-                pageY = y
-
-                for op in pg.ops:
-                    if op.type != pml.OP_TEXT:
-                        continue
-
-                    ypos = int(pageY + op.y * mm2p)
-
-                    # TODO: show partial lines at top of screen, or not?
-                    if ypos < 0:
-                        continue
-                    
-                    y = max(y, ypos)
-                    
-                    if y >= height:
-                        done = True
-                        break
-
-                    partial = (ypos + fontY) > height
-                    
-                    texts.append(TextString(op.line, op.text,
-                        int(cox + op.x * mm2p), ypos,
-                        cfgGui.fonts[op.flags & 3],
-                        op.flags & pml.UNDERLINED, partial))
-
-                y = pageY + gd.pageH + pageGap
-                pg = None
-
-            # if user has inserted new text causing the script to overflow
-            # the last page, we need to make the last page extra-long on
-            # the screen.
-            if dpages and texts and (pageNr >= (len(self.pages) - 1)):
-
-                lastY = texts[-1].y + fontY
-                if lastY >= dpages[-1].y2:
-                    dpages[-1].y2 = lastY + 10
-            else:
-                pass
-
-        return (texts, dpages)
-
-    def getLinesOnScreen(self, pageCache = None):
-        lines = 0
-
-        for t in self.getScreen(False, pageCache)[0]:
-            if not t.partial:
-                lines += 1
-
-        return lines
-
-    # return height for one line on screen
-    def getLineHeight(self):
-        if gd.isDraft:
-            return cfg.fontYdelta
-        else:
-            # the + 1.0 avoids occasional non-consecutive backgrounds for
-            # lines.
-            return int(gd.chY * gd.mm2p + 1.0)
-        
-    def pos2linecol(self, pos):
-        sel = None
-        lineh = self.getLineHeight()
-        
-        for t in self.getScreen(False)[0]:
-            if t.line == -1:
-                continue
-
-            sel = t
-            
-            if (t.y + lineh) > pos.y:
-                break
-
-        # shouldn't happen, but let's check anyway
-        if sel == None:
-            return (0, 0)
-
-        line = sel.line
-        l = self.sp.lines[line]
-
-        column = util.clamp(int((pos.x - sel.x) // sel.fi.fx), 0, len(l.text))
-
-        return (line, column)
-
     def line2page(self, line):
         return self.line2pageReal(line, self.pages)
 
@@ -1510,6 +1295,17 @@ class MyCtrl(wxControl):
                 lo = mid + 1
 
         return lo
+
+    # return (startLine, endLine) for given page number (1-based). if
+    # pageNr is out of bounds, it is clamped to the valid range. if
+    # pagination is out of date and the lines no longer exist, they are
+    # clamped to the valid range as well.
+    def page2lines(self, pageNr):
+        pageNr = util.clamp(pageNr, 1, len(self.pages) - 1)
+        last = len(self.sp.lines) - 1
+        
+        return (util.clamp(self.pages[pageNr - 1] + 1, 0, last),
+                util.clamp(self.pages[pageNr], 0, last))
 
     # returns True if we're at second-to-last character of PAREN element,
     # and last character is ")"
@@ -1546,30 +1342,26 @@ class MyCtrl(wxControl):
     def setTopLine(self, line):
         self._topLine = util.clamp(line, 0, len(self.sp.lines) - 1)
 
-    # los = results of self.getLinesOnScreen(), or if None, in which case
-    # it's called in this function.
-    def isLineVisible(self, line, los = None):
-        if los == None:
-            los = self.getLinesOnScreen()
-            
-        top = self.getTopLine()
-        bottom = top + los - 1
+    # texts = gd.vm.getScreen(self, False)[0], or None, in which case it's
+    # called in this function.
+    def isLineVisible(self, line, texts = None):
+        if texts == None:
+            texts = gd.vm.getScreen(self, False)[0]
 
-        return (line >= top) and (line <= bottom)
-        
+        # paranoia never hurts
+        if len(texts) == 0:
+            return False
+
+        return (line >= texts[0].line) and (line <= texts[-1].line)
+
     def makeLineVisible(self, line):
-        #dlkj = util.TimerDev("makeLineVisible")
+        texts = gd.vm.getScreen(self, False)[0]
 
-        los = self.getLinesOnScreen()
-        if self.isLineVisible(line, los):
+        if self.isLineVisible(line, texts):
             return
 
-        # TODO: this is kinda braindead...
-        
-        self.setTopLine(max(0, int(line - (los * 0.66))))
-        if not self.isLineVisible(line):
-            self.setTopLine(line)
-        
+        gd.vm.makeLineVisible(self, line, texts)
+
     def adjustScrollBar(self):
         height = self.GetClientSize().height
 
@@ -2250,13 +2042,17 @@ class MyCtrl(wxControl):
         self.makeLineVisible(self.line)
     
     def OnLeftDown(self, event, mark = False):
-        self.autoComp = None
-        self.line, self.column = self.pos2linecol(event.GetPosition())
+        pos = event.GetPosition()
+        line, col = gd.vm.pos2linecol(self, pos.x, pos.y)
 
-        if mark and not self.mark:
-            self.mark = Mark(self.line, self.column)
-            
-        self.updateScreen()
+        if line != None:
+            self.autoComp = None
+            self.line, self.column = line, col
+
+            if mark and not self.mark:
+                self.mark = Mark(line, col)
+
+            self.updateScreen()
 
     def OnRightDown(self, event):
         self.mark = None
@@ -2513,6 +2309,40 @@ class MyCtrl(wxControl):
                 return False
 
         return True
+
+    # page up (dir == -1) or page down (dir == 1) was pressed, handle it.
+    # cs = CommandState. ev = the key event.
+    def pageCmd(self, cs, ev, dir):
+        if self.autoComp:
+
+            cs.doAutoComp = cs.AC_KEEP
+                
+            if len(self.autoComp) > self.maxAutoCompItems:
+
+                if dir < 0:
+                    self.autoCompSel -= self.maxAutoCompItems
+
+                    if self.autoCompSel < 0:
+                        self.autoCompSel = len(self.autoComp) - 1
+
+                else:
+                    self.autoCompSel = (self.autoCompSel +
+                        self.maxAutoCompItems) % len(self.autoComp)
+
+            return
+
+        texts, dpages = gd.vm.getScreen(self, False)
+
+        # if user has scrolled with scrollbar so that cursor isn't seen,
+        # just make cursor visible and don't move
+        if not self.isLineVisible(self.line, texts):
+            gd.vm.makeLineVisible(self, self.line, texts)
+            cs.needsVisifying = False
+
+            return
+
+        self.maybeMark(ev.ShiftDown())
+        gd.vm.pageCmd(self, cs, dir, texts, dpages)
 
     def OnRevert(self):
         if self.fileName:
@@ -3004,69 +2834,10 @@ class MyCtrl(wxControl):
             self.column = len(ls[self.line].text)
 
         elif kc in (WXK_PRIOR, WXK_PAGEUP):
-            if not self.autoComp:
-                self.maybeMark(ev.ShiftDown())
+            self.pageCmd(cs, ev, -1)
 
-                pc = PageCache(self)
-                los = self.getLinesOnScreen(pc)
-
-                if not self.isLineVisible(self.line, los):
-                    # if cursor isn't visible, it's hard to know what
-                    # "page up" is supposed to mean, so just go up a few
-                    # lines.
-                    self.line = util.clamp(self.line - 5, 0, len(ls) - 1)
-                else:
-                    tl = self.getTopLine()
-                    if tl == (len(ls) - 1):
-                        self.setTopLine(tl - 5)
-                    else:
-                        self.line = tl
-
-                        while 1:
-                            tl = self.getTopLine()
-                            if tl == 0:
-                                break
-
-                            lastLine = tl + self.getLinesOnScreen(pc) - 1
-
-                            if self.line > lastLine:
-                                # line scrolled off screen, back up one line
-                                self.setTopLine(tl + 1)
-                                break
-                            elif self.line == lastLine:
-                                break
-
-                            self.setTopLine(tl - 1)
-            else:
-                if len(self.autoComp) > self.maxAutoCompItems:
-                    self.autoCompSel = self.autoCompSel - self.maxAutoCompItems
-                    if self.autoCompSel < 0:
-                        self.autoCompSel = len(self.autoComp) - 1
-                
-                cs.doAutoComp = cs.AC_KEEP
-            
         elif kc in (WXK_NEXT, WXK_PAGEDOWN):
-            if not self.autoComp:
-                self.maybeMark(ev.ShiftDown())
-                
-                los = self.getLinesOnScreen()
-
-                if self.isLineVisible(self.line, los):
-                    self.line = util.clamp(self.getTopLine() + los - 1,
-                        0, len(ls) - 1)
-                    self.setTopLine(self.line - 1)
-                else:
-                    # if cursor isn't visible, it's hard to know what
-                    # "page down" is supposed to mean, so just go down a
-                    # few lines.
-                    self.line = util.clamp(self.line + 5, 0, len(ls) - 1)
-                    
-            else:
-                if len(self.autoComp) > self.maxAutoCompItems:
-                    self.autoCompSel = (self.autoCompSel +
-                        self.maxAutoCompItems) % len(self.autoComp)
-                
-                cs.doAutoComp = cs.AC_KEEP
+            self.pageCmd(cs, ev, 1)
             
         elif ev.AltDown() and (kc < 256):
             ch = chr(kc).upper()
@@ -3154,8 +2925,12 @@ class MyCtrl(wxControl):
                 now = time.time()
                 if (now - self.lastPaginated) >= cfg.paginateInterval:
                     self.paginate()
+
+                    cs.needsVisifying = True
+
+            if cs.needsVisifying:
+                self.makeLineVisible(self.line)
                 
-            self.makeLineVisible(self.line)
             self.updateScreen()
 
     def OnPaint(self, event):
@@ -3166,7 +2941,7 @@ class MyCtrl(wxControl):
 
         size = self.GetClientSize()
         marked = self.getMarkedLines()
-        lineh = self.getLineHeight()
+        lineh = gd.vm.getLineHeight(self)
         posX = -1
         cursorY = -1
 
@@ -3181,7 +2956,7 @@ class MyCtrl(wxControl):
         ulines = []
         ulinesHdr = []
         
-        strings, dpages = self.getScreen(True)
+        strings, dpages = gd.vm.getScreen(self, True, True)
 
         if not dpages:
             dc.SetBrush(cfgGui.textBgBrush)
@@ -3325,9 +3100,7 @@ class MyCtrl(wxControl):
         dc.SetTextForeground(cfgGui.textColor)
 
         for tl in texts.iteritems():
-            dc.SetFont(tl[0])
-
-            dc.DrawTextList(tl[1][0], tl[1][1], tl[1][2])
+            gd.vm.drawTexts(self, dc, tl)
         
         if self.autoComp and (cursorY > 0):
             self.drawAutoComp(dc, posX, cursorY, acFi)
@@ -3468,12 +3241,23 @@ class MyFrame(wxFrame):
         viewMenu = wxMenu()
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_DRAFT, "&Draft")
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_LAYOUT, "&Layout")
+        viewMenu.AppendRadioItem(ID_VIEW_STYLE_SIDE_BY_SIDE, "&Side by side")
+        viewMenu.AppendRadioItem(ID_VIEW_STYLE_OVERVIEW_SMALL,
+                                 "&Overview - Small")
+        viewMenu.AppendRadioItem(ID_VIEW_STYLE_OVERVIEW_LARGE,
+                                 "O&verview - Large")
 
-        if gd.isDraft:
+        if gd.viewMode == VIEWMODE_DRAFT:
             viewMenu.Check(ID_VIEW_STYLE_DRAFT, True)
-        else:
+        elif gd.viewMode == VIEWMODE_LAYOUT:
             viewMenu.Check(ID_VIEW_STYLE_LAYOUT, True)
-
+        elif gd.viewMode == VIEWMODE_SIDE_BY_SIDE:
+            viewMenu.Check(ID_VIEW_STYLE_SIDE_BY_SIDE, True)
+        elif gd.viewMode == VIEWMODE_OVERVIEW_SMALL:
+            viewMenu.Check(ID_VIEW_STYLE_OVERVIEW_SMALL, True)
+        else:
+            viewMenu.Check(ID_VIEW_STYLE_OVERVIEW_LARGE, True)
+    
         viewMenu.AppendSeparator()
         viewMenu.AppendCheckItem(ID_VIEW_SHOW_FORMATTING, "&Show formatting")
         
@@ -3586,8 +3370,11 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_EDIT_DELETE_ELEMENTS, self.OnDeleteElements)
-        EVT_MENU(self, ID_VIEW_STYLE_DRAFT, self.OnStyleChange)
-        EVT_MENU(self, ID_VIEW_STYLE_LAYOUT, self.OnStyleChange)
+        EVT_MENU(self, ID_VIEW_STYLE_DRAFT, self.OnViewModeChange)
+        EVT_MENU(self, ID_VIEW_STYLE_LAYOUT, self.OnViewModeChange)
+        EVT_MENU(self, ID_VIEW_STYLE_SIDE_BY_SIDE, self.OnViewModeChange)
+        EVT_MENU(self, ID_VIEW_STYLE_OVERVIEW_SMALL, self.OnViewModeChange)
+        EVT_MENU(self, ID_VIEW_STYLE_OVERVIEW_LARGE, self.OnViewModeChange)
         EVT_MENU(self, ID_VIEW_SHOW_FORMATTING, self.OnShowFormatting)
         EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindError)
         EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
@@ -3671,7 +3458,10 @@ class MyFrame(wxFrame):
             "ID_TOOLS_NAME_DB",
             "ID_VIEW_SHOW_FORMATTING",
             "ID_VIEW_STYLE_DRAFT",
-            "ID_VIEW_STYLE_LAYOUT"
+            "ID_VIEW_STYLE_LAYOUT",
+            "ID_VIEW_STYLE_OVERVIEW_LARGE",
+            "ID_VIEW_STYLE_OVERVIEW_SMALL",
+            "ID_VIEW_STYLE_SIDE_BY_SIDE",
             ]
 
         g = globals()
@@ -3887,9 +3677,21 @@ class MyFrame(wxFrame):
         self.showFormatting = self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING)
         self.panel.ctrl.Refresh(False)
 
-    def OnStyleChange(self, event):
-        gd.isDraft = self.menuBar.IsChecked(ID_VIEW_STYLE_DRAFT)
+    def OnViewModeChange(self, event):
+        if self.menuBar.IsChecked(ID_VIEW_STYLE_DRAFT):
+            mode = VIEWMODE_DRAFT
+        elif self.menuBar.IsChecked(ID_VIEW_STYLE_LAYOUT):
+            mode = VIEWMODE_LAYOUT
+        elif self.menuBar.IsChecked(ID_VIEW_STYLE_SIDE_BY_SIDE):
+            mode = VIEWMODE_SIDE_BY_SIDE
+        elif self.menuBar.IsChecked(ID_VIEW_STYLE_OVERVIEW_SMALL):
+            mode = VIEWMODE_OVERVIEW_SMALL
+        else:
+            mode = VIEWMODE_OVERVIEW_LARGE
 
+        gd.setViewMode(mode)
+        gd.refresh()
+        
         c = self.panel.ctrl
         c.makeLineVisible(c.line)
         c.updateScreen()
@@ -4080,6 +3882,7 @@ class MyApp(wxApp):
                 gd.cvars.load(gd.cvars.makeVals(s), "", gd)
 
         # we now have both config and gd, init stuff that needs both
+        gd.setViewMode(gd.viewMode)
         gd.refresh()
         
         mainFrame = MyFrame(NULL, -1, "Blyte")
