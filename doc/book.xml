@@ -315,10 +315,93 @@
   </chapter>
 
   <chapter>
+	<title>View modes</title>
+
+	<para>This chapter describes the two different view modes available,
+	'Draft' and 'Layout'. You can toggle between them using the
+	View-menu.</para>
+
+	<sect1>
+	  <title>Draft</title>
+
+	  <para>In 'Draft' mode, the text area consists of an empty background
+	  with the script's text drawn on top. This text includes only actual
+	  script contents, so page headers, CONTINUED/(MORE) and other
+	  automatically added texts are not shown at all. Page breaks, if
+	  enabled, are shown as a horizontal line (see <xref
+	  linkend="display_cfg"/>).</para>
+
+	  <para>Reasons you might want to use this mode instead of the
+	  'Layout' mode:</para>
+	  
+	  <itemizedlist>
+
+		<listitem>
+		  
+		  <para>The left margin is not shown, so you can use a narrower
+		  window.</para>
+
+		</listitem>
+
+		<listitem>
+
+		  <para>Page breaks do not take space, so more lines fit onto the
+		  screen.</para>
+
+		</listitem>
+
+		<listitem>
+		  
+		  <para>It's considerably faster.</para>
+		  
+		</listitem>
+				
+	  </itemizedlist>
+
+	</sect1>
+
+	<sect1>
+	  <title>Layout</title>
+
+	  <para>'Layout' mode shows an almost exact representation of the page
+	  as it would appear when printed. Page borders, margins, headers,
+	  CONTINUED/(MORE) and so on are all shown at their correct
+	  places.</para>
+
+	  <para>Ways in which the display in this mode can differ from the
+	  printed output:</para>
+
+	  <itemizedlist>
+
+		<listitem>
+
+		  <para>If pagination is not up-to-date, text around page breaks
+		  can sometimes show in incorrect places. We recommend that when
+		  using this mode, auto-pagination is kept on and the interval at
+		  a low value, preferably 1 second (see <xref
+		  linkend="pagination_cfg"/>).</para>
+		  
+		</listitem>
+		
+		<listitem>
+
+		  <para>If you have scene continueds enabled, they will always
+		  show as plain "CONTINUED:" on top of the page, whereas in the
+		  PDF output, they will be "CONTINUED: (n)" if needed (see <xref
+		  linkend="pagination_cfg"/>).</para>
+		  
+		</listitem>
+		
+	  </itemizedlist>
+	  
+	</sect1>
+
+  </chapter>
+  
+  <chapter>
 	<title>Other commands</title>
 
-	<para>This chapter describes commands not discussed in other
-	chapters.</para>
+	<para>This chapter describes commands not discussed elsewhere.</para>
 
 	<sect1>
 	  <title>File/New,open,save,save as,close,revert</title>
@@ -416,18 +499,21 @@
 	</sect1>
 
 	<sect1>
-	  <title>Edit/Show formatting</title>
+	  <title>View/Show formatting</title>
 
 	  <para>This toggles whether formatting information is shown. It
-	  consists of blue lines drawn around each element, plus each line is
-	  prefixed with a red marker indicating the type of the line ending
-	  for that line. See fileformat.txt for information about the
-	  different marker types.</para>
+	  consists of blue lines drawn at the right and left margins of each
+	  line, plus a red marker indicating the type of the line ending for
+	  that line. See fileformat.txt for information about the different
+	  marker types.</para>
 
 	  <para>When using the 'Find errors' command, if you can't figure out
 	  what the error is, try switching this on to see if you have two
 	  elements where you thought you only had one, or something else
 	  that's not obvious in the normal display.</para>
+
+	  <para>It's also useful for seeing exactly how much space you've got
+	  left on a given line.</para>
 	  
 	</sect1>
 
@@ -551,9 +637,12 @@
 	  
 	  <para>Any occurrences of '${PAGE}' in the text string will be
 	  replaced by the page number in the actual headers.</para>
-	  
-	  <para>Finally there's a 'Preview' button that you can use to get an
-	  accurate preview of your headers.</para>
+
+	  <para>Finally there are 'Preview' and 'Apply' buttons that you can
+	  use to preview your changes. 'Preview' opens up a sample page in
+	  your PDF viewer program, while 'Apply' applies the new headers to
+	  the open script, so you can e.g. see how the page count of the
+	  script would change.</para>
 	  
 	</sect1>
 
@@ -736,7 +825,7 @@
 	  
 	</sect1>
 	
-	<sect1>
+	<sect1 id="display_cfg">
 	  <title>Display</title>
 
 	  <para>The topmost listbox allows you to configure what font you want
@@ -744,7 +833,8 @@
 	  you should use the same size fonts for each one.</para>
 
 	  <para>The row spacing setting affects how many pixels there are
-	  between each row.</para>
+	  between each row. Note: this setting has an effect only in the
+	  'Draft' view mode.</para>
 
 	  <para>The 'Page break lines to show' setting affects how page breaks
 	  are shown. If you select 'None', they are not shown at all.
@@ -752,8 +842,9 @@
 	  page break positions. 'Normal + unadjusted', you see the solid
 	  lines, but you also see a dotted gray line, that shows where the
 	  page could have ended, but that the page break position was adjusted
-	  backwards to honor the settings in <xref
-	  linkend="pagination_cfg"/>.</para>
+	  backwards to honor the settings in <xref linkend="pagination_cfg"/>.
+	  Note: this setting has an effect only in the 'Draft' view
+	  mode.</para>
 
 	  <para>This is useful when you've finished your script and you're
 	  going through it trying to reduce the page count. If, for example,
@@ -1095,6 +1186,39 @@ Something starts beeping.
 	
   </chapter>
 
+  <chapter>
+	<title>Troubleshooting</title>
+
+	<para>This chapter discusses some common problems you might
+	encounter.</para>
+
+
+	<itemizedlist>
+
+	  <listitem>
+
+		<para>The program usually works perfectly, but sometimes it's so
+		much slower that it's almost unusable.</para>
+
+		<itemizedlist>
+		  <listitem>
+
+			<para>This happens on certain machines with limited resources.
+			Try stopping all other programs and restarting &blyte; and see
+			if that helps; if so, make it a habit of starting &blyte;
+			first so it can allocate the resources (video memory, mainly)
+			that it needs for fast operation before starting other
+			programs.</para>
+			
+		  </listitem>
+		</itemizedlist>
+		
+	  </listitem>
+	  
+	</itemizedlist>
+
+  </chapter>
+  
   <appendix>
 	<title>File format</title>
 
