@@ -720,20 +720,19 @@ class MyCtrl(wxControl):
     # new lines.
     def wrapLine(self, line):
         ret = []
-        tcfg = cfg.getType(line.lt)
-
+        w = cfg.getType(line.lt).width
+        
         # text remaining to be wrapped
         text = line.text
         
         while 1:
-            if len(text) <= tcfg.width:
+            if len(text) <= w:
                 ret.append(screenplay.Line(line.lb, line.lt, text))
                 break
             else:
-                i = text.rfind(" ", 0, tcfg.width + 1)
+                i = text.rfind(" ", 0, w + 1)
 
-                if (i == tcfg.width) and (
-                    text[tcfg.width + 1:tcfg.width + 2] == " "):
+                if (i == w) and (text[w + 1:w + 2] == " "):
                     
                     ret.append(screenplay.Line(config.LB_AUTO_SPACE2, line.lt,
                                                text[0:i]))
@@ -746,21 +745,19 @@ class MyCtrl(wxControl):
                     
                 else:
                     ret.append(screenplay.Line(config.LB_AUTO_NONE, line.lt,
-                                               text[0:tcfg.width]))
-                    text = text[tcfg.width:]
+                                               text[0:w]))
+                    text = text[w:]
                     
         return ret
 
     # rewrap paragraph starting at given line. returns the number of lines
-    # in the wrapped paragraph. if startLine is -1, rewraps paragraph
+    # in the wrapped paragraph. if line1 is -1, rewraps paragraph
     # containing self.line. maintains cursor position correctness.
-    def rewrapPara(self, startLine = -1):
+    def rewrapPara(self, line1 = -1):
         ls = self.sp.lines
 
-        if startLine == -1:
+        if line1 == -1:
             line1 = self.getParaFirstIndexFromLine(self.line)
-        else:
-            line1 = startLine
 
         line2 = line1
 
@@ -788,16 +785,9 @@ class MyCtrl(wxControl):
             s += config.lb2str(ls[i - 1].lb)
             s += ls[i].text
 
-        # FIXME: don't delete old range, replace it with new one instead.
-        # if nothing has changed saves 2 vector modifies, if something has
-        # changed saves one.
-        
-        ls[line1].text = s
-        ls[line1].lb = ls[line2].lb
-        del ls[line1 + 1:line2 + 1]
-
-        wrappedLines = self.wrapLine(ls[line1])
-        ls[line1:line1 + 1] = wrappedLines
+        tmp = screenplay.Line(ls[line2].lb, ls[line2].lt, s)
+        wrappedLines = self.wrapLine(tmp)
+        ls[line1:line2 + 1] = wrappedLines
 
         # adjust cursor position
         if cursorOffset != -1:
