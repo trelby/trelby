@@ -34,12 +34,14 @@ _iso_8859_1_map = {
 _to_upper = ""
 _to_lower = ""
 
-# we only support ISO-8859-1 for now, so this doesn't take any parameters
-def setCharset():
-    global _to_upper, _to_lower
+# translate table for converting strings to only contain valid input
+# characters
+_input_tbl = ""
 
-    _to_upper = ""
-    _to_lower = ""
+def init():
+    global _to_upper, _to_lower, _input_tbl
+
+    # setup ISO-8859-1 case-conversion stuff
     tmpUpper = []
     tmpLower = []
 
@@ -54,6 +56,13 @@ def setCharset():
     for i in range(256):
         _to_upper += chr(tmpUpper[i])
         _to_lower += chr(tmpLower[i])
+
+    # valid input string stuff
+    for i in range(256):
+        if isValidInputChar(i):
+            _input_tbl += chr(i)
+        else:
+            _input_tbl += "|"
 
 # like string.upper/lower, but we do our own charset-handling that doesn't
 # need locales etc
@@ -76,6 +85,11 @@ def isValidInputChar(kc):
     return (kc >= 32) and (kc <= 255) and not\
            ((kc >= 0x7F) and (kc <= 0xA0)) and (kc != 0xAD)
 
+# return s with all non-valid input characters converted to valid input
+# characters.
+def toInputStr(s):
+    return s.translate(_input_tbl)
+
 # returns s with all possible different types of newlines converted to
 # unix newlines, i.e. a single "\n"
 def fixNL(s):
@@ -92,6 +106,10 @@ def clamp(val, minVal = None, maxVal = None):
         ret = min(ret, maxVal)
 
     return ret
+
+# like clamp, but gets/sets value directly from given object
+def clampObj(obj, name, minVal = None, maxVal = None):
+    setattr(obj, name, clamp(getattr(obj, name), minVal, maxVal))
 
 # convert given string to float, clamping it to the given range
 # (optional). never throws any exceptions, return defVal (possibly clamped

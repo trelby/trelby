@@ -296,8 +296,7 @@ class HeadersDlg(wxDialog):
 
         h = self.headers.hdrs[self.hdrIndex]
         
-        # FIXME: validate text
-        h.text = self.textEntry.GetValue()
+        h.text = util.toInputStr(self.textEntry.GetValue())
         self.stringsLb.SetString(self.hdrIndex, h.text)
         
         h.xoff = util.getSpinValue(self.xoffEntry)

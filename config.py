@@ -108,27 +108,56 @@ class Config:
         # prefix used for temp files
         self.tmpPrefix = "oskusoft-blyte-tmp-"
 
-        # vertical distance between rows, in pixels
-        self.fontYdelta = 18
-
         # offsets from upper left corner of main widget, ie. this much empty
         # space is left on the top and left sides.
         self.offsetY = 10
         self.offsetX = 10
 
-        # paper size
-        self.paperType = "A4"
-        self.paperWidth = 210.0
-        self.paperHeight = 297.0
+        # integer/floating-point variables, with default, minimum and
+        # maximum values
+        self.numberVars = {
 
-        # font size used for PDF generation, in points
-        self.fontSize = 12
-        
-        # margins
-        self.marginTop = 12.7
-        self.marginBottom = 25.4
-        self.marginLeft = 38.1
-        self.marginRight = 25.4
+            # not used perse, but listed here so that we can easily query
+            # min/max values for these in various places
+            "elementEmptyLinesBefore" : (0, 0, 5),
+            "elementIndent" : (0, 0, 80),
+            "elementWidth" : (5, 5, 80),
+
+            # vertical distance between rows, in pixels
+            "fontYdelta" : (18, 4, 125),
+            
+            # font size used for PDF generation, in points
+            "fontSize" : (12, 4, 72),
+
+            # margins
+            "marginBottom" : (25.4, 0.0, 900.0),
+            "marginLeft" : (38.1, 0.0, 900.0),
+            "marginRight" : (25.4, 0.0, 900.0),
+            "marginTop" : (12.7, 0.0, 900.0),
+            
+            # how many lines to scroll per mouse wheel event
+            "mouseWheelLines" : (4, 1, 50),
+            
+            # interval in seconds between automatic pagination (0 = disabled)
+            # TODO: change this to 5 or something
+            "paginateInterval" : (5, 0, 60),
+
+            # paper size
+            "paperHeight" : (210.0, 100.0, 1000.0),
+            "paperWidth" : (297.0, 50.0, 1000.0),
+            
+            # leave at least this many action lines on the end of a page
+            "pbActionLines" : (2, 1, 30),
+            
+            # leave at least this many dialogue lines on the end of a page
+            "pbDialogueLines" : (2, 1, 30),
+            }
+
+        for k, v in self.numberVars.iteritems():
+            setattr(self, k, v[0])
+            
+        # paper type
+        self.paperType = "A4"
 
         # whether to check script for errors before export / print
         self.checkOnExport = True
@@ -136,22 +165,9 @@ class Config:
         # whether to auto-capitalize start of sentences
         self.capitalize = True
 
-        # how many lines to scroll per mouse wheel event
-        self.mouseWheelLines = 4
-        
         # page break indicators to show
         self.pbi = PBI_REAL
         
-        # interval (seconds) between automatic pagination (0 = disabled)
-        # TODO: change this to 5 or something
-        self.paginateInterval = 0
-        
-        # leave at least this many action lines on the end of a page
-        self.pbActionLines = 2
-
-        # leave at least this many dialogue lines on the end of a page
-        self.pbDialogueLines = 2
-
         # PDF viewer program and args
         if misc.isUnix:
             self.pdfViewerPath = "/usr/local/Acrobat5/bin/acroread"
@@ -320,8 +336,40 @@ class Config:
 
         self.recalc()
 
-    # recalculate all variables dependent on other variables
+    # get default value of a numeric setting
+    def getDefault(self, name):
+        return self.numberVars[name][0]
+        
+    # get minimum value of a numeric setting
+    def getMin(self, name):
+        return self.numberVars[name][1]
+        
+    # get maximum value of a numeric setting
+    def getMax(self, name):
+        return self.numberVars[name][2]
+        
+    # get minimum and maximum value of a numeric setting as a (min,max)
+    # tuple.
+    def getMinMax(self, name):
+        return (self.getMin(name), self.getMax(name))
+        
+    # fix up all invalid config values and recalculate all variables
+    # dependent on other variables.
     def recalc(self):
+        for k, v in self.numberVars.iteritems():
+            util.clampObj(self, k, v[1], v[2])
+
+        for el in self.types.itervalues():
+            util.clampObj(el, "emptyLinesBefore",
+                          *self.getMinMax("elementEmptyLinesBefore"))
+            util.clampObj(el, "indent", *self.getMinMax("elementIndent"))
+            util.clampObj(el, "width", *self.getMinMax("elementWidth"))
+            
+        # make sure usable space on the page isn't too small
+        if (self.marginTop + self.marginBottom) >= (self.paperHeight - 100.0):
+            self.marginTop = 0.0
+            self.marginBottom = 0.0
+            
         h = self.paperHeight - self.marginTop - self.marginBottom
 
         # how many lines on a page

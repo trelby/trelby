@@ -141,7 +141,7 @@ class DisplayPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
 
         self.spacingEntry = wxSpinCtrl(panel, -1)
-        self.spacingEntry.SetRange(4, 125)
+        self.spacingEntry.SetRange(*self.cfg.getMinMax("fontYdelta"))
         EVT_SPINCTRL(self, self.spacingEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.spacingEntry, self.OnKillFocus)
         hsizer.Add(self.spacingEntry, 0)
@@ -260,7 +260,8 @@ class ElementsPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         self.emptyLinesEntry = wxSpinCtrl(panel, -1)
-        self.emptyLinesEntry.SetRange(0, 5)
+        self.emptyLinesEntry.SetRange(*self.cfg.getMinMax(
+            "elementEmptyLinesBefore"))
         EVT_SPINCTRL(self, self.emptyLinesEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.emptyLinesEntry, self.OnKillFocus)
         hsizer2.Add(self.emptyLinesEntry, 0)
@@ -273,7 +274,7 @@ class ElementsPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         self.indentEntry = wxSpinCtrl(panel, -1)
-        self.indentEntry.SetRange(0, 80)
+        self.indentEntry.SetRange(*self.cfg.getMinMax("elementIndent"))
         EVT_SPINCTRL(self, self.indentEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.indentEntry, self.OnKillFocus)
         gsizer.Add(self.indentEntry, 0)
@@ -285,7 +286,7 @@ class ElementsPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         self.widthEntry = wxSpinCtrl(panel, -1)
-        self.widthEntry.SetRange(5, 80)
+        self.widthEntry.SetRange(*self.cfg.getMinMax("elementWidth"))
         EVT_SPINCTRL(self, self.widthEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.widthEntry, self.OnKillFocus)
         gsizer.Add(self.widthEntry, 0)
@@ -643,8 +644,8 @@ class PaperPanel(wxPanel):
         if self.blockEvents > 0:
             return
 
-        self.entry2float(self.widthEntry, "paperWidth", 100.0)
-        self.entry2float(self.heightEntry, "paperHeight", 100.0)
+        self.entry2float(self.widthEntry, "paperWidth")
+        self.entry2float(self.heightEntry, "paperHeight")
     
         self.setLines()
         
@@ -654,14 +655,14 @@ class PaperPanel(wxPanel):
 
         self.blockEvents += 1
         
-        self.entry2float(self.topEntryMm, "marginTop", 0.0)
-        self.entry2float(self.bottomEntryMm, "marginBottom", 0.0)
-        self.entry2float(self.leftEntryMm, "marginLeft", 0.0)
-        self.entry2float(self.rightEntryMm, "marginRight", 0.0)
-
-        self.cfg2inch()
+        self.entry2float(self.topEntryMm, "marginTop")
+        self.entry2float(self.bottomEntryMm, "marginBottom")
+        self.entry2float(self.leftEntryMm, "marginLeft")
+        self.entry2float(self.rightEntryMm, "marginRight")
 
         self.setLines()
+
+        self.cfg2inch()
 
         self.blockEvents -= 1
         
@@ -671,15 +672,15 @@ class PaperPanel(wxPanel):
 
         self.blockEvents += 1
 
-        self.entry2float(self.topEntryInch, "marginTop", 0.0, 25.4)
-        self.entry2float(self.bottomEntryInch, "marginBottom", 0.0, 25.4)
-        self.entry2float(self.leftEntryInch, "marginLeft", 0.0, 25.4)
-        self.entry2float(self.rightEntryInch, "marginRight", 0.0, 25.4)
-
-        self.cfg2mm()
+        self.entry2float(self.topEntryInch, "marginTop", 25.4)
+        self.entry2float(self.bottomEntryInch, "marginBottom", 25.4)
+        self.entry2float(self.leftEntryInch, "marginLeft", 25.4)
+        self.entry2float(self.rightEntryInch, "marginRight", 25.4)
 
         self.setLines()
         
+        self.cfg2mm()
+
         self.blockEvents -= 1
 
     def cfg2mm(self):
@@ -694,12 +695,8 @@ class PaperPanel(wxPanel):
         self.leftEntryInch.SetValue(str(self.cfg.marginLeft / 25.4))
         self.rightEntryInch.SetValue(str(self.cfg.marginRight / 25.4))
 
-    def entry2float(self, entry, name, minVal, factor = 1.0):
-        try:
-            val = max(minVal, float(entry.GetValue()) * factor)
-        except ValueError:
-            val = minVal
-
+    def entry2float(self, entry, name, factor = 1.0):
+        val = util.str2float(entry.GetValue(), 0.0) * factor
         setattr(self.cfg, name, val)
         
 class AutoCompPanel(wxPanel):
@@ -767,7 +764,7 @@ class AutoCompPanel(wxPanel):
         for i in l:
             s = i.strip()
             if len(s) > 0:
-                l2.append(s)
+                l2.append(util.toInputStr(s))
 
         tcfg.autoCompList = l2
         
@@ -794,15 +791,15 @@ class PaginationPanel(wxPanel):
         
         gsizer = wxFlexGridSizer(2, 2, 5, 0)
 
-        self.addSpin("action", "Action:", panel, gsizer, 1, 30)
-        self.addSpin("dialogue", "Dialogue", panel, gsizer, 1, 30)
+        self.addSpin("action", "Action:", panel, gsizer, "pbActionLines")
+        self.addSpin("dialogue", "Dialogue", panel, gsizer, "pbDialogueLines")
 
         vsizer.Add(gsizer, 0, wxLEFT, 10)
         
         gsizer = wxFlexGridSizer(1, 2, 5, 0)
         
         self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
-                     " (0 = disable)", panel, gsizer, 0, 60)
+                     " (0 = disable)", panel, gsizer, "paginateInterval")
 
         vsizer.Add(gsizer, 0, wxTOP, 20)
 
@@ -815,12 +812,12 @@ class PaginationPanel(wxPanel):
         
         self.SetSizer(vmsizer)
 
-    def addSpin(self, name, descr, panel, sizer, minR, maxR):
+    def addSpin(self, name, descr, panel, sizer, cfgName):
         sizer.Add(wxStaticText(panel, -1, descr), 0,
                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         entry = wxSpinCtrl(panel, -1)
-        entry.SetRange(minR, maxR)
+        entry.SetRange(*self.cfg.getMinMax(cfgName))
         EVT_SPINCTRL(self, entry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(entry, self.OnKillFocus)
         sizer.Add(entry, 0)
@@ -871,7 +868,7 @@ class MiscPanel(wxPanel):
             wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
         
         self.wheelScrollEntry = wxSpinCtrl(panel, -1)
-        self.wheelScrollEntry.SetRange(1, 50)
+        self.wheelScrollEntry.SetRange(*self.cfg.getMinMax("mouseWheelLines"))
         EVT_SPINCTRL(self, self.wheelScrollEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.wheelScrollEntry, self.OnKillFocus)
         hsizer.Add(self.wheelScrollEntry)
@@ -944,7 +941,7 @@ class PDFPanel(wxPanel):
                    wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
 
         self.fontSizeEntry = wxSpinCtrl(panel, -1)
-        self.fontSizeEntry.SetRange(4, 72)
+        self.fontSizeEntry.SetRange(*self.cfg.getMinMax("fontSize"))
         EVT_SPINCTRL(self, self.fontSizeEntry.GetId(), self.OnMisc)
         EVT_KILL_FOCUS(self.fontSizeEntry, self.OnKillFocus)
         hsizer.Add(self.fontSizeEntry, 0)

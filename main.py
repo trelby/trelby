@@ -253,15 +253,6 @@ class MyCtrl(wxControl):
             # did we encounter characters in ISO-8859-1, but undesired
             unwantedChars = False
 
-            # construct fast translate table for getting rid of unwanted
-            # characters
-            tbl = ""
-            for i in xrange(256):
-                if util.isValidInputChar(i):
-                    tbl += chr(i)
-                else:
-                    tbl += "\\"
-            
             # convert to ISO-8859-1, remove newlines
             for i in range(len(lines)):
                 try:
@@ -278,7 +269,7 @@ class MyCtrl(wxControl):
 
                 s = util.fixNL(s.rstrip("\n"))
                 
-                newS = s.translate(tbl)
+                newS = util.toInputStr(s)
                 if s != newS:
                     unwantedChars = True
                     
@@ -401,7 +392,7 @@ class MyCtrl(wxControl):
 
             if unwantedChars:
                 wxMessageBox("Screenplay contained invalid characters.\n"
-                             "These characters have been converted to '\\'.",
+                             "These characters have been converted to '|'.",
                              "Warning", wxOK, mainFrame)
                 
             return True
@@ -2816,7 +2807,7 @@ class MyApp(wxApp):
         global cfg, mainFrame
 
         misc.init()
-        util.setCharset()
+        util.init()
         
         cfg = config.Config()
         refreshGuiConfig()
