@@ -1,7 +1,6 @@
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
-import betatest
 import bugreport
 import cfgdlg
 import charmapdlg
@@ -3299,6 +3298,7 @@ class MyApp(wxApp):
             sys.exit()
 
         if 0:
+            import betatest
             betatest.check()
             
         misc.init()
