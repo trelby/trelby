@@ -4,10 +4,7 @@ import pdf
 import pml
 import util
 
-import math
-
-# construct all possible dialogue charts in a single PDF document and show
-# it
+# show all all dialogue charts as a PDF document
 def show(mainFrame, ctrl, cfg):
     tmp = DialogueChart(ctrl, cfg)
     s = tmp.generate()

@@ -84,20 +84,20 @@ class CfgDlg(wxDialog):
 
         hsizer.Add(1, 1, 1)
         
-        apply = wxButton(self, -1, "Apply")
-        hsizer.Add(apply, 0, wxALL, 5)
+        applyBtn = wxButton(self, -1, "Apply")
+        hsizer.Add(applyBtn, 0, wxALL, 5)
 
-        cancel = wxButton(self, -1, "Cancel")
-        hsizer.Add(cancel, 0, wxALL, 5)
+        cancelBtn = wxButton(self, -1, "Cancel")
+        hsizer.Add(cancelBtn, 0, wxALL, 5)
         
-        ok = wxButton(self, -1, "OK")
-        hsizer.Add(ok, 0, wxALL, 5)
+        okBtn = wxButton(self, -1, "OK")
+        hsizer.Add(okBtn, 0, wxALL, 5)
 
         vsizer.Add(hsizer, 0, wxEXPAND)
 
-        EVT_BUTTON(self, apply.GetId(), self.OnApply)
-        EVT_BUTTON(self, cancel.GetId(), self.OnCancel)
-        EVT_BUTTON(self, ok.GetId(), self.OnOK)
+        EVT_BUTTON(self, applyBtn.GetId(), self.OnApply)
+        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
         
         self.Layout()
 

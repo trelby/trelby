@@ -48,12 +48,12 @@ class SplashWindow(wxFrame):
         dc.DrawText("Version %s" % misc.version, 200, 135)
         dc.DrawText(misc.copyright, 125, 165)
         
-        str = misc.licensedTo
-        w, h = dc.GetTextExtent(str)
+        s = misc.licensedTo
+        w, h = dc.GetTextExtent(s)
         w += 15
         h += 15
         size = self.GetClientSize()
-        dc.DrawText(str, size.width - w, size.height - h)
+        dc.DrawText(s, size.width - w, size.height - h)
         
     def OnTimer(self, event):
         self.timer.Stop()

@@ -388,9 +388,6 @@ class MyCtrl(wxControl):
         
         output = util.String()
 
-        # used in several places, so keep around
-        charIndent = cfg.getType(config.CHARACTER).indent
-        
         for p in range(1, len(self.pages)):
             start = self.pages[p - 1] + 1
             end = self.pages[p]
@@ -652,14 +649,14 @@ class MyCtrl(wxControl):
                         cursorOffset += 1
         else:
             cursorOffset = -1
-            
-        str = ls[line1].text
+
+        s = ls[line1].text
         for i in range(line1 + 1, line2 + 1):
             if ls[i - 1].lb == config.LB_AUTO_SPACE:
-                str += " "
-            str += ls[i].text
+                s += " "
+            s += ls[i].text
 
-        ls[line1].text = str
+        ls[line1].text = s
         ls[line1].lb = ls[line2].lb
         del ls[line1 + 1:line2 + 1]
 
@@ -735,9 +732,9 @@ class MyCtrl(wxControl):
     # split current line at current column position.
     def splitLine(self):
         ln = self.sp.lines[self.line]
-        str = ln.text
-        preStr = str[:self.column]
-        postStr = str[self.column:]
+        s = ln.text
+        preStr = s[:self.column]
+        postStr = s[self.column:]
         newLine = Line(ln.lb, ln.type, postStr)
         ln.text = preStr
         ln.lb = config.LB_FORCED
@@ -768,9 +765,9 @@ class MyCtrl(wxControl):
     # delete character at given position and optionally position
     # cursor there.
     def deleteChar(self, line, column, posCursor = True):
-        str = self.sp.lines[line].text
-        str = str[:column] + str[column + 1:]
-        self.sp.lines[line].text = str
+        s = self.sp.lines[line].text
+        self.sp.lines[line].text = s[:column] + s[column + 1:]
+        
         if posCursor:
             self.column = column
             self.line = line
@@ -1917,12 +1914,12 @@ class MyCtrl(wxControl):
             if self.capitalizeNeeded():
                 char = util.upper(char)
             
-            str = ls[self.line].text
-            str = str[:self.column] + char + str[self.column:]
-            ls[self.line].text = str
+            s = ls[self.line].text
+            s = s[:self.column] + char + s[self.column:]
+            ls[self.line].text = s
             self.column += 1
                 
-            tmp = str.upper()
+            tmp = s.upper()
             if (tmp == "EXT.") or (tmp == "INT."):
                 if self.isOnlyLineOfElem(self.line):
                     ls[self.line].type = config.SCENE

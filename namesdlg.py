@@ -127,7 +127,7 @@ class NamesDlg(wxDialog):
         selTypes = {}
         skipped = 0
         item = -1
-        eval = misc.isEval
+        isEval = misc.isEval
         
         while 1:
             item = self.typeList.GetNextItem(item, wxLIST_NEXT_ALL,
@@ -163,7 +163,7 @@ class NamesDlg(wxDialog):
                     if not name.endswith(s):
                         continue
 
-            if eval and (random.random() > 0.1):
+            if isEval and (random.random() > 0.1):
                 skipped += 1
                 continue
             
@@ -209,6 +209,9 @@ class MyListCtrl(wxListCtrl):
         elif col == 2:
             return self.sex[self.nameArr.sex[n]]
 
+        # shouldn't happen
+        return ""
+    
     # for some reason this must be overridden as well, otherwise we get
     # assert failures under windows.
     def OnGetItemImage(self, item):

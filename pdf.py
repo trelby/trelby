@@ -220,17 +220,15 @@ class PDFExporter:
     def addStream(self, s):
         compress = True
 
-        filter = " "
+        filterStr = " "
         if compress:
-            prev = len(s)
             s = s.encode("zlib")
-            new = len(s)
-            filter = "\n/Filter /FlateDecode "
+            filterStr = "\n/Filter /FlateDecode "
         
         self.addObj("<< /Length %d%s>>\n"
                     "stream\n"
                     "%s\n"
-                    "endstream" % (len(s), filter, s))
+                    "endstream" % (len(s), filterStr, s))
         
     # add new object. 's' is all data between 'obj/endobj' tags, excluding
     # newlines. adds an xref for the object also.

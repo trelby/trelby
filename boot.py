@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys
+#import sys
 
 class myimport:
     def find_module(fullname, path = None):
