@@ -18,15 +18,15 @@
 	  <corpauthor>Oskusoft</corpauthor>
     </authorgroup>
 
-    <pubdate>2004, August 22.</pubdate>
+    <pubdate>2004, October 17.</pubdate>
 
     <copyright>
       <year>2004</year>
       <holder>Oskusoft</holder>
     </copyright>
 
-	<legalnotice><para>Blaa blaa blaa, do not distribute
-		etc.</para></legalnotice>
+	<legalnotice><para>TODO: Insert legal stuff
+	here.</para></legalnotice>
 	
   </bookinfo>
 
@@ -34,11 +34,110 @@
 	<title>Introduction</title>
 
 	<para>This is the manual for the &blyte; screenwriting software. This
-	  version of the manual corresponds to version &blyte.version; of the
-	  software.</para>
+	version of the manual corresponds to version &blyte.version; of the
+	software.</para>
+
+	<sect1>
+	  <title>Basic concepts</title>
+
+	  <para>If you don't know anything about writing a screenplay, get a
+	  copy of a book such as Trottier's "The Screenwriter's Bible". This
+	  manual will not cover the same ground, but focuses on concepts
+	  specific to &blyte;.</para>
+
+	  <para>&blyte; divides a screenplay into a long list of elements,
+	  each with a specific <emphasis>element style</emphasis>. The
+	  available element styles are:</para>
+
+	  <variablelist>
+
+		<varlistentry>
+		  <term>Scene</term>
+		  <listitem>
+
+			<para>Scene header. Example: "INT. MOTEL ROOM - NIGHT".</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Action</term>
+		  <listitem>
+
+			<para>Describes action. Example: "John grabs the gun from the
+			desk."</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Character</term>
+		  <listitem>
+
+			<para>A speaking character's name. Example: "HARRY".</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Dialogue</term>
+		  <listitem>
+
+			<para>Speech. Example: "You could do that, sure. On the other
+			hand, if you want to live beyond the next minute or so, you
+			might want to rethink your approach."</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Parenthetical</term>
+		  <listitem>
+
+			<para>Describes how the actor should say the following
+			dialogue. Example: "(serious)".</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Transition</term>
+		  <listitem>
+
+			<para>Describes a non-standard transition between scenes.
+			Example: "DISSOLVE TO:".</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Shot</term>
+		  <listitem>
+
+			<para>Describes an in-scene shot. Example: "THE
+			NECKLACE".</para>
+			
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Note</term>
+		  <listitem>
+
+			<para>Note style has a yellow background so it stands out, and
+			is used to insert notes to yourself or to others about that
+			part of the script. Example: "Should Bobby shoot
+			first?".</para>
+			
+		  </listitem>
+		</varlistentry>
+
+	  </variablelist>
+	  
+	</sect1>
 	
   </chapter>
-
+  
   <chapter>
 	<title>Basic usage</title>
 
@@ -51,6 +150,107 @@
 
 	<para>This chapter describes commands not discussed in other
 	chapters.</para>
+
+	<sect1>
+	  <title>File/New,open,save,save as,close,revert</title>
+
+	  <para>These do exactly what you'd expect.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>File/Print</title>
+
+	  <para>This opens up the current script in your configured PDF viewer
+	  program, from which you can print it, or just see what it looks
+	  like.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>File/Settings,load,save as</title>
+
+	  <para>'Settings' allows you to edit the various configurable
+	  settings of the program. See chapter FIXME: link here for help on
+	  the settings window.</para>
+	  
+	  <para>&blyte; loads settings from a file named "default.conf" on
+	  startup. You can have as many config files as you want, and use the
+	  load/save as commands to manage them.</para>
+
+	  <para>You can give a "--conf /home/me/someother.conf" command line
+	  parameter to the program to have it start up with some other
+	  configuration file.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Edit/Cut,Copy,Paste</title>
+
+	  <para>Cut, copy and paste work pretty much the same way as in every
+	  other program. Note that these commands only use the program's own
+	  internal clipboard so can't be used for copying text to/from other
+	  programs. For that, see below.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Edit/Copy to,paste from clipboard</title>
+
+	  <para>These copy/paste text to the system wide clipboard so can be
+	  used for communicating with other programs. Note that if you copy
+	  text to the clipboard from &blyte;, you must keep &blyte; open until
+	  you've pasted the text to the destination program.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Edit/Select scene</title>
+
+	  <para>Select all the text of the current scene.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Edit/Find &amp; Replace</title>
+
+	  <para>This opens a dialog allowing you to search for and possibly
+	  replace text. Usually it operates on all element styles, but if you
+	  press the "More" button, you can select the styles it operates on,
+	  which is useful renaming a character and so on.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Edit/Remove elements</title>
+
+	  <para>'Remove elements' opens a dialog allowing you to select one or
+	  more element styles to completely remove from the script. Be sure to
+	  only do this on copies of the script, because there is no way to get
+	  back the removed elements.</para>
+
+	  <para>You can use this for e.g. removing notes before sending out
+	  copies of the script, or if you want a version of the script with
+	  only the dialog, only the action, or only the scene headers, or
+	  whatever else you can come up with.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Edit/Show formatting</title>
+
+	  <para>This toggles whether formatting information is shown. It
+	  consists of blue lines drawn around each element, plus each line is
+	  prefixed with a red marker indicating the type of the line ending
+	  for that line. See fileformat.txt for information about the
+	  different marker types.</para>
+
+	  <para>When using the 'Find errors' command, if you can't figure out
+	  what the error is, try switching this on to see if you have two
+	  elements where you thought you only had one, or something else
+	  that's not obvious in the normal display.</para>
+	  
+	</sect1>
 
 	<sect1>
 	  <title>Script/Find next error</title>
@@ -309,54 +509,60 @@
   </chapter>
 
   <chapter>
-	<title>Importing existing screenplays</title>
+	<title>Import and export</title>
 
-	<para>Existing screenplays can currently be imported from only one
-	file format: as formatted ASCII text. The following section documents
-	the format these files should have for optimal import
-	processing.</para>
-	
+	<para>This chapter discusses the import/export support of the
+	program.</para>
+
 	<sect1>
-	  <title>ASCII Text files</title>
+	  <title>Import</title>
+
+	  <para>Existing screenplays can currently be imported from only one
+	  file format: as formatted ASCII text. The following section
+	  documents the format these files should have for optimal import
+	  processing.</para>
+	
+	  <sect2>
+		<title>ASCII Text files</title>
 	  
-	  <para>ASCII text files should have the following
-	  characteristics:</para>
+		<para>ASCII text files should have the following
+		  characteristics:</para>
 
-	  <itemizedlist>
-
-		<listitem>
+		<itemizedlist>
 		  
-		  <para>Each element style should begin at a unique column. An
-		  exception is that Scene and Action can begin at the same
-		  column.</para>
-
-		  <para>There should only be one such starting column per element
-		  style, i.e. all dialogue should begin at the same column, it
-		  shouldn't sometimes start at column 25, sometimes at 27,
-		  etc.</para>
+		  <listitem>
 		  
-		</listitem>
+			<para>Each element style should begin at a unique column. An
+			exception is that Scene and Action can begin at the same
+			column.</para>
 
-		<listitem>
-
-		  <para>No production markings, e.g. scene numbers, page numbers,
-			cast lists, or anything like that.</para>
+			<para>There should only be one such starting column per
+			element style, i.e. all dialogue should begin at the same
+			column, it shouldn't sometimes start at column 25, sometimes
+			at 27, etc.</para>
 		  
-		</listitem>
+		  </listitem>
 
-		<listitem>
+		  <listitem>
 
-		  <para>Elements should be separated by a single empty
-		  line.</para>
+			<para>No production markings, e.g. scene numbers, page
+			numbers, cast lists, or anything like that.</para>
 		  
-		</listitem>
+		  </listitem>
+
+		  <listitem>
+
+			<para>Elements should be separated by a single empty
+			line.</para>
+		  
+		  </listitem>
 		
-	  </itemizedlist>
+		</itemizedlist>
 
-	  <para>Below is a short example of the kind of format best recognized
-	  by the program.</para>
-	  
-	  <screen>
+		<para>Below is a short example of the kind of format best
+		recognized by the program.</para>
+		
+		<screen>
 EXT. OCEAN - NIGHT
 
 The package hits the water and is submerged. A few seconds
@@ -386,7 +592,21 @@ on.
           me know.
 
 Something starts beeping.
-</screen>
+		</screen>
+	  </sect2>
+
+	</sect1>
+
+	<sect1>
+	  <title>Export</title>
+
+	  <para>You can export the script as a PDF file or as a formatted
+	  ASCII text file. Both are found in the File/Export dialog, which
+	  allows you to choose which one to export as. If you export as a text
+	  file, the program will ask whether you want the page markers
+	  included or not. If you're planning on importing the script to some
+	  other program, you shouldn't include them, otherwise you probably
+	  should.</para>
 	</sect1>
 	
   </chapter>
@@ -423,9 +643,9 @@ Something starts beeping.
 	  visual matching of distant markings to character names.</para>
 
 	  <para>You can use this chart in many ways. For example, you can at a
-	  glance see if your side characters disappear for 50 pages in the
-	  middle of the script, whether your main characters appear on nearly
-	  all pages or not, etc etc.</para>
+	  glance see if one of your side characters disappears for 50 pages in
+	  the middle of the script, whether the villain is introduced too
+	  late, and so on.</para>
 
 	  <para>At the top is another chart, this one showing the dialogue
 	  density for each page. Dialogue density is calculated as "number of
