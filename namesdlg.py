@@ -143,7 +143,7 @@ class NamesDlg(wxDialog):
         selTypes = {}
         skipped = 0
         item = -1
-        isEval = misc.isEval
+        isEval = not misc.license
         
         while 1:
             item = self.typeList.GetNextItem(item, wxLIST_NEXT_ALL,

@@ -26,6 +26,7 @@ import util
 
 import codecs
 import copy
+import datetime
 import difflib
 import os
 import os.path
@@ -69,6 +70,10 @@ ID_FILE_CFG_LOAD,\
 ID_FILE_CFG_SAVE_AS,\
 ID_HELP_ABOUT,\
 ID_HELP_COMMANDS,\
+ID_HELP_LICENSE,\
+ID_LICENSE_INFO,\
+ID_LICENSE_RELEASE,\
+ID_LICENSE_UPDATE,\
 ID_REPORTS_CHARACTER_REP,\
 ID_REPORTS_DIALOGUE_CHART,\
 ID_SCRIPT_FIND_ERROR,\
@@ -79,7 +84,7 @@ ID_SCRIPT_TITLES,\
 ID_TOOLS_CHARMAP,\
 ID_TOOLS_COMPARE_SCRIPTS,\
 ID_TOOLS_NAME_DB,\
-= range(34)
+= range(38)
 
 def refreshGuiConfig():
     global cfgGui
@@ -101,6 +106,20 @@ class GlobalData:
                              "Error")
             else:
                 self.confFilename = sys.argv[i + 1]
+
+        v = self.cvars = mypickle.Vars()
+
+        v.addInt("posX", 0, "PositionX", -20, 9999)
+        v.addInt("posY", 0, "PositionY", -20, 9999)
+        v.addInt("width", 700, "Width", 500, 9999)
+        v.addInt("height", 830, "Height", 300, 9999)
+        v.addStr("license", "", "License")
+        
+        v.makeDicts()
+        v.setDefaults(self)
+
+        self.height = min(self.height,
+            wxSystemSettings_GetMetric(wxSYS_SCREEN_Y) - 50)
 
         self.makeConfDir()
         
@@ -662,7 +681,7 @@ class MyCtrl(wxControl):
 
                 y += 10
             
-            if misc.isEval:
+            if not misc.license:
                 self.addDemoStamp(pg)
 
             if cfg.pdfShowMargins:
@@ -1870,7 +1889,7 @@ class MyCtrl(wxControl):
             util.writeToFile(gd.confFilename, cfg.save(), mainFrame)
         
     def checkEval(self):
-        if misc.isEval:
+        if not misc.license:
             wxMessageBox("This feature is not supported in the\n"
                          "evaluation version.", "Notice",
                          wxOK, mainFrame)
@@ -1896,7 +1915,7 @@ class MyCtrl(wxControl):
         self.paginate()
 
         sp = self.sp
-        if misc.isEval:
+        if not misc.license:
             sp = copy.deepcopy(self.sp)
             sp.replace()
 
@@ -2047,7 +2066,7 @@ class MyCtrl(wxControl):
 
         if len(dlt) == 0:
             s = "The scripts are identical."
-            if misc.isEval:
+            if not misc.license:
                 s += "\n\nHowever, this is the evaluation version of the\n"\
                      "program, which replaces some words in the\n"\
                      "scripts before doing the comparison, which\n"\
@@ -2167,7 +2186,7 @@ class MyCtrl(wxControl):
         pg.ops.extend(textOps)
         doc.add(pg)
 
-        if misc.isEval:
+        if not misc.license:
             for pg in doc.pages:
                 self.addDemoStamp(pg)
 
@@ -2225,7 +2244,7 @@ class MyCtrl(wxControl):
         tmpSp = Screenplay()
         tmpSp.lines = cd.lines
 
-        if misc.isEval:
+        if not misc.license:
             tmpSp.replace()
 
         s = util.String()
@@ -3023,30 +3042,11 @@ class MyFrame(wxFrame):
         self.clipboard = None
         self.showFormatting = False
 
-        v = self.cvars = mypickle.Vars()
+        self.SetSizeHints(gd.cvars.getMin("width"),
+                          gd.cvars.getMin("height"))
 
-        v.addInt("posX", 0, "PositionX", -20, 9999)
-        v.addInt("posY", 0, "PositionY", -20, 9999)
-        v.addInt("width", 700, "Width", 500, 9999)
-        v.addInt("height", 830, "Height", 300, 9999)
-
-        v.makeDicts()
-        
-        self.cvars.setDefaults(self)
-
-        self.SetSizeHints(v.getMin("width"), v.getMin("height"))
-
-        self.height = min(self.height,
-                          wxSystemSettings_GetMetric(wxSYS_SCREEN_Y) - 50)
-
-        if util.fileExists(gd.stateFilename):
-            s = util.loadFile(gd.stateFilename, self)
-
-            if s:
-                self.cvars.load(self.cvars.makeVals(s), "", self)
-
-        self.MoveXY(self.posX, self.posY)
-        self.SetSize(wxSize(self.width, self.height))
+        self.MoveXY(gd.posX, gd.posY)
+        self.SetSize(wxSize(gd.width, gd.height))
         
         util.removeTempFiles(misc.tmpPrefix)
 
@@ -3109,6 +3109,14 @@ class MyFrame(wxFrame):
         helpMenu = wxMenu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
         helpMenu.AppendSeparator()
+
+        tmp = wxMenu()
+        tmp.Append(ID_LICENSE_INFO, "&Information...")
+        tmp.Append(ID_LICENSE_UPDATE, "&Update...")
+        tmp.Append(ID_LICENSE_RELEASE, "&Release")
+        
+        helpMenu.AppendMenu(ID_HELP_LICENSE, "&License", tmp)
+        helpMenu.AppendSeparator()
         helpMenu.Append(ID_HELP_ABOUT, "&About...")
         
         self.menuBar = wxMenuBar()
@@ -3133,13 +3141,16 @@ class MyFrame(wxFrame):
         for t in cfg.types.values():
             self.typeCb.Append(t.name, t.lt)
 
-        # these are hidden here because they're somewhat harder to find
-        # here than in misc.pyo
-        misc.isEval = False
-        misc.licensedTo = "Evaluation copy."
-        misc.license = ("x" * 513).encode("base64")
-        misc.version = "0.8"
+        # this is hidden here because it's somewhat harder to find here
+        # than in misc.pyo
+        misc.version = "0.95"
+        misc.releaseDate = datetime.date(2004, 10, 11)
 
+        misc.license = None
+
+        if gd.license:
+            self.setLicense(gd.license, None, True)
+            
         hsizer.Add(self.typeCb)
 
         vsizer.Add(hsizer, 0, wxALL, 5)
@@ -3196,6 +3207,9 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
+        EVT_MENU(self, ID_LICENSE_INFO, self.OnLicenseInfo)
+        EVT_MENU(self, ID_LICENSE_UPDATE, self.OnLicenseUpdate)
+        EVT_MENU(self, ID_LICENSE_RELEASE, self.OnLicenseRelease)
 
         EVT_CLOSE(self, self.OnCloseWindow)
 
@@ -3268,6 +3282,28 @@ class MyFrame(wxFrame):
 
         return False
 
+    # try to set license from s.
+    def setLicense(self, s, frame, isStarting):
+        lic = util.License.fromStr(s, frame)
+
+        if lic:
+            if misc.releaseDate > lic.lastDate:
+                wxMessageBox("License is only valid for program\n"
+                    "versions released before %s." % lic.lastDate.isoformat(),
+                    "Error", wxOK, frame)
+
+                return
+                
+            misc.license = lic
+            gd.license = s
+
+            if not isStarting:
+                util.writeToFile(gd.stateFilename, gd.cvars.save("", gd),
+                                 frame)
+
+                wxMessageBox("License successfully updated.",
+                             "Information", wxOK, frame)
+        
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
         # override it and do nothing
@@ -3461,7 +3497,39 @@ class MyFrame(wxFrame):
     def OnAbout(self, event):
         win = splash.SplashWindow(self, -1)
         win.Show()
+
+    def OnLicenseInfo(self, event):
+        if misc.license:
+            s = "Licensed to: '%s'\n" % misc.license.userId.lstrip()
+
+            s += "License type: %s\n" % misc.license.getTypeStr()
+            s += "Upgradable until: %s\n" % misc.license.lastDate.isoformat()
+
+        else:
+            s = "Evaluation copy."
+
+        wxMessageBox(s, "License info", wxOK, self)
         
+    def OnLicenseUpdate(self, event):
+        dlg = wxFileDialog(self, "License file to open", ".",
+            wildcard = "License files (*.lic)|*.lic|All files|*",
+            style = wxOPEN)
+        
+        if dlg.ShowModal() == wxID_OK:
+            data = util.loadFile(dlg.GetPath(), self)
+
+            if data != None:
+                self.setLicense(data, self, False);
+
+        dlg.Destroy()
+    
+    def OnLicenseRelease(self, event):
+        if wxMessageBox("Are you sure you want to release your\n"
+                        "license information, i.e. go back to\n"
+                        "evaluation mode?", "Confirm",
+                        wxYES_NO | wxNO_DEFAULT, self) == wxYES:
+            misc.license = None
+
     def OnTypeCombo(self, event):
         self.panel.ctrl.OnTypeCombo(event)
 
@@ -3474,7 +3542,7 @@ class MyFrame(wxFrame):
                 doExit = False
 
         if doExit:
-            util.writeToFile(gd.stateFilename, self.cvars.save("", self),
+            util.writeToFile(gd.stateFilename, gd.cvars.save("", gd),
                              self)
             util.removeTempFiles(misc.tmpPrefix)
             self.Destroy()
@@ -3486,11 +3554,11 @@ class MyFrame(wxFrame):
         self.Close(False)
         
     def OnMove(self, event):
-        self.posX, self.posY = self.GetPositionTuple()
+        gd.posX, gd.posY = self.GetPositionTuple()
         event.Skip()
 
     def OnSize(self, event):
-        self.width, self.height = self.GetSizeTuple()
+        gd.width, gd.height = self.GetSizeTuple()
         event.Skip()
 
 class MyApp(wxApp):
@@ -3545,6 +3613,12 @@ class MyApp(wxApp):
         # misc.scriptDir is updated every time the user opens/saves
         # something in a different directory.
         misc.scriptDir = cfg.scriptDir
+
+        if util.fileExists(gd.stateFilename):
+            s = util.loadFile(gd.stateFilename, None)
+
+            if s:
+                gd.cvars.load(gd.cvars.makeVals(s), "", gd)
         
         mainFrame = MyFrame(NULL, -1, "Blyte")
         bugreport.mainFrame = mainFrame
@@ -3557,7 +3631,7 @@ class MyApp(wxApp):
         self.SetTopWindow(mainFrame)
 
         if "--test" not in sys.argv:
-            win = splash.SplashWindow(mainFrame, 5000)
+            win = splash.SplashWindow(mainFrame, 2500)
             win.Show()
             win.Raise()
         

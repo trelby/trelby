@@ -79,6 +79,8 @@ class BugReportDlg(wxDialog):
         self.brh.data = util.String(str(self.brh.data)[self.brh.copyPos:])
         self.brh.copyPos = 0
         
+    # FIXME: make this write the information to a file instead of using
+    # the clipboard
     def OnCopyCb(self, event):
         if wxTheClipboard.Open():
             wxTheClipboard.UsePrimarySelection(True)
@@ -89,6 +91,7 @@ class BugReportDlg(wxDialog):
             s1 = str(self.brh.data).encode("base64").encode("rot13")
             s2 = "---start info---\n1 "
 
+            # FIXME: put whole license string here
             if misc.isEval:
                 s2 += "0\n"
             else:

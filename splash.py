@@ -72,14 +72,10 @@ class SplashWindow(wxFrame):
         dc.SetFont(self.font)
         dc.SetTextForeground(self.textColor)
 
-        if self.pic:
-            dc.DrawBitmap(self.pic, 0, 0, False)
-        else:
-            dc.DrawText("Splash screen image not found", 50, 50)
+        dc.DrawBitmap(self.pic, 0, 0, False)
 
-        x = 421
-        dc.DrawText("Version %s" % misc.version, x, 346)
-        dc.DrawText(misc.licensedTo, x, 360)
+        util.drawText(dc, "Version %s, released %s." % (misc.version,
+            misc.releaseDate), 630, 346, util.ALIGN_RIGHT)
         
     def OnTimer(self, event):
         self.timer.Stop()

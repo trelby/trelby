@@ -254,7 +254,7 @@ class DialogueChart:
             y = self.chartY + i * self.charY
             ci = self.cinfo[i]
             
-            if not misc.isEval:
+            if misc.license:
                 name = ci.name
             else:
                 name = "BUY ME"
