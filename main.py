@@ -9,6 +9,7 @@ import decode
 import dialoguechart
 import finddlg
 import headers
+import headersdlg
 import misc
 import namesdlg
 import pdf
@@ -64,6 +65,7 @@ ID_TOOLS_CHARMAP = 22
 ID_FILE_PRINT = 23
 ID_TOOLS_COMPARE_SCRIPTS = 24
 ID_SCRIPT_TITLES = 25
+ID_SCRIPT_HEADERS = 26
 
 def refreshGuiConfig():
     global cfgGui
@@ -1582,6 +1584,15 @@ class MyCtrl(wxControl):
             self.sp.titles = dlg.titles
 
         dlg.Destroy()
+
+    def OnHeaders(self):
+        dlg = headersdlg.HeadersDlg(mainFrame, copy.deepcopy(self.sp.headers),
+                                    cfg)
+
+        if dlg.ShowModal() == wxID_OK:
+            self.sp.headers = dlg.headers
+
+        dlg.Destroy()
         
     def OnDialogueChart(self):
         self.paginate()
@@ -2466,6 +2477,7 @@ class MyFrame(wxFrame):
         
         scriptMenu.Append(ID_SCRIPT_PAGINATE, "&Paginate")
         scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
+        scriptMenu.Append(ID_SCRIPT_HEADERS, "&Headers...")
 
         reportsMenu = wxMenu()
         reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart")
@@ -2547,6 +2559,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SCRIPT_REFORMAT, self.OnReformat)
         EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
         EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitles)
+        EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeaders)
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnDialogueChart)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharMap)
@@ -2697,6 +2710,9 @@ class MyFrame(wxFrame):
 
     def OnTitles(self, event):
         self.panel.ctrl.OnTitles()
+
+    def OnHeaders(self, event):
+        self.panel.ctrl.OnHeaders()
 
     def OnDialogueChart(self, event):
         self.panel.ctrl.OnDialogueChart()
