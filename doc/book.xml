@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+ "/usr/share/xml/docbook/schema/dtd/4.3/docbookx.dtd"
+[
+<!ENTITY % vers   SYSTEM "version.xml">
+<!ENTITY blyte "<application>Blyte</application>">
+%vers;
+]>
+
+<book id="blyte-manual" lang="en">
+  <title>Blyte User's Manual</title>
+
+  <subtitle>Version &blyte.version;</subtitle>
+  
+  <bookinfo>
+	
+    <authorgroup>
+	  <corpauthor>Oskusoft</corpauthor>
+    </authorgroup>
+
+    <pubdate>2004, August 22.</pubdate>
+
+    <copyright>
+      <year>2004</year>
+      <holder>Oskusoft</holder>
+    </copyright>
+
+	<legalnotice><para>Blaa blaa blaa, do not distribute
+		etc.</para></legalnotice>
+	
+  </bookinfo>
+
+  <chapter>
+	<title>Introduction</title>
+
+	<para>This is the manual for the &blyte; screenwriting software. This
+	  version of the manual corresponds to version &blyte.version; of the
+	  software.</para>
+	
+  </chapter>
+
+  <chapter>
+	<title>Basic usage</title>
+
+	<para>This chapter discusses the basic usage of the program.</para>
+
+  </chapter>
+
+  <chapter>
+	<title>Importing existing screenplays</title>
+
+	<para>Existing screenplays can be imported in two formats: as
+	formatted ASCII text, or as RTF files. The following sections document
+	the format these files should have for optimal import
+	processing.</para>
+	
+	<sect1>
+	  <title>ASCII Text files</title>
+	  
+	  <para>ASCII text files should have the following
+	  characteristics:</para>
+
+	  <itemizedlist>
+
+		<listitem>
+		  
+		  <para>Each element style should begin at a unique column. An
+		  exception is that Scene and Action can begin at the same
+		  column.</para>
+
+		  <para>There should only be one such starting column per element
+		  style, i.e. all dialogue should begin at the same column, it
+		  shouldn't sometimes start at column 25, sometimes at 27,
+		  etc.</para>
+		  
+		</listitem>
+
+		<listitem>
+
+		  <para>No production markings, e.g. scene numbers, page numbers,
+			cast lists, or anything like that.</para>
+		  
+		</listitem>
+
+		<listitem>
+
+		  <para>Elements should be separated by a single empty
+		  line.</para>
+		  
+		</listitem>
+		
+	  </itemizedlist>
+
+	  <para>Below is a short example of the kind of format best recognized
+	  by the program.</para>
+	  
+	  <screen>
+EXT. OCEAN - NIGHT
+
+The package hits the water and is submerged. A few seconds
+later, a rapidly inflating liferaft appears.
+
+The people land into the water in their parachutes. They
+dispose of them and swim toward the liferaft.
+
+INT. LIFERAFT - NIGHT
+
+They're all aboard, taking off their clothes. When they're
+all naked, Sarah gathers the wet clothes, throws them out,
+and closes the entrance to the tent-like liferaft. The men
+openly admire Sarah's body, as she opens a storage locker
+and takes out dry clothes for everyone which they then put
+on.
+
+                      KEVIN
+          I know a great way to warm up.
+
+                      SARAH
+          Sorry, I got over the "older men"
+          thing a while back.
+
+                      KEVIN
+          Anytime you have a flashback, let
+          me know.
+
+Something starts beeping.
+</screen>
+	</sect1>
+	
+  </chapter>
+  
+  <chapter>
+	<title>Reports</title>
+
+	<para>This chapter discusses the various report types &blyte; can
+	  generate.</para>
+
+	<sect1>
+	  <title>Dialogue chart</title>
+	  <para>jep jep.</para>
+	</sect1>
+
+	<sect1>
+	  <title>Character report</title>
+	  <para>oh yeah.</para>
+	</sect1>
+	
+  </chapter>
+</book>
