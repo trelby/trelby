@@ -1443,8 +1443,12 @@ class MyCtrl(wxControl):
         cfg = copy.deepcopy(newCfg)
         cfg.recalc()
         refreshGuiConfig()
-        self.reformatAll()
-        self.paginate()
+
+        for c in mainFrame.getCtrls():
+            c.reformatAll()
+            c.paginate()
+            c.adjustScrollBar()
+
         self.updateScreen()
 
     def checkEval(self):
@@ -1555,9 +1559,8 @@ class MyCtrl(wxControl):
             return
 
         items = []
-        for i in range(mainFrame.notebook.GetPageCount()):
-            p = mainFrame.notebook.GetPage(i)
-            items.append(p.ctrl.fileNameDisplay)
+        for c in mainFrame.getCtrls():
+            items.append(c.fileNameDisplay)
 
         dlg = misc.ScriptChooserDlg(mainFrame, items)
 
@@ -2533,6 +2536,11 @@ class MyFrame(wxFrame):
         if i != -1:
             self.notebook.SetPageText(i, text)
     
+    # notebook.GetSelection() returns invalid values, eg. it can return 1
+    # when there is only one tab in existence, so it can't be relied on.
+    # this is currently worked around by never using that function,
+    # instead this iterates over all tabs and finds out the correct page
+    # number.
     def findPage(self, panel):
         for i in range(self.notebook.GetPageCount()):
             p = self.notebook.GetPage(i)
@@ -2541,10 +2549,19 @@ class MyFrame(wxFrame):
 
         return -1
 
-    def isModifications(self):
+    # get list of MyCtrl objects for all open scripts
+    def getCtrls(self):
+        l = []
+
         for i in range(self.notebook.GetPageCount()):
-            p = self.notebook.GetPage(i)
-            if p.ctrl.isModified():
+            l.append(self.notebook.GetPage(i).ctrl)
+
+        return l
+
+    # returns True if any open script has been modified
+    def isModifications(self):
+        for c in self.getCtrls():
+            if c.isModified():
                 return True
 
         return False
