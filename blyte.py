@@ -2187,15 +2187,15 @@ class MyCtrl(wxControl):
 
         cur = cfg.getType(self.sp.lines[self.line].lt)
         
-        sb.SetStatusText("Enter: %s" % cfg.getType(cur.newTypeEnter).name, 0)
-
         if self.tabMakesNew():
             s = "%s" % cfg.getType(cur.newTypeTab).name
         else:
             s = "%s [change]" % cfg.getType(cur.nextTypeTab).name
             
-        sb.SetStatusText("Tab: %s" % s, 1)
-        
+        sb.SetStatusText("Tab: %s" % s, 0)
+        sb.SetStatusText("Enter: %s" % cfg.getType(cur.newTypeEnter).name,
+                         1)
+
     def applyCfg(self, newCfg, writeCfg = True):
         global cfg
         
