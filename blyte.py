@@ -404,7 +404,7 @@ class MyCtrl(wxControl):
             unwantedChars = False
 
             # convert to ISO-8859-1, remove newlines
-            for i in range(len(lines)):
+            for i in xrange(len(lines)):
                 try:
                     s = unicode(lines[i], "UTF-8")
                 except ValueError:
@@ -448,7 +448,7 @@ class MyCtrl(wxControl):
             # did we encounter unknown config lines
             unknownConfigs = False
 
-            for i in range(1, len(lines)):
+            for i in xrange(1, len(lines)):
                 s = lines[i]
 
                 if len(s) < 2:
@@ -572,7 +572,7 @@ class MyCtrl(wxControl):
         output += "#Version 1\n"
 
         pgs = self.sp.titles.pages
-        for pg in range(len(pgs)):
+        for pg in xrange(len(pgs)):
             if pg != 0:
                 output += "#Title-Page \n"
 
@@ -584,7 +584,7 @@ class MyCtrl(wxControl):
 
         output += "#Header-Empty-Lines %d\n" % self.sp.headers.emptyLinesAfter
         
-        for i in range(len(ls)):
+        for i in xrange(len(ls)):
             output += util.toUTF8(str(ls[i]) + "\n")
 
         if util.writeToFile(fileName, str(output), mainFrame):
@@ -629,7 +629,7 @@ class MyCtrl(wxControl):
         
         output = util.String()
 
-        for p in range(1, len(self.pages)):
+        for p in xrange(1, len(self.pages)):
             start = self.pages[p - 1] + 1
             end = self.pages[p]
 
@@ -638,7 +638,7 @@ class MyCtrl(wxControl):
                 s += "-" * (60 - len(s))
                 output += "\n%s\n\n" % s
 
-            for i in range(start, end + 1):
+            for i in xrange(start, end + 1):
                 line = ls[i]
                 tcfg = cfg.getType(line.lt)
 
@@ -662,7 +662,7 @@ class MyCtrl(wxControl):
         pager = Pager(sp)
         sp.titles.generatePages(pager.doc)
         
-        for i in range(1, len(self.pages)):
+        for i in xrange(1, len(self.pages)):
             pg = self.generatePMLPage(pager, i, True, True)
 
             if pg:
@@ -752,7 +752,7 @@ class MyCtrl(wxControl):
 
                 y += 10
 
-        for i in range(start, end + 1):
+        for i in xrange(start, end + 1):
             line = ls[i]
             tcfg = cfg.getType(line.lt)
 
