@@ -322,6 +322,7 @@ class MyCtrl(wxControl):
 
             self.clearVars()
             self.sp = sp
+            self.reformatAll(False)
             self.setFile(fileName)
             self.makeBackup()
             self.paginate()
@@ -460,15 +461,21 @@ class MyCtrl(wxControl):
         util.reverseComboSelect(mainFrame.typeCb,
                                 self.sp.lines[self.line].type)
 
-    def reformatAll(self):
+    def reformatAll(self, makeVisible = True):
+        #t = time.time()
+        
         line = 0
         while 1:
             line += self.rewrapPara(line)
             if line >= len(self.sp.lines):
                 break
 
-        self.makeLineVisible(self.line)
+        if makeVisible:
+            self.makeLineVisible(self.line)
 
+        #t = time.time() - t
+        #print "reformat took %.4f seconds" % t
+        
     def fillAutoComp(self):
         ls = self.sp.lines
 
@@ -520,12 +527,12 @@ class MyCtrl(wxControl):
 
         line2 = line1
 
-        while ls[line2].lb not in(config.LB_LAST, config.LB_FORCED):
+        while ls[line2].lb not in (config.LB_LAST, config.LB_FORCED):
             line2 += 1
 
-        # if cursor is in this paragraph, save its offset from the
-        # beginning of the paragraph
         if (self.line >= line1) and (self.line <= line2):
+            # cursor is in this paragraph, save its offset from the
+            # beginning of the paragraph
             cursorOffset = 0
 
             for i in range(line1, line2 + 1):
