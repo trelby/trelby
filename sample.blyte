@@ -1,46 +1,47 @@
 ﻿#Version 1
 #Title-String 0.000000,100.000000,12,c,Courier,,by
 #Title-String 0.000000,108.470000,12,c,Courier,,Anonymous Person
-#Title-String 67.000000,200.000000,12,,Courier,,Sample script for 
+#Title-String 67.000000,200.000000,12,c,Courier,,Sample script for Blyte.
 #Title-String 0.000000,80.000000,32,cb,Times,,THE KOALA INCIDENT
-#Title-String 112.000000,200.000000,12,,Times,,Blyte
-#Title-String 123.000000,200.000000,12,,Courier,,program.
 #Title-String 160.000000,208.000000,12,c,Courier,,All rights reserved.
 #Header-String 1,0,r,,${PAGE}.
 #Header-Empty-Lines 1
 .\ext. stonehenge - night
+..SUPER: "STONEHENGE - 00:30"
 >.A blizzard rages. Snow is everywhere and visibility is
 >.almost zero. Only at brief moments do we catch sight of the
->.huge stones forming the monument. No one in his right mind
-..would be out in this kind of weather.
+>.stones forming the monument. No one in his right mind would
+..be out in this kind of weather.
 >.However, the rumble of engines appears, growing louder by
 >.the second. A dozen huge trucks emerge from the storm and
-..stop right by the stones. One of the trucks has a crane.
+>.drive up to the stones. One of the trucks has a crane
+..attached.
 >.Men jump down from the trucks and start attaching heavy
->.lifting cables to the stones. One of them is lifted onto the
->.flatbed of the truck beside it. This is repeated until all
->.of the trucks are full and not a single stone is left in the
-..ground.
+>.lifting cables to a stone, which is then lifted onto the
+..flatbed of the truck beside it.
+..LATER
+>.All of the trucks are full and not a single stone is left in
+..the ground.
 >.The men pile back into the trucks and start off into the
 >.storm. In a moment they are gone, and in place of the
 >.Stonehenge monument is just a few holes in the ground,
 ..rapidly filling with snow.
 .\ext. airport - night
->.A small local airport, with the storm still raging. Not a
->.person or a light can be seen, it being obviously abandoned
-..for the night.
->.The trucks roll into view, smashing through the gates and
->.driving towards the runway, where a huge transport plane is
+..SUPER: "AIRPORT - 02:15"
+>.A small local airport, seemingly abandoned for the night,
+..with the storm still raging.
+>.The trucks roll into view, smash through the gates and drive
+>.towards the runway, where a gigantic transport plane is
 >.waiting. As the trucks near it, it opens its rear cargo door
 ..and a ramp extends to the ground.
->.One by one the trucks reverse into the plane, where their
->.contents are unloaded by the plane's internal crane, after
-..which the truck is driven out again.
->.After all the trucks are emptied and everyone is in the
->.plane, the ramp is pulled back in, the cargo door closed,
->.and the plane begins to take off. It is so heavily loaded
->.that it just barely gets into the air before the runway
-..ends.
+>.A truck reverses into the plane, where it has its pile of
+>.stones unloaded by the plane's internal crane, after which
+..the truck drives out again.
+..LATER
+>.All the trucks are emptied and abandoned beside the runway.
+>.The plane's cargo door closes and the plane begins to take
+>.off. It is so heavily loaded that it just barely gets into
+..the air before the runway ends.
 .\int. airplane cargo bay - night
 >.Up until now everyone has been wearing heavy winter clothes
 >.and face masks, which they now take off. JASON, in his
@@ -76,19 +77,19 @@
 ._JASON
 >:I'll go entertain the others so
 .:that they don't get suspicious.
-.\INT. AIRPLANE CARGO BAY - ONE HOUR later
+.\INT. AIRPLANE CARGO BAY - NIGHT
+..SUPER: "ONE HOUR LATER"
 >.The party is in full swing. People are drunk and getting
 ..more so. Jason is sitting with a group of people.
 ._CREW MEMBER
->:So what are we gonna do next, steal
+>:What are we gonna do next, steal
 >:the Eiffel tower and sell it for
 .:scrap metal?
 ..Laughter all around. Jason looks at his watch and gets up.
 .\INT. AIRPLANE COCKPIT - NIGHT
->.All four of them are back in the cockpit. Sarah and Kevin
->.are in the pilots' seats, strapped in tightly. Jason sits on
->.a foldout seat behind them and grabs hold of whatever he
-..can.
+>.Sarah and Kevin are in the pilots' seats, strapped in
+>.tightly. Jason sits on a foldout seat behind them and grabs
+..hold of whatever he can.
 ._KEVIN
 .:Here goes nothing...
 ..Kevin presses a button on the console.
@@ -96,9 +97,9 @@
 ..The rear cargo door starts to open.
 .\INT. AIRPLANE CARGO BAY - NIGHT
 >.A whistling sound grows into a roar as the cargo door keeps
->.opening. Items start to tumble toward it, and people are
->.starting to panic. Two people by the door are swept out into
-..the air, their screams cut off as they disappear.
+>.opening. Items tumble toward it, and people start to panic.
+>.Two people by the door are swept out into the air, their
+..screams cut off as they disappear.
 ._Crew member
 >:Those fuckers are trying to dump
 .:us! Cut the control cables!
@@ -106,7 +107,7 @@
 >.Eventually someone hits something, as there's a spark and
 ..the opening of the cargo door is halted.
 ._CREW MEMBER
-.:Kill the motherfuckers!
+.:Kill them!
 >.The crowd starts running toward the cockpit, waving guns and
 ..yelling threats.
 .\INT. AIRPLANE COCKPIT - NIGHT
@@ -118,28 +119,26 @@
 >.Kevin pulls his stick back, sending the plane on a steep
 ..ascent.
 .\INT. AIRPLANE CARGO BAY - NIGHT
->.The crowd loses its balance as the floor tilts. They try to
->.get up, but the angle of the plane keeps rising, and they
->.have problems keeping from sliding toward the back of the
->.plane. All kinds of items are raining down on them from
-..above.
->.A grinding noise is starting to be heard. Horrified, they
->.look up to see the huge mass of stones beginning to slide
->.toward them. They try to escape to the sides of the cargo
->.bay, but it's no use, the stones come down in a huge
+>.Almost everyone falls down as the floor rises sharply. All
+..kinds of items rain down on them from above.
+>.A grinding noise is starting to be heard. Horrified, the
+>.people look up to see the huge mass of stones beginning to
+>.slide toward them. They try to escape to the sides of the
+>.cargo bay, but it's no use, the stones come down in a huge
 >.avalanche crushing everything in the way, including the
-..cargo door which is ripped off.
+..cargo door which is ripped straight off.
 .\EXT. OUTSIDE THE AIRPLANE - NIGHT
->.It's a stunning sight as the huge plane is climbing on a 45
+>.It's a stunning sight as the plane is climbing on a 45
 >.degree angle, with a trail of stones tumbling out of its
 ..rear.
 .\ext. fishing boat - night
->.A calm night in the middle of the Atlantic ocean. Two
-..fishermen are smoking at the rear deck.
+..SUPER: "THE MIDDLE OF THE ATLANTIC OCEAN - 04:00"
+>.A calm night, with the ocean almost still. Two fishermen are
+..smoking at the rear deck.
 ._fisherman #1
 >:Aye, it's nights like this that
 >:make me remember why I love being a
->:fisherman. Nothing but you, your
+>:fisherman. Nothing but you, the
 >:boat, and the sea. Don't get any
 .:better than this.
 ._FISHERMAN #2
@@ -148,15 +147,16 @@
 >.Suddenly, huge blocks of stone rain down on the boat,
 ..smashing it to pieces.
 .\INT. AIRPLANE - NIGHT
->.They're standing in front of the exit door, wearing
-..parachutes, with a bright yellow package at their feet.
+>.Jason, Kevin and Sarah are standing in front of the
+>.emergency exit door, wearing parachutes, with a bright
+..yellow package at their feet.
 .\EXT. OUTSIDE THE AIRPLANE - NIGHT
->.The package drops from the airplane with 4 people holding on
->.to it. Within seconds of their exit the plane starts a steep
-..dive.
->.The package and the people tumble down. They wait until the
->.last possible moment before releasing their grip on the
-..package and opening their parachutes.
+>.The yellow package drops from the airplane with 3 people
+>.holding on to it. Within seconds of their exit the plane
+..starts a steep dive.
+>.The package and the people fall down. Just seconds before
+>.hitting the ocean they release their grip on the package and
+..open their parachutes.
 ..In the background, the plane crashes into the ocean.
 .\Ext. Ocean - night
 >.The package hits the water and is submerged. A few seconds
@@ -178,14 +178,13 @@
 ._KEVIN
 >:Anytime you have a flashback, let
 .:me know.
-..Something starts beeping.
 .\EXT. OCEAN - NIGHT
 >.The liferaft bobs in the waves, utterly alone in the world.
 >.Or maybe not so alone after all, for a small submarine
 ..surfaces just beside it.
 .\Int. Submarine - night
->.The gang of four descend from the tower. The captain is
-..waiting for them.
+>.Jason, Kevin and Sarah descend into the submarine. The
+..captain is waiting for them.
 ._Captain
 >:Welcome aboard. I trust everything
 .:went well?
@@ -209,23 +208,16 @@
 >.A red line marks their progress southwest until it reaches
 ..Antigua.
 .\EXT. SUBMARINE - NIGHT
->.The four of them are naked once more. They slip into the
->.water and start swimming towards a nearby island, pushing a
->.floating package of clothes before them. As soon as they're
-..gone, the submarine disappears beneath the waves.
-.\Ext. Rabbit island - beach - night
->.They reach the deserted beach. They open the package, take
->.out towels and dry themselves, then dress in clothes from
-..the package. They start walking away.
+>.Jason, Kevin and Sarah are ferried to a deserted beach by a
+..silent rubber boat.
 .\Map of the american continents
 >.The red line snakes from Antigua to Dominican Republic, from
 ..there to Miami, and finally to Los Angeles.
 .\ext. jason's house - day
->.A luxurious mansion in the hills of Los Angeles, with a huge
-..swimming pool in the backyard.
+..SUPER: "JASON'S HOUSE - LOS ANGELES"
+..A luxurious mansion with a swimming pool in the backyard.
 .\int. jason'S living room - DAY
->.The four of them are finally back home after their long
->.return trip. They're sitting around sipping drinks and
+>.Jason, Kevin and Sarah are sitting around sipping drinks and
 >.watching the TV, which is showing a special report about the
 ..Stonehenge incident.
 ._Reporter
@@ -240,13 +232,45 @@
 ._REPORTER
 >:What possible motive could anyone
 >:have to destroy one of the oldest
->:artifacts in the world? We don't
-.:know.
+>:artifacts in the world? Police
+.:claim to have no idea.
 ..Jason turns the TV off.
 ._JASON
-.:They'll soon learn.
+.:That'll confuse them for a while.
 ._SARAH
->:Are you finally going to tell us
-.:then what the plan is?
+.:So, what's next on the agenda?
 ._JASON
-.:Soon, my love, soon.
+>:A strange letter was delivered to
+>:here while we were away. It reads:
+>:"Greetings. You may be wondering
+>:how I knew how to contact you. When
+>:I want something done, it gets
+>:done, and when I wanted to know who
+>:was the best thief in the world,
+>:your name eventually surfaced. But
+>:I digress. I have a job for you: I
+>:want you to steal the rarest animal
+>:in the world for me, the Russian
+>:koala. It's a mutant offspring of
+>:Australian koalas, developed by
+>:Soviet scientists during the cold
+>:war to eat the leaves off of all
+>:trees, thus dooming all of North
+>:America to starve to death as the
+>:ecosystem collapses. There are only
+>:five of these animals still alive,
+>:and they're kept in a heavily
+>:guarded secret Russian laboratory
+>:near Vladivostok. I will contact
+>:you again with further details in
+.:the near future."
+._SARAH
+.:Does it say who sent it?
+._JASON
+>:The letter is signed by someone who
+>:calls himself "ME USSR KOALA",
+.:whatever that means.
+._SARAH
+.:Intriguing.
+._JASON
+.:Very.
