@@ -388,10 +388,10 @@ class Config:
             v.addStr("fontBoldItalic", "0;-adobe-courier-bold-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontBoldItalic")
             
         elif misc.isWindows:
-            v.addStr("fontNormal", "0;-16;0;0;0;400;0;0;0;0;3;2;1;49;Courier New", "FontNormal")
-            v.addStr("fontBold", "0;-16;0;0;0;700;0;0;0;0;3;2;1;49;Courier New", "FontBold")
-            v.addStr("fontItalic", "0;-16;0;0;0;400;255;0;0;0;3;2;1;49;Courier New", "FontItalic")
-            v.addStr("fontBoldItalic", "0;-16;0;0;0;700;255;0;0;0;3;2;1;49;Courier New", "FontBoldItalic")
+            v.addStr("fontNormal", "0;-13;0;0;0;400;0;0;0;0;3;2;1;49;Courier New", "FontNormal")
+            v.addStr("fontBold", "0;-13;0;0;0;700;0;0;0;0;3;2;1;49;Courier New", "FontBold")
+            v.addStr("fontItalic", "0;-13;0;0;0;400;255;0;0;0;3;2;1;49;Courier New", "FontItalic")
+            v.addStr("fontBoldItalic", "0;-13;0;0;0;700;255;0;0;0;3;2;1;49;Courier New", "FontBoldItalic")
         else:
             raise ConfigError("unknown platform")
         
