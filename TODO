@@ -1,3 +1,5 @@
+-remove useless emacs keyboard commands
+
 -search, search & replace
 
 -"are you sure you want to open multiple copies of the same file?"
@@ -10,28 +12,30 @@
 
 -undo/redo support
 
+-when starting a new dialogue element with "(", it should morph into a
+parenthetical
+
+-when pressing enter at parenthetical element, if elements doesn't end
+in ")", add it
+
 -config dialogs
 
  -font
 
  -element styles
 
-  -underlined, italic, bold, caps
+  -underlined, italic, bold, caps, color (text & background)
 
  -colors
 
+ -element style tab order customizable
+
+   -some elements skipped totally
+ 
  -needs config file saving/loading as well
 
 -"find errors" function that finds obvious errors, like two dialogue
-elements one after another etc.
-
--when entering scene heading text, after some x characters are
-written, the program should search through the entire script to find
-existing scene headings with matching starts, and if there are less
-than n matches, display some kind of helpful popup-window or something
-allowing you to easily insert one of the existing ones. maybe the
-choices are numbered alt-1 - alt-0, and then pressing that key selects
-that one, inserts it, and positions cursor at end of line.
+elements one after another, empty elements, etc
 
 -30-day evaluation time limit
 

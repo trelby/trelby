@@ -148,6 +148,9 @@ def init():
            bgColor, bgBrush, bgPen, \
            selectedColor, selectedBrush, selectedPen, \
            cursorColor, cursorBrush, cursorPen, \
+           autoCompFgColor, autoCompBgColor, \
+           autoCompPen, autoCompBrush, \
+           autoCompRevPen, autoCompRevBrush, \
            pagebreakPen
     
     baseFont = wxFont(fontY, wxMODERN, wxNORMAL, wxNORMAL)
@@ -169,6 +172,13 @@ def init():
     cursorBrush = wxBrush(cursorColor)
     cursorPen = wxPen(cursorColor)
 
+    autoCompFgColor = wxColour(0, 0, 0)
+    autoCompBgColor = wxColor(249, 222, 99)
+    autoCompPen = wxPen(autoCompFgColor)
+    autoCompBrush = wxBrush(autoCompBgColor)
+    autoCompRevPen = wxPen(autoCompBgColor)
+    autoCompRevBrush = wxBrush(autoCompFgColor)
+    
     pagebreakPen = wxPen(wxColour(128, 128, 128), style = wxSHORT_DASH)
 
 def _conv(dict, key):

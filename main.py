@@ -124,6 +124,21 @@ class MyCtrl(wxControl):
         self.createEmptySp()
         self.updateScreen(redraw = False)
 
+    def clearVars(self):
+        self.line = 0
+        self.column = 0
+        self.topLine = 0
+        self.mark = -1
+        self.autoComp = None
+        self.autoCompSel = -1
+        
+    def createEmptySp(self):
+        self.clearVars()
+        self.sp = Screenplay()
+        self.sp.lines.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
+        self.setFile(None)
+        self.makeBackup()
+        
     def loadFile(self, fileName):
         try:
             try:
@@ -159,11 +174,8 @@ class MyCtrl(wxControl):
             if len(sp.lines) == 0:
                 raise MiscError("empty file")
             
+            self.clearVars()
             self.sp = sp
-            self.line = 0
-            self.column = 0
-            self.topLine = 0
-            self.mark = -1
             self.setFile(fileName)
             self.makeBackup()
 
@@ -234,6 +246,14 @@ class MyCtrl(wxControl):
                 break
         t = time.time() - t
         print "reformatted %d lines in %.2f seconds" % (line, t)
+
+    def fillAutoComp(self):
+        ls = self.sp.lines
+        
+        if ls[self.line].type in (cfg.SCENE, cfg.CHARACTER, cfg.TRANSITION):
+            self.autoComp = self.getMatchingText(ls[self.line].text,
+                                                 ls[self.line].type)
+            self.autoCompSel = 0
         
     def wrapLine(self, line):
         ret = []
@@ -473,6 +493,34 @@ class MyCtrl(wxControl):
         self.panel.scrollBar.SetScrollbar(self.topLine, pageSize,
                                           len(self.sp.lines), pageSize) 
 
+    # get a list of strings (single-line text elements for now) that
+    # start with 'text' (not case sensitive) and are of of type
+    # 'type'. ignores current line.
+    def getMatchingText(self, text, type):
+        ls = self.sp.lines
+        text = text.upper()
+        matches = {}
+        last = None
+        
+        for i in range(0, len(ls)):
+            if (ls[i].type == type) and (ls[i].lb == cfg.LB_LAST):
+                if i != self.line and ls[i].text.upper().\
+                       startswith(text):
+                    matches[ls[i].text.upper()] = None
+                    if i < self.line:
+                        last = ls[i].text.upper()
+
+        if last:
+            del matches[last]
+            
+        mlist = matches.keys()
+        mlist.sort()
+
+        if last:
+            mlist.insert(0, last)
+        
+        return mlist
+
     # returns pair (start, end) of marked lines, inclusive. if mark is
     # after the end of the script (text has been deleted since setting
     # it), returns a valid pair (by truncating selection to current
@@ -542,6 +590,7 @@ class MyCtrl(wxControl):
         self.screenBuf = wxEmptyBitmap(size.width, size.height)
     
     def OnLeftDown(self, event, mark = False):
+        self.autoComp = None
         pos = event.GetPosition()
         self.line = self.pos2line(pos)
         tcfg = cfg.getTypeCfg(self.sp.lines[self.line].type)
@@ -571,21 +620,12 @@ class MyCtrl(wxControl):
     def OnScroll(self, event):
         pos = self.panel.scrollBar.GetThumbPosition()
         self.topLine = pos
+        self.autoComp = None
         self.updateScreen()
 
     def OnReformat(self):
         self.reformatAll()
         self.updateScreen()
-
-    def createEmptySp(self):
-        self.sp = Screenplay()
-        self.sp.lines.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
-        self.line = 0
-        self.column = 0
-        self.topLine = 0
-        self.mark = -1
-        self.setFile(None)
-        self.makeBackup()
 
     def canBeClosed(self):
         if self.isModified():
@@ -710,6 +750,13 @@ class MyCtrl(wxControl):
         tcfg = cfg.getTypeCfg(ls[self.line].type)
 
         # FIXME: call ensureCorrectLine()
+
+        # what to do about auto-completion
+        AC_DEL = 0
+        AC_REDO = 1
+        AC_KEEP = 2
+
+        doAutoComp = AC_DEL
         
         if kc == WXK_RETURN:
             if ev.ShiftDown() or ev.ControlDown():
@@ -717,22 +764,30 @@ class MyCtrl(wxControl):
                 
                 self.rewrap()
             else:
-                if self.isLastLineOfElem(self.line) and\
-                   (ls[self.line].type == cfg.PAREN) and\
-                   (ls[self.line].text[self.column:] == ")"):
-                    self.column += 1
+                if not self.autoComp:
+                    if self.isLastLineOfElem(self.line) and\
+                       (ls[self.line].type == cfg.PAREN) and\
+                       (ls[self.line].text[self.column:] == ")"):
+                        self.column += 1
+
+                    self.splitLine()
+                    ls[self.line - 1].lb = cfg.LB_LAST
+
+                    newType = cfg.getNextType(ls[self.line].type)
+                    i = self.line
+                    while 1:
+                        ls[i].type = newType
+                        if ls[i].lb == cfg.LB_LAST:
+                            break
+                        i += 1
+                else:
+                    ls[self.line].text = self.autoComp[self.autoCompSel]
+                    self.column = len(ls[self.line].text)
+
+                    self.splitLine()
+                    ls[self.line - 1].lb = cfg.LB_LAST
+                    ls[self.line].type = cfg.getNextType(ls[self.line].type)
                     
-                self.splitLine()
-                ls[self.line - 1].lb = cfg.LB_LAST
-                
-                newType = cfg.getNextType(ls[self.line].type)
-                i = self.line
-                while 1:
-                    ls[i].type = newType
-                    if ls[i].lb == cfg.LB_LAST:
-                        break
-                    i += 1
-                
                 self.rewrap()
 
         elif kc == WXK_BACK:
@@ -741,6 +796,7 @@ class MyCtrl(wxControl):
                     self.joinLines(self.line - 1)
             else:
                 self.deleteChar(self.line, self.column - 1)
+                doAutoComp = AC_REDO
 
             self.rewrap()
             
@@ -752,6 +808,7 @@ class MyCtrl(wxControl):
                     self.joinLines(self.line)
             else:
                 self.deleteChar(self.line, self.column)
+                doAutoComp = AC_REDO
 
             self.rewrap()
 
@@ -778,18 +835,28 @@ class MyCtrl(wxControl):
             self.column = min(self.column + 1, len(ls[self.line].text))
             
         elif (kc == WXK_DOWN) or (kc == KC_CTRL_N):
-            if self.line < (len(ls) - 1):
-                self.line += 1
-                if self.line >= (self.topLine + self.getLinesOnScreen()):
-                    while (self.topLine + self.getLinesOnScreen() - 1)\
-                          < self.line:
-                        self.topLine += 1
+            if not self.autoComp:
+                if self.line < (len(ls) - 1):
+                    self.line += 1
+                    if self.line >= (self.topLine + self.getLinesOnScreen()):
+                        while (self.topLine + self.getLinesOnScreen() - 1)\
+                              < self.line:
+                            self.topLine += 1
+            else:
+                self.autoCompSel = (self.autoCompSel + 1) % len(self.autoComp)
+                doAutoComp = AC_KEEP
                         
         elif (kc == WXK_UP) or (kc == KC_CTRL_P):
-            if self.line > 0:
-                self.line -= 1
-                if self.line < self.topLine:
-                    self.topLine -= 1
+            if not self.autoComp:
+                if self.line > 0:
+                    self.line -= 1
+                    if self.line < self.topLine:
+                        self.topLine -= 1
+            else:
+                self.autoCompSel = self.autoCompSel - 1
+                if self.autoCompSel < 0:
+                    self.autoCompSel = len(self.autoComp) - 1
+                doAutoComp = AC_KEEP
                     
         elif (kc == WXK_HOME) or (kc == KC_CTRL_A):
             self.column = 0
@@ -861,7 +928,7 @@ class MyCtrl(wxControl):
             str = str[:self.column] + chr(kc) + str[self.column:]
             ls[self.line].text = str
             self.column += 1
-
+                
             tmp = str.upper()
             if (tmp == "EXT.") or (tmp == "INT."):
                 if (ls[self.line].lb == cfg.LB_LAST) and\
@@ -869,6 +936,7 @@ class MyCtrl(wxControl):
                     ls[self.line].type = cfg.SCENE
 
             self.rewrap()
+            doAutoComp = AC_REDO
 
         else:
             ev.Skip()
@@ -876,6 +944,15 @@ class MyCtrl(wxControl):
 
         # FIXME: call ensureCorrectLine()
         self.column = min(self.column, len(ls[self.line].text))
+
+        if doAutoComp == AC_DEL:
+            self.autoComp = None
+        elif doAutoComp == AC_REDO:
+            self.fillAutoComp()
+        elif doAutoComp == AC_KEEP:
+            pass
+        else:
+            print "unknown value of doAutoComp: %s" % doAutoComp
 
         self.makeLineVisible(self.line)
         self.updateScreen()
@@ -896,7 +973,9 @@ class MyCtrl(wxControl):
         length = len(ls)
 
         marked = self.getMarkedLines()
-        
+
+        cursorY = -1
+        ccfg = None
         i = self.topLine
         while (y < size.height) and (i < length):
             y += self.sp.getEmptyLinesBefore(i) * cfg.fontYdelta
@@ -929,6 +1008,8 @@ class MyCtrl(wxControl):
                 dc.DrawLine(0, y, size.width, y)
                 
             if i == self.line:
+                cursorY = y
+                ccfg = tcfg
                 dc.SetPen(cfg.cursorPen)
                 dc.SetBrush(cfg.cursorBrush)
                 dc.DrawRectangle(cfg.offsetX + (self.column + tcfg.indent)
@@ -952,8 +1033,79 @@ class MyCtrl(wxControl):
             y += cfg.fontYdelta
             i += 1
 
+        if self.autoComp and (cursorY > 0):
+            self.drawAutoComp(dc, cursorY, ccfg)
+            
 #        t = time.time() - t
-#        print "paint took %.4f seconds" % t
+#        print "paint took %.4f seconds"
+
+    def drawAutoComp(self, dc, cursorY, tcfg):
+        offset = 5
+        sbw = 10
+        selBleed = 2
+        
+        show = min(10, len(self.autoComp))
+        doSbw = show < len(self.autoComp)
+        
+        startPos = (self.autoCompSel / show) * show
+        endPos = min(startPos + show, len(self.autoComp))
+        if endPos == len(self.autoComp):
+            startPos = max(0, endPos - show)
+
+        w = 0
+        for i in range(startPos, endPos):
+            tw, tmp = dc.GetTextExtent(self.autoComp[i])
+            w = max(w, tw)
+
+        w += offset * 2
+        h = show * cfg.fontY + offset * 2
+
+        itemW = w - offset * 2 + selBleed * 2
+        if doSbw:
+            w += sbw + offset * 2
+            sbh = h - offset * 2 + selBleed * 2
+
+        posX = cfg.offsetX + tcfg.indent * cfg.fontX
+        posY = cursorY + cfg.fontYdelta
+        
+        dc.SetPen(cfg.autoCompPen)
+        dc.SetBrush(cfg.autoCompBrush)
+        dc.DrawRectangle(posX, posY, w, h)
+
+        dc.SetTextForeground(cfg.autoCompFgColor)
+
+        for i in range(startPos, endPos):
+            if i == self.autoCompSel:
+                dc.SetPen(cfg.autoCompRevPen)
+                dc.SetBrush(cfg.autoCompRevBrush)
+                dc.SetTextForeground(cfg.autoCompBgColor)
+                dc.DrawRectangle(posX + offset - selBleed,
+                    posY + offset + (i - startPos) * cfg.fontY - selBleed,
+                    itemW,
+                    cfg.fontY + selBleed * 2)
+                dc.SetTextForeground(cfg.autoCompBgColor)
+                dc.SetPen(cfg.autoCompPen)
+                dc.SetBrush(cfg.autoCompBrush)
+                
+            dc.DrawText(self.autoComp[i], posX + offset, posY + offset +
+                        (i - startPos) * cfg.fontY)
+
+            if i == self.autoCompSel:
+                dc.SetTextForeground(cfg.autoCompFgColor)
+
+        if doSbw:
+            dc.SetPen(cfg.autoCompPen)
+            dc.SetBrush(cfg.autoCompRevBrush)
+            dc.DrawLine(posX + w - offset * 2 - sbw,
+                posY,
+                posX + w - offset * 2 - sbw,
+                posY + h)
+            dc.DrawRectangle(posX + w - offset - sbw,
+                posY + offset - selBleed + int((float(startPos) /
+                     len(self.autoComp)) * sbh),
+                sbw,
+                int((float(show) / len(self.autoComp)) * sbh))
+
 
 class MyFrame(wxFrame):
 
