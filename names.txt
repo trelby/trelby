@@ -109728,7 +109728,7 @@ Lassa	Irish	F
 Lassalle	French	M
 Lassar	Irish	F
 Lassarina	Irish	M
-Lasse	Latin	M
+Lasse	Finnish	M
 Lasse-Allan	German	M
 Lasse-Nils	German	M
 Lasse-Olaf	German	M
@@ -139626,7 +139626,7 @@ Ollegard	Swedish	F
 Olleke	Dutch	F
 Olleta	Latin	F
 Ollett	Latin	F
-Olli	German	F
+Olli	Finnish	F
 Olli-Pekka	Finnish	M
 Ollie	German	F
 OllieLou	Mormon	F
@@ -187466,7 +187466,7 @@ Ulker	Turkish	F
 Ulkini	Hawaiian	F
 Ulku	Turkish	F
 Ull	German	M
-Ulla	German	F
+Ulla	Finnish	F
 Ulla-Angela	German	F
 Ulla-Birgit	German	F
 Ulla-Britt	German	F
@@ -192172,7 +192172,7 @@ Villanucci	Latin	M
 Villanueva	Latin	F
 Villars	Danish	M
 Villay	Indian	M
-Ville	Swedish	M
+Ville	Finnish	M
 Ville-Pekka	Finnish	M
 Ville-Veikko	Finnish	M
 Villebon	French	M
