@@ -30,6 +30,9 @@ ID_FILE_NEW = 5
 ID_FILE_SETTINGS = 6
 ID_FILE_CLOSE = 7
 ID_FILE_REVERT = 8
+ID_EDIT_CUT = 9
+ID_EDIT_COPY = 10
+ID_EDIT_PASTE = 11
 
 def clamp(val, min, max):
     if val < min:
@@ -46,7 +49,7 @@ class Line:
         self.text = text
 
     def __eq__(self, other):
-        return (self.lb == other.lb) and (self.type == other.type) and \
+        return (self.lb == other.lb) and (self.type == other.type) and\
                (self.text == other.text)
     
     def __ne__(self, other):
@@ -554,7 +557,7 @@ class MyCtrl(wxControl):
         self.topLine = pos
         self.updateScreen()
 
-    def OnReformat(self, event):
+    def OnReformat(self):
         self.reformatAll()
         self.updateScreen()
 
@@ -577,21 +580,81 @@ class MyCtrl(wxControl):
 
         return True
 
-    def OnRevert(self, event):
+    def OnRevert(self):
         if self.fileName:
             if not self.canBeClosed():
                 return
         
             self.loadFile(self.fileName)
             self.updateScreen()
+
+    def OnCut(self):
+        if self.mark != -1:
+            marked = self.getMarkedLines()
+
+            ls = self.sp.lines
             
-    def OnSave(self, event):
+            mainFrame.clipboard = ls[marked[0] : marked[1] + 1]
+            del ls[marked[0] : marked[1] + 1]
+            
+            if len(ls) == 0:
+                ls.append(Line(cfg.LB_LAST, cfg.SCENE, ""))
+
+            if (marked[0] != 0) and (marked[0] < len(ls)) and\
+                   (ls[marked[0] - 1].type != ls[marked[0]].type):
+                ls[marked[0] - 1].lb = cfg.LB_LAST
+
+            if marked[0] < len(ls):
+                self.line = marked[0]
+                self.column = 0
+            else:
+                self.line = len(ls) - 1
+                self.column = len(ls[self.line].text)
+            
+            self.mark = -1
+            self.makeLineVisible(self.line)
+            self.updateScreen()
+        
+    def OnCopy(self):
+        if self.mark != -1:
+            marked = self.getMarkedLines()
+
+            mainFrame.clipboard = copy.deepcopy(self.sp.lines[marked[0] :
+                                                              marked[1] + 1])
+        
+    def OnPaste(self):
+        if mainFrame.clipboard:
+            ls = self.sp.lines
+            
+            if self.column == 0:
+                insertPos = self.line
+            else:
+                insertPos = self.line + 1
+                
+            ls[insertPos : insertPos] = copy.deepcopy(mainFrame.clipboard)
+
+            self.line = insertPos + len(mainFrame.clipboard) - 1
+            self.column = len(ls[self.line].text)
+
+            if insertPos != 0:
+                if ls[insertPos - 1].type != ls[insertPos].type:
+                    ls[insertPos - 1].lb = cfg.LB_LAST
+
+            if (self.line + 1) < len(ls):
+                if ls[self.line].type != ls[self.line + 1].type:
+                    ls[self.line].lb = cfg.LB_LAST
+
+            self.mark = -1
+            self.makeLineVisible(self.line)
+            self.updateScreen()
+        
+    def OnSave(self):
         if self.fileName:
             self.saveFile(self.fileName)
         else:
             self.OnSaveAs()
 
-    def OnSaveAs(self, event = None):
+    def OnSaveAs(self):
         dlg = wxFileDialog(self, "Filename to save as",
                            wildcard = "NASP files (*.nasp)|*.nasp|All files|*",
                            style = wxSAVE | wxOVERWRITE_PROMPT)
@@ -600,7 +663,7 @@ class MyCtrl(wxControl):
 
         dlg.Destroy()
 
-    def OnSettings(self, event = None):
+    def OnSettings(self):
         dlg = CfgDlg(self, copy.deepcopy(cfg._types))
         dlg.ShowModal()
         dlg.Destroy()
@@ -823,6 +886,11 @@ class MyCtrl(wxControl):
             l = ls[i]
             tcfg = cfg.getTypeCfg(l.type)
 
+            if (self.mark != -1) and self.isLineMarked(i, marked):
+                dc.SetPen(cfg.selectedPen)
+                dc.SetBrush(cfg.selectedBrush)
+                dc.DrawRectangle(0, y, size.width, cfg.fontYdelta)
+            
             # FIXME: debug code, make a hidden config-option
             if 0:
                 dc.SetPen(cfg.bluePen)
@@ -835,11 +903,6 @@ class MyCtrl(wxControl):
                 dc.DrawText(cfg.lb2text(l.lb), 0, y)
                 dc.SetTextForeground(cfg.blackColor)
 
-            if (self.mark != -1) and self.isLineMarked(i, marked):
-                dc.SetPen(cfg.selectedPen)
-                dc.SetBrush(cfg.selectedBrush)
-                dc.DrawRectangle(0, y, size.width, cfg.fontYdelta)
-            
             if (i != 0) and (self.line2page(i - 1) != self.line2page(i)):
                 dc.SetPen(cfg.pagebreakPen)
                 dc.DrawLine(0, y, size.width, y)
@@ -877,6 +940,8 @@ class MyFrame(wxFrame):
         wxFrame.__init__(self, parent, id, title,
                          wxPoint(100, 100), wxSize(700, 830))
 
+        self.clipboard = None
+        
         fileMenu = wxMenu()
         fileMenu.Append(ID_FILE_NEW, "&New")
         fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
@@ -889,11 +954,17 @@ class MyFrame(wxFrame):
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_EXIT, "E&xit\tCTRL-Q")
 
+        editMenu = wxMenu()
+        editMenu.Append(ID_EDIT_CUT, "Cu&t\tCTRL-X")
+        editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
+        editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
+        
         formatMenu = wxMenu()
         formatMenu.Append(ID_REFORMAT, "&Reformat all")
         
         menuBar = wxMenuBar()
         menuBar.Append(fileMenu, "&File")
+        menuBar.Append(editMenu, "&Edit")
         menuBar.Append(formatMenu, "F&ormat")
         self.SetMenuBar(menuBar)
 
@@ -940,6 +1011,9 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_FILE_REVERT, self.OnRevert)
         EVT_MENU(self, ID_FILE_SETTINGS, self.OnSettings)
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
+        EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
+        EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
+        EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
         EVT_MENU(self, ID_REFORMAT, self.OnReformat)
 
         EVT_CLOSE(self, self.OnCloseWindow)
@@ -1005,10 +1079,10 @@ class MyFrame(wxFrame):
         dlg.Destroy()
 
     def OnSave(self, event):
-        self.panel.ctrl.OnSave(event)
+        self.panel.ctrl.OnSave()
 
     def OnSaveAs(self, event):
-        self.panel.ctrl.OnSaveAs(event)
+        self.panel.ctrl.OnSaveAs()
 
     def OnClose(self, event = None):
         if not self.panel.ctrl.canBeClosed():
@@ -1021,16 +1095,25 @@ class MyFrame(wxFrame):
             self.panel.ctrl.updateScreen()
 
     def OnRevert(self, event):
-        self.panel.ctrl.OnRevert(event)
+        self.panel.ctrl.OnRevert()
 
     def OnSettings(self, event):
-        self.panel.ctrl.OnSettings(event)
+        self.panel.ctrl.OnSettings()
+
+    def OnCut(self, event):
+        self.panel.ctrl.OnCut()
+
+    def OnCopy(self, event):
+        self.panel.ctrl.OnCopy()
+
+    def OnPaste(self, event):
+        self.panel.ctrl.OnPaste()
+
+    def OnReformat(self, event):
+        self.panel.ctrl.OnReformat()
 
     def OnTypeCombo(self, event):
         self.panel.ctrl.OnTypeCombo(event)
-
-    def OnReformat(self, event):
-        self.panel.ctrl.OnReformat(event)
 
     def OnCloseWindow(self, event):
         doExit = True
