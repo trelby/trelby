@@ -10,6 +10,7 @@ class FindDlg(wxDialog):
                           style = wxDEFAULT_DIALOG_STYLE | wxWANTS_CHARS)
 
         self.ctrl = ctrl
+        self.didReplaces = False
         
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
@@ -353,7 +354,7 @@ class FindDlg(wxDialog):
                         self.ctrl.column = len(ls[self.ctrl.line].text)
 
             if diff != 0:
-                self.ctrl.findDlgDidReplaces = True
+                self.didReplaces = True
             
             self.OnFind(autoFind = autoFind)
 
