@@ -244,6 +244,7 @@ class MyCtrl(wxControl):
         self.clearVars()
         self.sp = sp
         self.setFile(fileName)
+        self.refreshCache()
 
     def saveFile(self, fileName):
         if util.writeToFile(fileName, self.sp.save(), mainFrame):
