@@ -205,6 +205,7 @@ class TitlesDlg(wxDialog):
         setattr(self, name.lower() + "Cb", cb)
         
     def OnOK(self, event):
+        self.titles.sort()
         self.EndModal(wxID_OK)
 
     def OnCancel(self, event):

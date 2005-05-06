@@ -37,6 +37,27 @@ class Titles:
 
             doc.add(pg)
 
+    # return a (rough) RTF fragment representation of title pages
+    def generateRTF(self):
+        s = util.String()
+
+        for page in self.pages:
+            for p in page:
+                s += p.generateRTF()
+
+            s += "\\page\n"
+
+        return str(s)
+
+    # sort the title strings in y,x order (makes editing them easier
+    # and RTF output better)
+    def sort(self):
+        def tmpfunc(a, b):
+            return cmp(a.y, b.y) or cmp(a.x, b.x)
+
+        for page in self.pages:
+            page.sort(tmpfunc)
+        
     def __eq__(self, other):
         if len(self.pages) != len(other.pages):
             return False
@@ -107,6 +128,24 @@ class TitleString:
         page.add(pml.TextOp(self.text, x, self.y, self.size,
                             self.getStyle(), align))
 
+    # return a (rough) RTF fragment representation of this string
+    def generateRTF(self):
+        tmp = "\\fs%d" % (self.size * 2)
+
+        if self.isCentered:
+            tmp += " \qc"
+
+        if self.isBold:
+            tmp += r" \b"
+
+        if self.isItalic:
+            tmp += r" \i"
+
+        if self.isUnderlined:
+            tmp += r" \ul"
+
+        return r"{\pard\plain%s %s}{\par}" % (tmp, util.escapeRTF(self.text))
+        
     # parse information from s, which must be a string created by __str__,
     # and set object state accordingly. keeps default settings on any
     # errors, does not throw any exceptions.

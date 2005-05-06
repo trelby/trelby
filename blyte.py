@@ -868,14 +868,18 @@ class MyCtrl(wxControl):
             return
         
         dlg = wxFileDialog(mainFrame, "Filename to export as",
-            misc.scriptDir, wildcard = "PDF|*.pdf|Formatted text|*.txt",
+            misc.scriptDir,
+            wildcard = "PDF|*.pdf|RTF|*.rtf|Formatted text|*.txt",
             style = wxSAVE | wxOVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wxID_OK:
             misc.scriptDir = dlg.GetDirectory()
-            
-            if dlg.GetFilterIndex() == 0:
+
+            choice = dlg.GetFilterIndex()
+            if choice == 0:
                 data = sp.generatePDF(not misc.license)
+            elif choice == 1:
+                data = sp.generateRTF()
             else:
                 data = self.getExportText(sp)
 

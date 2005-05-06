@@ -295,7 +295,8 @@ class Screenplay:
 
         sp.reformatAll()
         sp.paginate()
-
+        sp.titles.sort()
+        
         msgs = []
         
         if unknownLb:
@@ -354,8 +355,8 @@ class Screenplay:
     def saveCfg(self):
         return self.cfg.save()
         
-    # generate formatted text return it as a string. if 'dopages' is True,
-    # marks pagination in the output.
+    # generate formatted text and return it as a string. if 'dopages' is
+    # True, marks pagination in the output.
     def generateText(self, doPages):
         ls = self.lines
         
@@ -385,9 +386,98 @@ class Screenplay:
 
         return str(output)
 
-    # generate PDF file from given screenplay and return it as a string.
-    # assumes paginate/reformat is 100% correct for the screenplay. if
-    # addDs is True, add demo stamp to each page.
+    # generate RTF and return it as a string.
+    def generateRTF(self):
+        ls = self.lines
+        s = util.String()
+
+        s += r"{\rtf1\ansi\deff0{\fonttbl{\f0\fmodern Courier;}}" + "\n"
+
+        s+= "{\\stylesheet\n"
+
+        mt = util.mm2twips
+        fs = self.cfg.fontSize
+
+        # since some of our units (beforeSpacing, indent, width) are
+        # easier to handle if we assume normal font size, this is a scale
+        # factor from actual font size to normal font size
+        sf = fs / 12.0
+        
+        for ti in config.getTIs():
+            t = self.cfg.getType(ti.lt)
+            tt = t.export
+
+            # font size is expressed as font size * 2 in RTF
+            tmp = " \\fs%d" % (fs * 2)
+
+            if tt.isCaps:
+                tmp += r" \caps"
+
+            if tt.isBold:
+                tmp += r" \b"
+
+            if tt.isItalic:
+                tmp += r" \i"
+
+            if tt.isUnderlined:
+                tmp += r" \ul"
+
+            # some hairy conversions going on here...
+            tmp += r" \li%d\ri%d" % (sf * t.indent * 144,
+                mt(self.cfg.paperWidth) -
+                      (mt(self.cfg.marginLeft + self.cfg.marginRight) +
+                      (t.indent + t.width) * 144 * sf))
+
+            tmp += r" \sb%d" % (sf * t.beforeSpacing * 24)
+            
+            s += "{\\s%d%s %s}\n" % (ti.lt, tmp, ti.name)
+
+        s += "}\n"
+
+        s += r"\paperw%d\paperh%d\margt%d\margr%d\margb%d\margl%d" % (
+            mt(self.cfg.paperWidth), mt(self.cfg.paperHeight),
+            mt(self.cfg.marginTop), mt(self.cfg.marginRight),
+            mt(self.cfg.marginBottom), mt(self.cfg.marginLeft))
+        s += "\n"
+
+        s += self.titles.generateRTF()
+        
+        length = len(ls)
+        i = 0
+
+        magicslash = "OSKUSOFT-MAGIC-SLASH"
+        
+        while i < length:
+            lt = ls[i].lt
+            text = ""
+
+            while 1:
+                ln = ls[i]
+                i += 1
+
+                lb = ln.lb
+                text += ln.text
+                
+                if lb in (LB_SPACE, LB_SPACE2, LB_NONE):
+                    text += config.lb2str(lb)
+                elif lb == LB_FORCED:
+                    text += magicslash + "line "
+                elif lb == LB_LAST:
+                    break
+                else:
+                    raise error.MiscError("Unknown line break style %d"
+                                          " in generateRTF" % lb)
+            
+            s += (r"{\pard \s%d " % lt) + util.escapeRTF(text).replace(
+                magicslash, "\\") + "}{\\par}\n"
+
+        s += "}"
+
+        return str(s)
+
+    # generate PDF and return it as a string. assumes paginate/reformat is
+    # 100% correct for the screenplay. if addDs is True, add demo stamp to
+    # each page.
     def generatePDF(self, addDs):
         pager = mypager.Pager(self.cfg)
         self.titles.generatePages(pager.doc)

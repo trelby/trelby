@@ -222,6 +222,15 @@ def _decodeRepl(mo):
     else:
         return ""
 
+# return string s escaped for use in RTF.
+def escapeRTF(s):
+    return s.replace("\\", "\\\\").replace("{", r"\{").replace("}", r"\}")
+
+# convert mm to twips (1/1440 inch = 1/20 point).
+def mm2twips(mm):
+    # 56.69291 = 1440 / 25.4
+    return mm * 56.69291
+
 # return True if given font is a fixed-width one.
 def isFixedWidth(font):
     return getTextExtent(font, "iiiii")[0] == getTextExtent(font, "OOOOO")[0]
