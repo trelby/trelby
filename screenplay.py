@@ -1184,6 +1184,7 @@ class Screenplay:
 
         return line
 
+    # convert current element to given type
     def convertCurrentTo(self, lt):
         ls = self.lines
         first, last = self.getElemIndexes()

@@ -424,7 +424,8 @@ class MyCtrl(wxControl):
         
         cfgGl.recalc()
         refreshGuiConfig()
-
+        mainFrame.updateKbdCommands()
+        
         for c in mainFrame.getCtrls():
             c.sp.cfgGl = cfgGl
             c.refreshCache()
@@ -635,8 +636,8 @@ class MyCtrl(wxControl):
         return True
 
     # page up (dir == -1) or page down (dir == 1) was pressed, handle it.
-    # cs = CommandState. ev = the key event.
-    def pageCmd(self, cs, ev, dir):
+    # cs = CommandState.
+    def pageCmd(self, cs, dir):
         if self.sp.autoComp:
             cs.doAutoComp = cs.AC_KEEP
             self.sp.pageScrollAutoComp(dir)
@@ -653,7 +654,7 @@ class MyCtrl(wxControl):
 
             return
 
-        self.sp.maybeMark(ev.ShiftDown())
+        self.sp.maybeMark(cs.mark)
         gd.vm.pageCmd(self, cs, dir, texts, dpages)
 
     def OnRevert(self):
@@ -914,120 +915,131 @@ class MyCtrl(wxControl):
             self.applyCfg(dlg.cfg)
 
         dlg.Destroy()
+
+    def cmdAbort(self, cs):
+        self.sp.abortCmd(cs)
+
+    def cmdChangeToAction(self, cs):
+        self.sp.toActionCmd(cs)
+
+    def cmdChangeToCharacter(self, cs):
+        self.sp.toCharacterCmd(cs)
+
+    def cmdChangeToDialogue(self, cs):
+        self.sp.toDialogueCmd(cs)
+
+    def cmdChangeToNote(self, cs):
+        self.sp.toNoteCmd(cs)
+
+    def cmdChangeToParenthetical(self, cs):
+        self.sp.toParenCmd(cs)
+
+    def cmdChangeToScene(self, cs):
+        self.sp.toSceneCmd(cs)
+
+    def cmdChangeToShot(self, cs):
+        self.sp.toShotCmd(cs)
+
+    def cmdChangeToTransition(self, cs):
+        self.sp.toTransitionCmd(cs)
+
+    def cmdDelete(self, cs):
+        if not self.sp.mark:
+            self.sp.deleteForwardCmd(cs)
+        else:
+            self.OnCut(doUpdate = False, copyToClip = False)
+
+    def cmdDeleteBackward(self, cs):
+        self.sp.deleteBackwardCmd(cs)
+
+    def cmdFindNextError(self, cs):
+        self.OnFindError()
         
+    def cmdForcedLineBreak(self, cs):
+        self.sp.insertForcedLineBreakCmd(cs)
+
+    def cmdMoveDown(self, cs):
+        self.sp.moveDownCmd(cs)
+
+    def cmdMoveEndOfLine(self, cs):
+        self.sp.moveLineEndCmd(cs)
+
+    def cmdMoveEndOfScript(self, cs):
+        self.sp.moveEndCmd(cs)
+
+    def cmdMoveLeft(self, cs):
+        self.sp.moveLeftCmd(cs)
+
+    def cmdMovePageDown(self, cs):
+        self.pageCmd(cs, 1)
+        
+    def cmdMovePageUp(self, cs):
+        self.pageCmd(cs, -1)
+
+    def cmdMoveRight(self, cs):
+        self.sp.moveRightCmd(cs)
+
+    def cmdMoveSceneDown(self, cs):
+        self.sp.moveSceneDownCmd(cs)
+
+    def cmdMoveSceneUp(self, cs):
+        self.sp.moveSceneUpCmd(cs)
+
+    def cmdMoveStartOfLine(self, cs):
+        self.sp.moveLineStartCmd(cs)
+
+    def cmdMoveStartOfScript(self, cs):
+        self.sp.moveStartCmd(cs)
+
+    def cmdMoveUp(self, cs):
+        self.sp.moveUpCmd(cs)
+
+    def cmdNewElement(self, cs):
+        self.sp.splitElementCmd(cs)
+
+    def cmdSelectScene(self, cs):
+        self.sp.selectSceneCmd(cs)
+
+    def cmdSetMark(self, cs):
+        self.sp.setMarkCmd(cs)
+
+    def cmdTab(self, cs):
+        self.sp.tabCmd(cs)
+
+    def cmdTabPrev(self, cs):
+        self.sp.toPrevTypeTabCmd(cs)
+
     def OnKeyChar(self, ev):
         kc = ev.GetKeyCode()
-        
+
         #print "kc: %d, ctrl/alt/shift: %d, %d, %d" %\
         #      (kc, ev.ControlDown(), ev.AltDown(), ev.ShiftDown())
         
         cs = screenplay.CommandState()
         cs.mark = bool(ev.ShiftDown())
-        
-        # 10 == CTRL+Enter under wxMSW
-        if (kc == WXK_RETURN) or (kc == 10):
-            if ev.ShiftDown() or ev.ControlDown():
-                self.sp.insertForcedLineBreakCmd(cs)
-            else:
-                self.sp.splitElementCmd(cs)
 
-        elif kc == WXK_BACK:
-            self.sp.deleteBackwardCmd(cs)
-
-        elif kc == WXK_DELETE:
-            if not self.sp.mark:
-                self.sp.deleteForwardCmd(cs)
-            else:
-                self.OnCut(doUpdate = False, copyToClip = False)
-
-        elif ev.ControlDown():
-            if kc == WXK_SPACE:
-                self.sp.setMarkCmd(cs)
-                
-            elif kc == WXK_HOME:
-                self.sp.moveStartCmd(cs)
-                
-            elif kc == WXK_END:
-                self.sp.moveEndCmd(cs)
-                
-            elif kc == WXK_UP:
-                self.sp.moveSceneUpCmd(cs)
-                
-            elif kc == WXK_DOWN:
-                self.sp.moveSceneDownCmd(cs)
-                
-            else:
-                ev.Skip()
-                return
-                
-        elif kc == WXK_LEFT:
-            self.sp.moveLeftCmd(cs)
-            
-        elif kc == WXK_RIGHT:
-            self.sp.moveRightCmd(cs)
-            
-        elif kc == WXK_DOWN:
-            self.sp.moveDownCmd(cs)
-                        
-        elif kc == WXK_UP:
-            self.sp.moveUpCmd(cs)
-            
-        elif kc == WXK_HOME:
-            self.sp.moveLineStartCmd(cs)
-            
-        elif kc == WXK_END:
-            self.sp.moveLineEndCmd(cs)
-
-        elif kc in (WXK_PRIOR, WXK_PAGEUP):
-            self.pageCmd(cs, ev, -1)
-
-        elif kc in (WXK_NEXT, WXK_PAGEDOWN):
-            self.pageCmd(cs, ev, 1)
-            
-        elif ev.AltDown() and (kc < 256):
-            ch = chr(kc).upper()
-
-            if ch == "S":
-                self.sp.toSceneCmd(cs)
-            elif ch == "A":
-                self.sp.toActionCmd(cs)
-            elif ch == "C":
-                self.sp.toCharacterCmd(cs)
-            elif ch == "D":
-                self.sp.toDialogueCmd(cs)
-            elif ch == "P":
-                self.sp.toParenCmd(cs)
-            elif ch == "T":
-                self.sp.toTransitionCmd(cs)
-            elif ch == "N":
-                self.sp.toNoteCmd(cs)
-            else:
-                ev.Skip()
-                return
-            
-        elif kc == WXK_TAB:
-            if not ev.ShiftDown():
-                self.sp.tabCmd(cs)
-            else:
-                self.sp.toPrevTypeTabCmd(cs)
-
-        elif kc == WXK_ESCAPE:
-            self.sp.abortCmd(cs)
-
-        # debug stuff
-        elif misc.isTest and (kc < 256) and (chr(kc) == "å"):
-            self.loadFile("sample.blyte")
-        elif misc.isTest and (kc < 256) and (chr(kc) == "¤"):
-            pass
-
-        elif util.isValidInputChar(kc):
+        if not ev.ControlDown() and not ev.AltDown() and \
+               util.isValidInputChar(kc):
             cs.char = chr(kc)
-            
-            self.sp.addCharCmd(cs)
 
+            if misc.isTest and (cs.char == "å"):
+                self.loadFile("sample.blyte")
+            elif misc.isTest and (cs.char == "¤"):
+                self.OnCfg()
+                pass
+            else:
+                self.sp.addCharCmd(cs)
+                
         else:
-            ev.Skip()
-            return
+            cmd = mainFrame.kbdCommands.get(util.Key(kc,
+                ev.ControlDown(), ev.AltDown(), ev.ShiftDown()).toInt())
+
+            if cmd:
+                #print "cmd %s (%s)" % (cmd.name, cmd.desc)
+                getattr(self, "cmd" + cmd.name)(cs)
+            else:
+                ev.Skip()
+                return
 
         self.sp.cmdPost(cs)
         
@@ -1350,7 +1362,7 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_COPY_TO_CB, "C&opy to clipboard")
         editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste from clipboard")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene\tCTRL-A")
+        editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
         editMenu.AppendSeparator()
@@ -1380,7 +1392,7 @@ class MyFrame(wxFrame):
         viewMenu.AppendCheckItem(ID_VIEW_SHOW_FORMATTING, "&Show formatting")
         
         scriptMenu = wxMenu()
-        scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error\tCTRL-E")
+        scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error")
         scriptMenu.Append(ID_SCRIPT_PAGINATE, "&Paginate")
         scriptMenu.AppendSeparator()
         scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
@@ -1526,6 +1538,7 @@ class MyFrame(wxFrame):
         self.Layout()
         
     def init(self):
+        self.updateKbdCommands()
         self.panel = self.createNewPanel()
 
     def mySetIcons(self):
@@ -1670,6 +1683,22 @@ class MyFrame(wxFrame):
 
                 wxMessageBox("License successfully updated.",
                              "Information", wxOK, frame)
+
+    def updateKbdCommands(self):
+        cfgGl.addShiftKeys()
+        
+        if cfgGl.getConflictingKeys() != None:
+            wxMessageBox("You have at least one key bound to more than one\n"
+                         "command. The program will not work correctly until\n"
+                         "you fix this.",
+                         "Warning", wxOK, self)
+
+        self.kbdCommands = {}
+
+        for cmd in cfgGl.commands:
+            if not cmd.isFixedMenu:
+                for key in cmd.keys:
+                    self.kbdCommands[key] = cmd
         
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
@@ -1911,7 +1940,7 @@ class MyFrame(wxFrame):
         self.panel.ctrl.OnCompareScripts()
 
     def OnHelpCommands(self, event):
-        dlg = commandsdlg.CommandsDlg()
+        dlg = commandsdlg.CommandsDlg(cfgGl)
         dlg.Show()
 
     def OnHelpManual(self, event):

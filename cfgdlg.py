@@ -7,8 +7,7 @@ import os.path
 
 from wxPython.wx import *
 
-# stupid hack to get correct window modality stacking for message box
-# windows
+# stupid hack to get correct window modality stacking for dialogs
 cfgFrame = None
 
 # we can delete this when/if we switch to using wxListBook in wxwidgets
@@ -78,6 +77,7 @@ class CfgDlg(wxDialog):
             self.AddPage(ColorsPanel, "Colors")
             self.AddPage(DisplayPanel, "Display")
             self.AddPage(ElementsGlobalPanel, "Elements")
+            self.AddPage(KeyboardPanel, "Keyboard")
             self.AddPage(MiscPanel, "Misc")
         else:
             self.AddPage(AutoCompPanel, "Auto-completion")
@@ -90,7 +90,8 @@ class CfgDlg(wxDialog):
         hsizer.SetItemMinSize(self.panel, *size)
         self.listbook.SetPageSizes(*size)
 
-        self.listbook.SetSelection(0)
+        # FIXME
+        self.listbook.SetSelection(3)
 
         # it's unclear whether SetSelection sends an event on all
         # platforms or not, so force correct action.
@@ -853,6 +854,126 @@ class FormattingPanel(wxPanel):
         self.marginsCb.SetValue(self.cfg.pdfShowMargins)
         self.lineNumbersCb.SetValue(self.cfg.pdfShowLineNumbers)
 
+class KeyboardPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        vsizer = wxBoxSizer(wxVERTICAL)
+        
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        vsizer2 = wxBoxSizer(wxVERTICAL)
+
+        vsizer2.Add(wxStaticText(self, -1, "Commands:"))
+
+        self.commandsLb = wxListBox(self, -1, size = (175, 50))
+
+        for cmd in self.cfg.commands:
+            self.commandsLb.Append(cmd.name, cmd)
+
+        vsizer2.Add(self.commandsLb, 1)
+
+        hsizer.Add(vsizer2, 0, wxEXPAND | wxRIGHT, 15)
+
+        vsizer2 = wxBoxSizer(wxVERTICAL)
+
+        vsizer2.Add(wxStaticText(self, -1, "Keys:"))
+
+        self.keysLb = wxListBox(self, -1, size = (150, 60))
+        vsizer2.Add(self.keysLb, 1, wxBOTTOM, 10)
+        
+        btn = wxButton(self, -1, "Add")
+        EVT_BUTTON(self, btn.GetId(), self.OnAdd)
+        vsizer2.Add(btn, 0, wxALIGN_CENTER | wxBOTTOM, 10)
+        self.addBtn = btn
+        
+        btn = wxButton(self, -1, "Delete")
+        EVT_BUTTON(self, btn.GetId(), self.OnDelete)
+        vsizer2.Add(btn, 0, wxALIGN_CENTER | wxBOTTOM, 10)
+        self.deleteBtn = btn
+
+        vsizer2.Add(wxStaticText(self, -1, "Description:"))
+
+        self.descEntry = wxTextCtrl(self, -1,
+            style = wxTE_MULTILINE | wxTE_READONLY, size = (150, 75))
+        vsizer2.Add(self.descEntry, 1, wxEXPAND)
+        
+        hsizer.Add(vsizer2, 0, wxEXPAND | wxBOTTOM, 10)
+
+        vsizer.Add(hsizer)
+
+        vsizer.Add(wxStaticText(self, -1, "Conflicting keys:"), 0, wxTOP, 10)
+
+        self.conflictsEntry = wxTextCtrl(self, -1,
+            style = wxTE_MULTILINE | wxTE_READONLY, size = (50, 75))
+        vsizer.Add(self.conflictsEntry, 1, wxEXPAND)
+        
+        util.finishWindow(self, vsizer, center = False)
+
+        EVT_LISTBOX(self, self.commandsLb.GetId(), self.OnCommandLb)
+        self.commandsLb.SetSelection(0)
+        self.OnCommandLb()
+
+    def OnCommandLb(self, event = None):
+        self.cmd = self.commandsLb.GetClientData(self.commandsLb.
+                                                 GetSelection())
+        self.cfg2gui()
+
+    def OnAdd(self, event):
+        dlg = misc.KeyDlg(cfgFrame, self.cmd.name)
+
+        key = None
+        if dlg.ShowModal() == wxID_OK:
+            key = dlg.key
+        dlg.Destroy()
+
+        if key:
+            kint = key.toInt()
+            if kint in self.cmd.keys:
+                wxMessageBox("The key is already bound to this command.",
+                             "Error", wxOK, cfgFrame)
+
+                return
+
+            if key.isValidInputChar():
+                wxMessageBox("You can't bind input characters to commands.",
+                             "Error", wxOK, cfgFrame)
+
+                return
+                
+            self.cmd.keys.append(kint)
+            self.cfg2gui()
+
+    def OnDelete(self, event):
+        sel = self.keysLb.GetSelection()
+        if sel != -1:
+            key = self.keysLb.GetClientData(sel)
+            self.cfg.removeKey(self.cmd, key)
+            self.cfg2gui()
+        
+    def cfg2gui(self):
+        self.cfg.addShiftKeys()
+        self.keysLb.Clear()
+        
+        for key in self.cmd.keys:
+            k = util.Key.fromInt(key)
+            self.keysLb.Append(k.toStr(), key)
+
+        self.addBtn.Enable(not self.cmd.isFixed)
+        self.deleteBtn.Enable(not self.cmd.isFixed)
+        
+        s = self.cmd.desc
+        self.descEntry.SetValue(s)
+        self.updateConflicts()
+
+    def updateConflicts(self):
+        s = self.cfg.getConflictingKeys()
+        if s == None:
+            s = "None"
+
+        self.conflictsEntry.SetValue(s)
+        
 class MiscPanel(wxPanel):
     def __init__(self, parent, id, cfg):
         wxPanel.__init__(self, parent, id)

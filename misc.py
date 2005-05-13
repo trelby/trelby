@@ -308,3 +308,34 @@ def showText(parent, text, title = "Message"):
     dlg = TextDlg(parent, text, title)
     dlg.ShowModal()
     dlg.Destroy()
+
+# asks the user for a keypress and stores it.
+class KeyDlg(wxDialog):
+    def __init__(self, parent, cmdName):
+        wxDialog.__init__(self, parent, -1, "Key capture",
+                          style = wxDEFAULT_DIALOG_STYLE)
+
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        vsizer.Add(wxStaticText(self, -1, "Press the key combination you\n"
+            "want to bind to the command\n'%s'." % cmdName))
+
+        tmp = KeyDlgWidget(self, -1, (1, 1))
+        vsizer.Add(tmp)
+
+        util.finishWindow(self, vsizer)
+
+        tmp.SetFocus()
+
+# used by KeyDlg
+class KeyDlgWidget(wxWindow):
+    def __init__(self, parent, id, size):
+        wxWindow.__init__(self, parent, id, size = size,
+                          style = wxWANTS_CHARS)
+
+        EVT_CHAR(self, self.OnKeyChar)
+
+    def OnKeyChar(self, ev):
+        p = self.GetParent()
+        p.key = util.Key.fromKE(ev)
+        p.EndModal(wxID_OK)

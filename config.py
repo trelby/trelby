@@ -7,6 +7,7 @@ import mypickle
 import screenplay
 import util
 
+import copy
 from wxPython.wx import *
 
 # mapping from character to linebreak
@@ -182,6 +183,86 @@ class TypeGlobal:
         prefix += "%s/" % self.ti.name
         
         self.cvars.load(vals, prefix, self)
+
+# command (an action in the main program)
+class Command:
+    cvars = None
+
+    def __init__(self, name, desc, defKeys = [], isMovement = False,
+                 isFixed = False, isFixedMenu = False):
+        # name, e.g. "MoveLeft"
+        self.name = name
+
+        # textual description
+        self.desc = desc
+
+        # default keys (list of serialized util.Key objects (ints))
+        self.defKeys = defKeys
+
+        # is this a movement command
+        self.isMovement = isMovement
+
+        # some commands & their keys (Tab, Enter, etc) are fixed and can't
+        # be changed
+        self.isFixed = isFixed
+        
+        # some menu commands (Open, Save, etc) are handled separately
+        self.isFixedMenu = isFixedMenu
+        if self.isFixedMenu:
+            self.isFixed = True
+        
+        if not self.__class__.cvars:
+            v = self.__class__.cvars = mypickle.Vars()
+
+            v.addList("keys", [], "Keys",
+                      mypickle.IntVar("", 0, "", 0, 9223372036854775808L))
+            
+            v.makeDicts()
+
+        # this is not actually needed but let's keep it for consistency
+        self.__class__.cvars.setDefaults(self)
+
+        self.keys = copy.deepcopy(self.defKeys)
+
+    def save(self, prefix):
+        if self.isFixed:
+            return ""
+        
+        prefix += "%s/" % self.name
+
+        if len(self.keys) > 0:
+            return self.cvars.save(prefix, self)
+        else:
+            self.keys.append(0)
+            s = self.cvars.save(prefix, self)
+            self.keys = []
+
+            return s
+
+    def load(self, vals, prefix):
+        if self.isFixed:
+            return
+
+        prefix += "%s/" % self.name
+
+        tmp = copy.deepcopy(self.keys)
+        self.cvars.load(vals, prefix, self)
+
+        if len(self.keys) == 0:
+            # we have a new command in the program not found in the old
+            # config file
+            self.keys = tmp
+        elif self.keys[0] == 0:
+            self.keys = []
+
+        # weed out invalid bindings
+        tmp2 = self.keys
+        self.keys = []
+        
+        for k in tmp2:
+            k2 = util.Key.fromInt(k)
+            if not k2.isValidInputChar():
+                self.keys.append(k)
 
 # information about one screen font
 class FontInfo:
@@ -445,6 +526,143 @@ class ConfigGlobal:
         t.prevTypeTab = screenplay.CHARACTER
         self.types[t.lt] = t
 
+        # FIXME: add all other commands
+        
+        # keyboard commands
+        self.commands = [
+            Command("Abort", "Abort something, e.g. selection,"
+                    " auto-completion, etc.", [WXK_ESCAPE], isFixed = True),
+
+            Command("ChangeToAction", "Change element style to action.",
+                    [util.Key(ord("A"), alt = True).toInt()]),
+
+            Command("ChangeToCharacter", "Change element style to character.",
+                    [util.Key(ord("C"), alt = True).toInt()]),
+
+            Command("ChangeToDialogue", "Change element style to dialogue.",
+                    [util.Key(ord("D"), alt = True).toInt()]),
+
+            Command("ChangeToNote", "Change element style to note.",
+                    [util.Key(ord("N"), alt = True).toInt()]),
+
+            Command("ChangeToParenthetical", "Change element style to"
+                    " parenthetical.",
+                    [util.Key(ord("P"), alt = True).toInt()]),
+
+            Command("ChangeToScene", "Change element style to scene.",
+                    [util.Key(ord("S"), alt = True).toInt()]),
+
+            Command("ChangeToShot", "Change element style to shot."),
+
+            Command("ChangeToTransition", "Change element style to"
+                    " transition.",
+                    [util.Key(ord("T"), alt = True).toInt()]),
+
+            Command("Copy", "Copy selected text.",
+                    [util.Key(3, ctrl = True).toInt()],
+                    isFixedMenu = True),
+
+            Command("Cut", "Cut selected text.",
+                    [util.Key(24, ctrl = True).toInt()],
+                    isFixedMenu = True),
+
+            Command("Delete", "Delete the character under the cursor,"
+                    " or selected text.", [WXK_DELETE], isFixed = True),
+            
+            Command("DeleteBackward", "Delete the character behind the"
+                    " cursor.", [WXK_BACK], isFixed = True),
+
+            Command("FindAndReplaceDlg", "Open the 'Find & Replace' dialog.",
+                    [util.Key(6, ctrl = True).toInt()],
+                    isFixedMenu = True),
+
+            Command("FindNextError", "Find next error in the script.",
+                    [util.Key(5, ctrl = True).toInt()]),
+            
+            Command("ForcedLineBreak", "Insert a forced line break.",
+                    [util.Key(WXK_RETURN, ctrl = True).toInt(),
+                     util.Key(WXK_RETURN, shift = True).toInt(),
+
+                     # CTRL+Enter under wxMSW
+                     util.Key(10, ctrl = True).toInt()],
+                    isFixed = True),
+
+            Command("MoveDown", "Move down.", [WXK_DOWN], isMovement = True),
+            
+            Command("MoveEndOfLine", "Move to the end of the line or"
+                    " finish auto-completion.",
+                    [WXK_END], isMovement = True),
+            
+            Command("MoveEndOfScript", "Move to the end of the script.",
+                    [util.Key(WXK_END, ctrl = True).toInt()],
+                    isMovement = True),
+            
+            Command("MoveLeft", "Move left.", [WXK_LEFT], isMovement = True),
+            
+            Command("MovePageDown", "Move one page down.",
+                    [WXK_NEXT, WXK_PAGEDOWN], isMovement = True),
+            
+            Command("MovePageUp", "Move one page up.",
+                    [WXK_PRIOR, WXK_PAGEUP], isMovement = True),
+            
+            Command("MoveRight", "Move right.", [WXK_RIGHT],
+                    isMovement = True),
+            
+            Command("MoveSceneDown", "Move one scene down.",
+                    [util.Key(WXK_DOWN, ctrl = True).toInt()],
+                    isMovement = True),
+            
+            Command("MoveSceneUp", "Move one scene up.",
+                    [util.Key(WXK_UP, ctrl = True).toInt()],
+                    isMovement = True),
+            
+            Command("MoveStartOfLine", "Move to the start of the line.",
+                    [WXK_HOME], isMovement = True),
+            
+            Command("MoveStartOfScript", "Move to the start of the"
+                    " script.",
+                    [util.Key(WXK_HOME, ctrl = True).toInt()],
+                    isMovement = True),
+            
+            Command("MoveUp", "Move up.", [WXK_UP], isMovement = True),
+
+            Command("NewElement", "Create new element.", [WXK_RETURN],
+                    isFixed = True),
+
+            Command("OpenScript", "Open script.",
+                    [util.Key(15, ctrl = True).toInt()],
+                    isFixedMenu = True),
+
+            Command("Paste", "Paste text from internal clipboard.",
+                    [util.Key(22, ctrl = True).toInt()],
+                    isFixedMenu = True),
+
+            Command("PrintScript", "Print script.",
+                    [util.Key(16, ctrl = True).toInt()],
+                    isFixedMenu = True),
+
+            Command("Quit", "Quit the program.",
+                    [util.Key(17, ctrl = True).toInt()],
+                    isFixedMenu = True),
+
+            Command("SaveScript", "Save script.",
+                    [util.Key(19, ctrl = True).toInt()],
+                    isFixedMenu = True),
+
+            Command("SelectScene", "Select the current scene.",
+                    [util.Key(1, ctrl = True).toInt()]),
+            
+            Command("SetMark", "Set mark.",
+                    [util.Key(WXK_SPACE, ctrl = True).toInt()]),
+            
+            Command("Tab", "Change element to the next style or create"
+                    " a new element.", [WXK_TAB], isFixed = True),
+
+            Command("TabPrev", "Change element to the previous style.",
+                    [util.Key(WXK_TAB, shift = True).toInt()],
+                    isFixed = True)
+            ]
+
         self.recalc()
 
     def setupVars(self):
@@ -540,6 +758,9 @@ class ConfigGlobal:
         for t in self.types.itervalues():
             t.load(vals, "Element/")
 
+        for cmd in self.commands:
+            cmd.load(vals, "Command/")
+
         self.recalc()
         
     # save config into a string and return that.
@@ -549,6 +770,9 @@ class ConfigGlobal:
         for t in self.types.itervalues():
             s += t.save("Element/")
             
+        for cmd in self.commands:
+            s += cmd.save("Command/")
+
         return s
             
     # fix up all invalid config values.
@@ -558,6 +782,62 @@ class ConfigGlobal:
 
     def getType(self, lt):
         return self.types[lt]
+
+    # add SHIFT+Key alias for all keys bound to movement commands, so
+    # selection-movement works.
+    def addShiftKeys(self):
+        for cmd in self.commands:
+            if cmd.isMovement:
+                nk = []
+                
+                for key in cmd.keys:
+                    k = util.Key.fromInt(key)
+                    k.shift = True
+                    ki = k.toInt()
+                    
+                    if ki not in cmd.keys:
+                        nk.append(ki)
+
+                cmd.keys.extend(nk)
+
+    # remove key (int) from given cmd
+    def removeKey(self, cmd, key):
+        cmd.keys.remove(key)
+
+        if cmd.isMovement:
+            k = util.Key.fromInt(key)
+            k.shift = True
+            ki = k.toInt()
+
+            if ki in cmd.keys:
+                cmd.keys.remove(ki)
+
+    # get textual description of conflicting keys, or None if no
+    # conflicts.
+    def getConflictingKeys(self):
+        keys = {}
+        
+        for cmd in self.commands:
+            for key in cmd.keys:
+                if key in keys:
+                    keys[key].append(cmd.name)
+                else:
+                    keys[key] = [cmd.name]
+
+        s = ""
+        for k, v in keys.iteritems():
+            if len(v) > 1:
+                s += "%s:" % util.Key.fromInt(k).toStr()
+
+                for cmd in v:
+                    s += " %s" % cmd
+
+                s += "\n"
+
+        if s == "":
+            return None
+        else:
+            return s
 
 # config stuff that are wxwindows objects, so can't be in normal
 # ConfigGlobal (deepcopy dies)

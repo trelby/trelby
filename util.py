@@ -441,6 +441,192 @@ class MyKeyEvent:
     def Skip(self):
         pass
 
+# one key press
+class Key:
+    keyMap = {
+        1 : "A",
+        2 : "B",
+        3 : "C",
+        4 : "D",
+        5 : "E",
+        6 : "F",
+        7 : "G",
+
+        # CTRL+Enter = 10 in Windows
+        10 : "Enter (Windows)",
+        
+        11 : "K",
+        12 : "L",
+        14 : "N",
+        15 : "O",
+        16 : "P",
+        17 : "Q",
+        18 : "R",
+        19 : "S",
+        20 : "T",
+        21 : "U",
+        22 : "V",
+        23 : "W",
+        24 : "X",
+        25 : "Y",
+        26 : "Z",
+        WXK_BACK : "Backspace",
+        WXK_TAB : "Tab",
+        WXK_RETURN : "Enter",
+        WXK_ESCAPE : "Escape",
+        WXK_DELETE : "Delete",
+        WXK_PRIOR : "Page up",
+        WXK_NEXT : "Page down",
+        WXK_END : "End",
+        WXK_HOME : "Home",
+        WXK_LEFT : "Left",
+        WXK_UP : "Up",
+        WXK_RIGHT : "Right",
+        WXK_DOWN : "Down",
+        WXK_SELECT : "Select",
+        WXK_INSERT : "Insert",
+        WXK_NUMPAD0 : "Numpad0",
+        WXK_NUMPAD1 : "Numpad1",
+        WXK_NUMPAD2 : "Numpad2",
+        WXK_NUMPAD3 : "Numpad3",
+        WXK_NUMPAD4 : "Numpad4",
+        WXK_NUMPAD5 : "Numpad5",
+        WXK_NUMPAD6 : "Numpad6",
+        WXK_NUMPAD7 : "Numpad7",
+        WXK_NUMPAD8 : "Numpad8",
+        WXK_NUMPAD9 : "Numpad9",
+        WXK_MULTIPLY : "Multiply",
+        WXK_ADD : "Add",
+        WXK_SEPARATOR : "Separator",
+        WXK_SUBTRACT : "Subtract",
+        WXK_DECIMAL : "Decimal",
+        WXK_DIVIDE : "Divide",
+        WXK_F1 : "F1",
+        WXK_F2 : "F2",
+        WXK_F3 : "F3",
+        WXK_F4 : "F4",
+        WXK_F5 : "F5",
+        WXK_F6 : "F6",
+        WXK_F7 : "F7",
+        WXK_F8 : "F8",
+        WXK_F9 : "F9",
+        WXK_F10 : "F10",
+        WXK_F11 : "F11",
+        WXK_F12 : "F12",
+        WXK_F13 : "F13",
+        WXK_F14 : "F14",
+        WXK_F15 : "F15",
+        WXK_F16 : "F16",
+        WXK_F17 : "F17",
+        WXK_F18 : "F18",
+        WXK_F19 : "F19",
+        WXK_F20 : "F20",
+        WXK_F21 : "F21",
+        WXK_F22 : "F22",
+        WXK_F23 : "F23",
+        WXK_F24 : "F24",
+        WXK_NUMLOCK : "Numlock",
+        WXK_SCROLL : "Scroll",
+        WXK_PAGEUP : "Page up (Mac)",
+        WXK_PAGEDOWN : "Page down (Mac)",
+        WXK_NUMPAD_SPACE : "Numpad_space",
+        WXK_NUMPAD_TAB : "Numpad_tab",
+        WXK_NUMPAD_ENTER : "Numpad_enter",
+        WXK_NUMPAD_F1 : "Numpad_f1",
+        WXK_NUMPAD_F2 : "Numpad_f2",
+        WXK_NUMPAD_F3 : "Numpad_f3",
+        WXK_NUMPAD_F4 : "Numpad_f4",
+        WXK_NUMPAD_HOME : "Numpad_home",
+        WXK_NUMPAD_LEFT : "Numpad_left",
+        WXK_NUMPAD_UP : "Numpad_up",
+        WXK_NUMPAD_RIGHT : "Numpad_right",
+        WXK_NUMPAD_DOWN : "Numpad_down",
+        WXK_NUMPAD_PRIOR : "Numpad_prior",
+        WXK_NUMPAD_PAGEUP : "Numpad_pageup",
+        WXK_NUMPAD_NEXT : "Numpad_next",
+        WXK_NUMPAD_PAGEDOWN : "Numpad_pagedown",
+        WXK_NUMPAD_END : "Numpad_end",
+        WXK_NUMPAD_BEGIN : "Numpad_begin",
+        WXK_NUMPAD_INSERT : "Numpad_insert",
+        WXK_NUMPAD_DELETE : "Numpad_delete",
+        WXK_NUMPAD_EQUAL : "Numpad_equal",
+        WXK_NUMPAD_MULTIPLY : "Numpad_multiply",
+        WXK_NUMPAD_ADD : "Numpad_add",
+        WXK_NUMPAD_SEPARATOR : "Numpad_separator",
+        WXK_NUMPAD_SUBTRACT : "Numpad_subtract",
+        WXK_NUMPAD_DECIMAL : "Numpad_decimal",
+        WXK_NUMPAD_DIVIDE : "Numpad_divide"
+        }
+
+    def __init__(self, kc, ctrl = False, alt = False, shift = False):
+
+        # we don't want to handle ALT+a/ALT+A etc separately, so uppercase
+        # input char combinations
+        if (kc < 256) and (ctrl or alt):
+            kc = ord(upper(chr(kc)))
+
+        # ASCII/Latin-1 keycode (0-255) or one of the WXK_ constants (>255)
+        self.kc = kc
+
+        self.ctrl = ctrl
+        self.alt = alt
+        self.shift = shift
+
+    # returns True if key is a valid input character
+    def isValidInputChar(self):
+        return not self.ctrl and not self.alt and isValidInputChar(self.kc)
+
+    # toInt/fromInt serialize/deserialize to/from a 35-bit integer, laid
+    # out like this:
+    # bits 0-31:  keycode
+    #        32:  Control
+    #        33:  Alt
+    #        34:  Shift
+    
+    def toInt(self):
+        return (self.kc & 0xFFFFFFFFL) | (self.ctrl << 32L) | \
+               (self.alt << 33L) | (self.shift << 34L)
+
+    def fromInt(val):
+        return Key(val & 0xFFFFFFFFL, (val >> 32) & 1, (val >> 33) & 1,
+                   (val >> 34) & 1)
+
+    fromInt = staticmethod(fromInt)
+
+    # construct from wxKeyEvent
+    def fromKE(ev):
+        return Key(ev.GetKeyCode(), ev.ControlDown(), ev.AltDown(),
+                   ev.ShiftDown())
+
+    fromKE = staticmethod(fromKE)
+
+    def toStr(self):
+        s = ""
+
+        if self.ctrl:
+            s += "CTRL+"
+
+        if self.alt:
+            s += "ALT+"
+
+        if self.shift:
+            s += "SHIFT+"
+
+        if isValidInputChar(self.kc):
+            if self.kc == WXK_SPACE:
+                s += "Space"
+            else:
+                s += chr(self.kc)
+        else:
+            kname = self.__class__.keyMap.get(self.kc)
+
+            if kname:
+                s += kname
+            else:
+                s += "UNKNOWN(%d)" % self.kc
+
+        return s
+
 # a string-like object that features reasonably fast repeated appends even
 # for large strings, since it keeps each appended string as an item in a
 # list.
