@@ -4,11 +4,10 @@ import xml.sax.saxutils as xss
 from wxPython.wx import *
 from wxPython.html import *
 
-class CommandsDlg(wxDialog):
+class CommandsDlg(wxFrame):
     def __init__(self, cfgGl):
-        wxDialog.__init__(self, None, -1, "Commands",
-                          size = (650, 600),
-                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+        wxFrame.__init__(self, None, -1, "Commands",
+                         size = (650, 600), style = wxDEFAULT_FRAME_STYLE)
 
         self.Center()
         
@@ -34,7 +33,7 @@ class CommandsDlg(wxDialog):
 
         s += "</table>"
         
-        html = """
+        self.html = """
 <html><head></head><body>
 
 %s
@@ -57,16 +56,34 @@ R                      Replace
         htmlWin = wxHtmlWindow(self)
         rep = htmlWin.GetInternalRepresentation()
         rep.SetIndent(0, wxHTML_INDENT_BOTTOM)
-        htmlWin.SetPage(html)
+        htmlWin.SetPage(self.html)
         htmlWin.SetFocus()
         
         vsizer.Add(htmlWin, 1, wxEXPAND)
 
-        # FIXME: add button for saving the html to a file
-        
+        id = wxNewId()
+        menu = wxMenu()
+        menu.Append(id, "&Save as...")
+
+        mb = wxMenuBar()
+        mb.Append(menu, "&File")
+        self.SetMenuBar(mb)
+
+        EVT_MENU(self, id, self.OnSave)
+
         self.Layout()
 
         EVT_CLOSE(self, self.OnCloseWindow)
 
     def OnCloseWindow(self, event):
         self.Destroy()
+
+    def OnSave(self, event):
+        dlg = wxFileDialog(self, "Filename to save as",
+            wildcard = "HTML files (*.html)|*.html|All files|*",
+            style = wxSAVE | wxOVERWRITE_PROMPT)
+
+        if dlg.ShowModal() == wxID_OK:
+            util.writeToFile(dlg.GetPath(), self.html, self)
+            
+        dlg.Destroy()
