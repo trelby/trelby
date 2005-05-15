@@ -539,7 +539,7 @@ class MyCtrl(wxControl):
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
-    def OnTitles(self):
+    def OnTitlesDlg(self):
         dlg = titlesdlg.TitlesDlg(mainFrame, copy.deepcopy(self.sp.titles),
                                   self.sp.cfg, cfgGl)
 
@@ -548,7 +548,7 @@ class MyCtrl(wxControl):
 
         dlg.Destroy()
 
-    def OnHeaders(self):
+    def OnHeadersDlg(self):
         dlg = headersdlg.HeadersDlg(mainFrame,
             copy.deepcopy(self.sp.headers), self.sp.cfg, cfgGl,
                                     self.applyHeaders)
@@ -558,11 +558,11 @@ class MyCtrl(wxControl):
 
         dlg.Destroy()
         
-    def OnDialogueChart(self):
+    def OnReportDialogueChart(self):
         self.sp.paginate()
         dialoguechart.genDialogueChart(mainFrame, self)
 
-    def OnCharacterReport(self):
+    def OnReportCharacter(self):
         self.sp.paginate()
         report.genCharacterReport(mainFrame, self)
 
@@ -657,7 +657,7 @@ class MyCtrl(wxControl):
         self.sp.maybeMark(cs.mark)
         gd.vm.pageCmd(self, cs, dir, texts, dpages)
 
-    def OnRevert(self):
+    def OnRevertScript(self):
         if self.fileName:
             if not self.canBeClosed():
                 return
@@ -690,7 +690,7 @@ class MyCtrl(wxControl):
     def OnCopy(self):
         self.OnCut(doDelete = False)
 
-    def OnCopyCb(self):
+    def OnCopySystemCb(self):
         cd = self.sp.getSelectedAsCD(False)
 
         if not cd:
@@ -731,7 +731,7 @@ class MyCtrl(wxControl):
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
     
-    def OnPasteCb(self):
+    def OnPasteSystemCb(self):
         s = ""
         
         if wxTheClipboard.Open():
@@ -774,7 +774,7 @@ class MyCtrl(wxControl):
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
-    def OnFindError(self):
+    def OnFindNextError(self):
         self.clearAutoComp()
 
         line, msg = self.sp.findError(self.sp.line)
@@ -849,9 +849,9 @@ class MyCtrl(wxControl):
         if self.fileName:
             self.saveFile(self.fileName)
         else:
-            self.OnSaveAs()
+            self.OnSaveScriptAs()
 
-    def OnSaveAs(self):
+    def OnSaveScriptAs(self):
         if self.checkEvalSave():
             return
         
@@ -864,7 +864,7 @@ class MyCtrl(wxControl):
 
         dlg.Destroy()
 
-    def OnExport(self):
+    def OnExportScript(self):
         sp = self.getExportable("export")
         if not sp:
             return
@@ -898,7 +898,7 @@ class MyCtrl(wxControl):
         s = sp.generatePDF(not misc.license)
         util.showTempPDF(s, cfgGl, mainFrame)
 
-    def OnCfg(self):
+    def OnSettings(self):
         dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfgGl),
                             self.applyGlobalCfg, True)
 
@@ -952,9 +952,6 @@ class MyCtrl(wxControl):
     def cmdDeleteBackward(self, cs):
         self.sp.deleteBackwardCmd(cs)
 
-    def cmdFindNextError(self, cs):
-        self.OnFindError()
-        
     def cmdForcedLineBreak(self, cs):
         self.sp.insertForcedLineBreakCmd(cs)
 
@@ -997,9 +994,6 @@ class MyCtrl(wxControl):
     def cmdNewElement(self, cs):
         self.sp.splitElementCmd(cs)
 
-    def cmdSelectScene(self, cs):
-        self.sp.selectSceneCmd(cs)
-
     def cmdSetMark(self, cs):
         self.sp.setMarkCmd(cs)
 
@@ -1025,7 +1019,7 @@ class MyCtrl(wxControl):
             if misc.isTest and (cs.char == "å"):
                 self.loadFile("sample.blyte")
             elif misc.isTest and (cs.char == "¤"):
-                self.OnCfg()
+                self.OnSettings()
                 pass
             else:
                 self.sp.addCharCmd(cs)
@@ -1035,8 +1029,11 @@ class MyCtrl(wxControl):
                 ev.ControlDown(), ev.AltDown(), ev.ShiftDown()).toInt())
 
             if cmd:
-                #print "cmd %s (%s)" % (cmd.name, cmd.desc)
-                getattr(self, "cmd" + cmd.name)(cs)
+                if cmd.isMenu:
+                    getattr(mainFrame, "On" + cmd.name)()
+                    return
+                else:
+                    getattr(self, "cmd" + cmd.name)(cs)
             else:
                 ev.Skip()
                 return
@@ -1359,14 +1356,14 @@ class MyFrame(wxFrame):
         editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
         editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_COPY_TO_CB, "C&opy to clipboard")
-        editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste from clipboard")
+        editMenu.Append(ID_EDIT_COPY_TO_CB, "C&opy (system)")
+        editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste (system)")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_DELETE_ELEMENTS, "&Remove elements...")
+        editMenu.Append(ID_EDIT_DELETE_ELEMENTS, "&Delete elements...")
 
         viewMenu = wxMenu()
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_DRAFT, "&Draft")
@@ -1487,24 +1484,24 @@ class MyFrame(wxFrame):
         
         EVT_COMBOBOX(self, self.typeCb.GetId(), self.OnTypeCombo)
 
-        EVT_MENU(self, ID_FILE_NEW, self.OnNew)
+        EVT_MENU(self, ID_FILE_NEW, self.OnNewScript)
         EVT_MENU(self, ID_FILE_OPEN, self.OnOpen)
         EVT_MENU(self, ID_FILE_SAVE, self.OnSave)
-        EVT_MENU(self, ID_FILE_SAVE_AS, self.OnSaveAs)
-        EVT_MENU(self, ID_FILE_IMPORT, self.OnImport)
-        EVT_MENU(self, ID_FILE_EXPORT, self.OnExport)
-        EVT_MENU(self, ID_FILE_CLOSE, self.OnClose)
-        EVT_MENU(self, ID_FILE_REVERT, self.OnRevert)
+        EVT_MENU(self, ID_FILE_SAVE_AS, self.OnSaveScriptAs)
+        EVT_MENU(self, ID_FILE_IMPORT, self.OnImportScript)
+        EVT_MENU(self, ID_FILE_EXPORT, self.OnExportScript)
+        EVT_MENU(self, ID_FILE_CLOSE, self.OnCloseScript)
+        EVT_MENU(self, ID_FILE_REVERT, self.OnRevertScript)
         EVT_MENU(self, ID_FILE_PRINT, self.OnPrint)
-        EVT_MENU(self, ID_SETTINGS_CHANGE, self.OnCfg)
-        EVT_MENU(self, ID_SETTINGS_LOAD, self.OnCfgLoad)
-        EVT_MENU(self, ID_SETTINGS_SAVE_AS, self.OnCfgSaveAs)
+        EVT_MENU(self, ID_SETTINGS_CHANGE, self.OnSettings)
+        EVT_MENU(self, ID_SETTINGS_LOAD, self.OnLoadSettings)
+        EVT_MENU(self, ID_SETTINGS_SAVE_AS, self.OnSaveSettingsAs)
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
         EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
-        EVT_MENU(self, ID_EDIT_COPY_TO_CB, self.OnCopyCb)
-        EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteCb)
+        EVT_MENU(self, ID_EDIT_COPY_TO_CB, self.OnCopySystemCb)
+        EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteSystemCb)
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_EDIT_DELETE_ELEMENTS, self.OnDeleteElements)
@@ -1514,24 +1511,24 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_VIEW_STYLE_OVERVIEW_SMALL, self.OnViewModeChange)
         EVT_MENU(self, ID_VIEW_STYLE_OVERVIEW_LARGE, self.OnViewModeChange)
         EVT_MENU(self, ID_VIEW_SHOW_FORMATTING, self.OnShowFormatting)
-        EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindError)
+        EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindNextError)
         EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
-        EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitles)
-        EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeaders)
+        EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitlesDlg)
+        EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeadersDlg)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_CHANGE, self.OnScriptSettings)
-        EVT_MENU(self, ID_SCRIPT_SETTINGS_LOAD, self.OnScriptSettingsLoad)
-        EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnScriptSettingsSaveAs)
-        EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnDialogueChart)
-        EVT_MENU(self, ID_REPORTS_CHARACTER_REP, self.OnCharacterReport)
-        EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDb)
-        EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharMap)
+        EVT_MENU(self, ID_SCRIPT_SETTINGS_LOAD, self.OnLoadScriptSettings)
+        EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnSaveScriptSettingsAs)
+        EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnReportDialogueChart)
+        EVT_MENU(self, ID_REPORTS_CHARACTER_REP, self.OnReportCharacter)
+        EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDatabase)
+        EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharacterMap)
         EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_MANUAL, self.OnHelpManual)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
         EVT_MENU(self, ID_LICENSE_INFO, self.OnLicenseInfo)
-        EVT_MENU(self, ID_LICENSE_UPDATE, self.OnLicenseUpdate)
-        EVT_MENU(self, ID_LICENSE_RELEASE, self.OnLicenseRelease)
+        EVT_MENU(self, ID_LICENSE_UPDATE, self.OnUpdateLicense)
+        EVT_MENU(self, ID_LICENSE_RELEASE, self.OnReleaseLicense)
 
         EVT_CLOSE(self, self.OnCloseWindow)
 
@@ -1696,7 +1693,7 @@ class MyFrame(wxFrame):
         self.kbdCommands = {}
 
         for cmd in cfgGl.commands:
-            if not cmd.isFixedMenu:
+            if not (cmd.isFixed and cmd.isMenu):
                 for key in cmd.keys:
                     self.kbdCommands[key] = cmd
         
@@ -1711,11 +1708,11 @@ class MyFrame(wxFrame):
         self.panel.ctrl.SetFocus()
         self.panel.ctrl.updateCommon()
         self.setTitle(self.panel.ctrl.fileNameDisplay)
-        
-    def OnNew(self, event = None):
+
+    def OnNewScript(self, event = None):
         self.panel = self.createNewPanel()
 
-    def OnOpen(self, event):
+    def OnOpen(self, event = None):
         dlg = wxFileDialog(self, "File to open", misc.scriptDir,
             wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
             style = wxOPEN)
@@ -1732,13 +1729,13 @@ class MyFrame(wxFrame):
 
         dlg.Destroy()
 
-    def OnSave(self, event):
+    def OnSave(self, event = None):
         self.panel.ctrl.OnSave()
 
-    def OnSaveAs(self, event):
-        self.panel.ctrl.OnSaveAs()
+    def OnSaveScriptAs(self, event = None):
+        self.panel.ctrl.OnSaveScriptAs()
 
-    def OnImport(self, event):
+    def OnImportScript(self, event = None):
         dlg = wxFileDialog(self, "File to import", misc.scriptDir,
             wildcard = "Text files (*.txt)|*.txt|All files|*",
             style = wxOPEN)
@@ -1755,10 +1752,10 @@ class MyFrame(wxFrame):
 
         dlg.Destroy()
 
-    def OnExport(self, event):
-        self.panel.ctrl.OnExport()
+    def OnExportScript(self, event = None):
+        self.panel.ctrl.OnExportScript()
 
-    def OnClose(self, event = None):
+    def OnCloseScript(self, event = None):
         if not self.panel.ctrl.canBeClosed():
             return
         
@@ -1768,16 +1765,16 @@ class MyFrame(wxFrame):
             self.panel.ctrl.createEmptySp()
             self.panel.ctrl.updateScreen()
 
-    def OnRevert(self, event):
-        self.panel.ctrl.OnRevert()
+    def OnRevertScript(self, event = None):
+        self.panel.ctrl.OnRevertScript()
 
-    def OnPrint(self, event):
+    def OnPrint(self, event = None):
         self.panel.ctrl.OnPrint()
 
-    def OnCfg(self, event):
-        self.panel.ctrl.OnCfg()
+    def OnSettings(self, event = None):
+        self.panel.ctrl.OnSettings()
 
-    def OnCfgLoad(self, event):
+    def OnLoadSettings(self, event = None):
         dlg = wxFileDialog(self, "File to open",
             defaultDir = os.path.dirname(gd.confFilename),
             defaultFile = os.path.basename(gd.confFilename),
@@ -1796,7 +1793,7 @@ class MyFrame(wxFrame):
 
         dlg.Destroy()
 
-    def OnCfgSaveAs(self, event):
+    def OnSaveSettingsAs(self, event = None):
         dlg = wxFileDialog(self, "Filename to save as",
             defaultDir = os.path.dirname(gd.confFilename),
             defaultFile = os.path.basename(gd.confFilename),
@@ -1809,38 +1806,64 @@ class MyFrame(wxFrame):
             
         dlg.Destroy()
 
-    def OnCut(self, event):
+    def OnCut(self, event = None):
         self.panel.ctrl.OnCut()
 
-    def OnCopy(self, event):
+    def OnCopy(self, event = None):
         self.panel.ctrl.OnCopy()
 
-    def OnCopyCb(self, event):
-        self.panel.ctrl.OnCopyCb()
+    def OnCopySystemCb(self, event = None):
+        self.panel.ctrl.OnCopySystemCb()
 
-    def OnPaste(self, event):
+    def OnPaste(self, event = None):
         self.panel.ctrl.OnPaste()
 
-    def OnPasteCb(self, event):
-        self.panel.ctrl.OnPasteCb()
+    def OnPasteSystemCb(self, event = None):
+        self.panel.ctrl.OnPasteSystemCb()
 
-    def OnSelectScene(self, event):
+    def OnSelectScene(self, event = None):
         self.panel.ctrl.OnSelectScene()
 
-    def OnFindError(self, event):
-        self.panel.ctrl.OnFindError()
+    def OnFindNextError(self, event = None):
+        self.panel.ctrl.OnFindNextError()
 
-    def OnFind(self, event):
+    def OnFind(self, event = None):
         self.panel.ctrl.OnFind()
 
-    def OnDeleteElements(self, event):
+    def OnDeleteElements(self, event = None):
         self.panel.ctrl.OnDeleteElements()
 
-    def OnShowFormatting(self, event):
+    def OnToggleShowFormatting(self, event = None):
+        self.menuBar.Check(ID_VIEW_SHOW_FORMATTING,
+            not self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING))
+        self.showFormatting = not self.showFormatting
+        self.panel.ctrl.Refresh(False)
+        
+    def OnShowFormatting(self, event = None):
         self.showFormatting = self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING)
         self.panel.ctrl.Refresh(False)
 
-    def OnViewModeChange(self, event):
+    def OnViewModeDraft(self):
+        self.menuBar.Check(ID_VIEW_STYLE_DRAFT, True)
+        self.OnViewModeChange()
+
+    def OnViewModeLayout(self):
+        self.menuBar.Check(ID_VIEW_STYLE_LAYOUT, True)
+        self.OnViewModeChange()
+
+    def OnViewModeSideBySide(self):
+        self.menuBar.Check(ID_VIEW_STYLE_SIDE_BY_SIDE, True)
+        self.OnViewModeChange()
+
+    def OnViewModeOverviewSmall(self):
+        self.menuBar.Check(ID_VIEW_STYLE_OVERVIEW_SMALL, True)
+        self.OnViewModeChange()
+
+    def OnViewModeOverviewLarge(self):
+        self.menuBar.Check(ID_VIEW_STYLE_OVERVIEW_LARGE, True)
+        self.OnViewModeChange()
+
+    def OnViewModeChange(self, event = None):
         if self.menuBar.IsChecked(ID_VIEW_STYLE_DRAFT):
             mode = VIEWMODE_DRAFT
         elif self.menuBar.IsChecked(ID_VIEW_STYLE_LAYOUT):
@@ -1864,16 +1887,16 @@ class MyFrame(wxFrame):
     def OnPaginate(self, event = None):
         self.panel.ctrl.OnPaginate()
 
-    def OnTitles(self, event):
-        self.panel.ctrl.OnTitles()
+    def OnTitlesDlg(self, event = None):
+        self.panel.ctrl.OnTitlesDlg()
 
-    def OnHeaders(self, event):
-        self.panel.ctrl.OnHeaders()
+    def OnHeadersDlg(self, event = None):
+        self.panel.ctrl.OnHeadersDlg()
 
-    def OnScriptSettings(self, event):
+    def OnScriptSettings(self, event = None):
         self.panel.ctrl.OnScriptSettings()
 
-    def OnScriptSettingsLoad(self, event):
+    def OnLoadScriptSettings(self, event = None):
         dlg = wxFileDialog(self, "File to open",
             defaultDir = gd.scriptSettingsPath,
             wildcard = "Script setting files (*.sconf)|*.sconf|All files|*",
@@ -1892,7 +1915,7 @@ class MyFrame(wxFrame):
 
         dlg.Destroy()
 
-    def OnScriptSettingsSaveAs(self, event):
+    def OnSaveScriptSettingsAs(self, event = None):
         dlg = wxFileDialog(self, "Filename to save as",
             defaultDir = gd.scriptSettingsPath,
             wildcard = "Script setting files (*.sconf)|*.sconf|All files|*",
@@ -1905,13 +1928,13 @@ class MyFrame(wxFrame):
             
         dlg.Destroy()
 
-    def OnDialogueChart(self, event):
-        self.panel.ctrl.OnDialogueChart()
+    def OnReportDialogueChart(self, event = None):
+        self.panel.ctrl.OnReportDialogueChart()
 
-    def OnCharacterReport(self, event):
-        self.panel.ctrl.OnCharacterReport()
+    def OnReportCharacter(self, event = None):
+        self.panel.ctrl.OnReportCharacter()
 
-    def OnNameDb(self, event):
+    def OnNameDatabase(self, event = None):
         if not hasattr(self, "names"):
             self.statusBar.SetStatusText("Opening name database...", 1)
             wxSafeYield()
@@ -1931,26 +1954,26 @@ class MyFrame(wxFrame):
         dlg.ShowModal()
         dlg.Destroy()
 
-    def OnCharMap(self, event):
+    def OnCharacterMap(self, event = None):
         dlg = charmapdlg.CharMapDlg(self, self.panel.ctrl)
         dlg.ShowModal()
         dlg.Destroy()
 
-    def OnCompareScripts(self, event):
+    def OnCompareScripts(self, event = None):
         self.panel.ctrl.OnCompareScripts()
 
-    def OnHelpCommands(self, event):
+    def OnHelpCommands(self, event = None):
         dlg = commandsdlg.CommandsDlg(cfgGl)
         dlg.Show()
 
-    def OnHelpManual(self, event):
+    def OnHelpManual(self, event = None):
         util.showPDF(misc.progPath + "/manual.pdf", cfgGl, self)
         
-    def OnAbout(self, event):
+    def OnAbout(self, event = None):
         win = splash.SplashWindow(self, -1)
         win.Show()
 
-    def OnLicenseInfo(self, event):
+    def OnLicenseInfo(self, event = None):
         if misc.license:
             s = "Licensed to: '%s'\n" % misc.license.userId.lstrip()
 
@@ -1962,7 +1985,7 @@ class MyFrame(wxFrame):
 
         wxMessageBox(s, "License info", wxOK, self)
         
-    def OnLicenseUpdate(self, event):
+    def OnUpdateLicense(self, event = None):
         dlg = wxFileDialog(self, "License file to open", ".",
             wildcard = "License files (*.lic)|*.lic|All files|*",
             style = wxOPEN)
@@ -1975,7 +1998,7 @@ class MyFrame(wxFrame):
 
         dlg.Destroy()
     
-    def OnLicenseRelease(self, event):
+    def OnReleaseLicense(self, event = None):
         if misc.license == None:
             wxMessageBox("You already are in evaluation mode.", "Error",
                          wxOK, self)

@@ -189,7 +189,7 @@ class Command:
     cvars = None
 
     def __init__(self, name, desc, defKeys = [], isMovement = False,
-                 isFixed = False, isFixedMenu = False):
+                 isFixed = False, isMenu = False):
         # name, e.g. "MoveLeft"
         self.name = name
 
@@ -202,14 +202,12 @@ class Command:
         # is this a movement command
         self.isMovement = isMovement
 
-        # some commands & their keys (Tab, Enter, etc) are fixed and can't
-        # be changed
+        # some commands & their keys (Tab, Enter, Quit, etc) are fixed and
+        # can't be changed
         self.isFixed = isFixed
         
-        # some menu commands (Open, Save, etc) are handled separately
-        self.isFixedMenu = isFixedMenu
-        if self.isFixedMenu:
-            self.isFixed = True
+        # is this a menu item
+        self.isMenu = isMenu
         
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
@@ -526,45 +524,61 @@ class ConfigGlobal:
         t.prevTypeTab = screenplay.CHARACTER
         self.types[t.lt] = t
 
-        # FIXME: add all other commands
-        
         # keyboard commands
         self.commands = [
             Command("Abort", "Abort something, e.g. selection,"
                     " auto-completion, etc.", [WXK_ESCAPE], isFixed = True),
 
-            Command("ChangeToAction", "Change element style to action.",
+            Command("About", "Show the about dialog.", isMenu = True),
+            
+            Command("ChangeToAction", "Change current element's style to"
+                    " action.",
                     [util.Key(ord("A"), alt = True).toInt()]),
 
-            Command("ChangeToCharacter", "Change element style to character.",
+            Command("ChangeToCharacter", "Change current element's style to"
+                    " character.",
                     [util.Key(ord("C"), alt = True).toInt()]),
 
-            Command("ChangeToDialogue", "Change element style to dialogue.",
+            Command("ChangeToDialogue", "Change current element's style to"
+                    " dialogue.",
                     [util.Key(ord("D"), alt = True).toInt()]),
 
-            Command("ChangeToNote", "Change element style to note.",
+            Command("ChangeToNote", "Change current element's style to note.",
                     [util.Key(ord("N"), alt = True).toInt()]),
 
-            Command("ChangeToParenthetical", "Change element style to"
-                    " parenthetical.",
+            Command("ChangeToParenthetical", "Change current element's"
+                    " style to parenthetical.",
                     [util.Key(ord("P"), alt = True).toInt()]),
 
-            Command("ChangeToScene", "Change element style to scene.",
+            Command("ChangeToScene", "Change current element's style to"
+                    " scene.",
                     [util.Key(ord("S"), alt = True).toInt()]),
 
-            Command("ChangeToShot", "Change element style to shot."),
+            Command("ChangeToShot", "Change current element's style to"
+                    " shot."),
 
-            Command("ChangeToTransition", "Change element style to"
+            Command("ChangeToTransition", "Change current element's style to"
                     " transition.",
                     [util.Key(ord("T"), alt = True).toInt()]),
 
-            Command("Copy", "Copy selected text.",
-                    [util.Key(3, ctrl = True).toInt()],
-                    isFixedMenu = True),
+            Command("CharacterMap", "Open the character map.",
+                    isMenu = True),
 
-            Command("Cut", "Cut selected text.",
+            Command("CloseScript", "Close the current script.",
+                    isMenu = True),
+            
+            Command("CompareScripts", "Compare two scripts.", isMenu = True),
+
+            Command("Copy", "Copy selected text to the internal clipboard.",
+                    [util.Key(3, ctrl = True).toInt()],
+                    isFixed = True, isMenu = True),
+
+            Command("CopySystemCb", "Copy selected text to the system's"
+                    " clipboard.", isMenu = True),
+            
+            Command("Cut", "Cut selected text to internal clipboard.",
                     [util.Key(24, ctrl = True).toInt()],
-                    isFixedMenu = True),
+                    isFixed = True, isMenu = True),
 
             Command("Delete", "Delete the character under the cursor,"
                     " or selected text.", [WXK_DELETE], isFixed = True),
@@ -572,12 +586,18 @@ class ConfigGlobal:
             Command("DeleteBackward", "Delete the character behind the"
                     " cursor.", [WXK_BACK], isFixed = True),
 
+            Command("DeleteElements", "Open the 'Delete elements' dialog.",
+                    isMenu = True),
+            
+            Command("ExportScript", "Export the current script.",
+                    isMenu = True),
+            
             Command("FindAndReplaceDlg", "Open the 'Find & Replace' dialog.",
                     [util.Key(6, ctrl = True).toInt()],
-                    isFixedMenu = True),
+                    isFixed = True, isMenu = True),
 
-            Command("FindNextError", "Find next error in the script.",
-                    [util.Key(5, ctrl = True).toInt()]),
+            Command("FindNextError", "Find next error in the current script.",
+                    [util.Key(5, ctrl = True).toInt()], isMenu = True),
             
             Command("ForcedLineBreak", "Insert a forced line break.",
                     [util.Key(WXK_RETURN, ctrl = True).toInt(),
@@ -587,6 +607,23 @@ class ConfigGlobal:
                      util.Key(10, ctrl = True).toInt()],
                     isFixed = True),
 
+            Command("HeadersDlg", "Open the headers dialog.", isMenu = True),
+            
+            Command("HelpCommands", "Show list of commands and their key"
+                    " bindings.", isMenu = True),
+            
+            Command("HelpManual", "Open the manual.", isMenu = True),
+            
+            Command("ImportScript", "Import a script.", isMenu = True),
+            
+            Command("LicenseInfo", "Show information about your license.",
+                    isMenu = True),
+            
+            Command("LoadSettings", "Load global settings.", isMenu = True),
+            
+            Command("LoadScriptSettings", "Load script-specific settings.",
+                    isMenu = True),
+            
             Command("MoveDown", "Move down.", [WXK_DOWN], isMovement = True),
             
             Command("MoveEndOfLine", "Move to the end of the line or"
@@ -626,41 +663,99 @@ class ConfigGlobal:
             
             Command("MoveUp", "Move up.", [WXK_UP], isMovement = True),
 
-            Command("NewElement", "Create new element.", [WXK_RETURN],
+            Command("NameDatabase", "Open the character name database.",
+                    isMenu = True),
+            
+            Command("NewElement", "Create a new element.", [WXK_RETURN],
                     isFixed = True),
 
-            Command("OpenScript", "Open script.",
+            Command("NewScript", "Create a new script.", isMenu = True),
+            
+            Command("OpenScript", "Open a script.",
                     [util.Key(15, ctrl = True).toInt()],
-                    isFixedMenu = True),
+                    isFixed = True, isMenu = True),
 
-            Command("Paste", "Paste text from internal clipboard.",
+            Command("Paginate", "Paginate current script.", isMenu = True),
+            
+            Command("Paste", "Paste text from the internal clipboard.",
                     [util.Key(22, ctrl = True).toInt()],
-                    isFixedMenu = True),
+                    isFixed = True, isMenu = True),
 
-            Command("PrintScript", "Print script.",
+            Command("PasteSystemCb", "Paste text from the system's"
+                    " clipboard.", isMenu = True),
+            
+            Command("PrintScript", "Print current script.",
                     [util.Key(16, ctrl = True).toInt()],
-                    isFixedMenu = True),
+                    isFixed = True, isMenu = True),
 
             Command("Quit", "Quit the program.",
                     [util.Key(17, ctrl = True).toInt()],
-                    isFixedMenu = True),
+                    isFixed = True, isMenu = True),
 
-            Command("SaveScript", "Save script.",
-                    [util.Key(19, ctrl = True).toInt()],
-                    isFixedMenu = True),
-
-            Command("SelectScene", "Select the current scene.",
-                    [util.Key(1, ctrl = True).toInt()]),
+            Command("ReleaseLicense", "Release your license.", isMenu = True),
             
-            Command("SetMark", "Set mark.",
+            Command("ReportCharacter", "Generate character report.",
+                    isMenu = True),
+            
+            Command("ReportDialogueChart", "Generate dialogue chart report.",
+                    isMenu = True),
+            
+            Command("RevertScript", "Revert current script to the"
+                    " version on disk.", isMenu = True),
+            
+            Command("SaveScriptSettingsAs", "Save script-specific settings"
+                    " to a new file.", isMenu = True),
+            
+            Command("SaveSettingsAs", "Save global settings to a new file.",
+                    isMenu = True),
+            
+            Command("SaveScript", "Save the current script.",
+                    [util.Key(19, ctrl = True).toInt()],
+                    isFixed = True, isMenu = True),
+
+            Command("SaveScriptAs", "Save the current script to a new file.",
+                    isMenu = True),
+            
+            Command("ScriptSettings", "Change script-specific settings.",
+                    isMenu = True),
+            
+            Command("SelectScene", "Select the current scene.",
+                    [util.Key(1, ctrl = True).toInt()], isMenu = True),
+            
+            Command("SetMark", "Set mark at current cursor position.",
                     [util.Key(WXK_SPACE, ctrl = True).toInt()]),
             
-            Command("Tab", "Change element to the next style or create"
-                    " a new element.", [WXK_TAB], isFixed = True),
+            Command("Settings", "Change global settings.", isMenu = True),
+            
+            Command("Tab", "Change current element to the next style or"
+                    " create a new element.", [WXK_TAB], isFixed = True),
 
-            Command("TabPrev", "Change element to the previous style.",
+            Command("TabPrev", "Change current element to the previous"
+                    " style.",
                     [util.Key(WXK_TAB, shift = True).toInt()],
-                    isFixed = True)
+                    isFixed = True),
+
+            Command("TitlesDlg", "Open the titles dialog.", isMenu = True),
+            
+            Command("ToggleShowFormatting", "Toggle 'Show formatting'"
+                    " display.", isMenu = True),
+
+            Command("UpdateLicense", "Update your license.", isMenu = True),
+
+            Command("ViewModeDraft", "Change view mode to draft.",
+                    isMenu = True),
+
+            Command("ViewModeLayout", "Change view mode to layout.",
+                    isMenu = True),
+
+            Command("ViewModeOverviewLarge", "Change view mode to large"
+                    " overview.", isMenu = True),
+            
+            Command("ViewModeOverviewSmall", "Change view mode to small"
+                    " overview.", isMenu = True),
+
+            Command("ViewModeSideBySide", "Change view mode to side by"
+                    " side.", isMenu = True)
             ]
 
         self.recalc()

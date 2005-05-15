@@ -61,6 +61,8 @@ R                      Replace
         htmlWin.SetFocus()
         
         vsizer.Add(htmlWin, 1, wxEXPAND)
+
+        # FIXME: add button for saving the html to a file
         
         self.Layout()
 
