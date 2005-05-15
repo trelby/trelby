@@ -72,12 +72,14 @@ class Screenplay:
         self.maxAutoCompItems = 10
 
         # True if script has had changes done to it after
-        # load/save/creation. FIXME: Nobody sets this yet, and everybody
-        # needs to do so. See issue #17.
+        # load/save/creation.
         self.hasChanged = False
 
     def isModified(self):
         return self.hasChanged
+
+    def markChanged(self):
+        self.hasChanged = True
     
     def getSpacingBefore(self, i):
         if i == 0:
@@ -343,13 +345,21 @@ class Screenplay:
             return (None, None)
 
     parseConfigLine = staticmethod(parseConfigLine)
-    
+
+    # apply new config.
+    def applyCfg(self, cfg):
+        self.cfg = copy.deepcopy(cfg)
+        self.cfg.recalc()
+        self.reformatAll()
+        self.paginate()
+        self.markChanged()
+        
     # load script config from string s, reformat and repaginate script
     # afterwards.
     def loadCfg(self, s):
+        # hackish, but works
         self.cfg.load(s)
-        self.reformatAll()
-        self.paginate()
+        self.applyCfg(self.cfg)
 
     # return script config as a string.
     def saveCfg(self):
@@ -1211,6 +1221,8 @@ class Screenplay:
             if ls[line - 1].lb == LB_LAST:
                 break
 
+        self.markChanged()
+
     # join lines 'line' and 'line + 1' and position cursor at the join
     # position.
     def joinLines(self, line):
@@ -1238,6 +1250,7 @@ class Screenplay:
 
         self.line += 1
         self.column = 0
+        self.markChanged()
 
     # split element at current position. newType is type to give to the
     # new element.
@@ -1258,6 +1271,7 @@ class Screenplay:
         
         self.rewrapPara()
         self.rewrapPrevPara()
+        self.markChanged()
 
     # delete character at given position and optionally position
     # cursor there.
@@ -1555,7 +1569,8 @@ class Screenplay:
             self.column = min(endCol, len(ls[self.line].text))
 
             self.rewrapPara()
-            
+            self.markChanged()
+
         return cd
 
     # paste data into script. clines is a list of Line objects.
@@ -1627,6 +1642,7 @@ class Screenplay:
 
         self.clearMark()
         self.clearAutoComp()
+        self.markChanged()
 
     # returns true if a character, inserted at current position, would
     # need to be capitalized as a start of a sentence.
@@ -1931,6 +1947,7 @@ class Screenplay:
         self.setTopLine(0)
         self.mark = None
         self.paginate()
+        self.markChanged()
 
     # clear mark
     def clearMark(self):
@@ -2057,9 +2074,10 @@ class Screenplay:
     def deleteBackwardCmd(self, cs):
         if self.column != 0:
             self.deleteChar(self.line, self.column - 1)
+            self.markChanged()
             cs.doAutoComp = cs.AC_REDO
         else:
-            if (self.line != 0):
+            if self.line != 0:
                 ln = self.lines[self.line - 1]
 
                 if ln.lb == LB_SPACE2:
@@ -2071,11 +2089,14 @@ class Screenplay:
 
                     self.joinLines(self.line - 1)
 
+                self.markChanged()
+
         self.rewrapPara()
 
     def deleteForwardCmd(self, cs):
         if self.column != len(self.lines[self.line].text):
             self.deleteChar(self.line, self.column)
+            self.markChanged()
             cs.doAutoComp = cs.AC_REDO
         else:
             if self.line != (len(self.lines) - 1):
@@ -2088,6 +2109,8 @@ class Screenplay:
                         self.deleteChar(self.line + 1, 0, False)
 
                     self.joinLines(self.line)
+
+                self.markChanged()
 
         self.rewrapPara()
 
@@ -2163,7 +2186,8 @@ class Screenplay:
             ls[self.line].text = "()"
 
         self.rewrapPara()
-
+        self.markChanged()
+        
         cs.doAutoComp = cs.AC_REDO
 
     def toSceneCmd(self, cs):

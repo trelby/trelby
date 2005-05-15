@@ -399,14 +399,10 @@ class MyCtrl(wxControl):
 
     # apply per-script config
     def applyCfg(self, newCfg):
-        self.sp.cfg = copy.deepcopy(newCfg)
-        self.sp.cfg.recalc()
+        self.sp.applyCfg(newCfg)
+
         self.refreshCache()
-
-        self.sp.reformatAll()
-        self.sp.paginate()
         self.makeLineVisible(self.sp.line)
-
         self.updateScreen()
 
     # apply global config
@@ -439,6 +435,7 @@ class MyCtrl(wxControl):
 
     def applyHeaders(self, newHeaders):
         self.sp.headers = newHeaders
+        self.sp.markChanged()
         self.OnPaginate()
 
     # if we have a valid license, or the script is shorter than ~20 pages,
@@ -545,6 +542,7 @@ class MyCtrl(wxControl):
 
         if dlg.ShowModal() == wxID_OK:
             self.sp.titles = dlg.titles
+            self.sp.markChanged()
 
         dlg.Destroy()
 

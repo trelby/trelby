@@ -390,6 +390,7 @@ class FindDlg(wxDialog):
             if diff != 0:
                 self.didReplaces = True
             
+            self.ctrl.sp.markChanged()
             self.OnFind(autoFind = autoFind)
 
             return True
