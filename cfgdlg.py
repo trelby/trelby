@@ -90,8 +90,7 @@ class CfgDlg(wxDialog):
         hsizer.SetItemMinSize(self.panel, *size)
         self.listbook.SetPageSizes(*size)
 
-        # FIXME
-        self.listbook.SetSelection(3)
+        self.listbook.SetSelection(0)
 
         # it's unclear whether SetSelection sends an event on all
         # platforms or not, so force correct action.
