@@ -1917,7 +1917,7 @@ class Screenplay:
         return pdf.generate(doc)
 
     # move to line,col, and if mark is True, set mark there
-    def gotoPos(self, line, col, mark):
+    def gotoPos(self, line, col, mark = False):
         self.clearAutoComp()
         
         self.line = line
@@ -1969,13 +1969,23 @@ class Screenplay:
         elif cs.doAutoComp == cs.AC_REDO:
             self.fillAutoComp()
 
-    # helper function for calling commands that don't require special
-    # stuff in the CommandState object. name is the name of the command,
-    # e.g. "moveLeftCmd".
-    def cmd(self, name):
-        cs = CommandState()
-        getattr(self, name)(cs)
-        self.cmdPost(cs)
+    # helper function for calling commands. name is the name of the
+    # command, e.g. "moveLeft".
+    def cmd(self, name, char = None, count = 1):
+        for i in range(count):
+            cs = CommandState()
+
+            if char:
+                cs.char = char
+
+            getattr(self, name + "Cmd")(cs)
+            self.cmdPost(cs)
+
+    # call addCharCmd for each character in s. ONLY MEANT TO BE USED IN
+    # TEST CODE.
+    def cmdChars(self, s):
+        for char in s:
+            self.cmd("addChar", char = char)
 
     def moveLeftCmd(self, cs):
         self.maybeMark(cs.mark)

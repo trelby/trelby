@@ -50,7 +50,7 @@ _input_tbl = ""
 # permanent memory DC to get text extents etc
 permDc = None
 
-def init():
+def init(doWX = True):
     global _to_upper, _to_lower, _input_tbl, permDc
 
     # setup ISO-8859-1 case-conversion stuff
@@ -76,10 +76,11 @@ def init():
         else:
             _input_tbl += "|"
 
-    # dunno if the bitmap needs to be big enough to contain the text we're
-    # measuring...
-    permDc = wxMemoryDC()
-    permDc.SelectObject(wxEmptyBitmap(512, 32))
+    if doWX:
+        # dunno if the bitmap needs to be big enough to contain the text
+        # we're measuring...
+        permDc = wxMemoryDC()
+        permDc.SelectObject(wxEmptyBitmap(512, 32))
     
 # like string.upper/lower, but we do our own charset-handling that doesn't
 # need locales etc

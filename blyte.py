@@ -767,7 +767,7 @@ class MyCtrl(wxControl):
         self.OnPaste(lines)
 
     def OnSelectScene(self):
-        self.sp.cmd("selectSceneCmd")
+        self.sp.cmd("selectScene")
         
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
