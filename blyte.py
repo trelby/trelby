@@ -249,6 +249,7 @@ class MyCtrl(wxControl):
     def saveFile(self, fileName):
         if util.writeToFile(fileName, self.sp.save(), mainFrame):
             self.setFile(fileName)
+            self.sp.markChanged(False)
 
     def importFile(self, fileName):
         lines = myimport.importTextFile(fileName, mainFrame)

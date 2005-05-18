@@ -78,8 +78,8 @@ class Screenplay:
     def isModified(self):
         return self.hasChanged
 
-    def markChanged(self):
-        self.hasChanged = True
+    def markChanged(self, state = True):
+        self.hasChanged = state
     
     def getSpacingBefore(self, i):
         if i == 0:
