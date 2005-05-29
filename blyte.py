@@ -18,6 +18,7 @@ import mypickle
 import namesdlg
 import pml
 import report
+import scenereport
 import screenplay
 import splash
 import titles
@@ -565,6 +566,10 @@ class MyCtrl(wxControl):
         self.sp.paginate()
         report.genCharacterReport(mainFrame, self)
 
+    def OnReportScene(self):
+        self.sp.paginate()
+        scenereport.genSceneReport(mainFrame, self.sp, cfgGl)
+
     def OnCompareScripts(self):
         if mainFrame.notebook.GetPageCount() < 2:
             wxMessageBox("You need two at least two scripts open to"
@@ -1002,6 +1007,9 @@ class MyCtrl(wxControl):
     def cmdTabPrev(self, cs):
         self.sp.toPrevTypeTabCmd(cs)
 
+    def cmdTest(self, cs):
+        pass
+    
     def OnKeyChar(self, ev):
         kc = ev.GetKeyCode()
 
@@ -1018,8 +1026,7 @@ class MyCtrl(wxControl):
             if misc.isTest and (cs.char == "å"):
                 self.loadFile("sample.blyte")
             elif misc.isTest and (cs.char == "¤"):
-                self.OnSettings()
-                pass
+                self.cmdTest(cs)
             else:
                 self.sp.addCharCmd(cs)
                 
@@ -1405,6 +1412,7 @@ class MyFrame(wxFrame):
         reportsMenu = wxMenu()
         reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart")
         reportsMenu.Append(ID_REPORTS_CHARACTER_REP, "&Character report...")
+        reportsMenu.Append(ID_REPORTS_SCENE_REP, "&Scene report")
         
         toolsMenu = wxMenu()
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
@@ -1519,6 +1527,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnSaveScriptSettingsAs)
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnReportDialogueChart)
         EVT_MENU(self, ID_REPORTS_CHARACTER_REP, self.OnReportCharacter)
+        EVT_MENU(self, ID_REPORTS_SCENE_REP, self.OnReportScene)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDatabase)
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharacterMap)
         EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
@@ -1585,6 +1594,7 @@ class MyFrame(wxFrame):
             "ID_LICENSE_UPDATE",
             "ID_REPORTS_CHARACTER_REP",
             "ID_REPORTS_DIALOGUE_CHART",
+            "ID_REPORTS_SCENE_REP",
             "ID_SCRIPT_FIND_ERROR",
             "ID_SCRIPT_HEADERS",
             "ID_SCRIPT_PAGINATE",
@@ -1927,11 +1937,14 @@ class MyFrame(wxFrame):
             
         dlg.Destroy()
 
+    def OnReportCharacter(self, event = None):
+        self.panel.ctrl.OnReportCharacter()
+
     def OnReportDialogueChart(self, event = None):
         self.panel.ctrl.OnReportDialogueChart()
 
-    def OnReportCharacter(self, event = None):
-        self.panel.ctrl.OnReportCharacter()
+    def OnReportScene(self, event = None):
+        self.panel.ctrl.OnReportScene()
 
     def OnNameDatabase(self, event = None):
         if not hasattr(self, "names"):

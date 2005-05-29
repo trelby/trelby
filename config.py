@@ -700,6 +700,9 @@ class ConfigGlobal:
             Command("ReportDialogueChart", "Generate dialogue chart report.",
                     isMenu = True),
             
+            Command("ReportScene", "Generate scene report.",
+                    isMenu = True),
+            
             Command("RevertScript", "Revert current script to the"
                     " version on disk.", isMenu = True),
             

@@ -52,7 +52,7 @@ class CharacterReport:
         chars = {}
 
         name = None
-        scene = None
+        scene = "(NO SCENE NAME)"
         
         # how many lines processed for current speech
         curSpeechLines = 0
@@ -166,14 +166,8 @@ class CharacterReport:
             if self.inf[self.INF_LOCATIONS].selected:
                 self.y += 2.5
 
-                tmp = []
-                for k, v in ci.scenes.iteritems():
-                    tmp.append(SceneSpeakInfo(k, v))
-
-                tmp.sort(cmpSpeakLines)
-
-                for sc in tmp:
-                    self.addText("%3d %s" % (sc.lines, sc.scene),
+                for it in util.sortDict(ci.scenes):
+                    self.addText("%3d %s" % (it[1], it[0]),
                                  x = self.margin * 2.0, fs = 10)
             
             self.y += 5.0
@@ -222,6 +216,11 @@ class CharInfo:
     # return textual representation of pages where consecutive pages are
     # formatted as "x-y".
     def getPageList(self):
+        # TODO: this is better implemented by:
+        #
+        # - producing a list of all pages of the screenplay
+        # - comparing our list to that, one-by-one
+        
         s = ""
 
         i = 0
@@ -270,17 +269,3 @@ def cmpLines(c1, c2):
         return ret
     else:
         return cmp(c1.name, c2.name)
-
-# temporary holder for sorting one speaker's scenes
-class SceneSpeakInfo:
-    def __init__(self, scene, lines):
-        self.scene = scene
-        self.lines = lines
-    
-def cmpSpeakLines(ss1, ss2):
-    ret = cmp(ss2.lines, ss1.lines)
-
-    if ret != 0:
-        return ret
-    else:
-        return cmp(ss1.scene, ss2.scene)

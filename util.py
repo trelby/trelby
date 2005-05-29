@@ -363,6 +363,29 @@ def multiFind(s, seq):
 
     return False
 
+# put everything from dictionary d into a list as (key, value) tuples,
+# then sort the list and return that. by default sorts by "desc(value)
+# asc(key)", but a custom sort function can be given
+def sortDict(d, sortFunc = None):
+    def tmpSortFunc(o1, o2):
+        ret = cmp(o2[1], o1[1])
+
+        if ret != 0:
+            return ret
+        else:
+            return cmp(o1[0], o2[0])
+
+    if sortFunc == None:
+        sortFunc = tmpSortFunc
+        
+    tmp = []
+    for k, v in d.iteritems():
+        tmp.append((k, v))
+
+    tmp.sort(sortFunc)
+    
+    return tmp
+
 # DrawLine-wrapper that makes it easier when the end-point is just
 # offsetted from the starting point
 def drawLine(dc, x, y, xd, yd):
