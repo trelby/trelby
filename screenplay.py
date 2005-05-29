@@ -967,13 +967,13 @@ class Screenplay:
 
         return (top, bottom)
 
-    # return scene number for the line before 'line'.
+    # return scene number for the given line. if line is -1, return 0.
     def getSceneNumber(self, line):
         ls = self.lines
         sc = SCENE
         scene = 0
 
-        for i in xrange(line):
+        for i in xrange(line + 1):
             if (ls[i].lt == sc) and self.isFirstLineOfElem(i):
                 scene += 1
 
