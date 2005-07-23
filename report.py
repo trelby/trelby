@@ -4,12 +4,10 @@ import pml
 import screenplay
 import util
 
-import textwrap
-
 from wxPython.wx import *
 
-def genCharacterReport(mainFrame, ctrl):
-    report = CharacterReport(ctrl)
+def genCharacterReport(mainFrame, sp):
+    report = CharacterReport(sp)
 
     if not report.cinfo:
         wxMessageBox("No characters speaking found.",
@@ -39,14 +37,14 @@ def genCharacterReport(mainFrame, ctrl):
     
     data = report.generate()
 
-    util.showTempPDF(data, ctrl.sp.cfgGl, mainFrame)
+    util.showTempPDF(data, sp.cfgGl, mainFrame)
     
 class CharacterReport:
-    def __init__(self, ctrl):
+    def __init__(self, sp):
 
-        self.ctrl = ctrl
+        self.sp = sp
         
-        ls = ctrl.sp.lines
+        ls = sp.lines
 
         # key = character name, value = CharInfo
         chars = {}
@@ -89,7 +87,7 @@ class CharacterReport:
                 ci.wordCnt += len(words)
                 ci.wordCharCnt += reduce(lambda x, y: x + len(y), words, 0)
                 
-                ci.addPage(ctrl.sp.line2page(i))
+                ci.addPage(sp.line2page(i))
 
             else:
                 name = None
@@ -118,81 +116,41 @@ class CharacterReport:
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
         
     def generate(self):
-        self.doc = pml.Document(self.ctrl.sp.cfg.paperWidth,
-                                self.ctrl.sp.cfg.paperHeight)
-
-        # how much to leave empty on each side (mm)
-        self.margin = 20.0
-
-        # normal font
-        self.fontSize = 12
-
-        charsToLine = int((self.ctrl.sp.cfg.paperWidth - self.margin * 2.0) /
-                          util.getTextWidth(" ", pml.COURIER, self.fontSize))
-        
-        # character name font
-        nameFs = 14
-
-        self.pg = pml.Page(self.doc)
-        self.y = self.margin
+        tf = pml.TextFormatter(self.sp.cfg.paperWidth,
+                               self.sp.cfg.paperHeight, 20.0, 12)
 
         for ci in self.cinfo:
             if not ci.include:
                 continue
             
-            self.addText(ci.name, fs = nameFs,
-                         style = pml.BOLD | pml.UNDERLINED)
+            tf.addText(ci.name, fs = 14,
+                       style = pml.BOLD | pml.UNDERLINED)
 
             if self.inf[self.INF_BASIC].selected:
-                self.addText("Speeches: %d, Lines: %d (%.2f%%),"
-                             " per speech: %.2f" %
-                             (ci.speechCnt, ci.lineCnt,
-                              (ci.lineCnt * 100.0) / self.totalLineCnt,
-                              ci.lineCnt / float(ci.speechCnt)))
-                self.addText("Words: %d, per speech: %.2f,"
-                             " characters per: %.2f"
-                             % (ci.wordCnt, ci.wordCnt / float(ci.speechCnt),
-                                ci.wordCharCnt / float(ci.wordCnt)))
+                tf.addText("Speeches: %d, Lines: %d (%.2f%%),"
+                    " per speech: %.2f" % (ci.speechCnt, ci.lineCnt,
+                    (ci.lineCnt * 100.0) / self.totalLineCnt,
+                    ci.lineCnt / float(ci.speechCnt)))
 
+                tf.addText("Words: %d, per speech: %.2f,"
+                    " characters per: %.2f" % (ci.wordCnt,
+                    ci.wordCnt / float(ci.speechCnt),
+                    ci.wordCharCnt / float(ci.wordCnt)))
                 
             if self.inf[self.INF_PAGES].selected:
-                pl = ci.getPageList()
-                plWrapped = textwrap.wrap("Pages: %d, list: " % len(ci.pages)
-                    + pl, charsToLine, subsequent_indent = "       ")
-
-                for l in plWrapped:
-                    self.addText(l)
+                tf.addWrappedText("Pages: %d, list: %s" % (len(ci.pages),
+                    ci.getPageList()), "       ")
 
             if self.inf[self.INF_LOCATIONS].selected:
-                self.y += 2.5
+                tf.addSpace(2.5)
 
                 for it in util.sortDict(ci.scenes):
-                    self.addText("%3d %s" % (it[1], it[0]),
-                                 x = self.margin * 2.0, fs = 10)
+                    tf.addText("%3d %s" % (it[1], it[0]),
+                               x = tf.margin * 2.0, fs = 10)
             
-            self.y += 5.0
+            tf.addSpace(5.0)
             
-        self.doc.add(self.pg)
-
-        return pdf.generate(self.doc)
-    
-    def addText(self, text, x = None, fs = None, style = pml.NORMAL):
-        if x == None:
-            x = self.margin
-
-        if fs == None:
-            fs = self.fontSize
-
-        yd = util.getTextHeight(fs)
-
-        if (self.y + yd) > (self.ctrl.sp.cfg.paperHeight - self.margin):
-            self.doc.add(self.pg)
-            self.pg = pml.Page(self.doc)
-            self.y = self.margin
-            
-        self.pg.add(pml.TextOp(text, x, self.y, fs, style))
-
-        self.y += yd
+        return pdf.generate(tf.doc)
 
 # information about one character
 class CharInfo:
@@ -203,6 +161,7 @@ class CharInfo:
         self.lineCnt = 0
         self.wordCnt = 0
         self.wordCharCnt = 0
+        # FIXME: use PageList
         self.pages = []
         self.scenes = {}
         self.include = True

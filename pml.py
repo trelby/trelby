@@ -14,6 +14,8 @@
 
 import util
 
+import textwrap
+
 # types of drawing operations
 OP_TEXT = 0
 OP_LINE = 1
@@ -167,3 +169,59 @@ class PDFOp(DrawOp):
         DrawOp.__init__(self, OP_PDF)
 
         self.cmds = cmds
+
+# create a PML document containing text (possibly linewrapped) divided
+# into pages automatically.
+class TextFormatter:
+    def __init__(self, width, height, margin, fontSize):
+        self.doc = Document(width, height)
+
+        # how much to leave empty on each side (mm)
+        self.margin = margin
+
+        # font size
+        self.fontSize = fontSize
+
+        # number of chararacters that fit on a single line
+        self.charsToLine = int((width - margin * 2.0) /
+                               util.getTextWidth(" ", COURIER, fontSize))
+        
+        self.createPage()
+        
+    # add new empty page, select it as current, reset y pos
+    def createPage(self):
+        self.pg = Page(self.doc)
+        self.doc.add(self.pg)
+        self.y = self.margin
+
+    # add blank vertical space, unless we're at the top of the page
+    def addSpace(self, mm):
+        if self.y > self.margin:
+            self.y += mm
+
+    # add text
+    def addText(self, text, x = None, fs = None, style = NORMAL):
+        if x == None:
+            x = self.margin
+
+        if fs == None:
+            fs = self.fontSize
+
+        yd = util.getTextHeight(fs)
+
+        if (self.y + yd) > (self.doc.h - self.margin):
+            self.createPage()
+            
+        self.pg.add(TextOp(text, x, self.y, fs, style))
+
+        self.y += yd
+
+    # wrap text into lines that fit on the page, using Courier and default
+    # font size and style, and add the lines. 'indent' is the text to
+    # prefix lines other than the first one with.
+    def addWrappedText(self, text, indent):
+        tmp = textwrap.wrap(text, self.charsToLine,
+                subsequent_indent = indent)
+        
+        for s in tmp:
+            self.addText(s)
