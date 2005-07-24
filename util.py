@@ -162,6 +162,14 @@ def listify(seq, name):
 
     return l
 
+# return percentage of 'val1' of 'val2' (both ints) as an int (0-100), or
+# 0 if val2 is 0.
+def pct(val1, val2):
+    if val2 != 0:
+        return (100 * val1) // val2
+    else:
+        return 0
+
 # for each character in 'flags', starting at beginning, checks if that
 # character is found in 's'. if so, appends True to a tuple, False
 # otherwise. returns that tuple, whose length is of course is len(flags).
