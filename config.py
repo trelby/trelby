@@ -699,6 +699,9 @@ class ConfigGlobal:
             
             Command("ReportDialogueChart", "Generate dialogue chart report.",
                     isMenu = True),
+
+            Command("ReportLocation", "Generate location report.",
+                    isMenu = True),
             
             Command("ReportScene", "Generate scene report.",
                     isMenu = True),

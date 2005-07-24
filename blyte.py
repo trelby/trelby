@@ -12,6 +12,7 @@ import dialoguechart
 import finddlg
 import headers
 import headersdlg
+import locationreport
 import misc
 import myimport
 import mypickle
@@ -565,6 +566,10 @@ class MyCtrl(wxControl):
     def OnReportCharacter(self):
         self.sp.paginate()
         report.genCharacterReport(mainFrame, self.sp)
+
+    def OnReportLocation(self):
+        self.sp.paginate()
+        locationreport.genLocationReport(mainFrame, self.sp)
 
     def OnReportScene(self):
         self.sp.paginate()
@@ -1412,6 +1417,7 @@ class MyFrame(wxFrame):
         reportsMenu = wxMenu()
         reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart")
         reportsMenu.Append(ID_REPORTS_CHARACTER_REP, "&Character report...")
+        reportsMenu.Append(ID_REPORTS_LOCATION_REP, "&Location report...")
         reportsMenu.Append(ID_REPORTS_SCENE_REP, "&Scene report")
         
         toolsMenu = wxMenu()
@@ -1527,6 +1533,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnSaveScriptSettingsAs)
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnReportDialogueChart)
         EVT_MENU(self, ID_REPORTS_CHARACTER_REP, self.OnReportCharacter)
+        EVT_MENU(self, ID_REPORTS_LOCATION_REP, self.OnReportLocation)
         EVT_MENU(self, ID_REPORTS_SCENE_REP, self.OnReportScene)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDatabase)
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharacterMap)
@@ -1594,6 +1601,7 @@ class MyFrame(wxFrame):
             "ID_LICENSE_UPDATE",
             "ID_REPORTS_CHARACTER_REP",
             "ID_REPORTS_DIALOGUE_CHART",
+            "ID_REPORTS_LOCATION_REP",
             "ID_REPORTS_SCENE_REP",
             "ID_SCRIPT_FIND_ERROR",
             "ID_SCRIPT_HEADERS",
@@ -1942,6 +1950,9 @@ class MyFrame(wxFrame):
 
     def OnReportDialogueChart(self, event = None):
         self.panel.ctrl.OnReportDialogueChart()
+
+    def OnReportLocation(self, event = None):
+        self.panel.ctrl.OnReportLocation()
 
     def OnReportScene(self, event = None):
         self.panel.ctrl.OnReportScene()
