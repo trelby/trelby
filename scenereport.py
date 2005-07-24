@@ -3,11 +3,11 @@ import pml
 import screenplay
 import util
 
-def genSceneReport(mainFrame, sp, cfgGl):
+def genSceneReport(mainFrame, sp):
     report = SceneReport(sp)
     data = report.generate()
 
-    util.showTempPDF(data, cfgGl, mainFrame)
+    util.showTempPDF(data, sp.cfgGl, mainFrame)
 
 class SceneReport:
     def __init__(self, sp):
@@ -23,7 +23,7 @@ class SceneReport:
             
             startLine, endLine = sp.getSceneIndexesFromLine(line)
 
-            si = SceneInfo()
+            si = SceneInfo(sp)
             si.read(sp, startLine, endLine)
             self.scenes.append(si)
 
@@ -35,71 +35,34 @@ class SceneReport:
         self.avgScene = sum(lineSeq) / float(len(self.scenes))
 
     def generate(self):
-        self.doc = pml.Document(self.sp.cfg.paperWidth,
-                                self.sp.cfg.paperHeight)
+        tf = pml.TextFormatter(self.sp.cfg.paperWidth,
+                               self.sp.cfg.paperHeight, 15.0, 12)
 
-        # how much to leave empty on each side (mm)
-        self.margin = 15.0
+        tf.addText("Minimum / maximum / average scene length in lines:"
+                   " %d / %d / %.2f" % (self.shortestScene,
+                                        self.longestScene, self.avgScene))
 
-        # normal font
-        self.fontSize = 12
-
-        # scene name font
-        nameFs = 14
-
-        self.pg = pml.Page(self.doc)
-        self.y = self.margin
-
-        self.addText("Minimum / maximum / average scene length in lines:"
-                     " %d / %d / %.2f" % (self.shortestScene,
-                                          self.longestScene, self.avgScene))
         for si in self.scenes:
-            self.y += 5.0
+            tf.addSpace(5.0)
             
-            self.addText("%-4s %s" % (si.number, si.name),
-                         style = pml.BOLD)
+            tf.addText("%-4s %s" % (si.number, si.name), style = pml.BOLD)
 
-            self.y += 1.0
-            
-            if si.lines != 0:
-                tmp = "%d" % ((100 * si.actionLines) / si.lines)
-            else:
-                tmp = "0"
-                
-            self.addText("     Lines: %d (%s%% action), Pages: %d (%s)" % (
-                si.lines, tmp, len(si.pages),
-                si.getPageList()))
+            tf.addSpace(1.0)
 
-            self.y += 2.5
+            tf.addText("     Lines: %d (%s%% action), Pages: %d"
+                " (%s)" % (si.lines, util.pct(si.actionLines, si.lines),
+                len(si.pages), si.pages))
+
+            tf.addSpace(2.5)
             
             for it in util.sortDict(si.chars):
-                self.addText("     %3d  %s" % (it[1], it[0]))
+                tf.addText("     %3d  %s" % (it[1], it[0]))
             
-        self.doc.add(self.pg)
-
-        return pdf.generate(self.doc)
-    
-    def addText(self, text, x = None, fs = None, style = pml.NORMAL):
-        if x == None:
-            x = self.margin
-
-        if fs == None:
-            fs = self.fontSize
-
-        yd = util.getTextHeight(fs)
-
-        if (self.y + yd) > (self.sp.cfg.paperHeight - self.margin):
-            self.doc.add(self.pg)
-            self.pg = pml.Page(self.doc)
-            self.y = self.margin
-            
-        self.pg.add(pml.TextOp(text, x, self.y, fs, style))
-
-        self.y += yd
+        return pdf.generate(tf.doc)
 
 # information about one scene
 class SceneInfo:
-    def __init__(self):
+    def __init__(self, sp):
         # scene number, e.g. "42A"
         self.number = None
         
@@ -112,8 +75,8 @@ class SceneInfo:
         # action lines
         self.actionLines = 0
 
-        # list of page numbers (strings)
-        self.pages = []
+        # page numbers
+        self.pages = screenplay.PageList(sp.getPageNumbers())
 
         # key = character name (upper cased), value = number of dialogue
         # lines
@@ -136,7 +99,7 @@ class SceneInfo:
         else:
             self.name = "(NO SCENE NAME)"
 
-        self.addPage(str(sp.line2page(startLine)))
+        self.pages.addPage(sp.line2page(startLine))
 
         line = startLine
 
@@ -155,7 +118,7 @@ class SceneInfo:
 
         # get number of action lines and store page information
         for i in range(startLine, endLine + 1):
-            self.addPage(str(sp.line2page(i)))
+            self.pages.addPage(sp.line2page(i))
             
             if ls[i].lt == screenplay.ACTION:
                 self.actionLines += 1
@@ -211,20 +174,3 @@ class SceneInfo:
             self.chars[name] = self.chars.get(name, 0) + dlines
             
         return line
-
-    # add page to page list if it's not already there
-    def addPage(self, page):
-        if self.pages and (self.pages[-1] == page):
-            return
-            
-        self.pages.append(page)
-
-    # get page list as a string
-    def getPageList(self):
-        p1 = self.pages[0]
-        p2 = self.pages[-1]
-
-        if p1 == p2:
-            return p1
-        else:
-            return "%s-%s" % (p1, p2)
