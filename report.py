@@ -70,7 +70,7 @@ class CharacterReport:
             elif line.lt in (screenplay.DIALOGUE, screenplay.PAREN) and name:
                 ci = chars.get(name)
                 if not ci:
-                    ci = CharInfo(name)
+                    ci = CharInfo(name, sp)
                     chars[name] = ci
 
                 if scene:
@@ -87,7 +87,7 @@ class CharacterReport:
                 ci.wordCnt += len(words)
                 ci.wordCharCnt += reduce(lambda x, y: x + len(y), words, 0)
                 
-                ci.addPage(sp.line2page(i))
+                ci.pages.addPage(sp.line2page(i))
 
             else:
                 name = None
@@ -139,7 +139,7 @@ class CharacterReport:
                 
             if self.inf[self.INF_PAGES].selected:
                 tf.addWrappedText("Pages: %d, list: %s" % (len(ci.pages),
-                    ci.getPageList()), "       ")
+                    ci.pages), "       ")
 
             if self.inf[self.INF_LOCATIONS].selected:
                 tf.addSpace(2.5)
@@ -154,72 +154,16 @@ class CharacterReport:
 
 # information about one character
 class CharInfo:
-    def __init__(self, name):
+    def __init__(self, name, sp):
         self.name = name
 
         self.speechCnt = 0
         self.lineCnt = 0
         self.wordCnt = 0
         self.wordCharCnt = 0
-        # FIXME: use PageList
-        self.pages = []
         self.scenes = {}
         self.include = True
-        
-    def addPage(self, page):
-        if self.pages and (self.pages[-1] == page):
-            return
-            
-        self.pages.append(page)
-
-    # return textual representation of pages where consecutive pages are
-    # formatted as "x-y".
-    def getPageList(self):
-        # TODO: this is better implemented by:
-        #
-        # - producing a list of all pages of the screenplay
-        # - comparing our list to that, one-by-one
-        
-        s = ""
-
-        i = 0
-        while 1:
-            if i >= len(self.pages):
-                break
-
-            p = self.pages[i]
-            
-            if s != "":
-                s += ", "
-
-            s += str(p)
-            pg = util.str2int(str(p), -1)
-
-            if pg != -1:
-                endPage = pg
-                j = i + 1
-                while 1:
-                    if j >= len(self.pages):
-                        break
-
-                    pg2 = util.str2int(str(self.pages[j]), -1)
-
-                    if pg2 != (endPage + 1):
-                        break
-
-                    endPage = pg2
-                    j += 1
-
-                if endPage != pg:
-                    s += "-%d" % (endPage)
-                    i = j
-                else:
-                    i += 1
-            else:
-                # fancy page number, e.g. "72A", can't do ranges with them
-                i += 1
-            
-        return s
+        self.pages = screenplay.PageList(sp.getPageNumbers())
 
 def cmpLines(c1, c2):
     ret = cmp(c2.lineCnt, c1.lineCnt)

@@ -568,7 +568,7 @@ class MyCtrl(wxControl):
 
     def OnReportScene(self):
         self.sp.paginate()
-        scenereport.genSceneReport(mainFrame, self.sp, cfgGl)
+        scenereport.genSceneReport(mainFrame, self.sp)
 
     def OnCompareScripts(self):
         if mainFrame.notebook.GetPageCount() < 2:
