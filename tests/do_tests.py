@@ -3,6 +3,9 @@
 
 # FIXME: handle KeyboardInterrupt so testing can be aborted
 
+# FIXME: complain if a tested .py file contains no test functions
+
+
 import glob
 import optparse
 import os
@@ -63,8 +66,8 @@ def getFlags(filename):
     fp.close()
 
     return ret
-    
-# run a single test
+
+# run tests from a single file, either all of them or a specific one.
 def doTest(opts):
     # FIXME
     sys.path.insert(0, "..")

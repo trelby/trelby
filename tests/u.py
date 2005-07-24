@@ -7,7 +7,7 @@ import util
 
 initDone = False
 
-def load(filename = "test.blyte"):
+def init():
     global initDone
     
     if not initDone:
@@ -16,5 +16,8 @@ def load(filename = "test.blyte"):
 
         initDone = True
     
+def load(filename = "test.blyte"):
+    init()
+
     return screenplay.Screenplay.load(open(filename, "r").read(),
                                       config.ConfigGlobal())[0]
