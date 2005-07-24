@@ -138,11 +138,11 @@ class CheckBoxItem:
     
     getClientData = staticmethod(getClientData)
 
-# shows one or two (one is cbil2 = None) checklistbox widgets with
+# shows one or two (one if cbil2 = None) checklistbox widgets with
 # contents from cbil1 and possibly cbil2, which are lists of
 # CheckBoxItems. btns[12] are bools for whether or not to include helper
-# buttons. cdata[12] are the optional client data lists. if OK is pressed,
-# the incoming lists' items' selection status will be modified.
+# buttons. if OK is pressed, the incoming lists' items' selection status
+# will be modified.
 class CheckBoxDlg(wxDialog):
     def __init__(self, parent, title, cbil1, descr1, btns1,
                  cbil2 = None, descr2 = None, btns2 = None):
