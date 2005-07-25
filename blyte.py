@@ -561,7 +561,7 @@ class MyCtrl(wxControl):
         
     def OnReportDialogueChart(self):
         self.sp.paginate()
-        dialoguechart.genDialogueChart(mainFrame, self)
+        dialoguechart.genDialogueChart(mainFrame, self.sp)
 
     def OnReportCharacter(self):
         self.sp.paginate()

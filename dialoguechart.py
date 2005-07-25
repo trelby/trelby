@@ -7,7 +7,7 @@ import util
 from wxPython.wx import *
 
 # show all all dialogue charts as a PDF document
-def genDialogueChart(mainFrame, ctrl):
+def genDialogueChart(mainFrame, sp):
     inf = []
     for it in [ ("Characters appearing on a single page", None),
                 ("Sorted by: First appearance", cmpFirst),
@@ -32,7 +32,7 @@ def genDialogueChart(mainFrame, ctrl):
     if not inf[0].selected:
         minPages = 2
 
-    chart = DialogueChart(ctrl, minPages)
+    chart = DialogueChart(sp, minPages)
 
     if not chart.cinfo:
         wxMessageBox("No characters speaking found.", "Error", wxOK,
@@ -50,14 +50,14 @@ def genDialogueChart(mainFrame, ctrl):
         
     data = chart.generate(inf)
 
-    util.showTempPDF(data, ctrl.sp.cfgGl, mainFrame)
+    util.showTempPDF(data, sp.cfgGl, mainFrame)
     
 class DialogueChart:
-    def __init__(self, ctrl, minPages):
+    def __init__(self, sp, minPages):
 
-        self.ctrl = ctrl
+        self.sp = sp
         
-        ls = ctrl.sp.lines
+        ls = sp.lines
 
         # appearances by each character. index = page (0-indexed), value =
         # map of characters speaking on that page
@@ -67,7 +67,7 @@ class DialogueChart:
         # each page
         self.diagDens = []
         
-        for i in xrange(len(ctrl.sp.pages) - 1):
+        for i in xrange(len(sp.pages) - 1):
             self.pages.append({})
 
         curPage = 0
@@ -79,7 +79,7 @@ class DialogueChart:
         characters = {}
         
         for i in xrange(len(ls)):
-            page = ctrl.sp.line2page(i) - 1
+            page = sp.line2page(i) - 1
             line = ls[i]
 
             if page != curPage:
@@ -149,7 +149,7 @@ class DialogueChart:
                 break
             
             if (self.chartY + self.chartHeight) <= \
-                   (self.ctrl.sp.cfg.paperWidth - self.margin):
+                   (sp.cfg.paperWidth - self.margin):
                 break
 
             size -= 1
@@ -168,12 +168,11 @@ class DialogueChart:
         self.chartX = self.margin + maxLen * charX + 3
 
         # width of chart
-        self.chartWidth = self.ctrl.sp.cfg.paperHeight - self.chartX -\
-                          self.margin
+        self.chartWidth = sp.cfg.paperHeight - self.chartX - self.margin
 
     def generate(self, cbil):
-        doc = pml.Document(self.ctrl.sp.cfg.paperHeight,
-                           self.ctrl.sp.cfg.paperWidth)
+        doc = pml.Document(self.sp.cfg.paperHeight,
+                           self.sp.cfg.paperWidth)
 
         for it in cbil:
             if it.selected:
