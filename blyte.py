@@ -4,6 +4,7 @@
 from error import *
 import bugreport
 import cfgdlg
+import characterreport
 import charmapdlg
 import commandsdlg
 import config
@@ -18,7 +19,6 @@ import myimport
 import mypickle
 import namesdlg
 import pml
-import report
 import scenereport
 import screenplay
 import splash
