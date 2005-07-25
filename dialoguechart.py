@@ -8,6 +8,12 @@ from wxPython.wx import *
 
 # show all all dialogue charts as a PDF document
 def genDialogueChart(mainFrame, sp):
+
+    # TODO: would be nice if this behaved like the other reports, i.e. the
+    # junk below would be inside the class, not outside. this would allow
+    # testcases to be written. only complication is the minPages thing
+    # which would need some thinking.
+
     inf = []
     for it in [ ("Characters appearing on a single page", None),
                 ("Sorted by: First appearance", cmpFirst),
