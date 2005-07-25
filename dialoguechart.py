@@ -259,7 +259,7 @@ class DialogueChart:
             if misc.license:
                 name = ci.name
             else:
-                name = "BUY ME"
+                name = "EVALUATION"
                 
             pg.add(pml.TextOp(name, self.margin, y + self.charY / 2.0,
                 self.charFs, valign = util.VALIGN_CENTER))
