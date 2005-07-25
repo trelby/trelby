@@ -1,8 +1,11 @@
+import misc
 import pdf
 import pml
 import scenereport
 import screenplay
 import util
+
+from wxPython.wx import *
 
 # FIXME: Screenplay should contain information about which scenes
 # constitute a location, and that should be saved/loaded. is it config
@@ -10,6 +13,19 @@ import util
 
 def genLocationReport(mainFrame, sp):
     report = LocationReport(scenereport.SceneReport(sp))
+
+    dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
+        "Information to include:", False)
+
+    ok = False
+    if dlg.ShowModal() == wxID_OK:
+        ok = True
+
+    dlg.Destroy()
+
+    if not ok:
+        return
+    
     data = report.generate()
 
     util.showTempPDF(data, sp.cfgGl, mainFrame)
@@ -71,6 +87,13 @@ class LocationReport:
 
         self.locations = tmp
 
+        # information about what to include (and yes, the comma is needed
+        # to unpack the list)
+        self.INF_SPEAKERS, = range(1)
+        self.inf = []
+        for s in ["Speakers"]:
+            self.inf.append(misc.CheckBoxItem(s))
+
     def generate(self):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
@@ -98,11 +121,12 @@ class LocationReport:
                 util.pct(li.lines, scriptLines), li.sceneCount,
                 len(li.pages), li.pages), "  ")
             
-            tf.addSpace(2.5)
 
-            # FIXME: make this optional
-            for it in util.sortDict(li.chars):
-                tf.addText("     %3d  %s" % (it[1], it[0]))
+            if self.inf[self.INF_SPEAKERS].selected:
+                tf.addSpace(2.5)
+                
+                for it in util.sortDict(li.chars):
+                    tf.addText("     %3d  %s" % (it[1], it[0]))
             
         return pdf.generate(tf.doc)
 

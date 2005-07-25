@@ -1,10 +1,26 @@
+import misc
 import pdf
 import pml
 import screenplay
 import util
 
+from wxPython.wx import *
+
 def genSceneReport(mainFrame, sp):
     report = SceneReport(sp)
+
+    dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
+        "Information to include:", False)
+
+    ok = False
+    if dlg.ShowModal() == wxID_OK:
+        ok = True
+
+    dlg.Destroy()
+
+    if not ok:
+        return
+
     data = report.generate()
 
     util.showTempPDF(data, sp.cfgGl, mainFrame)
@@ -34,6 +50,13 @@ class SceneReport:
         self.longestScene = max(lineSeq)
         self.avgScene = sum(lineSeq) / float(len(self.scenes))
 
+        # information about what to include (and yes, the comma is needed
+        # to unpack the list)
+        self.INF_SPEAKERS, = range(1)
+        self.inf = []
+        for s in ["Speakers"]:
+            self.inf.append(misc.CheckBoxItem(s))
+
     def generate(self):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
@@ -53,10 +76,11 @@ class SceneReport:
                 " (%s)" % (si.lines, util.pct(si.actionLines, si.lines),
                 len(si.pages), si.pages))
 
-            tf.addSpace(2.5)
+            if self.inf[self.INF_SPEAKERS].selected:
+                tf.addSpace(2.5)
             
-            for it in util.sortDict(si.chars):
-                tf.addText("     %3d  %s" % (it[1], it[0]))
+                for it in util.sortDict(si.chars):
+                    tf.addText("     %3d  %s" % (it[1], it[0]))
             
         return pdf.generate(tf.doc)
 
