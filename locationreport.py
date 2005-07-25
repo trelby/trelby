@@ -60,19 +60,18 @@ class LocationReport:
             for scene in sceneList:
                 locations[scene] = li
 
-        # merge scene information
+        # merge scene information for locations and store scene
+        # information
         for si in sr.scenes:
-            li = locations.setdefault(si.name, LocationInfo(self.sp)).\
-                 addScene(si)
-            li = self.scenes.setdefault(si.name, LocationInfo(self.sp)).\
+            locations.setdefault(si.name, LocationInfo(self.sp)).addScene(si)
+
+            self.scenes.setdefault(si.name, LocationInfo(self.sp)).\
                  addScene(si)
 
-        # remove empty LocationInfos, sort them (and their contents), and
-        # store to a list
+        # remove empty LocationInfos, sort them and store to a list
         tmp = []
         for li in locations.itervalues():
             if (len(li.scenes) > 0) and (li not in tmp):
-                li.scenes.sort()
                 tmp.append(li)
 
         def sortFunc(o1, o2):
@@ -103,15 +102,25 @@ class LocationReport:
         for li in self.locations:
             tf.addSpace(5.0)
 
-            # FIXME: sort by tmp (&name), highest first
-            for scene in li.scenes:
-                if len(li.scenes) > 1:
-                    tmp = " (%d%%)" % util.pct(self.scenes[scene].lines,
-                                               li.lines)
-                else:
-                    tmp = ""
+            # list of (scenename, lines_in_scene) tuples, which we sort in
+            # DESC(lines_in_scene) ASC(scenename) order.
+            tmp = [(scene, self.scenes[scene].lines) for scene in li.scenes]
 
-                tf.addText("%s%s" % (scene, tmp), style = pml.BOLD)
+            # PY2.4: this should work (test it):
+            #  tmp.sort(key=itemgetter(0))
+            #  tmp.sort(key=itemgetter(1) reverse=True)
+            tmp.sort(lambda x, y: cmp(x[0], y[0]))
+            tmp.reverse()
+            tmp.sort(lambda x, y: cmp(x[1], y[1]))
+            tmp.reverse()
+            
+            for scene, lines in tmp:
+                if len(tmp) > 1:
+                    pct = " (%d%%)" % util.pct(lines, li.lines)
+                else:
+                    pct = ""
+
+                tf.addText("%s%s" % (scene, pct), style = pml.BOLD)
 
             tf.addSpace(1.0)
 
