@@ -88,6 +88,10 @@ def doTest(opts):
     else:
         funcs = [opts.func]
 
+    if not funcs:
+        print "[--- No tests found in %s ---]" % name
+        sys.exit(1)
+
     for f in funcs:
         print "[Testing %s:%s]" % (name, f)
         getattr(mod, f)()
@@ -105,8 +109,13 @@ def doTests(opts):
 
     t = time.time()
     
-    # FIXME
-    for fname in glob.glob("*.py"):
+    # FIXME: allow specifying which files to test
+
+    # PY2.4: use "for fname in sorted(glob...)"
+    fnames = glob.glob("*.py")
+    fnames.sort()
+    
+    for fname in fnames:
         flags = getFlags(fname)
 
         if flags.has_key("ignore"):
@@ -128,6 +137,11 @@ def doTests(opts):
             attr = dir(mod)
 
             funcs = getTestFuncs(mod)
+
+            if not funcs:
+                print "[--- No tests found in %s ---]" % name
+                cntTotal += 1
+                cntFailed += 1
 
             for f in funcs:
                 # FIXME
