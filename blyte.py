@@ -565,7 +565,7 @@ class MyCtrl(wxControl):
 
     def OnReportCharacter(self):
         self.sp.paginate()
-        report.genCharacterReport(mainFrame, self.sp)
+        characterreport.genCharacterReport(mainFrame, self.sp)
 
     def OnReportLocation(self):
         self.sp.paginate()
