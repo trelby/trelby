@@ -240,6 +240,8 @@ def mm2twips(mm):
     # 56.69291 = 1440 / 25.4
     return mm * 56.69291
 
+# TODO: move all GUI stuff to gutil
+
 # return True if given font is a fixed-width one.
 def isFixedWidth(font):
     return getTextExtent(font, "iiiii")[0] == getTextExtent(font, "OOOOO")[0]

@@ -7,10 +7,6 @@ import util
 
 from wxPython.wx import *
 
-# FIXME: Screenplay should contain information about which scenes
-# constitute a location, and that should be saved/loaded. is it config
-# data or script data? good question...it also needs a config GUI.
-
 def genLocationReport(mainFrame, sp):
     report = LocationReport(scenereport.SceneReport(sp))
 
@@ -35,17 +31,6 @@ class LocationReport:
     def __init__(self, sr):
         self.sp = sr.sp
 
-        # location mapping. a list of lists of strings, where the strings
-        # are scene names and the inner list lists scenes to combine into
-        # one location.
-        # FIXME: get this from screenplay
-        locMap = [
-            ["INT. ROOM 413 - DAY.",
-             "INT. ROOM 413 - (CONTINUOUS) - DAY.",
-             "INT. ROOM 413 - DAWN.",
-             "INT. ROOM 413 - NIGHT."]
-            ]
-
         # key = scene name, value = LocationInfo. note that multiple keys
         # can point to the same LocationInfo.
         locations = {}
@@ -54,7 +39,7 @@ class LocationReport:
         self.scenes = {}
         
         # make grouped scenes point to the same LocationInfos.
-        for sceneList in locMap:
+        for sceneList in self.sp.locations.locations:
             li = LocationInfo(self.sp)
             
             for scene in sceneList:

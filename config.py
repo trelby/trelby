@@ -624,6 +624,9 @@ class ConfigGlobal:
             Command("LoadScriptSettings", "Load script-specific settings.",
                     isMenu = True),
             
+            Command("LocationsDlg", "Open the locations dialog.",
+                    isMenu = True),
+
             Command("MoveDown", "Move down.", [WXK_DOWN], isMovement = True),
             
             Command("MoveEndOfLine", "Move to the end of the line or"

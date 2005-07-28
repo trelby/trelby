@@ -14,6 +14,7 @@ import finddlg
 import headers
 import headersdlg
 import locationreport
+import locationsdlg
 import misc
 import myimport
 import mypickle
@@ -558,6 +559,15 @@ class MyCtrl(wxControl):
             self.applyHeaders(dlg.headers)
 
         dlg.Destroy()
+
+    def OnLocationsDlg(self):
+        dlg = locationsdlg.LocationsDlg(mainFrame, copy.deepcopy(self.sp))
+
+        if dlg.ShowModal() == wxID_OK:
+            self.sp.locations = dlg.sp.locations
+            self.sp.markChanged()
+
+        dlg.Destroy()
         
     def OnReportDialogueChart(self):
         self.sp.paginate()
@@ -1029,7 +1039,7 @@ class MyCtrl(wxControl):
             cs.char = chr(kc)
 
             if misc.isTest and (cs.char == "å"):
-                self.loadFile("sample.blyte")
+                self.loadFile("casablanca.blyte")
             elif misc.isTest and (cs.char == "¤"):
                 self.cmdTest(cs)
             else:
@@ -1405,6 +1415,8 @@ class MyFrame(wxFrame):
         scriptMenu.AppendSeparator()
         scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
         scriptMenu.Append(ID_SCRIPT_HEADERS, "&Headers...")
+        scriptMenu.Append(ID_SCRIPT_LOCATIONS, "&Locations...")
+        scriptMenu.AppendSeparator()
 
         tmp = wxMenu()
 
@@ -1528,6 +1540,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
         EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitlesDlg)
         EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeadersDlg)
+        EVT_MENU(self, ID_SCRIPT_LOCATIONS, self.OnLocationsDlg)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_CHANGE, self.OnScriptSettings)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_LOAD, self.OnLoadScriptSettings)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnSaveScriptSettingsAs)
@@ -1605,6 +1618,7 @@ class MyFrame(wxFrame):
             "ID_REPORTS_SCENE_REP",
             "ID_SCRIPT_FIND_ERROR",
             "ID_SCRIPT_HEADERS",
+            "ID_SCRIPT_LOCATIONS",
             "ID_SCRIPT_PAGINATE",
             "ID_SCRIPT_SETTINGS",
             "ID_SCRIPT_SETTINGS_CHANGE",
@@ -1909,6 +1923,9 @@ class MyFrame(wxFrame):
 
     def OnHeadersDlg(self, event = None):
         self.panel.ctrl.OnHeadersDlg()
+
+    def OnLocationsDlg(self, event = None):
+        self.panel.ctrl.OnLocationsDlg()
 
     def OnScriptSettings(self, event = None):
         self.panel.ctrl.OnScriptSettings()

@@ -17,12 +17,13 @@ NOTE = 8
 
 import config
 import error
-import titles
 import headers
+import locations
 import misc
 import mypager
 import pdf
 import pml
+import titles
 import util
 
 import codecs
@@ -35,8 +36,9 @@ import time
 # screenplay
 class Screenplay:
     def __init__(self, cfgGl):
-        self.titles = titles.Titles()
         self.headers = headers.Headers()
+        self.locations = locations.Locations()
+        self.titles = titles.Titles()
         
         self.lines = [ Line(LB_LAST, SCENE) ]
 
@@ -103,8 +105,9 @@ class Screenplay:
         sp = Screenplay(self.cfgGl)
         sp.cfg = copy.deepcopy(self.cfg)
 
-        sp.titles = copy.deepcopy(self.titles)
         sp.headers = copy.deepcopy(self.headers)
+        sp.locations = copy.deepcopy(self.locations)
+        sp.titles = copy.deepcopy(self.titles)
 
         # remove the dummy empty line
         sp.lines = []
@@ -127,6 +130,8 @@ class Screenplay:
         output += self.cfg.save()
         output += "#End-Config \n"
 
+        # FIXME: save locations
+        
         pgs = self.titles.pages
         for pg in xrange(len(pgs)):
             if pg != 0:
@@ -228,6 +233,8 @@ class Screenplay:
         # did we encounter unknown config lines
         unknownConfigs = False
 
+        # FIXME: load locations
+        
         for i in xrange(endConfig, len(lines)):
             s = lines[i]
 
@@ -1322,6 +1329,17 @@ class Screenplay:
             pages.append(str(p))
 
         return pages
+
+    # return a dictionary of all scene names (single-line text elements
+    # only, upper-cased, values = None).
+    def getSceneNames(self):
+        names = {}
+
+        for ln in self.lines:
+            if (ln.lt == SCENE) and (ln.lb == LB_LAST):
+                names[util.upper(ln.text)] = None
+
+        return names
 
     # returns True if we're at second-to-last character of PAREN element,
     # and last character is ")"
