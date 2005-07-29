@@ -6,8 +6,7 @@ import util
 
 from wxPython.wx import *
 
-# show all all dialogue charts as a PDF document
-def genDialogueChart(mainFrame, sp):
+def genDialogueChart(mainFrame, sp, addDs):
 
     # TODO: would be nice if this behaved like the other reports, i.e. the
     # junk below would be inside the class, not outside. this would allow
@@ -54,7 +53,7 @@ def genDialogueChart(mainFrame, sp):
 
         return
         
-    data = chart.generate(inf)
+    data = chart.generate(inf, addDs)
 
     util.showTempPDF(data, sp.cfgGl, mainFrame)
     
@@ -176,20 +175,23 @@ class DialogueChart:
         # width of chart
         self.chartWidth = sp.cfg.paperHeight - self.chartX - self.margin
 
-    def generate(self, cbil):
+    def generate(self, cbil, addDs):
         doc = pml.Document(self.sp.cfg.paperHeight,
                            self.sp.cfg.paperWidth)
 
         for it in cbil:
             if it.selected:
                 self.cinfo.sort(it.cdata)
-                doc.add(self.generatePage(it.text, doc))
+                doc.add(self.generatePage(it.text, doc, addDs))
         
         return pdf.generate(doc)
 
-    def generatePage(self, title, doc):
+    def generatePage(self, title, doc, addDs):
         pg = pml.Page(doc)
 
+        if addDs:
+            pg.addDemoStamp()
+        
         pg.add(pml.TextOp(title, doc.w / 2.0, self.margin, 18,
             pml.BOLD | pml.ITALIC | pml.UNDERLINED, util.ALIGN_CENTER))
 

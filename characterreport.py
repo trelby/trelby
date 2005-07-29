@@ -6,7 +6,7 @@ import util
 
 from wxPython.wx import *
 
-def genCharacterReport(mainFrame, sp):
+def genCharacterReport(mainFrame, sp, addDs):
     report = CharacterReport(sp)
 
     if not report.cinfo:
@@ -35,7 +35,7 @@ def genCharacterReport(mainFrame, sp):
     if not ok:
         return
     
-    data = report.generate()
+    data = report.generate(addDs)
 
     util.showTempPDF(data, sp.cfgGl, mainFrame)
     
@@ -115,9 +115,9 @@ class CharacterReport:
     def sum(self, name):
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
         
-    def generate(self):
+    def generate(self, addDs):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 20.0, 12)
+                               self.sp.cfg.paperHeight, 20.0, 12, addDs)
 
         for ci in self.cinfo:
             if not ci.include:

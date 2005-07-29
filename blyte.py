@@ -571,19 +571,23 @@ class MyCtrl(wxControl):
         
     def OnReportDialogueChart(self):
         self.sp.paginate()
-        dialoguechart.genDialogueChart(mainFrame, self.sp)
+        dialoguechart.genDialogueChart(mainFrame, self.sp,
+                                       not misc.license)
 
     def OnReportCharacter(self):
         self.sp.paginate()
-        characterreport.genCharacterReport(mainFrame, self.sp)
+        characterreport.genCharacterReport(mainFrame, self.sp,
+                                           not misc.license)
 
     def OnReportLocation(self):
         self.sp.paginate()
-        locationreport.genLocationReport(mainFrame, self.sp)
+        locationreport.genLocationReport(mainFrame, self.sp,
+                                         not misc.license)
 
     def OnReportScene(self):
         self.sp.paginate()
-        scenereport.genSceneReport(mainFrame, self.sp)
+        scenereport.genSceneReport(mainFrame, self.sp,
+                                   not misc.license)
 
     def OnCompareScripts(self):
         if mainFrame.notebook.GetPageCount() < 2:

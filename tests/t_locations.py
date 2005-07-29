@@ -10,7 +10,6 @@ def ch(locsOld, scenes, locsNew):
 
     loc.refresh(scenes)
 
-    #print loc.locations, locsNew
     assert loc.locations == locsNew
     
 def test():

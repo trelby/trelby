@@ -173,7 +173,7 @@ class PDFOp(DrawOp):
 # create a PML document containing text (possibly linewrapped) divided
 # into pages automatically.
 class TextFormatter:
-    def __init__(self, width, height, margin, fontSize):
+    def __init__(self, width, height, margin, fontSize, addDs):
         self.doc = Document(width, height)
 
         # how much to leave empty on each side (mm)
@@ -182,6 +182,9 @@ class TextFormatter:
         # font size
         self.fontSize = fontSize
 
+        # whether to add a demo stamp to each page
+        self.addDs = addDs
+        
         # number of chararacters that fit on a single line
         self.charsToLine = int((width - margin * 2.0) /
                                util.getTextWidth(" ", COURIER, fontSize))
@@ -191,6 +194,10 @@ class TextFormatter:
     # add new empty page, select it as current, reset y pos
     def createPage(self):
         self.pg = Page(self.doc)
+
+        if self.addDs:
+            self.pg.addDemoStamp()
+            
         self.doc.add(self.pg)
         self.y = self.margin
 

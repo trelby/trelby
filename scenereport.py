@@ -6,7 +6,7 @@ import util
 
 from wxPython.wx import *
 
-def genSceneReport(mainFrame, sp):
+def genSceneReport(mainFrame, sp, addDs):
     report = SceneReport(sp)
 
     dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
@@ -21,7 +21,7 @@ def genSceneReport(mainFrame, sp):
     if not ok:
         return
 
-    data = report.generate()
+    data = report.generate(addDs)
 
     util.showTempPDF(data, sp.cfgGl, mainFrame)
 
@@ -57,9 +57,9 @@ class SceneReport:
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
-    def generate(self):
+    def generate(self, addDs):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 15.0, 12)
+                               self.sp.cfg.paperHeight, 15.0, 12, addDs)
 
         tf.addText("Minimum / maximum / average scene length in lines:"
                    " %d / %d / %.2f" % (self.shortestScene,
