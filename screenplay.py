@@ -15,6 +15,7 @@ TRANSITION = 6
 SHOT = 7
 NOTE = 8
 
+import autocompletion
 import config
 import error
 import headers
@@ -36,6 +37,7 @@ import time
 # screenplay
 class Screenplay:
     def __init__(self, cfgGl):
+        self.autoCompletion = autocompletion.AutoCompletion()
         self.headers = headers.Headers()
         self.locations = locations.Locations()
         self.titles = titles.Titles()
@@ -63,15 +65,15 @@ class Screenplay:
         # time when last paginated
         self.lastPaginated = 0.0
 
-        # list of auto-comp strings
-        self.autoComp = None
+        # list of active auto-completion strings
+        self.acItems = None
 
-        # selected auto-comp item (only valid when autoComp contains
+        # selected auto-completion item (only valid when acItems contains
         # something)
-        self.autoCompSel = -1
+        self.acSel = -1
 
         # max nr of auto comp items displayed at once
-        self.maxAutoCompItems = 10
+        self.acMax = 10
 
         # True if script has had changes done to it after
         # load/save/creation.
@@ -105,6 +107,7 @@ class Screenplay:
         sp = Screenplay(self.cfgGl)
         sp.cfg = copy.deepcopy(self.cfg)
 
+        sp.autoCompletion = copy.deepcopy(self.autoCompletion)
         sp.headers = copy.deepcopy(self.headers)
         sp.locations = copy.deepcopy(self.locations)
         sp.titles = copy.deepcopy(self.titles)
@@ -125,6 +128,10 @@ class Screenplay:
 
         output += codecs.BOM_UTF8
         output += "#Version 2\n"
+
+        output += "#Begin-Auto-Completion \n"
+        output += util.toUTF8(self.autoCompletion.save())
+        output += "#End-Auto-Completion \n"
 
         output += "#Begin-Config \n"
         output += self.cfg.save()
@@ -209,6 +216,10 @@ class Screenplay:
 
         # current position at 'lines'
         index = 1
+
+        s, index = Screenplay.getConfigPart(lines, "Auto-Completion", index)
+        if s:
+            sp.autoCompletion.load(s)
 
         s, index = Screenplay.getConfigPart(lines, "Config", index)
         if s:
@@ -1283,11 +1294,11 @@ class Screenplay:
     def splitElement(self, newType):
         ls = self.lines
         
-        if not self.autoComp:
+        if not self.acItems:
             if self.isAtEndOfParen():
                 self.column += 1
         else:
-            ls[self.line].text = self.autoComp[self.autoCompSel]
+            ls[self.line].text = self.acItems[self.acSel]
             self.column = len(ls[self.line].text)
 
         self.splitLine()
@@ -1388,44 +1399,43 @@ class Screenplay:
     # if auto-completion is active, clear it and return True. otherwise
     # return False.
     def clearAutoComp(self):
-        if not self.autoComp:
+        if not self.acItems:
             return False
 
-        self.autoComp = None
+        self.acItems = None
 
         return True
 
     def fillAutoComp(self):
         ls = self.lines
 
-        tcfg = self.cfg.getType(ls[self.line].lt)
+        lt = ls[self.line].lt
+        t = self.autoCompletion.getType(lt)
 
-        if tcfg.doAutoComp:
-            self.autoComp = self.getMatchingText(ls[self.line].text,
-                                                 tcfg.lt)
-            self.autoCompSel = 0
+        if t and t.enabled:
+            self.acItems = self.getMatchingText(ls[self.line].text, lt)
+            self.acSel = 0
 
     # page up (dir == -1) or page down (dir == 1) was pressed and we're in
     # auto-comp mode, handle it.
     def pageScrollAutoComp(self, dir):
-        if len(self.autoComp) > self.maxAutoCompItems:
+        if len(self.acItems) > self.acMax:
 
             if dir < 0:
-                self.autoCompSel -= self.maxAutoCompItems
+                self.acSel -= self.acMax
 
-                if self.autoCompSel < 0:
-                    self.autoCompSel = len(self.autoComp) - 1
+                if self.acSel < 0:
+                    self.acSel = len(self.acItems) - 1
 
             else:
-                self.autoCompSel = (self.autoCompSel +
-                    self.maxAutoCompItems) % len(self.autoComp)
+                self.acSel = (self.acSel + self.acMax) % len(self.acItems)
         
     # get a list of strings (single-line text elements for now) that start
     # with 'text' (not case sensitive) and are of of type 'type'. also
     # mixes in the type's default items from config. ignores current line.
     def getMatchingText(self, text, lt):
         text = util.upper(text)
-        tcfg = self.cfg.getType(lt)
+        t = self.autoCompletion.getType(lt)
         ls = self.lines
         matches = {}
         last = None
@@ -1439,8 +1449,8 @@ class Screenplay:
                     if i < self.line:
                         last = upstr
 
-        for i in tcfg.autoCompList:
-            upstr = util.upper(i)
+        for s in t.items:
+            upstr = util.upper(s)
             
             if upstr.startswith(text):
                 matches[upstr] = None
@@ -2054,35 +2064,35 @@ class Screenplay:
                 self.column = 0
 
     def moveUpCmd(self, cs):
-        if not self.autoComp:
+        if not self.acItems:
             self.maybeMark(cs.mark)
 
             if self.line > 0:
                 self.line -= 1
 
         else:
-            self.autoCompSel = self.autoCompSel - 1
+            self.acSel -= 1
             
-            if self.autoCompSel < 0:
-                self.autoCompSel = len(self.autoComp) - 1
+            if self.acSel < 0:
+                self.acSel = len(self.acItems) - 1
 
             cs.doAutoComp = cs.AC_KEEP
 
     def moveDownCmd(self, cs):
-        if not self.autoComp:
+        if not self.acItems:
             self.maybeMark(cs.mark)
 
             if self.line < (len(self.lines) - 1):
                 self.line += 1
 
         else:
-            self.autoCompSel = (self.autoCompSel + 1) % len(self.autoComp)
+            self.acSel = (self.acSel + 1) % len(self.acItems)
             
             cs.doAutoComp = cs.AC_KEEP
                 
     def moveLineEndCmd(self, cs):
-        if self.autoComp:
-            self.lines[self.line].text = self.autoComp[self.autoCompSel]
+        if self.acItems:
+            self.lines[self.line].text = self.acItems[self.acSel]
         else:
             self.maybeMark(cs.mark)
 

@@ -51,7 +51,7 @@ class MyListBook(wxListBox):
     
 class CfgDlg(wxDialog):
     def __init__(self, parent, cfg, applyFunc, isGlobal):
-        wxDialog.__init__(self, parent, -1, "Settings dialog",
+        wxDialog.__init__(self, parent, -1, "",
                           style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
         self.cfg = cfg
         self.applyFunc = applyFunc
@@ -64,8 +64,8 @@ class CfgDlg(wxDialog):
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
         self.listbook = MyListBook(self)
-        w = util.getTextExtent(self.listbook.GetFont(), "Auto-completion")[0]
-        self.listbook.SetClientSizeWH(w + 10, 200)
+        w = util.getTextExtent(self.listbook.GetFont(), "Formatting")[0]
+        self.listbook.SetClientSizeWH(w + 20, 200)
 
         hsizer.Add(self.listbook, 0, wxEXPAND)
 
@@ -74,13 +74,16 @@ class CfgDlg(wxDialog):
         hsizer.Add(self.panel, 1, wxEXPAND)
 
         if isGlobal:
+            self.SetTitle("Settings dialog")
+            
             self.AddPage(ColorsPanel, "Colors")
             self.AddPage(DisplayPanel, "Display")
             self.AddPage(ElementsGlobalPanel, "Elements")
             self.AddPage(KeyboardPanel, "Keyboard")
             self.AddPage(MiscPanel, "Misc")
         else:
-            self.AddPage(AutoCompPanel, "Auto-completion")
+            self.SetTitle("Script settings dialog")
+            
             self.AddPage(ElementsPanel, "Elements")
             self.AddPage(FormattingPanel, "Formatting")
             self.AddPage(PaperPanel, "Paper")
@@ -687,77 +690,6 @@ class PaperPanel(wxPanel):
     def entry2float(self, entry, name, factor = 1.0):
         val = util.str2float(entry.GetValue(), 0.0) * factor
         setattr(self.cfg, name, val)
-        
-class AutoCompPanel(wxPanel):
-    def __init__(self, parent, id, cfg):
-        wxPanel.__init__(self, parent, id)
-        self.cfg = cfg
-
-        vsizer = wxBoxSizer(wxVERTICAL)
-
-        hsizer = wxBoxSizer(wxHORIZONTAL)
-
-        hsizer.Add(wxStaticText(self, -1, "Element:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-
-        self.elementsCombo = wxComboBox(self, -1, style = wxCB_READONLY)
-
-        for t in (screenplay.SCENE, screenplay.CHARACTER,
-                  screenplay.TRANSITION):
-            self.elementsCombo.Append(cfg.getType(t).ti.name, t)
-
-        EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
-
-        hsizer.Add(self.elementsCombo, 0)
-
-        vsizer.Add(hsizer, 0, wxEXPAND)
-
-        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 10)
-
-        self.enabledCb = wxCheckBox(self, -1, "Auto-completion enabled")
-        EVT_CHECKBOX(self, self.enabledCb.GetId(), self.OnMisc)
-        vsizer.Add(self.enabledCb, 0, wxBOTTOM, 10)
-
-        vsizer.Add(wxStaticText(self, -1, "Default items:"))
-
-        self.itemsEntry = wxTextCtrl(self, -1, style = wxTE_MULTILINE |
-                                     wxTE_DONTWRAP)
-        EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
-        vsizer.Add(self.itemsEntry, 1, wxEXPAND)
-
-        util.finishWindow(self, vsizer, center = False)
-
-        self.elementsCombo.SetSelection(0)
-        self.OnElementCombo()
-
-    def OnElementCombo(self, event = None):
-        self.lt = self.elementsCombo.GetClientData(self.elementsCombo.
-                                                     GetSelection())
-        self.cfg2gui()
-                         
-    def OnMisc(self, event = None):
-        tcfg = self.cfg.types[self.lt]
-
-        tcfg.doAutoComp = bool(self.enabledCb.IsChecked())
-        self.itemsEntry.Enable(tcfg.doAutoComp)
-        
-        l = self.itemsEntry.GetValue().split("\n")
-        l2 = []
-        
-        for i in l:
-            s = i.strip()
-            if len(s) > 0:
-                l2.append(util.toInputStr(s))
-
-        tcfg.autoCompList = l2
-        
-    def cfg2gui(self):
-        tcfg = self.cfg.types[self.lt]
-        
-        self.enabledCb.SetValue(tcfg.doAutoComp)
-
-        self.itemsEntry.Enable(tcfg.doAutoComp)
-        self.itemsEntry.SetValue("\n".join(tcfg.autoCompList))
 
 class FormattingPanel(wxPanel):
     def __init__(self, parent, id, cfg):

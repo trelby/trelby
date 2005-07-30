@@ -122,11 +122,6 @@ class Type:
             v.addInt("indent", 0, "Indent", 0, 80)
             v.addInt("width", 5, "Width", 5, 80)
 
-            # auto-completion stuff, only used for some element types
-            v.addBool("doAutoComp", False, "AutoCompletion")
-            v.addList("autoCompList", [], "AutoCompletionList",
-                      mypickle.StrVar("", "", ""))
-
             v.makeDicts()
             
         self.__class__.cvars.setDefaults(self)
@@ -293,7 +288,6 @@ class Config:
         t.screen.isCaps = True
         t.screen.isBold = True
         t.export.isCaps = True
-        t.doAutoComp = True
         self.types[t.lt] = t
 
         t = Type(screenplay.ACTION)
@@ -308,7 +302,6 @@ class Config:
         t.width = 38
         t.screen.isCaps = True
         t.export.isCaps = True
-        t.doAutoComp = True
         self.types[t.lt] = t
 
         t = Type(screenplay.DIALOGUE)
@@ -327,15 +320,6 @@ class Config:
         t.width = 20
         t.screen.isCaps = True
         t.export.isCaps = True
-        t.doAutoComp = True
-        t.autoCompList = [
-            "CUT TO:",
-            "DISSOLVE TO:",
-            "FADE IN:",
-            "FADE OUT",
-            "FADE TO BLACK",
-            "MATCH CUT TO:"
-            ]
         self.types[t.lt] = t
 
         t = Type(screenplay.SHOT)
@@ -430,14 +414,6 @@ class Config:
             for it in el.cvars.numeric.itervalues():
                 util.clampObj(el, it.name, it.minVal, it.maxVal)
 
-            tmp = []
-            for v in el.autoCompList:
-                v = util.toInputStr(v).strip()
-                if len(v) > 0:
-                    tmp.append(v)
-
-            el.autoCompList = tmp
-            
         # make sure usable space on the page isn't too small
         if doAll and (self.marginTop + self.marginBottom) >= \
                (self.paperHeight - 100.0):
@@ -529,6 +505,9 @@ class ConfigGlobal:
                     " auto-completion, etc.", [WXK_ESCAPE], isFixed = True),
 
             Command("About", "Show the about dialog.", isMenu = True),
+            
+            Command("AutoCompletionDlg", "Open the auto-completion dialog.",
+                    isMenu = True),
             
             Command("ChangeToAction", "Change current element's style to"
                     " action.",

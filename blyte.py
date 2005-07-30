@@ -2,6 +2,7 @@
 # -*- coding: ISO-8859-1 -*-
 
 from error import *
+import autocompletiondlg
 import bugreport
 import cfgdlg
 import characterreport
@@ -532,13 +533,23 @@ class MyCtrl(wxControl):
     def OnScroll(self, event):
         pos = self.panel.scrollBar.GetThumbPosition()
         self.sp.setTopLine(pos)
-        self.sp.autoComp = None
+        self.sp.clearAutoComp()
         self.updateScreen()
 
     def OnPaginate(self):
         self.sp.paginate()
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
+
+    def OnAutoCompletionDlg(self):
+        dlg = autocompletiondlg.AutoCompletionDlg(mainFrame,
+            copy.deepcopy(self.sp.autoCompletion))
+
+        if dlg.ShowModal() == wxID_OK:
+            self.sp.autoCompletion = dlg.autoCompletion
+            self.sp.markChanged()
+
+        dlg.Destroy()
 
     def OnTitlesDlg(self):
         dlg = titlesdlg.TitlesDlg(mainFrame, copy.deepcopy(self.sp.titles),
@@ -661,7 +672,7 @@ class MyCtrl(wxControl):
     # page up (dir == -1) or page down (dir == 1) was pressed, handle it.
     # cs = CommandState.
     def pageCmd(self, cs, dir):
-        if self.sp.autoComp:
+        if self.sp.acItems:
             cs.doAutoComp = cs.AC_KEEP
             self.sp.pageScrollAutoComp(dir)
 
@@ -1247,12 +1258,12 @@ class MyCtrl(wxControl):
         for tl in texts.iteritems():
             gd.vm.drawTexts(self, dc, tl)
         
-        if self.sp.autoComp and (cursorY > 0):
+        if self.sp.acItems and (cursorY > 0):
             self.drawAutoComp(dc, posX, cursorY, acFi)
 
     def drawAutoComp(self, dc, posX, cursorY, fi):
-        ac = self.sp.autoComp
-        asel = self.sp.autoCompSel
+        ac = self.sp.acItems
+        asel = self.sp.acSel
         
         offset = 5
         selBleed = 2
@@ -1264,7 +1275,7 @@ class MyCtrl(wxControl):
         
         dc.SetFont(fi.font)
 
-        show = min(self.sp.maxAutoCompItems, len(ac))
+        show = min(self.sp.acMax, len(ac))
         doSbw = show < len(ac)
         
         startPos = (asel // show) * show
@@ -1417,9 +1428,10 @@ class MyFrame(wxFrame):
         scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error")
         scriptMenu.Append(ID_SCRIPT_PAGINATE, "&Paginate")
         scriptMenu.AppendSeparator()
-        scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
+        scriptMenu.Append(ID_SCRIPT_AUTO_COMPLETION, "&Auto-completion...")
         scriptMenu.Append(ID_SCRIPT_HEADERS, "&Headers...")
         scriptMenu.Append(ID_SCRIPT_LOCATIONS, "&Locations...")
+        scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
         scriptMenu.AppendSeparator()
 
         tmp = wxMenu()
@@ -1542,9 +1554,10 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_VIEW_SHOW_FORMATTING, self.OnShowFormatting)
         EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindNextError)
         EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
-        EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitlesDlg)
+        EVT_MENU(self, ID_SCRIPT_AUTO_COMPLETION, self.OnAutoCompletionDlg)
         EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeadersDlg)
         EVT_MENU(self, ID_SCRIPT_LOCATIONS, self.OnLocationsDlg)
+        EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitlesDlg)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_CHANGE, self.OnScriptSettings)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_LOAD, self.OnLoadScriptSettings)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnSaveScriptSettingsAs)
@@ -1620,6 +1633,7 @@ class MyFrame(wxFrame):
             "ID_REPORTS_DIALOGUE_CHART",
             "ID_REPORTS_LOCATION_REP",
             "ID_REPORTS_SCENE_REP",
+            "ID_SCRIPT_AUTO_COMPLETION",
             "ID_SCRIPT_FIND_ERROR",
             "ID_SCRIPT_HEADERS",
             "ID_SCRIPT_LOCATIONS",
@@ -1921,6 +1935,9 @@ class MyFrame(wxFrame):
 
     def OnPaginate(self, event = None):
         self.panel.ctrl.OnPaginate()
+
+    def OnAutoCompletionDlg(self, event = None):
+        self.panel.ctrl.OnAutoCompletionDlg()
 
     def OnTitlesDlg(self, event = None):
         self.panel.ctrl.OnTitlesDlg()
