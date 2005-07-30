@@ -181,6 +181,20 @@ class StrVar(ConfVar):
     def fromStr(self, vals, val, prefix):
         return util.decodeStr(val)
 
+# like StrVar, but doesn't do any escaping. this is useful if you have
+# e.g. Latin1 text without newlines that you want to transcode to UTF-8
+# later on, which is impossible to do with StrVar since it's escaped the
+# Latin1 characters already.
+class StrNoEscapeVar(ConfVar):
+    def __init__(self, name, defVal, name2):
+        ConfVar.__init__(self, name, defVal, name2)
+        
+    def toStr(self, val, prefix):
+        return "%s:%s\n" % (prefix, val)
+
+    def fromStr(self, vals, val, prefix):
+        return val
+
 # screenplay.ACTION <-> "Action"
 class ElementNameVar(ConfVar):
     def __init__(self, name, defVal, name2):

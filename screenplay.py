@@ -130,7 +130,9 @@ class Screenplay:
         output += self.cfg.save()
         output += "#End-Config \n"
 
-        # FIXME: save locations
+        output += "#Begin-Locations \n"
+        output += util.toUTF8(self.locations.save())
+        output += "#End-Locations \n"
         
         pgs = self.titles.pages
         for pg in xrange(len(pgs)):
@@ -165,17 +167,13 @@ class Screenplay:
         # remove default empty line
         sp.lines = []
 
-        # used to keep track that element type only changes after a
-        # LB_LAST line.
-        prevType = None
-
         # did we encounter characters not in ISO-8859-1
         invalidChars = False
 
         # did we encounter characters in ISO-8859-1, but undesired
         unwantedChars = False
 
-        # convert to ISO-8859-1
+        # convert to ISO-8859-1, remove invalid characters
         for i in xrange(len(lines)):
             try:
                 s = unicode(lines[i], "UTF-8")
@@ -209,20 +207,20 @@ class Screenplay:
                                   "which is not supported by this version\n"
                                   "of the program." % version)
 
-        # line index after config ends
-        endConfig = 1
-        
-        if version in ("2"):
-            if lines[1] != "#Begin-Config ":
-                raise error.MiscError("#Begin-Config not found")
-            
-            try:
-                endConfig = lines.index("#End-Config ", 2)
-            except ValueError:
-                raise error.MiscError("#End-Config not found")
+        # current position at 'lines'
+        index = 1
 
-            sp.cfg.load("\n".join(lines[2:endConfig]))
-            endConfig += 1
+        s, index = Screenplay.getConfigPart(lines, "Config", index)
+        if s:
+            sp.cfg.load(s)
+
+        s, index = Screenplay.getConfigPart(lines, "Locations", index)
+        if s:
+            sp.locations.load(s)
+
+        # used to keep track that element type only changes after a
+        # LB_LAST line.
+        prevType = None
 
         # did we encounter unknown lb types
         unknownLb = False
@@ -233,9 +231,7 @@ class Screenplay:
         # did we encounter unknown config lines
         unknownConfigs = False
 
-        # FIXME: load locations
-        
-        for i in xrange(endConfig, len(lines)):
+        for i in xrange(index, len(lines)):
             s = lines[i]
 
             if len(s) < 2:
@@ -297,7 +293,8 @@ class Screenplay:
                     prevType = None
 
         if len(sp.lines) == 0:
-            raise error.MiscError("Empty file.")
+            raise error.MiscError("File doesn't contain any screenplay"
+                                  " lines.")
 
         if sp.lines[-1].lb != LB_LAST:
             raise error.MiscError("Last line doesn't end an element.")
@@ -305,7 +302,8 @@ class Screenplay:
         sp.reformatAll()
         sp.paginate()
         sp.titles.sort()
-        
+        sp.locations.refresh(sp.getSceneNames())
+
         msgs = []
         
         if unknownLb:
@@ -338,7 +336,28 @@ class Screenplay:
         return (sp, "\n\n".join(msgs))
 
     load = staticmethod(load)
-    
+
+    # lines is an array of strings. if lines[startIndex] == "Begin-$name
+    # ", this searches for a string of "End-$name ", takes all the strings
+    # between those two, joins the lines into a single string (lines
+    # separated by a "\n") and returns (string,
+    # line-index-after-the-end-line). returns ("", startIndex) if
+    # startIndex does not contain the start line or startIndex is too big
+    # for 'lines'. raises error.MiscError on errors.
+    def getConfigPart(lines, name, startIndex):
+        if (startIndex >= len(lines)) or\
+               (lines[startIndex] != ("#Begin-%s " % name)):
+            return ("", startIndex)
+            
+        try:
+            endIndex = lines.index("#End-%s " % name, startIndex)
+        except ValueError:
+            raise error.MiscError("#End-%s not found" % name)
+
+        return ("\n".join(lines[startIndex + 1:endIndex]), endIndex + 1)
+
+    getConfigPart = staticmethod(getConfigPart)
+
     # parse a line containing a config-value in the format detailed in
     # fileformat.txt. line must have newline stripped from the end
     # already. returns a (key, value) tuple. if line doesn't match the

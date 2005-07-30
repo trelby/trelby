@@ -77,8 +77,8 @@ Parenthetical|Transition|Shot|Note) and y is one of:
  Underlined: (boolean): Whether to underline text.
 
 After "#End-Config " (in v2 files, in v1 files after "#Version 1") there
-is more configuration, but in a different syntax. This is mostly due to
-historical accidents...
+is more configuration, but in a different syntax, that is mostly due to
+historical accidents.
 
 These config lines are of the form: "#", "Config-Name", " " (space),
 "Config-Value". Config-Value can be empty.

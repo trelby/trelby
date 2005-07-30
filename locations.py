@@ -1,3 +1,4 @@
+import mypickle
 import util
 
 # manages location-information for a single screenplay. a "location" is a
@@ -6,9 +7,22 @@ import util
 #  INT. MOTEL ROOM - DAY - 2 HOURS LATER
 #  INT. MOTEL ROOM - NIGHT
 class Locations:
+    cvars = None
+
     def __init__(self):
-        # a list of lists of strings, where the inner lists list scene
-        # names to combine into one location. e.g.
+        if not self.__class__.cvars:
+            v = self.__class__.cvars = mypickle.Vars()
+
+            v.addList("locations", [], "Locations",
+                      mypickle.ListVar("", [], "",
+                                       mypickle.StrNoEscapeVar("", "", "")))
+
+            v.makeDicts()
+            
+        self.__class__.cvars.setDefaults(self)
+
+        # self.locations is a list of lists of strings, where the inner
+        # lists list scene names to combine into one location. e.g.
         # [
         #  [
         #   "INT. ROOM 413 - DAY",
@@ -16,7 +30,14 @@ class Locations:
         #  ]
         # ]
 
-        self.locations = []
+    # load from string 's'. does not throw any exceptions and silently
+    # ignores any errors.
+    def load(self, s):
+        self.cvars.load(self.cvars.makeVals(s), "", self)
+        
+    # save to a string and return that.
+    def save(self):
+        return self.cvars.save("", self)
 
     # refresh location list against the given scene names (in the format
     # returned by Screenplay.getSceneNames()). removes unknown and
