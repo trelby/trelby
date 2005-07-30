@@ -486,7 +486,6 @@ class ConfigGlobal:
         t.newTypeTab = screenplay.PAREN
         t.nextTypeTab = screenplay.ACTION
         t.prevTypeTab = screenplay.ACTION
-        t.doAutoComp = True
         self.types[t.lt] = t
 
         t = TypeGlobal(screenplay.DIALOGUE)
