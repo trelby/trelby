@@ -862,8 +862,9 @@ def showPDF(filename, cfgGl, frame):
         os.stat(cfgGl.pdfViewerPath)
     except OSError:
         wxMessageBox("PDF viewer application not found.\n\n"
-                     "You can change your PDF settings\n"
-                     "at File/Settings/PDF.", "Error", wxOK, frame)
+                     "You can change your PDF viewer\n"
+                     "settings at File/Settings/Change.", "Error", wxOK,
+                     frame)
 
         return
     
