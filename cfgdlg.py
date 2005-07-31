@@ -722,6 +722,12 @@ class FormattingPanel(wxPanel):
 
         vsizer.Add(hsizer, 0, wxTOP, 20)
 
+        # wxGTK adds way more space by default than wxMSW between the
+        # items, have to adjust for that
+        pad = 0
+        if misc.isWindows:
+            pad = 10
+
         self.sceneContinuedsCb = wxCheckBox(self, -1,
             "Include scene CONTINUEDs")
         EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
@@ -729,15 +735,15 @@ class FormattingPanel(wxPanel):
         
         self.scenesCb = wxCheckBox(self, -1, "Include scene numbers")
         EVT_CHECKBOX(self, self.scenesCb.GetId(), self.OnMisc)
-        vsizer.Add(self.scenesCb)
+        vsizer.Add(self.scenesCb, 0, wxTOP, pad)
 
         self.marginsCb = wxCheckBox(self, -1, "Show margins (debug)")
         EVT_CHECKBOX(self, self.marginsCb.GetId(), self.OnMisc)
-        vsizer.Add(self.marginsCb, 0, wxTOP, 10)
+        vsizer.Add(self.marginsCb, 0, wxTOP, 10 + pad)
 
         self.lineNumbersCb = wxCheckBox(self, -1, "Show line numbers (debug)")
         EVT_CHECKBOX(self, self.lineNumbersCb.GetId(), self.OnMisc)
-        vsizer.Add(self.lineNumbersCb)
+        vsizer.Add(self.lineNumbersCb, 0, wxTOP, pad)
 
         self.cfg2gui()
         
@@ -958,10 +964,16 @@ class MiscPanel(wxPanel):
 
         vsizer.Add(bsizer, 1, wxEXPAND)
 
+        # wxGTK adds way more space by default than wxMSW between the
+        # items, have to adjust for that
+        pad = 0
+        if misc.isWindows:
+            pad = 10
+
         self.autoCapSentences = wxCheckBox(self, -1,
                                            "Auto-capitalize sentences")
         EVT_CHECKBOX(self, self.autoCapSentences.GetId(), self.OnMisc)
-        vsizer.Add(self.autoCapSentences)
+        vsizer.Add(self.autoCapSentences, 0, wxTOP | wxBOTTOM, pad)
 
         self.checkErrorsCb = wxCheckBox(self, -1,
             "Check script for errors before print, export or compare")
