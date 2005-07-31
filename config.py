@@ -781,7 +781,7 @@ class ConfigGlobal:
             s1 = "/usr/local/Adobe/Acrobat7.0/bin/acroread"
             s2 = "-tempFile"
         elif misc.isWindows:
-            s1 = r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe"
+            s1 = r"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe"
             s2 = ""
         else:
             s1 = "not set yet (unknown platform %s)"\
