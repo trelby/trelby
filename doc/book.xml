@@ -19,7 +19,7 @@
     </authorgroup>
 
     <copyright>
-      <year>2004</year>
+      <year>2005</year>
       <holder>Oskusoft</holder>
     </copyright>
 
@@ -36,8 +36,8 @@
 	  <title>Basic concepts</title>
 
 	  <para>If you don't know anything about writing a screenplay, get a
-	  copy of a book such as Trottier's "The Screenwriter's Bible". This
-	  manual will not cover the same ground, but focuses on concepts
+	  copy of a book such as David Trottier's "The Screenwriter's Bible".
+	  This manual will not cover the same ground, but focuses on concepts
 	  specific to &blyte;.</para>
 
 	  <para>&blyte; divides a screenplay into a long list of elements,
@@ -235,14 +235,14 @@
 		<para>What kind of element Enter/Tab/Shift + Tab will
 		create/switch to is dependent on the current style of the element,
 		and is configurable by the user (see <xref
-		linkend="elements_cfg"/>). These values for Enter/Tab are always
+		linkend="elements_gcfg"/>). These values for Enter/Tab are always
 		shown at the bottom of the window at the status bar. Additionally
 		the Tab section will have a "[change]" at the end if pressing Tab
 		would switch the element's style, not create a new one.</para>
 
 		<para>Other ways to change an element's style are using the combo
 		box at the top of the window, or pressing a short-cut key for each
-		element style. See Help/Commands for a list of the keys.</para>
+		element style..</para>
 
 		<para>Shift + Enter or CTRL + Enter will insert a forced
 		linebreak.</para>
@@ -262,7 +262,7 @@
 
 		<para>You can select the current scene with CTRL + A.</para>
 
-		<para>After you've selected the desired text, you can the
+		<para>After you've selected the desired text, you can use the
 		cut/copy/paste commands to move text around, delete it, etc. You
 		can also press Del to simply delete it. Note that this is not
 		undoable in any way.</para>
@@ -317,9 +317,9 @@
   <chapter>
 	<title>View modes</title>
 
-	<para>This chapter describes the two different view modes available,
-	'Draft' and 'Layout'. You can toggle between them using the
-	View-menu.</para>
+	<para>This chapter describes the different view modes available. You
+	can toggle between them using the View-menu or by keyboard
+	shortcuts.</para>
 
 	<sect1>
 	  <title>Draft</title>
@@ -331,8 +331,7 @@
 	  enabled, are shown as a horizontal line (see <xref
 	  linkend="display_cfg"/>).</para>
 
-	  <para>Reasons you might want to use this mode instead of the
-	  'Layout' mode:</para>
+	  <para>Reasons you might want to use this mode:</para>
 	  
 	  <itemizedlist>
 
@@ -352,7 +351,7 @@
 
 		<listitem>
 		  
-		  <para>It's considerably faster.</para>
+		  <para>It's the fastest view mode.</para>
 		  
 		</listitem>
 				
@@ -365,8 +364,9 @@
 
 	  <para>'Layout' mode shows an almost exact representation of the page
 	  as it would appear when printed. Page borders, margins, headers,
-	  CONTINUED/(MORE) and so on are all shown at their correct
-	  places.</para>
+	  CONTINUED/(MORE) and so on are all shown at their correct places.
+	  This is the default mode and what most people will probably want to
+	  use.</para>
 
 	  <para>Ways in which the display in this mode can differ from the
 	  printed output:</para>
@@ -379,7 +379,7 @@
 		  can sometimes show in incorrect places. We recommend that when
 		  using this mode, auto-pagination is kept on and the interval at
 		  a low value, preferably 1 second (see <xref
-		  linkend="pagination_cfg"/>).</para>
+		  linkend="misc_cfg"/>).</para>
 		  
 		</listitem>
 		
@@ -388,11 +388,39 @@
 		  <para>If you have scene continueds enabled, they will always
 		  show as plain "CONTINUED:" on top of the page, whereas in the
 		  PDF output, they will be "CONTINUED: (n)" if needed (see <xref
-		  linkend="pagination_cfg"/>).</para>
+		  linkend="format_cfg"/>).</para>
 		  
 		</listitem>
 		
 	  </itemizedlist>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Side by side</title>
+
+	  <para>'Side by side' mode shows multiple pages side by side, as many
+	  as fit on your screen. You need to use a high resolution display
+	  and/or small fonts in order to fit more than one page on the screen
+	  at a time. Otherwise this mode is the same as the 'Layout'
+	  mode.</para>
+
+	  <para>Note that this mode also assumes that the whole pages fit
+	  vertically on the screen, so Page up/down commands behave somewhat
+	  differently.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Overviews</title>
+
+	  <para>There are two overview modes, one showing each character as a
+	  single pixel, and one showing each character as 4 pixels. This is
+	  unsuitable for editing, so these modes are mainly useful for getting
+	  an overview of the page layouts, and even so, will only really
+	  become useful once production-oriented features are implemented,
+	  when it will show each page's revision by coloring it
+	  accordingly.</para>
 	  
 	</sect1>
 
@@ -404,7 +432,7 @@
 	<para>This chapter describes commands not discussed elsewhere.</para>
 
 	<sect1>
-	  <title>File/New,open,save,save as,close,revert</title>
+	  <title>File/New,Open,Save,Save as,Close,Revert</title>
 
 	  <para>These do what you'd expect them to do.</para>
 	  
@@ -420,18 +448,15 @@
 	</sect1>
 
 	<sect1>
-	  <title>File/Settings,load,save as</title>
+	  <title>File/Settings/(Change|Load|Save as)</title>
 
-	  <para>'Settings' allows you to edit the various configurable
-	  settings of &blyte;. See <xref linkend="settings"/>.</para>
+	  <para>These allow you to edit/load/save global settings (see <xref
+	  linkend="settings"/>).</para>
 	  
-	  <para>&blyte; loads settings from a file named "default.conf" on
-	  startup. You can have as many config files as you want, and use the
-	  load/save as commands to manage them.</para>
-
-	  <para>You can give a "--conf /home/me/someother.conf" command line
-	  parameter to &blyte; to have it start up with some other
-	  configuration file.</para>
+	  <para>By default, &blyte; loads settings from a file named
+	  "default.conf" on startup. You can give a "--conf
+	  /home/me/someother.conf" command line parameter to &blyte; to have
+	  it start up with some other configuration file.</para>
 	  
 	</sect1>
 
@@ -439,9 +464,9 @@
 	  <title>Edit/Cut,Copy,Paste</title>
 
 	  <para>Cut, copy and paste work pretty much the same way as in every
-	  other program. Note that these commands only use &blyte;'s own
-	  internal clipboard so can't be used for copying text to/from other
-	  programs. For that, see below.</para>
+	  other program. Note that these commands use &blyte;'s internal
+	  clipboard so can't be used for copying text to/from other programs.
+	  For that, see below.</para>
 	  
 	</sect1>
 
@@ -467,8 +492,9 @@
 
 	  <para>This opens a dialog allowing you to search for and possibly
 	  replace text. Usually it operates on all element styles, but if you
-	  press the "More" button, you can select the styles it operates on,
-	  which is useful renaming a character and so on.</para>
+	  press the "More" button, you can select the element styles it
+	  operates on, which is useful when renaming a character and so
+	  on.</para>
 
 	  <para>Pressing Enter while the cursor is either the text box is
 	  equivalent to pressing the 'Find next' button. The Esc key will
@@ -526,11 +552,11 @@
 	  the beginning of the script.</para>
 
 	  <para>If it finds any errors, it positions the cursor on the line
-	  containing the error and displays a message box detailing the error.
-	  You should fix the error, back up a few lines, and activate the
-	  command again to search for more errors. Alternatively, if you don't
-	  want to fix the error right now, move the cursor down one line if
-	  you want to search for more errors.</para>
+	  containing the error and displays a message detailing the error. You
+	  should fix the error, back up a few lines, and activate the command
+	  again to search for more errors. Alternatively, if you don't want to
+	  fix the error right now, move the cursor down one line if you want
+	  to search for more errors.</para>
 
 	  <para>It can detect the following errors:</para>
 
@@ -574,41 +600,26 @@
 	  <para>'Paginate' simply repaginates the script. You normally don't
 	  need to run this if you have automatic repagination enabled, but the
 	  command is available for use when automatic repagination is disabled
-	  or you want immediate repagination after a large cut/paste
-	  operation.</para>
+	  or you want immediate repagination for some reason.</para>
 	  
 	</sect1>
 
-	<sect1>
-	  <title>Script/Title pages</title>
+	<sect1 id="autocomp">
+	  <title>Scripts/Auto-completion</title>
 
-	  <para>'Title pages' allows you to edit your script's title pages.
-	  You can have as many title pages as you want, or none at all.</para>
+	  <para>Here you can define items to be added to the auto-completion
+	  lists for Scene, Character and Transition elements, and optionally
+	  disable auto-completion for any one of them.</para>
 
-	  <para>At the top of the window are add/delete/move/next buttons.
-	  'Add' adds a page, 'Delete' deletes the current page, 'Move' swaps
-	  the current page with the next page, and 'Next' changes the view to
-	  the next page.</para>
-
-	  <para>The strings listbox contains all text strings for the current
-	  page. Select the text string you want to edit in this listbox, and
-	  use the add/delete buttons to add/delete text strings.</para>
-
-	  <para>On the right side of the listbox is a coarse preview showing
-	  the approximate location of text strings on the current page, with
-	  the selected text string shown in red.</para>
-	  
-	  <para>At the bottom of the window are the settings for the selected
-	  text string. There's the text itself, the position of its upper left
-	  corner as an offset from the paper's upper left corner, font, size,
-	  and style. 'Centered' means that the text is centered horizontally
-	  on the page.</para>
-
-	  <para>Finally there's a 'Preview' button that you can use to get an
-	  accurate preview of all of the title pages.</para>
+	  <para>Transition auto-completes are pretty generic so by default
+	  there are a few of them here, but the Scene and Character lists are
+	  empty. The main use for them are episodic TV shows, where you have a
+	  recurring cast of characters and locations, and it's nice to have
+	  them always available, even if they haven't yet been used in the
+	  current episode's script.</para>
 	  
 	</sect1>
-
+	
 	<sect1>
 	  <title>Script/Headers</title>
 
@@ -646,6 +657,68 @@
 	  
 	</sect1>
 
+	<sect1 id="locations_dlg">
+	  <title>Scripts/Locations</title>
+
+	  <para>This dialog allows you to define what scenes are part of the
+	  same location (see <xref linkend="location_rep"/>). The top listbox
+	  shows locations, separated by lines of "-----------", while the
+	  bottom listbox shows scenes not part of a user-specified location.
+	  In the middle are 'Add' and 'Delete' buttons for moving scenes
+	  between the two listboxes. The bottom listbox allows you to select
+	  many scenes at once.</para>
+
+	  <para>An example of how to use this dialog: select the scenes "INT.
+	  MOTEL ROOM - DAY", "INT. MOTEL ROOM - DAY - LATER" and "INT. MOTEL
+	  ROOM - NIGHT" in the bottom listbox, then click 'Add' which adds
+	  those three into a single location in the top listbox. Then, if you
+	  want to add more scenes to the same location, make sure one of the
+	  scenes for the location is selected in the top listbox, select the
+	  new scenes you want to add in the bottom listbox, and click 'Add'.
+	  If you want to add scenes to a new location, select one of the
+	  "-----------" lines in the top listbox as the destination before
+	  clicking 'Add'.</para>
+	  
+	</sect1>
+	
+	<sect1>
+	  <title>Script/Title pages</title>
+
+	  <para>'Title pages' allows you to edit your script's title pages.
+	  You can have as many title pages as you want, or none at all.</para>
+
+	  <para>At the top of the window are add/delete/move/next buttons.
+	  'Add' adds a page, 'Delete' deletes the current page, 'Move' swaps
+	  the current page with the next page, and 'Next' changes the view to
+	  the next page.</para>
+
+	  <para>The strings listbox contains all text strings for the current
+	  page. Select the text string you want to edit in this listbox, and
+	  use the add/delete buttons to add/delete text strings.</para>
+
+	  <para>On the right side of the listbox is a coarse preview showing
+	  the approximate location of text strings on the current page, with
+	  the selected text string shown in red.</para>
+	  
+	  <para>At the bottom of the window are the settings for the selected
+	  text string. There's the text itself, the position of its upper left
+	  corner as an offset from the paper's upper left corner, font, size,
+	  and style. 'Centered' means that the text is centered horizontally
+	  on the page.</para>
+
+	  <para>Finally there's a 'Preview' button that you can use to get an
+	  accurate preview of all of the title pages.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>Script/Settings/(Change|Load|Save as)</title>
+
+	  <para>These allow you to edit/load/save script format settings (see
+	  <xref linkend="format_settings"/>).</para>
+	  
+	</sect1>
+	
 	<sect1>
 	  <title>Tools/Name database</title>
 
@@ -707,8 +780,13 @@
 	  scripts looking for changes between them and displays the results as
 	  a PDF file.</para>
 
-	  <para>The PDF file contains only changed parts of the script. The
-	  changes are color coded: Deleted lines are red, added lines are
+	  <para>There's a checkbox allowing you to use the same configuration
+	  parameters for the scripts you're comparing. This is useful if the
+	  scripts differ in in their formatting settings, because in that case
+	  practically the whole script would show up as changed.</para>
+
+	  <para>The PDF file contains only the changed parts of the script.
+	  The changes are color coded: Deleted lines are red, added lines are
 	  green, non-changed lines (shown for context) are white, and marker
 	  lines for single-line changes are yellow. The changed parts are
 	  separated by two gray lines.</para>
@@ -718,8 +796,10 @@
 	<sect1>
 	  <title>Help/Commands</title>
 
-	  <para>'Commands' opens a window showing all the keyboard
-	  commands.</para>
+	  <para>'Commands' opens a window showing all the commands and their
+	  current keyboard shortcuts. It also has a menu allowing you to save
+	  this as a HTML file if you e.g. want to print it for
+	  reference.</para>
 	  
 	</sect1>
 
@@ -779,213 +859,256 @@
   <chapter id="settings">
 	<title>Settings</title>
 
-	<para>&blyte; has many settings you can configure to adjust the
-	  program's functioning to your preferences. Some of the settings just
-	  modify the user interface, and have no effect on the output of the
-	  program, while others have.</para>
+	<para>&blyte; has 3 levels of settings: global settings, script format
+	settings, and script-specific settings.</para>
 
-	<para>It's important to notice that these settings are not per-script;
-	any changes you make affect all scripts that you open. If you want
-	different settings for different scripts, you'll have to create
-	separate configuration files.</para>
+	<para>Global settings are things like interface colors, keyboard
+	shortcuts, display fonts and other settings that only affect the user
+	interface of the program, not the script output. These settings are
+	also platform-dependent, so you can't share these between
+	Windows/Linux machines, and even sharing between different machines on
+	the same platform could be unreliable if you don't have the exact same
+	fonts, PDF viewer applications, etc. on the machines. The other two
+	levels of settings are completely platform-neutral, guaranteeing the
+	exact same script output whatever platform you use.</para>
 
-	<para>The settings dialog is found under File/Settings. It has a list
-	of categories on the left, the selected category's settings on the
-	right, and three buttons, Apply, Cancel and OK on the bottom. Apply
-	updates the settings to the ones given in the dialog and updates all
-	open scripts to them, so you can easily preview your changes without
-	closing the dialog. Note that you pressing Cancel after Apply has no
-	effect, it only cancels changes that haven't yet been
-	committed.</para>
-	
-	<para>The following sections detail the various settings.</para>
+	<para>Script format settings are things like paper sizes,
+	indendation/line widths/font styles for the different element types,
+	whether to include scene numbers, and so on that directly affect
+	script formatting and output but are not tied to any specific script,
+	in the sense that they can be reused for different scripts with no
+	changes. You can easily save/load these, so you can have ready-made
+	settings for different scenarios.</para>
+
+	<para>Script-specific settings are things that are specific to one
+	particular script, like title pages, header strings, and
+	auto-completion settings, and so can't be reused for different scripts
+	without changes. However, if you want to have a template for these
+	(e.g. your contact information on the title page is always the same,
+	or you're writing several episodes of the same TV show), it's easy:
+	just fill in the information you want, and save the script as
+	"my_template.blyte", then when you want to use that as a template,
+	open that file, change what's needed, and save the script under a new
+	name.</para>
 
 	<sect1>
-	  <title>Auto-completion</title>
+	  <title>Global settings</title>
 
-	  <para>Here you can define items to be added to the auto-completion
-	  lists for Scene, Character and Transition elements, and optionally
-	  disable auto-completion for any one of them.</para>
+	  <para>The global settings dialog is found under
+	  File/Settings/Change. It has a list of categories on the left, the
+	  selected category's settings on the right, and three buttons, Apply,
+	  Cancel and OK on the bottom. Apply updates the settings to the ones
+	  given in the dialog so you can easily preview your changes without
+	  closing the dialog. Note that pressing Cancel after Apply has no
+	  effect, it only cancels changes that haven't yet been
+	  committed.</para>
+	  
+	  <para>The following sections detail the various settings.</para>
 
-	  <para>Transition auto-completes are pretty generic so by default
-	  there are a few of them here, but the Scene and Character lists are
-	  empty. The main use for them are episodic TV shows, where you have a
-	  recurring cast of characters and locations, and it's nice to have
-	  them always available, even if they haven't yet been used in the
-	  current episode's script.</para>
+	  <sect2>
+		<title>Colors</title>
+
+		<para>Color configuration; not much to explain here, besides the
+		fact that these only affect the display, the PDF output is always
+		black on white.</para>
+		
+	  </sect2>
+	  
+	  <sect2 id="display_cfg">
+		<title>Display</title>
+
+		<para>The topmost listbox allows you to configure what font you
+		want to use for normal, bold, italic, and bold + italic text. Note
+		that you should use the same size font for each one.</para>
+
+		<para>(Draft view mode only) The row spacing setting affects how
+		many pixels there are between each row. It has an effect only in
+		the 'Draft' view mode.</para>
+
+		<para>(Draft view mode only) The 'Page break lines to show'
+		setting affects how page breaks are shown. If you select 'None',
+		they are not shown at all. 'Normal', you see solid gray lines in
+		the scripts indicating actual page break positions. 'Normal +
+		unadjusted', you see the solid lines, but you also see a dotted
+		gray line, that shows where the page could have ended, but that
+		the page break position was adjusted backwards to honor the
+		settings in <xref linkend="format_cfg"/>.</para>
+
+		<para>This is useful when you've finished your script and you're
+		going through it trying to reduce the page count. If, for example,
+		you have three lines, a Character, a Parenthetical, and a Dialogue
+		element, all one line, and the unadjusted page break line is after
+		the Parenthetical line, and the actual page break line is above
+		the character line, you know that if you can trim just one line
+		from the page, all three lines will then fit on the page instead
+		of being pushed to the next page.</para>
+		
+	  </sect2>
+	  
+	  <sect2 id="elements_gcfg">
+		<title>Elements</title>
+
+		<para>This is where you configure the interaction parameters for
+		each element style.</para>
+
+		<para>At the top is a combo box where you specify what element
+		style you're configuring. All things below that are
+		element-specific settings.</para>
+
+		<para>The 'Enter/Tab creates' and 'Tab/Shift+Tab switches to'
+		affect what element is created when Enter or Tab is pressed in
+		this element style, or what element style Tab/Shift+Tab switches
+		the element to. See <xref linkend="add_element"/> for more
+		information.</para>
+		
+	  </sect2>
+
+	  <sect2>
+		<title>Keyboard</title>
+
+		<para>Here you can configure keyboard shortcuts for each command.
+		Note that a few command/keys (Enter, Tab, etc.) can't be changed
+		because they're an integral part of the program's design.</para>
+		
+	  </sect2>
+	  
+	  <sect2 id="misc_cfg">
+		<title>Misc</title>
+
+		<para>The default script directory setting allows you to specify
+		the default directory for File/Open dialog on program
+		startup.</para>
+
+		<para>You can specify what application you want to use as your PDF
+		viewer. On Windows, this is usually Adobe Acrobat, and the path is
+		something like "C:\Program Files\Adobe\Acrobat
+		7.0\Reader\AcroRd32.exe". On Linux, you can also use Adobe
+		Acrobat, path being something like
+		"/usr/local/Adobe/Acrobat7.0/bin/acroread".</para>
+
+		<para>You can also specify arguments to give to the PDF viewer
+		program.</para>
+
+		<para>'Auto-capitalize sentences', if on, auto-capitalizes
+		sentences as you write them. If it capitalizes something you don't
+		want capitalized, write another letter, and then replace the
+		capitalized letter by a lowercase one.</para>
+
+		<para>'Check script for errors before print, export or compare',
+		if checked, causes the program to run 'Script/Find next error' for
+		the whole script automatically before print/export/compare
+		operations. This is to avoid printing 100 pages and then finding
+		there's an error on one of them, fixing of which causes
+		repagination of the whole script, and having to print all the 100
+		pages again.</para>
+
+		<para>'Auto-paginate interval' defines how often to repaginate the
+		script automatically. If you have a particularly slow machine, you
+		might want to increase this number. Note that automatic
+		repagination is only done when you modify the script, so you can't
+		just sit back and wait for the repagination to happen, you have to
+		keep making changes. (You can always use Script/Paginate if you
+		want immediate repagination.)</para>
+		
+		<para>The 'Confirm deletes' setting allows you to configure how
+		many lines you can delete without confirmation. It exists because
+		otherwise it'd be too easy to select a large block of text, press
+		Delete, and see all your work disappear.</para>
+
+		<para>'Lines to scroll per mouse wheel event' needs no
+		explaining.</para>
+		
+	  </sect2>
 	  
 	</sect1>
-	
+
+	<sect1 id="format_settings">
+	  <title>Script format settings</title>
+
+	  <para>Script format settings are found in Script/Settings/Change. It
+	  has the same Apply/Cancel/OK buttons as the global settings
+	  dialog.</para>
+
+	  <sect2 id="elements_cfg">
+		<title>Elements</title>
+
+		<para>This is where you configure the formatting parameters for
+		each element style.</para>
+		
+		<para>At the top is a combo box where you specify what element
+		style you're configuring. All things below that are
+		element-specific settings.</para>
+
+		<para>The Screen/Print areas hold four checkboxes,
+		Caps/Bold/Italic/Underlined, affecting the text style for the
+		element. Screen affects the editing screen, while Print affects
+		PDF output.</para>
+
+		<para>The 'Empty lines / 10 before' setting is linespacing before
+		the element, divided by 10. So a value of 10 means normal
+		linespacing, 15 means 1.5 linespacing, 20 is double linespacing,
+		etc.</para>
+
+		<para>The 'Empty lines / 10 between' is the same, but for
+		intra-element linespacing, i.e. consecutive lines of the same
+		element have this much space between them.</para>
+
+		<para>The Indent and Width settings specify in characters how much
+		the element is indented (i.e. set off from the left margin) and
+		how wide it is. 10 characters (in the default 12-point font) equal
+		one inch.</para>
+
+	  </sect2>
+
+	  <sect2 id="format_cfg">
+		<title>Formatting</title>
+
+		<para>Here you can configure parameters affecting the formatting
+		of the script.</para>
+		
+		<para>The first two settings affect how many action and dialogue
+		lines there must be left at the end of a page to allow breaking at
+		that position. This only affects elements that are broken in the
+		middle, i.e. if you have a one-line element, the page can always
+		end after that.</para>
+
+		<para>The font size specifies the font size to use. 12 is the
+		default, and you should only deviate from this if you have a very
+		good reason.</para>
+
+		<para>'Include scene continueds', if enabled, inserts
+		"(CONTINUED)" at the end of each page that has a scene that
+		continues to the next page, and "CONTINUED: (n)" (n = number of
+		CONTINUED pages for current scene, omitted if n = 1) for each page
+		that continues a scene from previous page(s).</para>
+
+		<para>'Include scene numbers' causes scene numbers to be inserted
+		to the left and right of each scene element. This is usually only
+		done for scripts in production.</para>
+
+		<para>'Show margins/line numbers' can be considered debug options,
+		for they have no use in normal operation, but can be useful if
+		you're trying to figure out printing related problems.</para>
+
+	  </sect2>
+	  
+	  <sect2>
+		<title>Paper</title>
+
+		<para>Here you can configure your output paper size and margins.
+		You can use A4, Letter, or a custom paper size. At the bottom of
+		the page is shown the number of lines that will fit on a page with
+		the given settings.</para>
+		
+	  </sect2>
+	  
+	</sect1>
+
 	<sect1>
-	  <title>Colors</title>
+	  <title>Script-specific settings</title>
 
-	  <para>Color configuration; not much to explain here, besides the
-	  fact that these only affect the display, the PDF output is always
-	  black on white.</para>
-	  
-	</sect1>
-	
-	<sect1 id="display_cfg">
-	  <title>Display</title>
-
-	  <para>The topmost listbox allows you to configure what font you want
-	  to use for normal, bold, italic, and bold + italic text. Note that
-	  you should use the same size fonts for each one.</para>
-
-	  <para>The row spacing setting affects how many pixels there are
-	  between each row. Note: this setting has an effect only in the
-	  'Draft' view mode.</para>
-
-	  <para>The 'Page break lines to show' setting affects how page breaks
-	  are shown. If you select 'None', they are not shown at all.
-	  'Normal', you see solid gray lines in the scripts indicating actual
-	  page break positions. 'Normal + unadjusted', you see the solid
-	  lines, but you also see a dotted gray line, that shows where the
-	  page could have ended, but that the page break position was adjusted
-	  backwards to honor the settings in <xref linkend="pagination_cfg"/>.
-	  Note: this setting has an effect only in the 'Draft' view
-	  mode.</para>
-
-	  <para>This is useful when you've finished your script and you're
-	  going through it trying to reduce the page count. If, for example,
-	  you have three lines, a Character, a Parenthetical, and a Dialogue
-	  element, all one line, and the unadjusted page break line is after
-	  the Parenthetical line, and the actual page break line is above the
-	  character line, you know that if you can trim just one line from the
-	  page, all three lines will then fit on the page instead of being
-	  pushed to the next page.</para>
-	  
-	</sect1>
-	
-	<sect1 id="elements_cfg">
-	  <title>Elements</title>
-
-	  <para>This is where you configure the formatting (and interaction)
-	  parameters for each element style.</para>
-
-	  <para>At the top is a combo box where you specify what element style
-	  you're configuring. All things below that are element-specific
-	  settings.</para>
-
-	  <para>The Screen/Print areas hold four checkboxes,
-	  Caps/Bold/Italic/Underlined, affecting the text style for the
-	  element. Screen affects your screen only, while Print affects PDF
-	  output.</para>
-
-	  <para>The 'Empty lines / 10 before' setting is linespacing before
-	  the element, divided by 10. So a value of 10 means normal
-	  linespacing, 15 means 1.5 linespacing, 20 is double linespacing,
-	  etc.</para>
-
-	  <para>The 'Empty lines / 10 between' is the same, but for
-	  intra-element linespacing, i.e. consecutive lines of the same
-	  element have this much space between them.</para>
-
-	  <para>The Indent and Width settings specify in characters how much
-	  the element is indented (i.e. set off from the left margin) and how
-	  wide it is. 10 characters (in the default 12-point font) equal one
-	  inch.</para>
-
-	  <para>The 'Enter/Tab creates' and 'Tab/Shift+Tab switches to' affect
-	  what element is created when Enter or Tab is pressed in this element
-	  style, or what element style Tab/Shift+Tab switches the element to.
-	  See <xref linkend="add_element"/> for more information.</para>
-	  
-	</sect1>
-	
-	<sect1>
-	  <title>Misc</title>
-
-	  <para>The default script directory setting allows you to specify the
-	  default directory for File/Open dialog on program startup.</para>
-
-	  <para>'Auto-capitalize sentences', if on, well, auto-capitalizes
-	  sentences as you write them. If it capitalizes something you don't
-	  want capitalized, write another letter, and then replace the
-	  capitalized letter by a lowercase one.</para>
-
-	  <para>The 'Confirm deletes' setting allows you to configure how many
-	  lines you can delete without confirmation. It exists because
-	  otherwise it'd be too easy to select a large block of text, press
-	  Delete, and see all your work disappear.</para>
-
-	  <para>'Lines to scroll per mouse wheel event' needs no
-	  explaining.</para>
-	  
-	</sect1>
-	
-	<sect1 id="pagination_cfg">
-	  <title>Pagination</title>
-
-	  <para>This category contains settings that affect pagination of the
-	  script.</para>
-
-	  <para>The first two settings affect how many Action and Dialogue
-	  lines there must be left at the end of a page to allow breaking at
-	  that position. Note that this only affects elements that are broken
-	  in the middle, i.e. if you have a one-line element, the page can
-	  always end after that.</para>
-
-	  <para>'Include scene continueds', if enabled, inserts "(CONTINUED)"
-	  at the end of each page that has a scene that continues to the next
-	  page, and "CONTINUED: (n)" (n = number of CONTINUED pages for
-	  current scene, omitted if n = 1) for each page that continues a
-	  scene from previous page(s).</para>
-
-	  <para>'Auto-paginate interval' defines how often to repaginate the
-	  script automatically. If you have a particularly slow machine, you
-	  might want to increase this number. Note that automatic repagination
-	  is only done when you modify the script, so you can't just sit back
-	  and wait for the repagination to happen, you have to keep making
-	  changes. (You can always use Script/Paginate if you want immediate
-	  repagination.)</para>
-	  
-	</sect1>
-	
-	<sect1>
-	  <title>Paper</title>
-
-	  <para>Here you can configure your output paper size and margins. You
-	  can use A4, Letter, or a custom paper size. At the bottom of the
-	  page is shown the number of lines that will fit on a page with the
-	  given settings.</para>
-	  
-	</sect1>
-	
-	<sect1>
-	  <title>PDF</title>
-
-	  <para>Here you can configure parameters affecting the PDF
-	  output.</para>
-
-	  <para>First you need to specify what application you want to use as
-	  your PDF viewer. On Windows, this is usually Adobe Acrobat, and the
-	  path is something like "C:\Program Files\Adobe\Acrobat
-	  6.0\Reader\AcroRd32.exe". On Linux, you can also use Adobe Acrobat,
-	  path being something like "/usr/local/Acrobat5/bin/acroread". xpdf
-	  is another program you could use if you want, but it's not as good
-	  as Adobe Acrobat.</para>
-
-	  <para>You can also specify arguments to give to the program.</para>
-
-	  <para>The font size specifies the font size to use. 12 is the
-	  default, and you should only deviate from this if you have a very
-	  good reason.</para>
-
-	  <para>'Check script for errors before print, export or compare', if
-	  checked, causes the program to run 'Script/Find next error' for the
-	  whole script automatically before print/export/compare operations.
-	  This is to avoid printing 100 pages and then finding there's an
-	  error on one of them, fixing of which causes repagination of the
-	  whole script, and having to print all the 100 pages again.</para>
-
-	  <para>'Include scene numbers' causes scene numbers to be inserted to
-	  the left and right of each Scene element. This is usually only done
-	  for scripts in production.</para>
-
-	  <para>Show margins/line numbers can be considered debug options, for
-	  they have no use in normal operation, but can be useful if you're
-	  trying to figure out printing related errors.</para>
+	  <para>Decriptions for these start at <xref
+	  linkend="autocomp"/>.</para>
 	  
 	</sect1>
 	
@@ -1083,13 +1206,18 @@ Something starts beeping.
 	<sect1>
 	  <title>Export</title>
 
-	  <para>You can export the script as a PDF file or as a formatted
-	  ASCII text file. Both are found in the File/Export dialog, which
-	  allows you to choose which one to export as. If you export as a text
-	  file, &blyte; will ask whether you want the page markers included or
-	  not. If you're planning on importing the script to some other
-	  program, you shouldn't include them, otherwise you probably
-	  should.</para>
+	  <para>You can export the script in PDF, RTF or in a formatted ASCII
+	  format. All are found in the File/Export dialog, which allows you to
+	  choose which one to export as. If you export as a text file, &blyte;
+	  will ask whether you want the page markers included or not. If
+	  you're planning on importing the script to some other program, you
+	  shouldn't include them, otherwise you probably should.</para>
+
+	  <para>The RTF file produced uses stylesheets, which not all RTF
+	  reading programs support, so if you get unexpected output check with
+	  something like OpenOffice to see whether the problem is with the
+	  file or with the program you tried to use.</para>
+
 	</sect1>
 	
   </chapter>
@@ -1098,47 +1226,92 @@ Something starts beeping.
 	<title>Reports</title>
 
 	<para>This chapter discusses the various report types &blyte; can
-	generate.</para>
+	generate. All the reports are in PDF format so that you can easily
+	view them on your computer, and if necessary also get high-quality
+	printed output.</para>
 
 	<sect1>
-	  <title>Dialogue chart</title>
+	  <title>Script report</title>
 
-	  <para>'Dialogue chart' first opens a window allowing you to specify
-	  what to include in the generated chart. The 'Sorted by:' options
-	  select what orderings to include, while the 'Characters appearing on
-	  a single page' option, if unselected, leaves out all characters
-	  appearing on a single page only from the generated chart. It's
-	  useful for long scripts that have many such characters, or otherwise
-	  if you want to concentrate on the more important characters.</para>
+	  <para>The script report is a short, one-page report on general
+	  script statistics. It has the following information:</para>
 
-	  <para>It then generates a chart in PDF format with one page for each
-	  selected ordering and shows that.</para>
+	  <itemizedlist>
 
-	  <para>The chart has two axes: The horizontal one, with page numbers
-	  increasing from left to right, and the vertical one, with characters
-	  ordered by the current page's sort criterion from top to
-	  bottom.</para>
+		<listitem>
 
-	  <para>If a character speaks on a given page, he will have a black
-	  mark on that page's position on the chart.</para>
+		  <para>Total line count of the script and line counts for each
+		  element type, both in absolute terms and as a percentage of the
+		  whole.</para>
+		  
+		</listitem>
 
-	  <para>Every other line has a light gray background to allow easier
-	  visual matching of distant markings to character names.</para>
+		<listitem>
 
-	  <para>You can use this chart in many ways. For example, you can at a
-	  glance see if one of your side characters disappears for 50 pages in
-	  the middle of the script, whether the villain is introduced too
-	  late, and so on.</para>
+		  <para>Percentage of lines found in interior and exterior scenes
+		  (it determines this based solely on whether the scene element
+		  starts with INT. or EXT.)</para>
+		  
+		</listitem>
 
-	  <para>At the top is another chart, this one showing the dialogue
-	  density for each page. Dialogue density is calculated as "number of
-	  dialogue/character/parenthetical lines on page divided by total
-	  number of non-empty lines on page". By looking at the chart you can
-	  easily see where the action scenes are by the lower dialogue density
-	  in those pages.</para>
+		<listitem>
+
+		  <para>Maximum and average scene lengths in lines.</para>
+		  
+		</listitem>
+
+		<listitem>
+
+		  <para>Maximum and average action element lengths in lines.</para>
+		  
+		</listitem>
+
+		<listitem>
+
+		  <para>Number of different speaking characters.</para>
+		  
+		</listitem>
+		
+	  </itemizedlist>
+
+	</sect1>
+
+	<sect1 id="location_rep">
+	  <title>Location report</title>
+
+	  <para>The location report is similar to the scene report, but
+	  combines scenes taking place at the same location into one entity.
+	  If you always use the same scene line to describe a single location,
+	  you don't need to do anything special to get a correct location
+	  report. If, however, you have e.g. scenes named "INT. MOTEL ROOM -
+	  DAY", "INT. MOTEL ROOM - DAY - LATER" and "INT. MOTEL ROOM - NIGHT"
+	  and you'd like them to be treated as the same location, see <xref
+	  linkend="locations_dlg"/> for details on how to do that.</para>
+
+	  <para>The location report lists the following information for each
+	  location: list of scenes for the location (if more than one, each is
+	  followed by a percentage showing its part of the total lines of the
+	  location), total lines in location, percentage of action lines in
+	  location, percentage of the location's total lines of the script's
+	  total lines, how many scenes the location has, count of pages that
+	  the location appears in, list of pages that the location appears in,
+	  and optionally a list of all speaking characters in the location
+	  along with the number of lines they speak.</para>
 	  
 	</sect1>
 
+	<sect1>
+	  <title>Scene report</title>
+
+	  <para>The scene report lists the following information for each
+	  scene: scene number, scene name, total lines in scene, percentage of
+	  action lines in scene, count of pages that the scene appears in,
+	  list of pages that the scene appears in, and optionally a list of
+	  all speaking characters in the scene along with the number of lines
+	  they speak.</para>
+	  
+	</sect1>
+	
 	<sect1>
 	  <title>Character report</title>
 
@@ -1180,10 +1353,47 @@ Something starts beeping.
 		
 	  </variablelist>
 
-	  <para>It then generates a report in PDF format containing the
-	  selected information and opens that file.</para>
 	</sect1>
 	
+	<sect1>
+	  <title>Dialogue chart</title>
+
+	  <para>'Dialogue chart' first opens a window allowing you to specify
+	  what to include in the generated chart. The 'Sorted by:' options
+	  select what orderings to include, while the 'Characters appearing on
+	  a single page' option, if unselected, leaves out all characters
+	  appearing on a single page only from the generated chart. It's
+	  useful for long scripts that have many such characters, or if you
+	  want to concentrate on the more important characters.</para>
+
+	  <para>It then generates a chart with one page for each selected
+	  ordering and shows that.</para>
+
+	  <para>The chart has two axes: The horizontal one, with page numbers
+	  increasing from left to right, and the vertical one, with characters
+	  ordered by the current page's sort criterion from top to
+	  bottom.</para>
+
+	  <para>If a character speaks on a given page, he will have a black
+	  mark on that page's position on the chart.</para>
+
+	  <para>Every other line has a light gray background to allow easier
+	  visual matching of distant markings to character names.</para>
+
+	  <para>You can use this chart in many ways. For example, you can at a
+	  glance see if one of your side characters disappears for 50 pages in
+	  the middle of the script, whether the villain is introduced too
+	  late, and so on.</para>
+
+	  <para>At the top is another chart, this one showing the dialogue
+	  density for each page. Dialogue density is calculated as "number of
+	  dialogue/character/parenthetical lines on page divided by total
+	  number of non-empty lines on page". By looking at the chart you can
+	  easily see where the action scenes are by the lower dialogue density
+	  in those pages.</para>
+	  
+	</sect1>
+
   </chapter>
 
   <chapter>
@@ -1225,8 +1435,7 @@ Something starts beeping.
 	<para>The file format used by &blyte; for scripts is open and
 	documented, and third parties are encouraged to add support for the
 	format in their programs and/or write utility programs that use the
-	file format in some way, e.g. for generating detailed reports from
-	scripts.</para>
+	file format in some way.</para>
 
 	<para>For more information, see the file 'fileformat.txt' in the
 	program's installation directory, and read through the sample script
