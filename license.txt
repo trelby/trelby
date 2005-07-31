@@ -1,5 +1,5 @@
 Blyte
-Copyright 2004, Oskusoft.
+Copyright 2005, Oskusoft.
 All Rights Reserved.
 
 1. END USER LICENSE AGREEMENT
@@ -59,7 +59,7 @@ copyright and other intellectual property rights.
 
 3. COPYRIGHT
 
-This Software is Copyright (c) 2004 by Oskusoft. All Rights Reserved
+This Software is Copyright (c) 2005 by Oskusoft. All Rights Reserved
 Worldwide. This Software is protected under Finnish copyright laws and
 international treaty provisions. You may not distribute the registered
 version of the Software nor distribute the License Key code provided to
