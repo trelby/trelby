@@ -29,6 +29,8 @@ def genLocationReport(mainFrame, sp, addDs):
 class LocationReport:
     # sr = SceneReport
     def __init__(self, sr):
+        # TODO: have this construct SceneReport internally
+        
         self.sp = sr.sp
 
         # key = scene name, value = LocationInfo. note that multiple keys

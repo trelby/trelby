@@ -22,6 +22,7 @@ import mypickle
 import namesdlg
 import pml
 import scenereport
+import scriptreport
 import screenplay
 import splash
 import titles
@@ -582,8 +583,7 @@ class MyCtrl(wxControl):
         
     def OnReportDialogueChart(self):
         self.sp.paginate()
-        dialoguechart.genDialogueChart(mainFrame, self.sp,
-                                       not misc.license)
+        dialoguechart.genDialogueChart(mainFrame, self.sp, not misc.license)
 
     def OnReportCharacter(self):
         self.sp.paginate()
@@ -592,13 +592,15 @@ class MyCtrl(wxControl):
 
     def OnReportLocation(self):
         self.sp.paginate()
-        locationreport.genLocationReport(mainFrame, self.sp,
-                                         not misc.license)
+        locationreport.genLocationReport(mainFrame, self.sp, not misc.license)
 
     def OnReportScene(self):
         self.sp.paginate()
-        scenereport.genSceneReport(mainFrame, self.sp,
-                                   not misc.license)
+        scenereport.genSceneReport(mainFrame, self.sp, not misc.license)
+
+    def OnReportScript(self):
+        self.sp.paginate()
+        scriptreport.genScriptReport(mainFrame, self.sp, not misc.license)
 
     def OnCompareScripts(self):
         if mainFrame.notebook.GetPageCount() < 2:
@@ -1443,10 +1445,11 @@ class MyFrame(wxFrame):
         scriptMenu.AppendMenu(ID_SCRIPT_SETTINGS, "&Settings", tmp)
 
         reportsMenu = wxMenu()
-        reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart")
-        reportsMenu.Append(ID_REPORTS_CHARACTER_REP, "&Character report...")
+        reportsMenu.Append(ID_REPORTS_SCRIPT_REP, "Sc&ript report")
         reportsMenu.Append(ID_REPORTS_LOCATION_REP, "&Location report...")
-        reportsMenu.Append(ID_REPORTS_SCENE_REP, "&Scene report")
+        reportsMenu.Append(ID_REPORTS_SCENE_REP, "&Scene report...")
+        reportsMenu.Append(ID_REPORTS_CHARACTER_REP, "&Character report...")
+        reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart...")
         
         toolsMenu = wxMenu()
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
@@ -1563,6 +1566,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnSaveScriptSettingsAs)
         EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnReportDialogueChart)
         EVT_MENU(self, ID_REPORTS_CHARACTER_REP, self.OnReportCharacter)
+        EVT_MENU(self, ID_REPORTS_SCRIPT_REP, self.OnReportScript)
         EVT_MENU(self, ID_REPORTS_LOCATION_REP, self.OnReportLocation)
         EVT_MENU(self, ID_REPORTS_SCENE_REP, self.OnReportScene)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDatabase)
@@ -1633,6 +1637,7 @@ class MyFrame(wxFrame):
             "ID_REPORTS_DIALOGUE_CHART",
             "ID_REPORTS_LOCATION_REP",
             "ID_REPORTS_SCENE_REP",
+            "ID_REPORTS_SCRIPT_REP",
             "ID_SCRIPT_AUTO_COMPLETION",
             "ID_SCRIPT_FIND_ERROR",
             "ID_SCRIPT_HEADERS",
@@ -1994,6 +1999,9 @@ class MyFrame(wxFrame):
 
     def OnReportScene(self, event = None):
         self.panel.ctrl.OnReportScene()
+
+    def OnReportScript(self, event = None):
+        self.panel.ctrl.OnReportScript()
 
     def OnNameDatabase(self, event = None):
         if not hasattr(self, "names"):

@@ -687,6 +687,9 @@ class ConfigGlobal:
             Command("ReportScene", "Generate scene report.",
                     isMenu = True),
             
+            Command("ReportScript", "Generate script report.",
+                    isMenu = True),
+
             Command("RevertScript", "Revert current script to the"
                     " version on disk.", isMenu = True),
             

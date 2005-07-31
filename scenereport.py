@@ -45,8 +45,8 @@ class SceneReport:
 
             line = endLine + 1
 
+        # we don't use these, but ScriptReport does
         lineSeq = [si.lines for si in self.scenes]
-        self.shortestScene = min(lineSeq)
         self.longestScene = max(lineSeq)
         self.avgScene = sum(lineSeq) / float(len(self.scenes))
 
@@ -60,10 +60,6 @@ class SceneReport:
     def generate(self, addDs):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12, addDs)
-
-        tf.addText("Minimum / maximum / average scene length in lines:"
-                   " %d / %d / %.2f" % (self.shortestScene,
-                                        self.longestScene, self.avgScene))
 
         for si in self.scenes:
             tf.addSpace(5.0)
