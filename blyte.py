@@ -1056,7 +1056,7 @@ class MyCtrl(wxControl):
             cs.char = chr(kc)
 
             if misc.isTest and (cs.char == "å"):
-                self.loadFile("casablanca.blyte")
+                self.loadFile("sample.blyte")
             elif misc.isTest and (cs.char == "¤"):
                 self.cmdTest(cs)
             else:
