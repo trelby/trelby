@@ -604,7 +604,7 @@ class MyCtrl(wxControl):
 
     def OnCompareScripts(self):
         if mainFrame.notebook.GetPageCount() < 2:
-            wxMessageBox("You need two at least two scripts open to"
+            wxMessageBox("You need at least two scripts open to"
                          " compare them.", "Error", wxOK, mainFrame)
 
             return
