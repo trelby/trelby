@@ -49,6 +49,9 @@ The following config sections exists and appear in the file in this order:
 
   SceneContinueds (boolean): Whether to include scene continueds.
 
+  SceneContinuedIndent (integer): How many characters to indent the
+  "(CONTINUED)" text from the left margin.
+
   ShowSceneNumbers: (boolean): Whether to include scene numbers.
 
   ShowMargins: (boolean): Whether to show margins by drawing lines.
@@ -66,7 +69,7 @@ The following config sections exists and appear in the file in this order:
    IntraSpacing (integer): Like BeforeSpacing, but for intra-element
    lines.
 
-   Indent (integer): How many characters to indent from left margin.
+   Indent (integer): How many characters to indent from the left margin.
 
    Width (integer): How many characters wide, max.
 

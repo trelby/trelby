@@ -710,32 +710,33 @@ class FormattingPanel(wxPanel):
         vsizer.Add(gsizer, 0, wxLEFT, 10)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
-        
-        hsizer.Add(wxStaticText(self, -1, "Font size:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-
-        self.fontSizeEntry = wxSpinCtrl(self, -1)
-        self.fontSizeEntry.SetRange(*self.cfg.cvars.getMinMax("fontSize"))
-        EVT_SPINCTRL(self, self.fontSizeEntry.GetId(), self.OnMisc)
-        EVT_KILL_FOCUS(self.fontSizeEntry, self.OnKillFocus)
-        hsizer.Add(self.fontSizeEntry, 0)
-
+        self.addSpin("fontSize", "Font size:", self, hsizer, "fontSize")
         vsizer.Add(hsizer, 0, wxTOP, 20)
+
+        vsizer.Add(wxStaticText(self, -1, "Scene CONTINUEDs:"), 0,
+                   wxTOP, 20)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        self.sceneContinuedsCb = wxCheckBox(self, -1,
+            "Include,")
+        EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
+        hsizer.Add(self.sceneContinuedsCb, 0, wxLEFT, 10)
+        
+        self.addSpin("sceneContinuedIndent", "indent:", self, hsizer,
+                     "sceneContinuedIndent")
+        hsizer.Add(wxStaticText(self, -1, "characters"), 0,
+                  wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
+        vsizer.Add(hsizer, 0, wxLEFT, 5)
+
+        self.scenesCb = wxCheckBox(self, -1, "Include scene numbers")
+        EVT_CHECKBOX(self, self.scenesCb.GetId(), self.OnMisc)
+        vsizer.Add(self.scenesCb, 0, wxTOP, 10)
 
         # wxGTK adds way more space by default than wxMSW between the
         # items, have to adjust for that
         pad = 0
         if misc.isWindows:
             pad = 10
-
-        self.sceneContinuedsCb = wxCheckBox(self, -1,
-            "Include scene CONTINUEDs")
-        EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
-        vsizer.Add(self.sceneContinuedsCb, 0, wxTOP, 20)
-        
-        self.scenesCb = wxCheckBox(self, -1, "Include scene numbers")
-        EVT_CHECKBOX(self, self.scenesCb.GetId(), self.OnMisc)
-        vsizer.Add(self.scenesCb, 0, wxTOP, pad)
 
         self.marginsCb = wxCheckBox(self, -1, "Show margins (debug)")
         EVT_CHECKBOX(self, self.marginsCb.GetId(), self.OnMisc)
@@ -772,6 +773,8 @@ class FormattingPanel(wxPanel):
         self.cfg.pbActionLines = util.getSpinValue(self.actionEntry)
         self.cfg.pbDialogueLines = util.getSpinValue(self.dialogueEntry)
         self.cfg.sceneContinueds = self.sceneContinuedsCb.GetValue()
+        self.cfg.sceneContinuedIndent = util.getSpinValue(
+            self.sceneContinuedIndentEntry)
         self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
         self.cfg.pdfShowSceneNumbers = self.scenesCb.GetValue()
         self.cfg.pdfShowMargins = self.marginsCb.GetValue()
@@ -782,10 +785,12 @@ class FormattingPanel(wxPanel):
         # value is zero if we don't do this...
         self.actionEntry.SetValue(5)
         self.dialogueEntry.SetValue(5)
+        self.sceneContinuedIndentEntry.SetValue(5)
         
         self.actionEntry.SetValue(self.cfg.pbActionLines)
         self.dialogueEntry.SetValue(self.cfg.pbDialogueLines)
         self.sceneContinuedsCb.SetValue(self.cfg.sceneContinueds)
+        self.sceneContinuedIndentEntry.SetValue(self.cfg.sceneContinuedIndent)
         self.fontSizeEntry.SetValue(self.cfg.fontSize)
         self.scenesCb.SetValue(self.cfg.pdfShowSceneNumbers)
         self.marginsCb.SetValue(self.cfg.pdfShowMargins)

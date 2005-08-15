@@ -1,4 +1,18 @@
 ﻿#Version 2
+#Begin-Auto-Completion 
+AutoCompletion/Scene/Enabled:True
+AutoCompletion/Scene/Items:0
+AutoCompletion/Character/Enabled:True
+AutoCompletion/Character/Items:0
+AutoCompletion/Transition/Enabled:True
+AutoCompletion/Transition/Items:6
+AutoCompletion/Transition/Items/1:CUT TO:
+AutoCompletion/Transition/Items/2:DISSOLVE TO:
+AutoCompletion/Transition/Items/3:FADE IN:
+AutoCompletion/Transition/Items/4:FADE OUT
+AutoCompletion/Transition/Items/5:FADE TO BLACK
+AutoCompletion/Transition/Items/6:MATCH CUT TO:
+#End-Auto-Completion 
 #Begin-Config 
 FontSize:12
 Margin/Bottom:25.40
@@ -10,6 +24,7 @@ Paper/Width:210.00
 PageBreakActionLines:2
 PageBreakDialogueLines:2
 SceneContinueds:True
+SceneContinuedIndent:45
 ShowSceneNumbers:False
 ShowMargins:False
 ShowLineNumbers:False
@@ -17,8 +32,6 @@ Element/Scene/BeforeSpacing:10
 Element/Scene/IntraSpacing:0
 Element/Scene/Indent:0
 Element/Scene/Width:60
-Element/Scene/AutoCompletion:True
-Element/Scene/AutoCompletionList:0
 Element/Scene/Screen/AllCaps:True
 Element/Scene/Screen/Bold:True
 Element/Scene/Screen/Italic:False
@@ -31,8 +44,6 @@ Element/Action/BeforeSpacing:10
 Element/Action/IntraSpacing:0
 Element/Action/Indent:0
 Element/Action/Width:60
-Element/Action/AutoCompletion:False
-Element/Action/AutoCompletionList:0
 Element/Action/Screen/AllCaps:False
 Element/Action/Screen/Bold:False
 Element/Action/Screen/Italic:False
@@ -45,8 +56,6 @@ Element/Character/BeforeSpacing:10
 Element/Character/IntraSpacing:0
 Element/Character/Indent:22
 Element/Character/Width:38
-Element/Character/AutoCompletion:True
-Element/Character/AutoCompletionList:0
 Element/Character/Screen/AllCaps:True
 Element/Character/Screen/Bold:False
 Element/Character/Screen/Italic:False
@@ -59,8 +68,6 @@ Element/Dialogue/BeforeSpacing:0
 Element/Dialogue/IntraSpacing:0
 Element/Dialogue/Indent:10
 Element/Dialogue/Width:35
-Element/Dialogue/AutoCompletion:False
-Element/Dialogue/AutoCompletionList:0
 Element/Dialogue/Screen/AllCaps:False
 Element/Dialogue/Screen/Bold:False
 Element/Dialogue/Screen/Italic:False
@@ -73,8 +80,6 @@ Element/Parenthetical/BeforeSpacing:0
 Element/Parenthetical/IntraSpacing:0
 Element/Parenthetical/Indent:16
 Element/Parenthetical/Width:25
-Element/Parenthetical/AutoCompletion:False
-Element/Parenthetical/AutoCompletionList:0
 Element/Parenthetical/Screen/AllCaps:False
 Element/Parenthetical/Screen/Bold:False
 Element/Parenthetical/Screen/Italic:False
@@ -87,14 +92,6 @@ Element/Transition/BeforeSpacing:10
 Element/Transition/IntraSpacing:0
 Element/Transition/Indent:45
 Element/Transition/Width:20
-Element/Transition/AutoCompletion:True
-Element/Transition/AutoCompletionList:6
-Element/Transition/AutoCompletionList/1:CUT TO:
-Element/Transition/AutoCompletionList/2:DISSOLVE TO:
-Element/Transition/AutoCompletionList/3:FADE IN:
-Element/Transition/AutoCompletionList/4:FADE OUT
-Element/Transition/AutoCompletionList/5:FADE TO BLACK
-Element/Transition/AutoCompletionList/6:MATCH CUT TO:
 Element/Transition/Screen/AllCaps:True
 Element/Transition/Screen/Bold:False
 Element/Transition/Screen/Italic:False
@@ -107,8 +104,6 @@ Element/Shot/BeforeSpacing:10
 Element/Shot/IntraSpacing:0
 Element/Shot/Indent:0
 Element/Shot/Width:60
-Element/Shot/AutoCompletion:False
-Element/Shot/AutoCompletionList:0
 Element/Shot/Screen/AllCaps:True
 Element/Shot/Screen/Bold:False
 Element/Shot/Screen/Italic:False
@@ -121,8 +116,6 @@ Element/Note/BeforeSpacing:10
 Element/Note/IntraSpacing:0
 Element/Note/Indent:5
 Element/Note/Width:55
-Element/Note/AutoCompletion:False
-Element/Note/AutoCompletionList:0
 Element/Note/Screen/AllCaps:False
 Element/Note/Screen/Bold:False
 Element/Note/Screen/Italic:True
@@ -132,10 +125,13 @@ Element/Note/Export/Bold:False
 Element/Note/Export/Italic:True
 Element/Note/Export/Underlined:False
 #End-Config 
+#Begin-Locations 
+Locations:0
+#End-Locations 
+#Title-String 0.000000,80.000000,32,cb,Times,,THE KOALA INCIDENT
 #Title-String 0.000000,100.000000,12,c,Courier,,by
 #Title-String 0.000000,108.470000,12,c,Courier,,Anonymous Person
 #Title-String 67.000000,200.000000,12,c,Courier,,Sample script for Blyte.
-#Title-String 0.000000,80.000000,32,cb,Times,,THE KOALA INCIDENT
 #Title-String 160.000000,208.000000,12,c,Courier,,All rights reserved.
 #Header-String 1,0,r,,${PAGE}.
 #Header-Empty-Lines 1

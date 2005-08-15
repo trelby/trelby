@@ -365,6 +365,9 @@ class Config:
         # whether scene continueds are enabled
         v.addBool("sceneContinueds", True, "SceneContinueds")
         
+        # whether scene continueds are enabled
+        v.addInt("sceneContinuedIndent", 45, "SceneContinuedIndent", -20, 80)
+
         # whether to include scene numbers
         v.addBool("pdfShowSceneNumbers", False, "ShowSceneNumbers")
 

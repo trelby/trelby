@@ -684,7 +684,7 @@ class Screenplay:
         if cfg.sceneContinueds and not self.isLastLineOfScene(end):
             if doExtra:
                 pg.add(pml.TextOp("(CONTINUED)",
-                        cfg.marginLeft + 45 * chX,
+                        cfg.marginLeft + cfg.sceneContinuedIndent * chX,
                         cfg.marginTop + (y / 10.0 + 1.0) * chY, fs))
 
             y += 10
