@@ -1495,7 +1495,7 @@ class MyFrame(wxFrame):
 
         # this is hidden here because it's somewhat harder to find here
         # than in misc.pyo
-        misc.version = "1.1.0"
+        misc.version = "1.2-dev"
 
         # slightly obfuscated in a desperate attempt to fool at least some
         # people...
