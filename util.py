@@ -327,11 +327,14 @@ def getSpinValue(spinCtrl):
     
     return tmp
 
-# returns true if c, a single character, is either empty, not an
-# alphanumeric character, or more than one character.
+# return True if c is not a word character, i.e. is either empty, not an
+# alphanumeric character or a "'", or is more than one character.
 def isWordBoundary(c):
     if len(c) != 1:
         return True
+
+    if c == "'":
+        return False
 
     c = unicode(c, "ISO-8859-1")
     if not c.isalnum():
