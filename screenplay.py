@@ -134,7 +134,7 @@ class Screenplay:
         output += "#End-Auto-Completion \n"
 
         output += "#Begin-Config \n"
-        output += self.cfg.save()
+        output += util.toUTF8(self.cfg.save())
         output += "#End-Config \n"
 
         output += "#Begin-Locations \n"
@@ -600,7 +600,7 @@ class Screenplay:
 
             if cfg.sceneContinueds and not self.isFirstLineOfScene(start):
                 if doExtra:
-                    s = "CONTINUED:"
+                    s = cfg.strContinuedPageStart
                     if pager.sceneContNr != 0:
                         s += " (%d)" % (pager.sceneContNr + 1)
 
@@ -619,7 +619,7 @@ class Screenplay:
             if self.needsMore(start - 1):
                 if doExtra:
                     pg.add(pml.TextOp(self.getPrevSpeaker(start) +
-                        " (cont'd)",
+                        cfg.strDialogueContinued,
                         cfg.marginLeft + pager.charIndent * chX,
                         cfg.marginTop + (y / 10.0) * chY, fs))
 
@@ -675,7 +675,7 @@ class Screenplay:
 
         if self.needsMore(end):
             if doExtra:
-                pg.add(pml.TextOp("(MORE)",
+                pg.add(pml.TextOp(cfg.strMore,
                         cfg.marginLeft + pager.charIndent * chX,
                         cfg.marginTop + (y / 10.0) * chY, fs))
 
@@ -683,7 +683,7 @@ class Screenplay:
 
         if cfg.sceneContinueds and not self.isLastLineOfScene(end):
             if doExtra:
-                pg.add(pml.TextOp("(CONTINUED)",
+                pg.add(pml.TextOp(cfg.strContinuedPageEnd,
                         cfg.marginLeft + cfg.sceneContinuedIndent * chX,
                         cfg.marginTop + (y / 10.0 + 1.0) * chY, fs))
 

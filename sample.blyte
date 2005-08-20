@@ -28,6 +28,10 @@ SceneContinuedIndent:45
 ShowSceneNumbers:False
 ShowMargins:False
 ShowLineNumbers:False
+String/MoreDialogue:(MORE)
+String/ContinuedPageEnd:(CONTINUED)
+String/ContinuedPageStart:CONTINUED:
+String/DialogueContinued: (cont'd)
 Element/Scene/BeforeSpacing:10
 Element/Scene/IntraSpacing:0
 Element/Scene/Indent:0

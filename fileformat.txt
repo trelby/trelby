@@ -59,6 +59,10 @@ The following config sections exists and appear in the file in this order:
   ShowLineNumbers: (boolean): Whether to prefix each line with its line
   number.
 
+  String/(MoreDialogue|ContinuedPageEnd|ContinuedPageStart|
+  DialogueContinued): The "(MORE)", "(CONTINUED)", "CONTINUED:",
+  " (cont'd)" texts to use.
+
   In addition, there are element-type specific config directives, which
   are named "Element/x/y", where x is (Scene|Action|Character|Dialogue|
   Parenthetical|Transition|Shot|Note) and y is one of:

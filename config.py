@@ -377,6 +377,15 @@ class Config:
         # whether to show line numbers next to each line
         v.addBool("pdfShowLineNumbers", False, "ShowLineNumbers")
 
+        # various strings we add to the script
+        v.addStrNoEscape("strMore", "(MORE)", "String/MoreDialogue")
+        v.addStrNoEscape("strContinuedPageEnd", "(CONTINUED)",
+                         "String/ContinuedPageEnd")
+        v.addStrNoEscape("strContinuedPageStart", "CONTINUED:",
+                         "String/ContinuedPageStart")
+        v.addStrNoEscape("strDialogueContinued", " (cont'd)",
+                         "String/DialogueContinued")
+
         v.makeDicts()
         
     # load config from string 's'. does not throw any exceptions, silently
@@ -417,6 +426,9 @@ class Config:
             for it in el.cvars.numeric.itervalues():
                 util.clampObj(el, it.name, it.minVal, it.maxVal)
 
+        for it in self.cvars.stringNoEscape.itervalues():
+            setattr(self, it.name, util.toInputStr(getattr(self, it.name)))
+            
         # make sure usable space on the page isn't too small
         if doAll and (self.marginTop + self.marginBottom) >= \
                (self.paperHeight - 100.0):

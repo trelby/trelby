@@ -17,6 +17,7 @@ class Vars:
         self.all = self.getDict()
         self.color = self.getDict(ColorVar)
         self.numeric = self.getDict(NumericVar)
+        self.stringNoEscape = self.getDict(StrNoEscapeVar)
 
     # return dictionary containing given type of variable objects, or all
     # if typeObj is None.
@@ -101,6 +102,9 @@ class Vars:
 
     def addStr(self, *params):
         self.addVar(StrVar(*params))
+
+    def addStrNoEscape(self, *params):
+        self.addVar(StrNoEscapeVar(*params))
 
     def addElemName(self, *params):
         self.addVar(ElementNameVar(*params))

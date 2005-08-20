@@ -87,6 +87,7 @@ class CfgDlg(wxDialog):
             self.AddPage(ElementsPanel, "Elements")
             self.AddPage(FormattingPanel, "Formatting")
             self.AddPage(PaperPanel, "Paper")
+            self.AddPage(StringsPanel, "Strings")
 
         size = self.listbook.GetContainingSize()
 
@@ -717,8 +718,7 @@ class FormattingPanel(wxPanel):
                    wxTOP, 20)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
-        self.sceneContinuedsCb = wxCheckBox(self, -1,
-            "Include,")
+        self.sceneContinuedsCb = wxCheckBox(self, -1, "Include,")
         EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
         hsizer.Add(self.sceneContinuedsCb, 0, wxLEFT, 10)
         
@@ -1147,3 +1147,50 @@ class ElementsGlobalPanel(wxPanel):
         util.reverseComboSelect(self.newTabCombo, tcfg.newTypeTab)
         util.reverseComboSelect(self.nextTabCombo, tcfg.nextTypeTab)
         util.reverseComboSelect(self.prevTabCombo, tcfg.prevTypeTab)
+
+class StringsPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        # list of names. each name is both the name of a wxTextCtrl in
+        # this class and the name of a string configuration variable in
+        # cfg.
+        self.items = []
+        
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        gsizer = wxFlexGridSizer(4, 2, 5, 0)
+
+        self.addEntry("strMore", "(MORE)", self, gsizer)
+        self.addEntry("strContinuedPageEnd", "(CONTINUED)", self, gsizer)
+        self.addEntry("strContinuedPageStart", "CONTINUED:", self, gsizer)
+        self.addEntry("strDialogueContinued", " (cont'd)", self, gsizer)
+
+        gsizer.AddGrowableCol(1)
+        vsizer.Add(gsizer, 0, wxEXPAND)
+
+        self.cfg2gui()
+
+        util.finishWindow(self, vsizer, center = False)
+
+        for it in self.items:
+            EVT_TEXT(self, getattr(self, it).GetId(), self.OnMisc)
+
+    def addEntry(self, name, descr, parent, sizer):
+        sizer.Add(wxStaticText(parent, -1, descr), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        tmp = wxTextCtrl(parent, -1)
+        sizer.Add(tmp, 0, wxEXPAND | wxALIGN_CENTER_VERTICAL)
+        
+        setattr(self, name, tmp)
+        self.items.append(name)
+
+    def OnMisc(self, event = None):
+        for it in self.items:
+            setattr(self.cfg, it, getattr(self, it).GetValue())
+
+    def cfg2gui(self):
+        for it in self.items:
+            getattr(self, it).SetValue(getattr(self.cfg, it))
