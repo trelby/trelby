@@ -3,9 +3,6 @@
 
 # FIXME: handle KeyboardInterrupt so testing can be aborted
 
-# FIXME: complain if a tested .py file contains no test functions
-
-
 import glob
 import optparse
 import os
