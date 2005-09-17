@@ -20,6 +20,7 @@ import misc
 import myimport
 import mypickle
 import namesdlg
+import opts
 import pml
 import scenereport
 import scriptreport
@@ -73,14 +74,8 @@ class GlobalData:
         # current script config path
         self.scriptSettingsPath = misc.confPath
 
-        if "--conf" in sys.argv:
-            i = sys.argv.index("--conf")
-
-            if (i + 1) >= len(sys.argv):
-                wxMessageBox("Missing argument to --conf parameter.",
-                             "Error")
-            else:
-                self.confFilename = sys.argv[i + 1]
+        if opts.conf:
+            self.confFilename = opts.conf
 
         v = self.cvars = mypickle.Vars()
 
@@ -1055,9 +1050,9 @@ class MyCtrl(wxControl):
                util.isValidInputChar(kc):
             cs.char = chr(kc)
 
-            if misc.isTest and (cs.char == "å"):
+            if opts.isTest and (cs.char == "å"):
                 self.loadFile("sample.blyte")
-            elif misc.isTest and (cs.char == "¤"):
+            elif opts.isTest and (cs.char == "¤"):
                 self.cmdTest(cs)
             else:
                 self.sp.addCharCmd(cs)
@@ -1750,6 +1745,16 @@ class MyFrame(wxFrame):
             if not (cmd.isFixed and cmd.isMenu):
                 for key in cmd.keys:
                     self.kbdCommands[key] = cmd
+
+    # open script, in the current tab if it's untouched, or in a new one
+    # otherwise
+    def openScript(self, filename):
+        if not self.notebook.GetPage(self.findPage(self.panel))\
+               .ctrl.isUntouched():
+            self.panel = self.createNewPanel()
+
+        self.panel.ctrl.loadFile(filename)
+        self.panel.ctrl.updateScreen()
         
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
@@ -1773,13 +1778,7 @@ class MyFrame(wxFrame):
         
         if dlg.ShowModal() == wxID_OK:
             misc.scriptDir = dlg.GetDirectory()
-            
-            if not self.notebook.GetPage(self.findPage(self.panel))\
-                   .ctrl.isUntouched():
-                self.panel = self.createNewPanel()
-
-            self.panel.ctrl.loadFile(dlg.GetPath())
-            self.panel.ctrl.updateScreen()
+            self.openScript(dlg.GetPath())
 
         dlg.Destroy()
 
@@ -2131,7 +2130,7 @@ class MyApp(wxApp):
         # if we're on linux and running a released version, remove all
         # ~/.oskusoft-tmp/*.pyo files now, we've already loaded them all,
         # and we don't want them lying around for the user to stumble on.
-        if misc.isUnix and not misc.isTest:
+        if misc.isUnix and not opts.isTest:
             tmpDir = os.environ["HOME"] + "/.oskusoft-tmp"
             os.chdir(tmpDir)
             os.system("rm -f *.pyo")
@@ -2181,6 +2180,10 @@ class MyApp(wxApp):
         mainFrame = MyFrame(NULL, -1, "Blyte")
         bugreport.mainFrame = mainFrame
         mainFrame.init()
+        
+        for arg in opts.filenames:
+            mainFrame.openScript(arg)
+
         mainFrame.Show(True)
 
         # windows needs this for some reason
@@ -2188,7 +2191,7 @@ class MyApp(wxApp):
         
         self.SetTopWindow(mainFrame)
 
-        if not misc.isTest:
+        if not opts.isTest:
             win = splash.SplashWindow(mainFrame, 2500)
             win.Show()
             win.Raise()
@@ -2198,7 +2201,9 @@ class MyApp(wxApp):
 def main():
     global myApp
 
-    if "--test" not in sys.argv:
+    opts.init()
+    
+    if not opts.isTest:
         brh = bugreport.BugReportHandler()
         sys.stdout = brh
         sys.stderr = brh
