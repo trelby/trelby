@@ -19,11 +19,13 @@ class FindDlg(wxDialog):
         gsizer = wxFlexGridSizer(2, 2, 5, 20)
         gsizer.AddGrowableCol(1)
         
-        gsizer.Add(wxStaticText(self, -1, "Find what:"))
+        gsizer.Add(wxStaticText(self, -1, "Find what:"), 0,
+                   wxALIGN_CENTER_VERTICAL)
         self.findEntry = wxTextCtrl(self, -1, style = wxTE_PROCESS_ENTER)
         gsizer.Add(self.findEntry, 0, wxEXPAND)
 
-        gsizer.Add(wxStaticText(self, -1, "Replace with:"))
+        gsizer.Add(wxStaticText(self, -1, "Replace with:"), 0,
+                   wxALIGN_CENTER_VERTICAL)
         self.replaceEntry = wxTextCtrl(self, -1, style = wxTE_PROCESS_ENTER)
         gsizer.Add(self.replaceEntry, 0, wxEXPAND)
         
