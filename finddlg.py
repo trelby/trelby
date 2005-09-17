@@ -357,13 +357,12 @@ class FindDlg(wxDialog):
             
     def OnReplace(self, event = None, autoFind = False):
         if self.ctrl.searchLine != -1:
-            value = self.replaceEntry.GetValue()
+            value = util.toInputStr(self.replaceEntry.GetValue())
             ls = self.ctrl.sp.lines
 
-            old = ls[self.ctrl.searchLine].text
-            new = old[0 : self.ctrl.searchColumn] + value +\
-                  old[self.ctrl.searchColumn + self.ctrl.searchWidth:]
-            ls[self.ctrl.searchLine].text = new
+            ls[self.ctrl.searchLine].text = util.replace(
+                ls[self.ctrl.searchLine].text, value,
+                self.ctrl.searchColumn, self.ctrl.searchWidth)
 
             self.ctrl.searchLine = -1
 

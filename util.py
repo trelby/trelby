@@ -108,6 +108,10 @@ def isValidInputChar(kc):
 def toInputStr(s):
     return s.translate(_input_tbl, "\f")
 
+# replace s[start:start + width] with toInputStr(new) and return s
+def replace(s, new, start, width):
+    return s[0 : start] + toInputStr(new) + s[start + width:]
+
 # returns s with all possible different types of newlines converted to
 # unix newlines, i.e. a single "\n"
 def fixNL(s):
