@@ -910,7 +910,7 @@ class MyCtrl(wxControl):
 
             choice = dlg.GetFilterIndex()
             if choice == 0:
-                data = sp.generatePDF(not misc.license)
+                data = sp.generatePDF(not misc.license, True)
             elif choice == 1:
                 data = sp.generateRTF()
             else:
@@ -926,7 +926,7 @@ class MyCtrl(wxControl):
         if not sp:
             return
         
-        s = sp.generatePDF(not misc.license)
+        s = sp.generatePDF(not misc.license, False)
         util.showTempPDF(s, cfgGl, mainFrame)
 
     def OnSettings(self):

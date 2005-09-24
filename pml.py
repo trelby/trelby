@@ -42,8 +42,20 @@ class Document:
         # a collection of Page objects
         self.pages = []
 
+        # a collection of TOCItem objects
+        self.tocs = []
+
+        # whether to show TOC by default on document open
+        self.showTOC = False
+
+        # page number to display on document open, or -1
+        self.defPage = -1
+
     def add(self, page):
         self.pages.append(page)
+
+    def addTOC(self, toc):
+        self.tocs.append(toc)
 
 class Page:
     def __init__(self, doc):
@@ -90,6 +102,19 @@ class Page:
 
         self.add(PDFOp("Q"))
 
+# Table of content item (Outline item, in PDF lingo)
+class TOCItem:
+    def __init__(self, text, op):
+        # text to show in TOC
+        self.text = text
+
+        # pointer to the TextOp that this item links to (used to get the
+        # correct positioning information)
+        self.op = op
+
+        # the PDF object number of the page we point to
+        self.pageObjNr = -1
+
 # An abstract base class for all drawing operations.
 class DrawOp:
     def __init__(self, type):
@@ -111,6 +136,9 @@ class TextOp(DrawOp):
         self.size = size
         self.flags = flags
 
+        # TOCItem, by default we have none
+        self.toc = None
+        
         # index of line in Screenplay.lines, or -1 if some other text.
         # only used when drawing display, pdf output doesn't use this.
         self.line = line

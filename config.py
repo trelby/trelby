@@ -371,6 +371,15 @@ class Config:
         # whether to include scene numbers
         v.addBool("pdfShowSceneNumbers", False, "ShowSceneNumbers")
 
+        # whether to include PDF TOC
+        v.addBool("pdfIncludeTOC", True, "IncludeTOC")
+
+        # whether to show PDF TOC by default
+        v.addBool("pdfShowTOC", True, "ShowTOC")
+        
+        # whether to open PDF document on current page
+        v.addBool("pdfOpenOnCurrentPage", True, "OpenOnCurrentPage")
+        
         # whether to draw rectangle showing margins
         v.addBool("pdfShowMargins", False, "ShowMargins")
 

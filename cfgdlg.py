@@ -87,6 +87,7 @@ class CfgDlg(wxDialog):
             self.AddPage(ElementsPanel, "Elements")
             self.AddPage(FormattingPanel, "Formatting")
             self.AddPage(PaperPanel, "Paper")
+            self.AddPage(PDFPanel, "PDF")
             self.AddPage(StringsPanel, "Strings")
 
         size = self.listbook.GetContainingSize()
@@ -1194,3 +1195,43 @@ class StringsPanel(wxPanel):
     def cfg2gui(self):
         for it in self.items:
             getattr(self, it).SetValue(getattr(self.cfg, it))
+
+class PDFPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        # wxGTK adds way more space by default than wxMSW between the
+        # items, have to adjust for that
+        pad = 0
+        if misc.isWindows:
+            pad = 10
+
+        self.includeTOCCb = self.addCb("Add table of contents", vsizer, pad)
+        self.showTOCCb = self.addCb("Show table of contents on PDF open",
+                                    vsizer, pad)
+        self.openOnCurrentPageCb = self.addCb("Open PDF on current page",
+                                              vsizer, pad)
+
+        self.cfg2gui()
+        
+        util.finishWindow(self, vsizer, center = False)
+
+    def addCb(self, descr, sizer, pad):
+        ctrl = wxCheckBox(self, -1, descr)
+        EVT_CHECKBOX(self, ctrl.GetId(), self.OnMisc)
+        sizer.Add(ctrl, 0, wxTOP, pad)
+
+        return ctrl
+
+    def OnMisc(self, event = None):
+        self.cfg.pdfIncludeTOC = self.includeTOCCb.GetValue()
+        self.cfg.pdfShowTOC = self.showTOCCb.GetValue()
+        self.cfg.pdfOpenOnCurrentPage = self.openOnCurrentPageCb.GetValue()
+        
+    def cfg2gui(self):
+        self.includeTOCCb.SetValue(self.cfg.pdfIncludeTOC)
+        self.showTOCCb.SetValue(self.cfg.pdfShowTOC)
+        self.openOnCurrentPageCb.SetValue(self.cfg.pdfOpenOnCurrentPage)

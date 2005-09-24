@@ -52,12 +52,20 @@ The following config sections exists and appear in the file in this order:
   SceneContinuedIndent (integer): How many characters to indent the
   "(CONTINUED)" text from the left margin.
 
-  ShowSceneNumbers: (boolean): Whether to include scene numbers.
+  ShowSceneNumbers (boolean): Whether to include scene numbers.
 
-  ShowMargins: (boolean): Whether to show margins by drawing lines.
+  ShowMargins (boolean): Whether to show margins by drawing lines.
 
-  ShowLineNumbers: (boolean): Whether to prefix each line with its line
+  ShowLineNumbers (boolean): Whether to prefix each line with its line
   number.
+
+  IncludeTOC (boolean): Whether to add a table of contents.
+
+  ShowTOC (boolean): Whether to show the table of contents when opening
+  the PDF file.
+        
+  OpenOnCurrentPage (boolean): If True, display current page in the PDF
+  file when opening it.
 
   String/(MoreDialogue|ContinuedPageEnd|ContinuedPageStart|
   DialogueContinued): The "(MORE)", "(CONTINUED)", "CONTINUED:",

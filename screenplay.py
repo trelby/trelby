@@ -524,11 +524,19 @@ class Screenplay:
 
     # generate PDF and return it as a string. assumes paginate/reformat is
     # 100% correct for the screenplay. if addDs is True, add demo stamp to
-    # each page.
-    def generatePDF(self, addDs):
+    # each page. isExport is True if this is an "export to file"
+    # operation, False if we're just going to launch a PDF viewer with the
+    # data.
+    def generatePDF(self, addDs, isExport):
         pager = mypager.Pager(self.cfg)
         self.titles.generatePages(pager.doc)
-        
+
+        pager.doc.showTOC = self.cfg.pdfShowTOC
+
+        if not isExport and self.cfg.pdfOpenOnCurrentPage:
+            pager.doc.defPage = len(self.titles.pages) + \
+                                self.line2page(self.line) - 1
+            
         for i in xrange(1, len(self.pages)):
             pg = self.generatePMLPage(pager, i, True, True, addDs)
 
@@ -653,10 +661,12 @@ class Screenplay:
                     typ |= pml.UNDERLINED
             else:
                 text = line.text
-                
-            pg.add(pml.TextOp(text,
+
+            to = pml.TextOp(text,
                 cfg.marginLeft + tcfg.indent * chX,
-                cfg.marginTop + (y / 10.0) * chY, fs, typ, line = i))
+                cfg.marginTop + (y / 10.0) * chY, fs, typ, line = i)
+
+            pg.add(to)
 
             if doExtra and (tcfg.lt == SCENE) and self.isFirstLineOfElem(i):
                 pager.sceneContNr = 0
@@ -665,6 +675,15 @@ class Screenplay:
                     pager.scene += 1
                     self.addSceneNumbers(pg, "%d" % pager.scene, tcfg.width,
                                          y, chX, chY)
+
+                if cfg.pdfIncludeTOC:
+                    if cfg.pdfShowSceneNumbers:
+                        s = "%d %s" % (pager.scene, text)
+                    else:
+                        s = text
+
+                    to.toc = pml.TOCItem(s, to)
+                    pager.doc.addTOC(to.toc)
 
             if doExtra and cfg.pdfShowLineNumbers:
                 pg.add(pml.TextOp("%02d" % (i - start + 1),

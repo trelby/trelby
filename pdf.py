@@ -62,14 +62,32 @@ class PDFExporter:
         firstPageNr = catalogNr + 1
         lastPageNr = firstPageNr + pages * 2 - 1
         pagesNr = lastPageNr + 1
-        firstFontNr = pagesNr + 1
+
+        if doc.tocs:
+            outlinesNr = pagesNr + 1
+            firstOutlineNr = outlinesNr + 1
+            lastOutlineNr = firstOutlineNr + len(doc.tocs) - 1
+            firstFontNr = lastOutlineNr + 1
+            outlinesStr = "/Outlines %d 0 R\n" % outlinesNr
+
+            if doc.showTOC:
+                outlinesStr += "/PageMode /UseOutlines\n"
+
+        else:
+            firstFontNr = pagesNr + 1
+            outlinesStr = ""
+
+        if doc.defPage != -1:
+            outlinesStr += "/OpenAction [%d 0 R /XYZ null null 0]\n" % (
+                firstPageNr + doc.defPage * 2)
 
         self.addXref(65535, "f")
         self.data += "%PDF-1.4\n"
         
         self.addObj("<< /Type /Catalog\n"
                     "/Pages %d 0 R\n"
-                    ">>" % pagesNr)
+                    "%s"
+                    ">>" % (pagesNr, outlinesStr))
 
         for i in range(pages):
             self.addObj("<< /Type /Page\n"
@@ -86,8 +104,8 @@ class PDFExporter:
             for op in pg.ops:
                 if op.type == pml.OP_TEXT:
 
-                    s = op.text.replace("\\", "\\\\").replace("(", "\\(").\
-                        replace(")", "\\)")
+                    if op.toc:
+                        op.toc.pageObjNr = self.objectCnt - 1
 
                     # we need to adjust y position since PDF uses baseline
                     # of text as the y pos, but pml uses top of the text
@@ -111,7 +129,7 @@ class PDFExporter:
                     cont += "BT\n"\
                             "%f %f Td\n"\
                             "(%s) Tj\n"\
-                            "ET\n" % (x, y, s)
+                            "ET\n" % (x, y, self.escapeStr(op.text))
 
                     if op.flags & pml.UNDERLINED:
                         
@@ -193,6 +211,37 @@ class PDFExporter:
                     ">>" % (kids, pages, self.mm2points(doc.w),
                             self.mm2points(doc.h), fontObjs))
 
+        if doc.tocs:
+            self.addObj("<< /Type /Outlines\n"
+                        "/Count %d\n"
+                        "/First %d 0 R\n"
+                        "/Last %d 0 R\n"
+                        ">>" % (len(doc.tocs), firstOutlineNr,
+                                lastOutlineNr))
+
+            for i in range(len(doc.tocs)):
+                toc = doc.tocs[i]
+
+                if i != (len(doc.tocs) - 1):
+                    nextStr = "/Next %d 0 R\n" % (self.objectCnt + 1)
+                else:
+                    nextStr = ""
+
+                if i != 0:
+                    prevStr = "/Prev %d 0 R\n" % (self.objectCnt - 1)
+                else:
+                    prevStr = ""
+
+                self.addObj("<< /Parent %d 0 R\n"
+                            "/Dest [%d 0 R /XYZ %f %f 0]\n"
+                            "/Title (%s)\n"
+                            "%s"
+                            "%s"
+                            ">>" % (
+                    outlinesNr, toc.pageObjNr, self.x(toc.op.x),
+                    self.y(toc.op.y), self.escapeStr(toc.text),
+                    prevStr, nextStr))
+
         for fi in self.fonts.itervalues():
             if fi.number != -1:
                 self.addObj("<< /Type /Font\n"
@@ -257,6 +306,10 @@ class PDFExporter:
             self.fontCnt += 1
 
         return fi.number
+
+    # escape string
+    def escapeStr(self, s):
+        return s.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
         
     # convert mm to points (1/72 inch).
     def mm2points(self, mm):

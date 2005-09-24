@@ -26,6 +26,9 @@ PageBreakDialogueLines:2
 SceneContinueds:True
 SceneContinuedIndent:45
 ShowSceneNumbers:False
+IncludeTOC:True
+ShowTOC:True
+OpenOnCurrentPage:True
 ShowMargins:False
 ShowLineNumbers:False
 String/MoreDialogue:(MORE)
