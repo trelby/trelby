@@ -1,3 +1,5 @@
+# -*- coding: ISO-8859-1 -*-
+
 import u
 import util
 
@@ -16,3 +18,18 @@ def testReplace():
     assert ur("yo", "bar", 1, 1) == "ybar"
     assert ur("yo", "bar", 2, 0) == "yobar"
     assert ur("yo", "ba\tr", 2, 0) == "yoba|r"
+
+def testSplitToWords():
+    u.init()
+
+    us = util.splitToWords
+
+    assert us("") == []
+    assert us("yo") == ["yo"]
+    assert us("yo foo") == ["yo", "foo"]
+    assert us("äksy yö") == ["äksy", "yö"]
+    assert us("Mixed CASE") == ["Mixed", "CASE"]
+    assert us("out-of-nowhere, a monkey appears, bearing fruit!") == [
+        "out", "of", "nowhere", "a", "monkey", "appears", "bearing", "fruit"]
+    assert us("don't assume -- it blaa") == ["don't", "assume", "it", "blaa"]
+    assert us("a''b--c|d®e") == ["a''b", "c", "d", "e"]

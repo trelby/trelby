@@ -81,12 +81,16 @@ class CharacterReport:
                     ci.speechCnt += 1
 
                 curSpeechLines += 1
-                ci.lineCnt += 1
 
-                words = util.splitToWords(line.text)
-                
-                ci.wordCnt += len(words)
-                ci.wordCharCnt += reduce(lambda x, y: x + len(y), words, 0)
+                # PAREN lines don't count as spoken words
+                if line.lt == screenplay.DIALOGUE:
+                    ci.lineCnt += 1
+
+                    words = util.splitToWords(line.text)
+
+                    ci.wordCnt += len(words)
+                    ci.wordCharCnt += reduce(lambda x, y: x + len(y), words,
+                                             0)
                 
                 ci.pages.addPage(sp.line2page(i))
 
@@ -130,13 +134,13 @@ class CharacterReport:
             if self.inf[self.INF_BASIC].selected:
                 tf.addText("Speeches: %d, Lines: %d (%.2f%%),"
                     " per speech: %.2f" % (ci.speechCnt, ci.lineCnt,
-                    (ci.lineCnt * 100.0) / self.totalLineCnt,
-                    ci.lineCnt / float(ci.speechCnt)))
+                    util.pctf(ci.lineCnt, self.totalLineCnt),
+                    util.safeDiv(ci.lineCnt, ci.speechCnt)))
 
                 tf.addText("Words: %d, per speech: %.2f,"
                     " characters per: %.2f" % (ci.wordCnt,
-                    ci.wordCnt / float(ci.speechCnt),
-                    ci.wordCharCnt / float(ci.wordCnt)))
+                    util.safeDiv(ci.wordCnt, ci.speechCnt),
+                    util.safeDiv(ci.wordCharCnt, ci.wordCnt)))
                 
             if self.inf[self.INF_PAGES].selected:
                 tf.addWrappedText("Pages: %d, list: %s" % (len(ci.pages),
