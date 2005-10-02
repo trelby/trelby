@@ -33,3 +33,23 @@ def testSplitToWords():
         "out", "of", "nowhere", "a", "monkey", "appears", "bearing", "fruit"]
     assert us("don't assume -- it blaa") == ["don't", "assume", "it", "blaa"]
     assert us("a''b--c|d®e") == ["a''b", "c", "d", "e"]
+
+def testToUTF8():
+    u.init()
+
+    t = util.toUTF8
+
+    assert t("") == ""
+    assert t("yo") == "yo"
+    assert t("yö") == "yÃ¶"
+    
+def testFromUTF8():
+    u.init()
+
+    f = util.fromUTF8
+
+    assert f("") == ""
+    assert f("yo") == "yo"
+    assert f("yÃ¶") == "yö"
+    assert f("yö12345") == "y45"
+    assert f("a\xE2\x82\xACb") == "ab"

@@ -94,6 +94,12 @@ def lower(s):
 def toUTF8(s):
     return unicode(s, "ISO-8859-1").encode("UTF-8")
 
+# return 's', which must be a string of UTF-8 characters, converted to
+# ISO-8859-1, with characters not representable in ISO-8859-1 discarded
+# and any invalid UTF-8 sequences ignored.
+def fromUTF8(s):
+    return s.decode("UTF-8", "ignore").encode("ISO-8859-1", "ignore")
+
 # returns True if kc (key-code) is a valid character to add to the script.
 def isValidInputChar(kc):
     # [0x80, 0x9F] = unspecified control characters in ISO-8859-1, added
