@@ -1,3 +1,4 @@
+import gutil
 import misc
 import pdf
 import pml
@@ -23,7 +24,7 @@ def genSceneReport(mainFrame, sp, addDs):
 
     data = report.generate(addDs)
 
-    util.showTempPDF(data, sp.cfgGl, mainFrame)
+    gutil.showTempPDF(data, sp.cfgGl, mainFrame)
 
 class SceneReport:
     def __init__(self, sp):

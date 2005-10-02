@@ -11,7 +11,7 @@ def init():
     global initDone
     
     if not initDone:
-        misc.init()
+        misc.init(False)
         util.init(False)
 
         initDone = True

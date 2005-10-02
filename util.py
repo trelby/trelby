@@ -1,5 +1,4 @@
 from error import *
-import misc
 
 import datetime
 import glob
@@ -835,33 +834,6 @@ class TimerDev:
         self.__class__.nestingLevel -= 1
         print "%s%s took %.5f seconds" % (" " * self.__class__.nestingLevel,
                                           self.msg, self.t)
-
-# show PDF document 'pdfData' in an external viewer program. writes out a
-# temporary file, first deleting all old temporary files, then opens PDF
-# viewer application. 'mainFrame' is used as a parent for message boxes in
-# case there are any errors.
-def showTempPDF(pdfData, cfgGl, mainFrame):
-
-    try:
-        try:
-            removeTempFiles(misc.tmpPrefix)
-
-            fd, filename = tempfile.mkstemp(prefix = misc.tmpPrefix,
-                                            suffix = ".pdf")
-
-            try:
-                os.write(fd, pdfData)
-            finally:
-                os.close(fd)
-
-            showPDF(filename, cfgGl, mainFrame)
-
-        except IOError, (errno, strerror):
-            raise MiscError("IOError: %s" % strerror)
-
-    except BlyteError, e:
-        wxMessageBox("Error writing temporary PDF file: %s" % e,
-                     "Error", wxOK, mainFrame)
 
 # show PDF file.
 def showPDF(filename, cfgGl, frame):

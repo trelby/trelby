@@ -1,3 +1,4 @@
+import gutil
 import misc
 import pdf
 import pml
@@ -37,7 +38,7 @@ def genCharacterReport(mainFrame, sp, addDs):
     
     data = report.generate(addDs)
 
-    util.showTempPDF(data, sp.cfgGl, mainFrame)
+    gutil.showTempPDF(data, sp.cfgGl, mainFrame)
     
 class CharacterReport:
     def __init__(self, sp):

@@ -12,6 +12,7 @@ import config
 import decode
 import dialoguechart
 import finddlg
+import gutil
 import headersdlg
 import locationreport
 import locationsdlg
@@ -644,7 +645,7 @@ class MyCtrl(wxControl):
         s = sp1.compareScripts(sp2, not misc.license)
 
         if s:
-            util.showTempPDF(s, cfgGl, mainFrame)
+            gutil.showTempPDF(s, cfgGl, mainFrame)
         else:
             s = "The scripts are identical."
             if not misc.license:
@@ -925,7 +926,7 @@ class MyCtrl(wxControl):
             return
         
         s = sp.generatePDF(not misc.license, False)
-        util.showTempPDF(s, cfgGl, mainFrame)
+        gutil.showTempPDF(s, cfgGl, mainFrame)
 
     def OnSettings(self):
         dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfgGl),

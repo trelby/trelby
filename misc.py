@@ -6,7 +6,7 @@ import sys
 
 from wxPython.wx import *
 
-def init():
+def init(doWX = True):
     global isWindows, isUnix, progPath, confPath, tmpPrefix
 
     # prefix used for temp files
@@ -20,7 +20,10 @@ def init():
     else:
         isUnix = True
 
-    if opts.isTest:
+    # stupid hack to keep testcases working, since they don't initialize
+    # opts (the doWX name is just for similary with util, and to confuse
+    # people trying to disassemble the code)
+    if not doWX or opts.isTest:
         progPath = "."
         confPath = ".blyte"
     else:

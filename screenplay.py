@@ -20,7 +20,6 @@ import config
 import error
 import headers
 import locations
-import misc
 import mypager
 import pdf
 import pml

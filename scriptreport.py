@@ -1,5 +1,6 @@
 import characterreport
 import config
+import gutil
 import pdf
 import pml
 import scenereport
@@ -10,7 +11,7 @@ def genScriptReport(mainFrame, sp, addDs):
     report = ScriptReport(sp)
     data = report.generate(addDs)
 
-    util.showTempPDF(data, sp.cfgGl, mainFrame)
+    gutil.showTempPDF(data, sp.cfgGl, mainFrame)
 
 class ScriptReport:
     def __init__(self, sp):

@@ -1,3 +1,4 @@
+import gutil
 import misc
 import pdf
 import pml
@@ -216,7 +217,7 @@ class TitlesDlg(wxDialog):
 
         self.titles.generatePages(doc)
         tmp = pdf.generate(doc)
-        util.showTempPDF(tmp, self.cfgGl, self)
+        gutil.showTempPDF(tmp, self.cfgGl, self)
 
     # set given page. 'page' can be an invalid value.
     def setPage(self, page):

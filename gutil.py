@@ -1,3 +1,12 @@
+from error import *
+import misc
+import util
+
+import os
+import tempfile
+
+from wxPython.wx import *
+
 # this contains misc GUI-related functions
 
 # since at least GTK 1.2's single-selection listbox is buggy in that if we
@@ -25,3 +34,29 @@ def listBoxAdd(lb, name, cdata):
             return
 
     lb.Append(name, cdata)
+
+# show PDF document 'pdfData' in an external viewer program. writes out a
+# temporary file, first deleting all old temporary files, then opens PDF
+# viewer application. 'mainFrame' is used as a parent for message boxes in
+# case there are any errors.
+def showTempPDF(pdfData, cfgGl, mainFrame):
+    try:
+        try:
+            util.removeTempFiles(misc.tmpPrefix)
+
+            fd, filename = tempfile.mkstemp(prefix = misc.tmpPrefix,
+                                            suffix = ".pdf")
+
+            try:
+                os.write(fd, pdfData)
+            finally:
+                os.close(fd)
+
+            util.showPDF(filename, cfgGl, mainFrame)
+
+        except IOError, (errno, strerror):
+            raise MiscError("IOError: %s" % strerror)
+
+    except BlyteError, e:
+        wxMessageBox("Error writing temporary PDF file: %s" % e,
+                     "Error", wxOK, mainFrame)

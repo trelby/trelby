@@ -1,3 +1,4 @@
+import gutil
 import headers
 import misc
 import pdf
@@ -201,7 +202,7 @@ class HeadersDlg(wxDialog):
         doc.add(pg)
         
         tmp = pdf.generate(doc)
-        util.showTempPDF(tmp, self.cfgGl, self)
+        gutil.showTempPDF(tmp, self.cfgGl, self)
 
     def OnKillFocus(self, event):
         self.OnMisc()
