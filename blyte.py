@@ -12,7 +12,6 @@ import config
 import decode
 import dialoguechart
 import finddlg
-import headers
 import headersdlg
 import locationreport
 import locationsdlg
@@ -26,7 +25,6 @@ import scenereport
 import scriptreport
 import screenplay
 import splash
-import titles
 import titlesdlg
 import util
 import viewmode

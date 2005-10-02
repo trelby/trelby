@@ -2312,13 +2312,6 @@ class Line:
         # text
         self.text = text
 
-    def __eq__(self, other):
-        return (self.lb == other.lb) and (self.lt == other.lt) and\
-               (self.text == other.text)
-    
-    def __ne__(self, other):
-        return not self == other
-        
     def __str__(self):
         return config.lb2char(self.lb) + config.lt2char(self.lt)\
                + self.text

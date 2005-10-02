@@ -57,24 +57,6 @@ class Titles:
 
         for page in self.pages:
             page.sort(tmpfunc)
-        
-    def __eq__(self, other):
-        if len(self.pages) != len(other.pages):
-            return False
-
-        for pg in xrange(len(self.pages)):
-
-            if len(self.pages[pg]) != len(other.pages[pg]):
-                return False
-            
-            for i in xrange(len(self.pages[pg])):
-                if self.pages[pg][i] != other.pages[pg][i]:
-                    return False
-
-        return True
-    
-    def __ne__(self, other):
-        return not self == other
 
 # a single string displayed on a title page
 class TitleString:
@@ -189,13 +171,3 @@ class TitleString:
         s += ",,%s" % self.text
 
         return s
-
-    def __eq__(self, other):
-        for k in self.__dict__.iterkeys():
-            if getattr(self, k) != getattr(other, k):
-                return False
-
-        return True
-    
-    def __ne__(self, other):
-        return not self == other

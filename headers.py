@@ -38,19 +38,6 @@ class Headers:
         for h in self.hdrs:
             h.generatePML(page, pageNr, cfg)
 
-    def __eq__(self, other):
-        if len(self.hdrs) != len(other.hdrs):
-            return False
-
-        for i in range(len(self.hdrs)):
-            if self.hdrs[i] != other.hdrs[i]:
-                return False
-
-        return True
-    
-    def __ne__(self, other):
-        return not self == other
-
 # a single header string
 class HeaderString:
     def __init__(self):
@@ -144,13 +131,3 @@ class HeaderString:
         s += ",,%s" % self.text
 
         return s
-
-    def __eq__(self, other):
-        for k in self.__dict__.iterkeys():
-            if getattr(self, k) != getattr(other, k):
-                return False
-
-        return True
-    
-    def __ne__(self, other):
-        return not self == other
