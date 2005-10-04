@@ -25,6 +25,9 @@ import pml
 import scenereport
 import scriptreport
 import screenplay
+import spellcheck
+import spellcheckdlg
+import spellcheckcfgdlg
 import splash
 import titlesdlg
 import util
@@ -69,9 +72,13 @@ class GlobalData:
 
         self.confFilename = misc.confPath + "/default.conf"
         self.stateFilename = misc.confPath + "/state"
+        self.scDictFilename = misc.confPath + "/spell_checker_dictionary"
 
         # current script config path
         self.scriptSettingsPath = misc.confPath
+
+        # global spell checker (user) dictionary
+        self.scDict = spellcheck.Dict()
 
         if opts.conf:
             self.confFilename = opts.conf
@@ -139,6 +146,11 @@ class GlobalData:
             self.vm = self.vmOverviewSmall
         else:
             self.vm = self.vmOverviewLarge
+
+    # save global spell checker dictionary to disk
+    def saveScDict(self):
+        util.writeToFile(self.scDictFilename,
+                         util.toUTF8(self.scDict.save()), mainFrame)
 
 class MyPanel(wxPanel):
 
@@ -575,6 +587,16 @@ class MyCtrl(wxControl):
 
         dlg.Destroy()
         
+    def OnSpellCheckerScriptDictionaryDlg(self):
+        dlg = spellcheckcfgdlg.SCDictDlg(mainFrame,
+            copy.deepcopy(self.sp.scDict), False)
+
+        if dlg.ShowModal() == wxID_OK:
+            self.sp.scDict = dlg.scDict
+            self.sp.markChanged()
+
+        dlg.Destroy()
+
     def OnReportDialogueChart(self):
         self.sp.paginate()
         dialoguechart.genDialogueChart(mainFrame, self.sp, not misc.license)
@@ -835,7 +857,53 @@ class MyCtrl(wxControl):
         dlg.Destroy()
 
         self.searchLine = -1
-        self.searchColStart = -1
+        self.searchColumn = -1
+        self.searchWidth = -1
+
+        self.updateScreen()
+
+    def OnSpellCheckerDlg(self):
+        self.clearAutoComp()
+        
+        wasAtStart = self.sp.line == 0
+
+        wxBeginBusyCursor()
+        
+        if not spellcheck.loadDict(mainFrame):
+            wxEndBusyCursor()
+            
+            return
+
+        sc = spellcheck.SpellChecker(self.sp, gd.scDict)
+        found = sc.findNext()
+        
+        wxEndBusyCursor()
+
+        if not found:
+            s = ""
+            
+            if not wasAtStart:
+                s = "\n\n(Starting position was not at\n"\
+                    "the beginning of the script.)"
+            wxMessageBox("Spell checker found no errors." + s, "Results",
+                         wxOK, mainFrame)
+
+            return
+
+        dlg = spellcheckdlg.SpellCheckDlg(mainFrame, self, sc, gd.scDict)
+        dlg.ShowModal()
+        
+        if dlg.didReplaces:
+            self.sp.reformatAll()
+            self.makeLineVisible(self.sp.line)
+
+        if dlg.changedGlobalDict:
+            gd.saveScDict()
+            
+        dlg.Destroy()
+
+        self.searchLine = -1
+        self.searchColumn = -1
         self.searchWidth = -1
 
         self.updateScreen()
@@ -1378,6 +1446,8 @@ class MyFrame(wxFrame):
         tmp.AppendSeparator()
         tmp.Append(ID_SETTINGS_LOAD, "Load...")
         tmp.Append(ID_SETTINGS_SAVE_AS, "Save as...")
+        tmp.AppendSeparator()
+        tmp.Append(ID_SETTINGS_SC_DICT, "&Spell checker dictionary...")
         fileMenu.AppendMenu(ID_FILE_SETTINGS, "Se&ttings", tmp)
 
         fileMenu.AppendSeparator()
@@ -1428,6 +1498,7 @@ class MyFrame(wxFrame):
         scriptMenu.Append(ID_SCRIPT_HEADERS, "&Headers...")
         scriptMenu.Append(ID_SCRIPT_LOCATIONS, "&Locations...")
         scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
+        scriptMenu.Append(ID_SCRIPT_SC_DICT, "&Spell checker dictionary...")
         scriptMenu.AppendSeparator()
 
         tmp = wxMenu()
@@ -1446,6 +1517,7 @@ class MyFrame(wxFrame):
         reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart...")
         
         toolsMenu = wxMenu()
+        toolsMenu.Append(ID_TOOLS_SPELL_CHECK, "&Spell checker...")
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
         toolsMenu.Append(ID_TOOLS_CHARMAP, "&Character map...")
         toolsMenu.Append(ID_TOOLS_COMPARE_SCRIPTS, "C&ompare scripts...")
@@ -1534,6 +1606,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SETTINGS_CHANGE, self.OnSettings)
         EVT_MENU(self, ID_SETTINGS_LOAD, self.OnLoadSettings)
         EVT_MENU(self, ID_SETTINGS_SAVE_AS, self.OnSaveSettingsAs)
+        EVT_MENU(self, ID_SETTINGS_SC_DICT, self.OnSpellCheckerDictionaryDlg)
         EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
         EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
         EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
@@ -1555,6 +1628,8 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeadersDlg)
         EVT_MENU(self, ID_SCRIPT_LOCATIONS, self.OnLocationsDlg)
         EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitlesDlg)
+        EVT_MENU(self, ID_SCRIPT_SC_DICT,
+                 self.OnSpellCheckerScriptDictionaryDlg)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_CHANGE, self.OnScriptSettings)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_LOAD, self.OnLoadScriptSettings)
         EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnSaveScriptSettingsAs)
@@ -1563,6 +1638,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_REPORTS_SCRIPT_REP, self.OnReportScript)
         EVT_MENU(self, ID_REPORTS_LOCATION_REP, self.OnReportLocation)
         EVT_MENU(self, ID_REPORTS_SCENE_REP, self.OnReportScene)
+        EVT_MENU(self, ID_TOOLS_SPELL_CHECK, self.OnSpellCheckerDlg)
         EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDatabase)
         EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharacterMap)
         EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
@@ -1637,6 +1713,7 @@ class MyFrame(wxFrame):
             "ID_SCRIPT_HEADERS",
             "ID_SCRIPT_LOCATIONS",
             "ID_SCRIPT_PAGINATE",
+            "ID_SCRIPT_SC_DICT",
             "ID_SCRIPT_SETTINGS",
             "ID_SCRIPT_SETTINGS_CHANGE",
             "ID_SCRIPT_SETTINGS_LOAD",
@@ -1645,9 +1722,11 @@ class MyFrame(wxFrame):
             "ID_SETTINGS_CHANGE",
             "ID_SETTINGS_LOAD",
             "ID_SETTINGS_SAVE_AS",
+            "ID_SETTINGS_SC_DICT",
             "ID_TOOLS_CHARMAP",
             "ID_TOOLS_COMPARE_SCRIPTS",
             "ID_TOOLS_NAME_DB",
+            "ID_TOOLS_SPELL_CHECK",
             "ID_VIEW_SHOW_FORMATTING",
             "ID_VIEW_STYLE_DRAFT",
             "ID_VIEW_STYLE_LAYOUT",
@@ -1951,6 +2030,19 @@ class MyFrame(wxFrame):
     def OnLocationsDlg(self, event = None):
         self.panel.ctrl.OnLocationsDlg()
 
+    def OnSpellCheckerDictionaryDlg(self, event = None):
+        dlg = spellcheckcfgdlg.SCDictDlg(self, copy.deepcopy(gd.scDict),
+                                         True)
+
+        if dlg.ShowModal() == wxID_OK:
+            gd.scDict = dlg.scDict
+            gd.saveScDict()
+
+        dlg.Destroy()
+
+    def OnSpellCheckerScriptDictionaryDlg(self, event = None):
+        self.panel.ctrl.OnSpellCheckerScriptDictionaryDlg()
+
     def OnScriptSettings(self, event = None):
         self.panel.ctrl.OnScriptSettings()
 
@@ -2000,6 +2092,9 @@ class MyFrame(wxFrame):
 
     def OnReportScript(self, event = None):
         self.panel.ctrl.OnReportScript()
+
+    def OnSpellCheckerDlg(self, event = None):
+        self.panel.ctrl.OnSpellCheckerDlg()
 
     def OnNameDatabase(self, event = None):
         if not hasattr(self, "names"):
@@ -2173,8 +2268,14 @@ class MyApp(wxApp):
 
             if s:
                 gd.cvars.load(gd.cvars.makeVals(s), "", gd)
-
+                
         gd.setViewMode(gd.viewMode)
+
+        if util.fileExists(gd.scDictFilename):
+            s = util.fromUTF8(util.loadFile(gd.scDictFilename, None))
+
+            if s:
+                gd.scDict.load(s)
         
         mainFrame = MyFrame(NULL, -1, "Blyte")
         bugreport.mainFrame = mainFrame

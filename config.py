@@ -740,7 +740,19 @@ class ConfigGlobal:
                     [util.Key(WXK_SPACE, ctrl = True).toInt()]),
             
             Command("Settings", "Change global settings.", isMenu = True),
+
+            Command("SpellCheckerDlg","Spell check the script.",
+                    [util.Key(WXK_F8).toInt()], isMenu = True),
             
+            Command("SpellCheckerDictionaryDlg",
+                    "Open the global spell checker dictionary dialog.",
+                    isMenu = True),
+
+            Command("SpellCheckerScriptDictionaryDlg",
+                    "Open the script-specific spell checker dictionary"
+                    " dialog.",
+                    isMenu = True),
+
             Command("Tab", "Change current element to the next style or"
                     " create a new element.", [WXK_TAB], isFixed = True),
 

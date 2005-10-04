@@ -1,4 +1,4 @@
-﻿#Version 2
+﻿#Version 3
 #Begin-Auto-Completion 
 AutoCompletion/Scene/Enabled:True
 AutoCompletion/Scene/Items:0
@@ -135,6 +135,10 @@ Element/Note/Export/Underlined:False
 #Begin-Locations 
 Locations:0
 #End-Locations 
+#Begin-Spell-Checker-Dict 
+Words:1
+Words/1:pilots'
+#End-Spell-Checker-Dict 
 #Title-String 0.000000,80.000000,32,cb,Times,,THE KOALA INCIDENT
 #Title-String 0.000000,100.000000,12,c,Courier,,by
 #Title-String 0.000000,108.470000,12,c,Courier,,Anonymous Person
@@ -142,6 +146,7 @@ Locations:0
 #Title-String 160.000000,208.000000,12,c,Courier,,All rights reserved.
 #Header-String 1,0,r,,${PAGE}.
 #Header-Empty-Lines 1
+#Start-Script 
 .\ext. stonehenge - night
 ..SUPER: "STONEHENGE - 00:30"
 >.A blizzard rages. Snow is everywhere and visibility is

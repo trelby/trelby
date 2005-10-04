@@ -3,7 +3,7 @@ a single byte 0x0A. The file is encoded in UTF-8, and begins with the
 Unicode byte order mark (BOM), i.e. the bytes "EF BB BF".
 
 After the BOM, the first line contains "#Version x", where x is the
-file format number, currently either 1 or 2.
+file format number, currently either 1, 2 or 3.
 
 If file format is 2, configuration sections come next. They are of the
 form "#Begin-X ", [lines belonging to X], "#End-X ". Each line in the
@@ -97,10 +97,17 @@ The following config sections exists and appear in the file in this order:
 
    Underlined: (boolean): Whether to underline text.
 
+
  Locations:
 
   Locations (list of lists of strings): Each inner list lists scene names
   to treat as the same location.
+
+
+ Spell-Checker-Dict:
+
+  Words (list of strings): Script-specific spell checker dictionary.
+
 
 After this (in version 1 files after "#Version 1") there is more
 configuration, but in a different syntax, that is mostly due to historical
@@ -168,8 +175,12 @@ pages exist yet, creates one. Example:
 "Header-Empty-Lines". Value: integer >= 0. If there are header lines, this
 is the number of empty lines between headers and actual script contents.
 
+If file format is >= 3, between the config data and the actual script data
+is a "#Start-Script " line. With it, config sections can be added without
+increasing the file format version number, as unknown config parts can be
+skipped.
 
-After that, the actual script starts. Each line has two bytes at the
+After the above, the actual script starts. Each line has two bytes at the
 beginning that signal the type of linebreak at the end of that line and
 the general type of the line, and everything after that is the text of the
 line.

@@ -23,6 +23,7 @@ import locations
 import mypager
 import pdf
 import pml
+import spellcheck
 import titles
 import util
 
@@ -40,7 +41,8 @@ class Screenplay:
         self.headers = headers.Headers()
         self.locations = locations.Locations()
         self.titles = titles.Titles()
-        
+        self.scDict = spellcheck.Dict()
+
         self.lines = [ Line(LB_LAST, SCENE) ]
 
         self.cfgGl = cfgGl
@@ -110,6 +112,7 @@ class Screenplay:
         sp.headers = copy.deepcopy(self.headers)
         sp.locations = copy.deepcopy(self.locations)
         sp.titles = copy.deepcopy(self.titles)
+        sp.scDict = copy.deepcopy(self.scDict)
 
         # remove the dummy empty line
         sp.lines = []
@@ -126,7 +129,7 @@ class Screenplay:
         output = util.String()
 
         output += codecs.BOM_UTF8
-        output += "#Version 2\n"
+        output += "#Version 3\n"
 
         output += "#Begin-Auto-Completion \n"
         output += util.toUTF8(self.autoCompletion.save())
@@ -139,6 +142,10 @@ class Screenplay:
         output += "#Begin-Locations \n"
         output += util.toUTF8(self.locations.save())
         output += "#End-Locations \n"
+
+        output += "#Begin-Spell-Checker-Dict \n"
+        output += util.toUTF8(self.scDict.save())
+        output += "#End-Spell-Checker-Dict \n"
         
         pgs = self.titles.pages
         for pg in xrange(len(pgs)):
@@ -152,6 +159,8 @@ class Screenplay:
             output += "#Header-String %s\n" % util.toUTF8(str(h))
 
         output += "#Header-Empty-Lines %d\n" % self.headers.emptyLinesAfter
+
+        output += "#Start-Script \n"
         
         for i in xrange(len(self.lines)):
             output += util.toUTF8(str(self.lines[i]) + "\n")
@@ -208,10 +217,12 @@ class Screenplay:
             raise error.MiscError("File doesn't seem to be a proper\n"
                                   "screenplay file.")
 
-        if version not in ("1", "2"):
+        if version not in ("1", "2", "3"):
             raise error.MiscError("File uses fileformat version '%s',\n"
                                   "which is not supported by this version\n"
                                   "of the program." % version)
+
+        version = int(version)
 
         # current position at 'lines'
         index = 1
@@ -228,6 +239,11 @@ class Screenplay:
         if s:
             sp.locations.load(s)
 
+        s, index = Screenplay.getConfigPart(lines, "Spell-Checker-Dict",
+                                            index)
+        if s:
+            sp.scDict.load(s)
+
         # used to keep track that element type only changes after a
         # LB_LAST line.
         prevType = None
@@ -240,6 +256,10 @@ class Screenplay:
 
         # did we encounter unknown config lines
         unknownConfigs = False
+
+        # have we seen the Start-Script line. defaults to True in old
+        # files which didn't have it.
+        startSeen = version < 3
 
         for i in xrange(index, len(lines)):
             s = lines[i]
@@ -272,10 +292,18 @@ class Screenplay:
                 elif key == "Header-Empty-Lines":
                     sp.headers.emptyLinesAfter = util.str2int(val, 1, 0, 5)
 
+                elif key == "Start-Script":
+                    startSeen = True
+
                 else:
                     unknownConfigs = True
 
             else:
+                if not startSeen:
+                    unknownConfigs = True
+                    
+                    continue
+
                 lb = config.char2lb(s[0], False)
                 lt = config.char2lt(s[1], False)
                 text = s[2:]
@@ -301,6 +329,9 @@ class Screenplay:
                     prevType = lt
                 else:
                     prevType = None
+
+        if not startSeen:
+            raise error.MiscError("Start-Script line not found.")
 
         if len(sp.lines) == 0:
             raise error.MiscError("File doesn't contain any screenplay"
@@ -1388,6 +1419,60 @@ class Screenplay:
                 names[util.upper(ln.text)] = None
 
         return names
+
+    # return a dictionary of all character names (single-line text
+    # elements only, lower-cased, values = None).
+    def getCharacterNames(self):
+        names = {}
+
+        ul = util.lower
+        
+        for ln in self.lines:
+            if (ln.lt == CHARACTER) and (ln.lb == LB_LAST):
+                names[ul(ln.text)] = None
+
+        return names
+
+    # get next word, starting at (line, col). line must be valid, but col
+    # can point after the line's length, in which case the search starts
+    # at (line + 1, 0). returns (word, line, col), where word is None if
+    # at end of script, and (line, col) point to the start of the word.
+    # note that this only handles words that are on a single line.
+    def getWord(self, line, col):
+        ls = self.lines
+        
+        while 1:
+            if ((line < 0) or (line >= len(ls))):
+                return (None, 0, 0)
+
+            s = ls[line].text
+            
+            if col >= len(s):
+                line += 1
+                col = 0
+
+                continue
+
+            ch = s[col : col + 1]
+            
+            if not util.isWordBoundary(ch):
+                word = ch
+                startCol = col
+                col += 1
+
+                while col < len(s):
+                    ch = s[col : col + 1]
+                    
+                    if util.isWordBoundary(ch):
+                        break
+
+                    word += ch
+                    col += 1
+
+                return (word, line, startCol)
+
+            else:
+                col += 1
 
     # returns True if we're at second-to-last character of PAREN element,
     # and last character is ")"
