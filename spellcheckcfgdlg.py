@@ -20,7 +20,6 @@ class SCDictDlg(wxDialog):
 
         self.itemsEntry = wxTextCtrl(self, -1, style = wxTE_MULTILINE |
                                      wxTE_DONTWRAP, size = (300, 300))
-        EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
         vsizer.Add(self.itemsEntry, 1, wxEXPAND)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
@@ -39,6 +38,7 @@ class SCDictDlg(wxDialog):
 
         util.finishWindow(self, vsizer)
 
+        EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
         EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 

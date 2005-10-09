@@ -721,7 +721,8 @@ class FormattingPanel(wxPanel):
         hsizer = wxBoxSizer(wxHORIZONTAL)
         self.sceneContinuedsCb = wxCheckBox(self, -1, "Include,")
         EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
-        hsizer.Add(self.sceneContinuedsCb, 0, wxLEFT, 10)
+        hsizer.Add(self.sceneContinuedsCb, 0,
+                   wxALIGN_CENTER_VERTICAL | wxLEFT, 10)
         
         self.addSpin("sceneContinuedIndent", "indent:", self, hsizer,
                      "sceneContinuedIndent")
