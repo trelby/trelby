@@ -1,10 +1,9 @@
 import config
 import misc
+import spellcheck
 import util
 
 from wxPython.wx import *
-
-# FIXME: add "suggested replacement words" functionality
 
 class SpellCheckDlg(wxDialog):
     def __init__(self, parent, ctrl, sc, gScDict):
@@ -53,12 +52,16 @@ class SpellCheckDlg(wxDialog):
 
         vsizer.Add(gsizer, 0, wxEXPAND, 0)
 
+        suggestBtn = wxButton(self, -1, "S&uggest replacement")
+        vsizer.Add(suggestBtn, 0, wxEXPAND | wxTOP, 10)
+
         EVT_TEXT_ENTER(self, self.replaceEntry.GetId(), self.OnReplace)
 
         EVT_BUTTON(self, replaceBtn.GetId(), self.OnReplace)
         EVT_BUTTON(self, addScriptBtn.GetId(), self.OnAddScript)
         EVT_BUTTON(self, addGlobalBtn.GetId(), self.OnAddGlobal)
         EVT_BUTTON(self, skipBtn.GetId(), self.OnSkip)
+        EVT_BUTTON(self, suggestBtn.GetId(), self.OnSuggest)
 
         EVT_CHAR(self, self.OnChar)
         EVT_CHAR(self.replaceEntry, self.OnChar)
@@ -66,6 +69,7 @@ class SpellCheckDlg(wxDialog):
         EVT_CHAR(addScriptBtn, self.OnChar)
         EVT_CHAR(skipBtn, self.OnChar)
         EVT_CHAR(addGlobalBtn, self.OnChar)
+        EVT_CHAR(suggestBtn, self.OnChar)
 
         util.finishWindow(self, vsizer)
 
@@ -149,4 +153,73 @@ class SpellCheckDlg(wxDialog):
         self.changedGlobalDict = True
         
         self.gotoNext()
+
+    def OnSuggest(self, event):
+        if not self.sc.word:
+            return
+
+        isAllCaps = self.sc.word == util.upper(self.sc.word)
+        isCapitalized = self.sc.word[:1] == util.upper(self.sc.word[:1])
+        
+        word = util.lower(self.sc.word)
+        
+        wl = len(word)
+        wstart = word[:2]
+        d = 500
+        fifo = util.FIFO(5)
+        wxBeginBusyCursor()
+
+        for w in spellcheck.prefixDict[util.getWordPrefix(word)].iterkeys():
+            if w.startswith(wstart):
+                d = self.tryWord(word, wl, w, d, fifo)
+
+        for w in self.gScDict.words.iterkeys():
+            if w.startswith(wstart):
+                d = self.tryWord(word, wl, w, d, fifo)
+            
+        for w in self.ctrl.sp.scDict.words.iterkeys():
+            if w.startswith(wstart):
+                d = self.tryWord(word, wl, w, d, fifo)
+
+        items = fifo.get()
+
+        wxEndBusyCursor()
+
+        if len(items) == 0:
+            wxMessageBox("No similar words found.", "Results",
+                         wxOK, self)
+
+            return
+
+        dlg = wxSingleChoiceDialog(self, "Most similar words:",
+                                   "Suggestions", items)
+        
+        if dlg.ShowModal() == wxID_OK:
+            sel = dlg.GetSelection()
+
+            newWord = items[sel]
+
+            if isAllCaps:
+                newWord = util.upper(newWord)
+            elif isCapitalized:
+                newWord = util.capitalize(newWord)
+                
+            self.replaceEntry.SetValue(newWord)
+
+        dlg.Destroy()
+
+    # if w2 is closer to w1 in Levenshtein distance than d, add it to
+    # fifo. return min(d, new_distance).
+    def tryWord(self, w1, w1len, w2, d, fifo):
+        if abs(w1len - len(w2)) > 3:
+            return d
+
+        d2 = spellcheck.lev(w1, w2)
+
+        if d2 <= d:
+            fifo.add(w2)
+
+            return d2
+
+        return d
 

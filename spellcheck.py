@@ -10,6 +10,11 @@ from wxPython.wx import *
 # dict of words loaded from dict_en.dat. key = word, value = None.
 gdict = {}
 
+# PY2.4: use a Set object
+# key = util.getWordPrefix(word), value = dict of words beginning with
+# that prefix (only words in gdict)
+prefixDict = {}
+
 # load word dictionary. returns True on success or if it's already loaded,
 # False on errors.
 def loadDict(frame):
@@ -45,6 +50,14 @@ def loadDict(frame):
     
     lines = s.splitlines()
 
+    chars = "abcdefghijklmnopqrstuvwxyz"
+
+    for ch1 in chars:
+        for ch2 in chars:
+            prefixDict[ch1 + ch2] = {}
+
+    gwp = util.getWordPrefix
+
     for it in lines:
         # theoretically, we should do util.lower(util.toInputStr(it)), but:
         #
@@ -53,7 +66,10 @@ def loadDict(frame):
         #  -it takes 1.35 secs, compared to 0.56 secs if we don't, on an
         #   1.33GHz Athlon
         gdict[it] = None
-    
+
+        if len(it) > 2:
+            prefixDict[gwp(it)][it] = None
+
     return True
 
 # dictionary, a list of known words that the user has specified.
@@ -202,3 +218,29 @@ class SpellChecker:
                self.sp.scDict.isKnown(word) or \
                self.gScDict.isKnown(word) or \
                word.isdigit()
+
+# Calculates the Levenshtein distance between a and b.
+def lev(a, b):
+    n, m = len(a), len(b)
+    
+    if n > m:
+        # Make sure n <= m, to use O(min(n, m)) space
+        a, b = b, a
+        n, m = m, n
+
+    current = range(n + 1)
+    
+    for i in range(1, m + 1):
+        previous, current = current, [i] + [0] * m
+        
+        for j in range(1, n + 1):
+            add, delete = previous[j] + 1, current[j - 1] + 1
+            
+            change = previous[j - 1]
+            
+            if a[j - 1] != b[i - 1]:
+                change += 1
+
+            current[j] = min(add, delete, change)
+
+    return current[n]

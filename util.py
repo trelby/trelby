@@ -46,11 +46,15 @@ _to_lower = ""
 # characters
 _input_tbl = ""
 
+# translate table that converts A-Z -> a-z, keeps a-z as they are, and
+# converts everything else to z.
+_normalize_tbl = ""
+
 # permanent memory DC to get text extents etc
 permDc = None
 
 def init(doWX = True):
-    global _to_upper, _to_lower, _input_tbl, permDc
+    global _to_upper, _to_lower, _input_tbl, _normalize_tbl, permDc
 
     # setup ISO-8859-1 case-conversion stuff
     tmpUpper = []
@@ -75,19 +79,35 @@ def init(doWX = True):
         else:
             _input_tbl += "|"
 
+    for i in range(256):
+        # "a" - "z"
+        if (i >= 97) and (i <= 122):
+            ch = chr(i)
+        # "A" - "Z"
+        elif (i >= 65) and (i <= 90):
+            # + 32 ("A" - "a") lowercases it
+            ch = chr(i + 32)
+        else:
+            ch = "z"
+
+        _normalize_tbl += ch
+
     if doWX:
         # dunno if the bitmap needs to be big enough to contain the text
         # we're measuring...
         permDc = wxMemoryDC()
         permDc.SelectObject(wxEmptyBitmap(512, 32))
     
-# like string.upper/lower, but we do our own charset-handling that doesn't
-# need locales etc
+# like string.upper/lower/capitalize, but we do our own charset-handling
+# that doesn't need locales etc
 def upper(s):
     return s.translate(_to_upper)
 
 def lower(s):
     return s.translate(_to_lower)
+
+def capitalize(s):
+    return upper(s[:1]) + s[1:]
 
 # return 's', which must be a string of ISO-8859-1 characters, converted
 # to UTF-8.
@@ -374,6 +394,11 @@ def splitToWords(s):
 
     return tmp.split()
 
+# return two-character prefix of s, using characters a-z only. len(s) must
+# be at least 2.
+def getWordPrefix(s):
+    return s[:2].translate(_normalize_tbl)
+
 # return count of how many 'ch' characters 's' begins with.
 def countInitial(s, ch):
     cnt = 0
@@ -417,6 +442,41 @@ def sortDict(d, sortFunc = None):
     tmp.sort(sortFunc)
     
     return tmp
+
+# an efficient FIFO container of fixed size. can't contain None objects.
+class FIFO:
+    def __init__(self, size):
+        self.arr = [None] * size
+
+        # index of next slot to fill
+        self.next = 0
+
+    # add item
+    def add(self, obj):
+        self.arr[self.next] = obj
+        self.next += 1
+
+        if self.next >= len(self.arr):
+            self.next = 0
+        
+    # get contents as a list, in LIFO order.
+    def get(self):
+        tmp = []
+
+        j = self.next - 1
+        
+        for i in range(len(self.arr)):
+            if j < 0:
+                j = len(self.arr) - 1
+
+            obj = self.arr[j]
+            
+            if  obj != None:
+                tmp.append(obj)
+
+            j -= 1
+
+        return tmp
 
 # DrawLine-wrapper that makes it easier when the end-point is just
 # offsetted from the starting point
