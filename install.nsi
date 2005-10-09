@@ -111,6 +111,7 @@ Section Uninstall
   Delete "$INSTDIR\icon32.png"
   Delete "$INSTDIR\logo.jpg"
   Delete "$INSTDIR\names.dat"
+  Delete "$INSTDIR\dict_en.dat.gz"
   Delete "$INSTDIR\python23.dll"
   Delete "$INSTDIR\unicodedata.pyd"
   Delete "$INSTDIR\w9xpopen.exe"

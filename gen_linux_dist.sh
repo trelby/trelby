@@ -8,7 +8,7 @@ DIR="linux-dist/blyte-$VER"
 rm -rf linux-dist
 mkdir -p $DIR
 
-cp blyte data.dat icon16.png icon32.png logo.jpg names.dat sample.blyte manual.pdf fileformat.txt license.txt INSTALL $DIR
+cp blyte data.dat icon16.png icon32.png logo.jpg names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt license.txt INSTALL $DIR
 cp Makefile.install $DIR/Makefile
 cd linux-dist
 tar cvf "blyte-$VER.tar" "blyte-$VER"
