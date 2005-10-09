@@ -122,6 +122,11 @@ class Screenplay:
             ln = self.lines[i]
             l.append(Line(ln.lb, ln.lt, ln.text))
 
+        # "open PDF on current page" breaks on evaluation version if we
+        # don't copy these
+        sp.line = self.line
+        sp.column = self.column
+
         return sp
 
     # save script to a string and return that
