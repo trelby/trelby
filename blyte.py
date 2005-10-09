@@ -33,12 +33,10 @@ import titlesdlg
 import util
 import viewmode
 
-import codecs
 import copy
 import datetime
 import os
 import os.path
-import re
 import signal
 import sys
 import time
