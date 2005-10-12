@@ -405,7 +405,7 @@
 	  at a time. Otherwise this mode is the same as the 'Layout'
 	  mode.</para>
 
-	  <para>Note that this mode also assumes that the whole pages fit
+	  <para>Note that this mode also assumes that the entire pages fit
 	  vertically on the screen, so Page up/down commands behave somewhat
 	  differently.</para>
 	  
@@ -447,16 +447,25 @@
 	  
 	</sect1>
 
-	<sect1>
+	<sect1 id="globcfg_menu">
 	  <title>File/Settings/(Change|Load|Save as)</title>
 
 	  <para>These allow you to edit/load/save global settings (see <xref
 	  linkend="settings"/>).</para>
 	  
 	  <para>By default, &blyte; loads settings from a file named
-	  "default.conf" on startup. You can give a "--conf
-	  /home/me/someother.conf" command line parameter to &blyte; to have
-	  it start up with some other configuration file.</para>
+	  "default.conf" on startup. See <xref linkend="cmdparams"/> for
+	  customizing this.</para>
+	  
+	</sect1>
+
+	<sect1>
+	  <title>File/Settings/Spell checker dictionary</title>
+
+	  <para>This opens a dialog allowing you to edit the global spell
+	  checker user-defined dictionary. Insert new words by entering them
+	  on separate lines, or delete existing words by deleting the lines
+	  they are on.</para>
 	  
 	</sect1>
 
@@ -712,6 +721,16 @@
 	</sect1>
 
 	<sect1>
+	  <title>Script/Spell checker dictionary</title>
+
+	  <para>This opens a dialog allowing you to edit the script-specific
+	  spell checker dictionary. Insert new words by entering them on
+	  separate lines, or delete existing words by deleting the lines they
+	  are on.</para>
+	  
+	</sect1>
+
+	<sect1>
 	  <title>Script/Settings/(Change|Load|Save as)</title>
 
 	  <para>These allow you to edit/load/save script format settings (see
@@ -719,6 +738,88 @@
 	  
 	</sect1>
 	
+	<sect1>
+	  <title>Tools/Spell checker</title>
+
+	  <para>This spell checks the current script beginning at the current
+	  position. If you want to spell check the entire script, be sure to
+	  position the cursor at the first line of the script.</para>
+	  
+	  <para>If it finds any words it doesn't recognize, it jump to that
+	  position in the script, highlights the word, and opens a dialog
+	  window that has a text box for editing the word, and the following 5
+	  buttons:</para>
+
+	  <variablelist>
+		
+		<varlistentry>
+		  <term>Replace</term>
+		  <listitem>
+
+			<para>Replace the word in the script with the (modified) one
+			in the text box. You can also do this by pressing Enter in the
+			text box.</para>
+			
+		  </listitem>
+		</varlistentry>
+		
+		<varlistentry>
+		  <term>Skip</term>
+		  <listitem>
+
+			<para>Skip the word for now.</para>
+			
+		  </listitem>
+		</varlistentry>
+		
+		<varlistentry>
+		  <term>Add to script dictionary</term>
+		  <listitem>
+
+			<para>Add the word to the script-specific dictionary.</para>
+			
+		  </listitem>
+		</varlistentry>
+		
+		<varlistentry>
+		  <term>Add to global dictionary</term>
+		  <listitem>
+
+			<para>Add the word to the (super-)global dictionary.</para>
+			
+		  </listitem>
+		</varlistentry>
+		
+		<varlistentry>
+		  <term>Suggest replacement</term>
+		  <listitem>
+
+			<para>Search for the 5 most similar known words and allow
+			choosing one of them. If selected, that word is put in the
+			text box and you can either edit it further or press 'Replace'
+			at once to replace the word in the script.</para>
+
+			<para>Note that this only looks at words with the same two
+			first characters as the misspelled word (mostly for speed
+			reasons). So while it can correct "accommdoate" to
+			"accommodate", it can't correct "cmoputer" to
+			"computer".</para>
+			
+		  </listitem>
+		</varlistentry>
+		
+	  </variablelist>
+
+	  <para>After pressing any of the above buttons, the spell checker
+	  looks for the next misspelled word. If none are found, it closes the
+	  dialog. You can also press the Esc key at any time to close the
+	  dialog.</para>
+
+	  <para>Note that the spell checker currently only supports the
+	  English language.</para>
+
+	</sect1>
+
 	<sect1>
 	  <title>Tools/Name database</title>
 
@@ -783,7 +884,7 @@
 	  <para>There's a checkbox allowing you to use the same configuration
 	  parameters for the scripts you're comparing. This is useful if the
 	  scripts differ in in their formatting settings, because in that case
-	  practically the whole script would show up as changed.</para>
+	  practically the entire script would show up as changed.</para>
 
 	  <para>The PDF file contains only the changed parts of the script.
 	  The changes are color coded: Deleted lines are red, added lines are
@@ -859,18 +960,22 @@
   <chapter id="settings">
 	<title>Settings</title>
 
-	<para>&blyte; has 3 levels of settings: global settings, script format
-	settings, and script-specific settings.</para>
+	<para>&blyte; has 4 levels of settings: super-global settings, global
+	settings, script format settings, and script-specific settings.</para>
 
+	<para>Super-global settings are the current view mode, license
+	information, window size and position, and the global spell checker
+	dictionary. There can only be one set of these.</para>
+	
 	<para>Global settings are things like interface colors, keyboard
 	shortcuts, display fonts and other settings that only affect the user
-	interface of the program, not the script output. These settings are
-	also platform-dependent, so you can't share these between
-	Windows/Linux machines, and even sharing between different machines on
-	the same platform could be unreliable if you don't have the exact same
-	fonts, PDF viewer applications, etc. on the machines. The other two
-	levels of settings are completely platform-neutral, guaranteeing the
-	exact same script output whatever platform you use.</para>
+	interface of the program, not the script output. You can have multiple
+	sets of these and switch between them at will (see <xref
+	linkend="globcfg_menu"/>). These settings are platform-dependent, so
+	you can't share these between Windows/Linux machines, and even sharing
+	between different machines on the same platform could be unreliable if
+	you don't have the exact same fonts, PDF viewer applications, etc. on
+	the machines.</para>
 
 	<para>Script format settings are things like paper sizes,
 	indendation/line widths/font styles for the different element types,
@@ -878,7 +983,9 @@
 	script formatting and output but are not tied to any specific script,
 	in the sense that they can be reused for different scripts with no
 	changes. You can easily save/load these, so you can have ready-made
-	settings for different scenarios.</para>
+	settings for different scenarios. This, and script-specific settings,
+	are completely platform-neutral, guaranteeing the exact same script
+	output whatever platform you use.</para>
 
 	<para>Script-specific settings are things that are specific to one
 	particular script, like title pages, header strings, and
@@ -996,10 +1103,10 @@
 
 		<para>'Check script for errors before print, export or compare',
 		if checked, causes the program to run 'Script/Find next error' for
-		the whole script automatically before print/export/compare
+		the entire script automatically before print/export/compare
 		operations. This is to avoid printing 100 pages and then finding
 		there's an error on one of them, fixing of which causes
-		repagination of the whole script, and having to print all the 100
+		repagination of the entire script, and having to print all the 100
 		pages again.</para>
 
 		<para>'Auto-paginate interval' defines how often to repaginate the
@@ -1082,6 +1189,9 @@
 		CONTINUED pages for current scene, omitted if n = 1) for each page
 		that continues a scene from previous page(s).</para>
 
+		<para>'Scene continueds indent' is the number of characters to
+		indent the "(CONTINUED)" text with.</para>
+
 		<para>'Include scene numbers' causes scene numbers to be inserted
 		to the left and right of each scene element. This is usually only
 		done for scripts in production.</para>
@@ -1101,7 +1211,86 @@
 		the given settings.</para>
 		
 	  </sect2>
+
+	  <sect2>
+		<title>PDF</title>
+
+		<para>Here you can configure parameters affecting the generation
+		of the PDF file for printing or exporting.</para>
+
+		<para>'Add table of contents', if on, will cause the PDF file to
+		have a table of contents listing all the scenes. Note that this is
+		not printed, it's just shown in PDF viewer applications allowing
+		one to quickly jump to the selected scene.</para>
+		
+		<para>'Show table of contents on PDF open', if on, will cause the
+		table of contents to be shown by default when opening the PDF
+		file.</para>
+		
+		<para>'Open PDF on current page', if on, will insert a command
+		into the PDF file telling the PDF viewer application to show the
+		current page when opening the file. Not all PDF viewer
+		applications support this command. Note that this only affects PDF
+		files generated through the File/Print command, File/Export
+		command isn't affected by this. If you really want to generate a
+		permanent PDF file opening on a non-standard page, use File/Print
+		and save the PDF file from the PDF viewer application to a
+		different name.</para>
+		
+	  </sect2>
 	  
+	  <sect2>
+		<title>Strings</title>
+
+		<para>Here you can customize the strings that are automatically
+		added to the script in certain situations:</para>
+
+		<variablelist>
+
+		  <varlistentry>
+			<term>(CONTINUED)</term>
+			<listitem>
+
+			  <para>Added at the end of a page when a scene spans multiple
+			  pages.</para>
+			  
+			</listitem>
+		  </varlistentry>
+		  
+		  <varlistentry>
+			<term>CONTINUED:</term>
+			<listitem>
+
+			  <para>Added at the start of a page when a scene spans
+			  multiple pages.</para>
+			  
+			</listitem>
+		  </varlistentry>
+		  
+		  <varlistentry>
+			<term>(MORE)</term>
+			<listitem>
+
+			  <para>Added at the end of a dialogue element that spans
+			  multiple pages.</para>
+			  
+			</listitem>
+		  </varlistentry>
+		  
+		  <varlistentry>
+			<term> (cont'd)</term>
+			<listitem>
+
+			  <para>Added after the speaker's name at the start of a page
+			  when a dialogue element spans multiple pages.</para>
+			  
+			</listitem>
+		  </varlistentry>
+		  
+		</variablelist>
+		
+	  </sect2>
+
 	</sect1>
 
 	<sect1>
@@ -1396,6 +1585,35 @@ Something starts beeping.
 
   </chapter>
 
+  <chapter id="cmdparams">
+	<title>Command line parameters</title>
+
+	<para>&blyte; supports the following command line parameters:</para>
+
+	<variablelist>
+
+	  <varlistentry>
+		<term>--conf FILENAME</term>
+		<listitem>
+
+		  <para>Read global settings from the given file instead of
+		  "default.conf".</para>
+
+		</listitem>
+	  </varlistentry>
+	  
+	  <varlistentry>
+		<term>FILENAME1 FILENAME2 ...</term>
+		<listitem>
+
+		  <para>Open the given script files.</para>
+		  
+		</listitem>
+	  </varlistentry>
+	  
+	</variablelist>
+  </chapter>
+  
   <chapter>
 	<title>Troubleshooting</title>
 
