@@ -131,6 +131,7 @@ Section Uninstall
   Delete "$INSTDIR\_sre.pyd"
   Delete "$INSTDIR\blyte.exe"
   Delete "$INSTDIR\datetime.pyd"
+  Delete "$INSTDIR\pyexpat.pyd"
   Delete "$INSTDIR\htmlc.pyd"
   Delete "$INSTDIR\icon16.png"
   Delete "$INSTDIR\icon32.png"
