@@ -78,6 +78,9 @@ class GlobalData:
         # global spell checker (user) dictionary
         self.scDict = spellcheck.Dict()
 
+        # recently used files list
+        self.mru = misc.MRUFiles(5)
+
         if opts.conf:
             self.confFilename = opts.conf
 
@@ -97,6 +100,9 @@ class GlobalData:
         v.addInt("viewMode", VIEWMODE_LAYOUT, "ViewMode", VIEWMODE_DRAFT,
                  VIEWMODE_OVERVIEW_LARGE)
         v.addStr("license", "", "License")
+
+        v.addList("files", [], "Files",
+                  mypickle.StrNoEscapeVar("", "", ""))
         
         v.makeDicts()
         v.setDefaults(self)
@@ -144,6 +150,18 @@ class GlobalData:
             self.vm = self.vmOverviewSmall
         else:
             self.vm = self.vmOverviewLarge
+
+    # load from string 's'. does not throw any exceptions and silently
+    # ignores any errors.
+    def load(self, s):
+        self.cvars.load(self.cvars.makeVals(s), "", self)
+        self.mru.items = self.files
+
+    # save to a string and return that.
+    def save(self):
+        self.files = self.mru.items
+
+        return self.cvars.save("", self)
 
     # save global spell checker dictionary to disk
     def saveScDict(self):
@@ -255,10 +273,15 @@ class MyCtrl(wxControl):
         self.setFile(fileName)
         self.refreshCache()
 
+    # save script to given filename. returns True on success.
     def saveFile(self, fileName):
         if util.writeToFile(fileName, self.sp.save(), mainFrame):
             self.setFile(fileName)
             self.sp.markChanged(False)
+
+            return True
+        else:
+            return False
 
     def importFile(self, fileName):
         lines = myimport.importTextFile(fileName, mainFrame)
@@ -956,7 +979,8 @@ class MyCtrl(wxControl):
             style = wxSAVE | wxOVERWRITE_PROMPT)
         if dlg.ShowModal() == wxID_OK:
             misc.scriptDir = dlg.GetDirectory()
-            self.saveFile(dlg.GetPath())
+            if self.saveFile(dlg.GetPath()):
+                gd.mru.add(dlg.GetPath())
 
         dlg.Destroy()
 
@@ -1449,6 +1473,8 @@ class MyFrame(wxFrame):
         fileMenu.AppendMenu(ID_FILE_SETTINGS, "Se&ttings", tmp)
 
         fileMenu.AppendSeparator()
+        # "most recently used" list comes in here
+        fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_EXIT, "E&xit\tCTRL-Q")
 
         editMenu = wxMenu()
@@ -1585,6 +1611,8 @@ class MyFrame(wxFrame):
         self.statusBar.SetStatusWidths([-2, -2, -1])
         self.SetStatusBar(self.statusBar)
 
+        gd.mru.useMenu(fileMenu, 14)
+
         EVT_MENU_HIGHLIGHT_ALL(self, self.OnMenuHighlight)
         
         EVT_NOTEBOOK_PAGE_CHANGED(self, self.notebook.GetId(),
@@ -1646,6 +1674,8 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_LICENSE_INFO, self.OnLicenseInfo)
         EVT_MENU(self, ID_LICENSE_UPDATE, self.OnUpdateLicense)
         EVT_MENU(self, ID_LICENSE_RELEASE, self.OnReleaseLicense)
+        EVT_MENU_RANGE(self, gd.mru.getIds()[0], gd.mru.getIds()[1],
+                       self.OnMRUFile)
 
         EVT_CLOSE(self, self.OnCloseWindow)
 
@@ -1800,8 +1830,7 @@ class MyFrame(wxFrame):
             gd.license = s
 
             if not isStarting:
-                util.writeToFile(gd.stateFilename, gd.cvars.save("", gd),
-                                 frame)
+                util.writeToFile(gd.stateFilename, gd.save(), frame)
 
                 wxMessageBox("License successfully updated.",
                              "Information", wxOK, frame)
@@ -1831,6 +1860,7 @@ class MyFrame(wxFrame):
 
         self.panel.ctrl.loadFile(filename)
         self.panel.ctrl.updateScreen()
+        gd.mru.add(filename)
         
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
@@ -1846,6 +1876,10 @@ class MyFrame(wxFrame):
 
     def OnNewScript(self, event = None):
         self.panel = self.createNewPanel()
+
+    def OnMRUFile(self, event):
+        i = event.GetId() - gd.mru.getIds()[0]
+        self.openScript(gd.mru.get(i))
 
     def OnOpen(self, event = None):
         dlg = wxFileDialog(self, "File to open", misc.scriptDir,
@@ -2169,8 +2203,7 @@ class MyFrame(wxFrame):
                             wxYES_NO | wxNO_DEFAULT, self) == wxYES:
                 misc.license = None
                 gd.license = ""
-                util.writeToFile(gd.stateFilename, gd.cvars.save("", gd),
-                                 self)
+                util.writeToFile(gd.stateFilename, gd.save(), self)
 
     def OnTypeCombo(self, event):
         self.panel.ctrl.OnTypeCombo(event)
@@ -2184,8 +2217,7 @@ class MyFrame(wxFrame):
                 doExit = False
 
         if doExit:
-            util.writeToFile(gd.stateFilename, gd.cvars.save("", gd),
-                             self)
+            util.writeToFile(gd.stateFilename, gd.save(), self)
             util.removeTempFiles(misc.tmpPrefix)
             self.Destroy()
             myApp.ExitMainLoop()
@@ -2265,7 +2297,7 @@ class MyApp(wxApp):
             s = util.loadFile(gd.stateFilename, None)
 
             if s:
-                gd.cvars.load(gd.cvars.makeVals(s), "", gd)
+                gd.load(s)
                 
         gd.setViewMode(gd.viewMode)
 

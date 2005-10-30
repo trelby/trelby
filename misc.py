@@ -2,6 +2,7 @@ import opts
 import util
 
 import os
+import os.path
 import sys
 
 from wxPython.wx import *
@@ -341,3 +342,76 @@ class KeyDlgWidget(wxWindow):
         p = self.GetParent()
         p.key = util.Key.fromKE(ev)
         p.EndModal(wxID_OK)
+
+# handles the "Most recently used" list of files in a menu. uses 
+class MRUFiles:
+    def __init__(self, maxCount):
+        # max number of items
+        self.maxCount = maxCount
+
+        # items (strings)
+        self.items = []
+
+        for i in range(self.maxCount):
+            id = wxNewId()
+
+            if i == 0:
+                # first menu id
+                self.firstId = id
+            elif i == (self.maxCount - 1):
+                # last menu id
+                self.lastId = id
+
+    # use given menu. this must be called before any "add" calls.
+    def useMenu(self, menu, menuPos):
+        # menu to use
+        self.menu = menu
+
+        # position in menu to add first item at
+        self.menuPos = menuPos
+
+        # if we already have items, add them to the menu (in reverse order
+        # to maintain the correct ordering)
+        tmp = self.items
+        tmp.reverse()
+        self.items = []
+
+        for it in tmp:
+            self.add(it)
+
+    # return (firstMenuId, lastMenuId).
+    def getIds(self):
+        return (self.firstId, self.lastId)
+
+    # add item.
+    def add(self, s):
+        # remove old menu items
+        for i in range(self.getCount()):
+            self.menu.Delete(self.firstId + i)
+
+        # if item already exists, remove it
+        try:
+            i = self.items.index(s)
+            del self.items[i]
+        except ValueError:
+            pass
+
+        # add item to top of list
+        self.items.insert(0, s)
+
+        # prune overlong list
+        if self.getCount() > self.maxCount:
+            self.items = self.items[:self.maxCount]
+
+        # add new menu items
+        for i in range(self.getCount()):
+            self.menu.Insert(self.menuPos + i, self.firstId + i,
+                             "&%d %s" % (i + 1, os.path.basename(self.get(i))))
+
+    # return number of items.
+    def getCount(self):
+        return len(self.items)
+
+    # get item number 'i'.
+    def get(self, i):
+        return self.items[i]
