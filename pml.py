@@ -31,6 +31,11 @@ TIMES_ROMAN = 4
 HELVETICA = 8
 UNDERLINED = 16
 
+# fill types
+NO_FILL = 0
+FILL = 1
+STROKE_FILL = 2
+
 # A single document.
 class Document:
 
@@ -175,19 +180,18 @@ class LineOp(DrawOp):
 def genLine(x, y, xd, yd, width):
     return LineOp([(x, y), (x + xd, y + yd)], width)
 
-# Draw a rectangle, possibly filled, with specified lineWidth. (x, y) is
-# position of upper left corner. Line width of filled rectangles is
-# ignored.
+# Draw a rectangle, possibly filled, with specified lineWidth (which can
+# be -1 if fillType is FILL). (x, y) is position of upper left corner.
 class RectOp(DrawOp):
-    def __init__(self, x, y, width, height, lineWidth, isFilled = False):
+    def __init__(self, x, y, width, height, fillType = FILL, lineWidth = -1):
         DrawOp.__init__(self, OP_RECT)
 
         self.x = x
         self.y = y
         self.width = width
         self.height = height
+        self.fillType = fillType
         self.lw = lineWidth
-        self.isFilled = isFilled
 
 # Arbitrary PDF commands. Should not have whitespace in the beginning or
 # the end. Should be used only for non-critical things like tweaking line

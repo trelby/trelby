@@ -177,10 +177,16 @@ class PDFExporter:
                         self.y(op.y) - self.mm2points(op.height),
                         self.mm2points(op.width), self.mm2points(op.height))
 
-                    if op.isFilled:
-                        cont += "f\n"
-                    else:
+                    if op.fillType == pml.NO_FILL:
                         cont += "S\n"
+                    elif op.fillType == pml.FILL:
+                        cont += "f\n"
+                    elif op.fillType == pml.STROKE_FILL:
+                        cont += "B\n"
+                    else:
+                        print "Invalid fill type for pml.OP_RECT"
+
+                        continue
 
                 elif op.type == pml.OP_PDF:
                     cont += "%s\n" % op.cmds

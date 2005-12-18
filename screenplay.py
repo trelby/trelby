@@ -2051,7 +2051,7 @@ class Screenplay:
                 pg.add(pml.PDFOp("0.75 g"))
                 w = 50.0
                 pg.add(pml.RectOp(doc.w / 2.0 - w / 2.0, cfg.marginTop +
-                    y * chY + chY / 4, w, chY / 2.0, -1, True))
+                    y * chY + chY / 4, w, chY / 2.0))
                 pg.add(pml.PDFOp("0.0 g"))
 
             else:
@@ -2067,7 +2067,7 @@ class Screenplay:
                 if color:
                     pg.add(pml.PDFOp("%s rg" % color))
                     pg.add(pml.RectOp(cfg.marginLeft, cfg.marginTop + y * chY,
-                        doc.w - cfg.marginLeft - 5.0, chY, -1, True))
+                        doc.w - cfg.marginLeft - 5.0, chY))
                     pg.add(pml.PDFOp("0.0 g"))
 
                 textOps.append(pml.TextOp(s[1:], cfg.marginLeft,
