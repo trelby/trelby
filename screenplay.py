@@ -1695,33 +1695,48 @@ class Screenplay:
                     del2 = max(del2, i)
 
             # adjust linebreaks
+            if marked[0] == marked[1]:
 
-            ln = ls[marked[0]]
-            
-            if marked[0] != marked[1]:
+                # user has selected text from a single line only
 
-                # if we're totally removing the last line selected, and
-                # it's the last line of its element, mark first line
-                # selected as last line of its element so that the
-                # following element is not joined to that one.
-                
-                if self.isLastLineOfElem(marked[1]) and \
-                       not(ls[marked[1]].text):
-                    ln.lb = LB_LAST
-                else:
-                    ln.lb = LB_NONE
+                ln = ls[marked[0]]
 
+                # if it is a single-line element, we never need to modify
+                # its linebreak
+                if not self.isOnlyLineOfElem(marked[0]):
+                    # if we're totally deleting the line and it's the last
+                    # line of a multi-line element, mark the preceding
+                    # line as the new last line of the element.
+
+                    if not ln.text and self.isLastLineOfElem(marked[0]):
+                        ls[marked[0] - 1].lb = LB_LAST
+                        
             else:
 
-                # if we're totally removing a single line, and that line
-                # is the last line of a multi-line element, mark the
-                # preceding line as the new last line of the element.
+                # if the selection ends by removing completely the last
+                # line of an element, we need to mark the element's new
+                # end, otherwise we must set it to LB_NONE so that the new
+                # element is reformatted properly.
+                if self.isLastLineOfElem(marked[1]) and not ls[marked[1]].text:
+                    lb = LB_LAST
+                else:
+                    lb = LB_NONE
 
-                if not ln.text and (marked[0] != 0) and \
-                       not self.isFirstLineOfElem(marked[0]) and \
-                       self.isLastLineOfElem(marked[0]):
-                    ls[marked[0] - 1].lb = LB_LAST
-                        
+                # now find the line whose linebreak we need to adjust. if
+                # the starting line is not completely removed, it is that,
+                # otherwise it is the preceding line, unless we delete the
+                # first line, in which case there's nothing to adjust.
+                if ls[marked[0]].text:
+                    ln = ls[marked[0]]
+                else:
+                    if marked[0] != 0:
+                        ln = ls[marked[0] - 1]
+                    else:
+                        ln = None
+
+                if ln:
+                    ln.lb = lb
+
             del ls[del1:del2 + 1]
 
             self.clearMark()
