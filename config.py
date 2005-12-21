@@ -609,6 +609,10 @@ class ConfigGlobal:
                      util.Key(10, ctrl = True).toInt()],
                     isFixed = True),
 
+            Command("GotoPage", "Goto to a given page.",
+                    [util.Key(7, ctrl = True).toInt()], isFixed = True,
+                    isMenu = True),
+            
             Command("HeadersDlg", "Open the headers dialog.", isMenu = True),
             
             Command("HelpCommands", "Show list of commands and their key"

@@ -281,6 +281,7 @@ class CheckBoxDlg(wxDialog):
     def OnCancel(self, event):
         self.EndModal(wxID_CANCEL)
 
+# shows a multi-line string to the user in a scrollable text control.
 class TextDlg(wxDialog):
     def __init__(self, parent, text, title):
         wxDialog.__init__(self, parent, -1, title,
@@ -307,10 +308,87 @@ class TextDlg(wxDialog):
     def OnOK(self, event):
         self.EndModal(wxID_OK)
 
+# helper function for using TextDlg
 def showText(parent, text, title = "Message"):
     dlg = TextDlg(parent, text, title)
     dlg.ShowModal()
     dlg.Destroy()
+
+# ask user for a single-line text input.
+class TextInputDlg(wxDialog):
+    def __init__(self, parent, text, title, validateFunc = None):
+        wxDialog.__init__(self, parent, -1, title,
+                          style = wxDEFAULT_DIALOG_STYLE)
+
+        # function to call to validate the input string on OK. can be
+        # None, in which case it is not called. if it returns "", the
+        # input is valid, otherwise the string it returns is displayed in
+        # a message box and the dialog is not closed.
+        self.validateFunc = validateFunc
+
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        vsizer.Add(wxStaticText(self, -1, text), 1, wxEXPAND | wxBOTTOM, 5)
+        
+        self.tc = wxTextCtrl(self, -1)
+        vsizer.Add(self.tc, 1, wxEXPAND);
+        
+        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 5)
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+
+        cancelBtn = wxButton(self, -1, "Cancel")
+        hsizer.Add(cancelBtn)
+        
+        okBtn = wxButton(self, -1, "OK")
+        hsizer.Add(okBtn, 0, wxLEFT, 10)
+
+        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 5)
+
+        util.finishWindow(self, vsizer)
+
+        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+
+        EVT_CHAR(self.tc, self.OnCharEntry)
+        EVT_CHAR(cancelBtn, self.OnCharButton)
+        EVT_CHAR(okBtn, self.OnCharButton)
+
+        self.tc.SetFocus()
+
+    def OnCharEntry(self, event):
+        self.OnChar(event, True)
+
+    def OnCharButton(self, event):
+        self.OnChar(event, False)
+
+    def OnChar(self, event, isEntry):
+        kc = event.GetKeyCode()
+
+        if kc == WXK_ESCAPE:
+            self.OnCancel()
+            
+        elif (kc == WXK_RETURN) and isEntry:
+                self.OnOK()
+
+        else:
+            event.Skip()
+
+    def OnOK(self, event = None):
+        self.input = self.tc.GetValue()
+
+        if self.validateFunc:
+            msg = self.validateFunc(self.input)
+
+            if msg:
+                wxMessageBox(msg, "Error", wxOK, self)
+
+                return
+        
+        self.EndModal(wxID_OK)
+
+    def OnCancel(self, event = None):
+        self.EndModal(wxID_CANCEL)
 
 # asks the user for a keypress and stores it.
 class KeyDlg(wxDialog):
