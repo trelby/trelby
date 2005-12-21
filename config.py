@@ -609,6 +609,10 @@ class ConfigGlobal:
                      util.Key(10, ctrl = True).toInt()],
                     isFixed = True),
 
+            Command("GotoScene", "Goto to a given scene.",
+                    [util.Key(ord("G"), alt = True).toInt()], isFixed = True,
+                    isMenu = True),
+
             Command("GotoPage", "Goto to a given page.",
                     [util.Key(7, ctrl = True).toInt()], isFixed = True,
                     isMenu = True),

@@ -1414,6 +1414,23 @@ class Screenplay:
 
         return pages
 
+    # return a list of all scene locations in a [(sceneNumber, startLine),
+    # ...] format. if script does not start with a scene line, that scene
+    # is not included in this list. note that the sceneNumber in the
+    # returned list is a string, not a number.
+    def getSceneLocations(self):
+        ls = self.lines
+        sc = SCENE
+        scene = 0
+        ret = []
+        
+        for i in xrange(len(ls)):
+            if (ls[i].lt == sc) and self.isFirstLineOfElem(i):
+                scene += 1
+                ret.append((str(scene), i))
+
+        return ret
+        
     # return a dictionary of all scene names (single-line text elements
     # only, upper-cased, values = None).
     def getSceneNames(self):

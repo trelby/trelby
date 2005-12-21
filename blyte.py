@@ -847,6 +847,32 @@ class MyCtrl(wxControl):
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
+    def OnGotoScene(self):
+        self.sp.paginate()
+
+        scenes = self.sp.getSceneLocations()
+
+        def validateFunc(s):
+            if s in [x[0] for x in scenes]:
+                return ""
+            else:
+                return "Invalid scene number."
+
+        dlg = misc.TextInputDlg(mainFrame, "Enter scene number (%s - %s):" %\
+            (scenes[0][0], scenes[-1][0]), "Goto scene", validateFunc)
+
+        if dlg.ShowModal() == wxID_OK:
+            for it in scenes:
+                if it[0] == dlg.input:
+                    self.sp.line = it[1]
+
+                    break
+
+        # we need to refresh the screen in all cases because pagination
+        # might have changed
+        self.makeLineVisible(self.sp.line)
+        self.updateScreen()
+
     def OnGotoPage(self):
         self.sp.paginate()
 
@@ -1510,6 +1536,7 @@ class MyFrame(wxFrame):
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene")
         editMenu.Append(ID_EDIT_GOTO_PAGE, "&Goto page...\tCTRL-G")
+        editMenu.Append(ID_EDIT_GOTO_SCENE, "Goto sc&ene...\tALT-G")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
         editMenu.AppendSeparator()
@@ -1665,6 +1692,7 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteSystemCb)
         EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         EVT_MENU(self, ID_EDIT_GOTO_PAGE, self.OnGotoPage)
+        EVT_MENU(self, ID_EDIT_GOTO_SCENE, self.OnGotoScene)
         EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         EVT_MENU(self, ID_EDIT_DELETE_ELEMENTS, self.OnDeleteElements)
         EVT_MENU(self, ID_VIEW_STYLE_DRAFT, self.OnViewModeChange)
@@ -1735,6 +1763,7 @@ class MyFrame(wxFrame):
             "ID_EDIT_CUT",
             "ID_EDIT_DELETE_ELEMENTS",
             "ID_EDIT_FIND",
+            "ID_EDIT_GOTO_SCENE",
             "ID_EDIT_GOTO_PAGE",
             "ID_EDIT_PASTE",
             "ID_EDIT_PASTE_FROM_CB",
@@ -2015,6 +2044,9 @@ class MyFrame(wxFrame):
 
     def OnGotoPage(self, event = None):
         self.panel.ctrl.OnGotoPage()
+
+    def OnGotoScene(self, event = None):
+        self.panel.ctrl.OnGotoScene()
 
     def OnFindNextError(self, event = None):
         self.panel.ctrl.OnFindNextError()
