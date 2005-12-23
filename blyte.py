@@ -1008,6 +1008,7 @@ class MyCtrl(wxControl):
             return
 
         self.sp.removeElementTypes(tdict)
+        self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
     def OnSave(self):

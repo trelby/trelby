@@ -2154,19 +2154,29 @@ class Screenplay:
 
         lsNew = []
         lsOld = self.lines
+        sl = self.line
+        
+        # how many lines were removed from above the current line
+        # (inclusive)
+        cnt = 0
+        
+        for i in xrange(len(lsOld)):
+            l = lsOld[i]
 
-        for l in lsOld:
             if l.lt not in tdict:
                 lsNew.append(l)
+            else:
+                if i <= sl:
+                    cnt += 1
+
+        self.line -= cnt
 
         if len(lsNew) == 0:
             lsNew.append(Line(LB_LAST, SCENE))
 
         self.lines = lsNew
-        
-        self.line = 0
-        self.column = 0
-        self.setTopLine(0)
+
+        self.validatePos()
         self.mark = None
         self.paginate()
         self.markChanged()
@@ -2179,6 +2189,12 @@ class Screenplay:
     def maybeMark(self, doIt):
         if doIt and not self.mark:
             self.mark = Mark(self.line, self.column)
+
+    # make sure current line and column are within the valid bounds.
+    def validatePos(self):
+        self.line = util.clamp(self.line, 0, len(self.lines) - 1)
+        self.column = util.clamp(self.column, 0,
+                                 len(self.lines[self.line].text))
 
     # this must be called after each command (all functions named fooCmd
     # are commands)
