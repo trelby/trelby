@@ -1212,8 +1212,11 @@ class PDFPanel(wxPanel):
         self.openOnCurrentPageCb = self.addCb("Open PDF on current page",
                                               vsizer, pad)
         
+        self.removeNotesCb = self.addCb(
+            "Omit Note elements", vsizer, pad)
+
         self.outlineNotesCb = self.addCb(
-            "Draw rectangles around Note elements", vsizer, pad)
+            "  Draw rectangles around Note elements", vsizer, pad)
 
         self.marginsCb = self.addCb("Show margins (debug)", vsizer, pad)
 
@@ -1232,12 +1235,16 @@ class PDFPanel(wxPanel):
         self.cfg.pdfIncludeTOC = self.includeTOCCb.GetValue()
         self.cfg.pdfShowTOC = self.showTOCCb.GetValue()
         self.cfg.pdfOpenOnCurrentPage = self.openOnCurrentPageCb.GetValue()
+        self.cfg.pdfRemoveNotes = self.removeNotesCb.GetValue()
         self.cfg.pdfOutlineNotes = self.outlineNotesCb.GetValue()
         self.cfg.pdfShowMargins = self.marginsCb.GetValue()
+
+        self.outlineNotesCb.Enable(not self.cfg.pdfRemoveNotes)
         
     def cfg2gui(self):
         self.includeTOCCb.SetValue(self.cfg.pdfIncludeTOC)
         self.showTOCCb.SetValue(self.cfg.pdfShowTOC)
         self.openOnCurrentPageCb.SetValue(self.cfg.pdfOpenOnCurrentPage)
+        self.removeNotesCb.SetValue(self.cfg.pdfRemoveNotes)
         self.outlineNotesCb.SetValue(self.cfg.pdfOutlineNotes)
         self.marginsCb.SetValue(self.cfg.pdfShowMargins)

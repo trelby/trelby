@@ -380,6 +380,9 @@ class Config:
         # whether to open PDF document on current page
         v.addBool("pdfOpenOnCurrentPage", True, "OpenOnCurrentPage")
         
+        # whether to remove Note elements in PDF output
+        v.addBool("pdfRemoveNotes", False, "RemoveNotes")
+
         # whether to draw rectangles around the outlines of Note elements
         v.addBool("pdfOutlineNotes", True, "OutlineNotes")
 

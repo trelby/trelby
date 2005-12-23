@@ -503,9 +503,14 @@ class MyCtrl(wxControl):
                     return None
 
         sp = self.sp
-        if not misc.license:
+        if not misc.license or sp.cfg.pdfRemoveNotes:
             sp = copy.deepcopy(self.sp)
-            sp.replace()
+
+            if sp.cfg.pdfRemoveNotes:
+                sp.removeElementTypes({screenplay.NOTE : None})
+                
+            if not misc.license:
+                sp.replace()
 
         sp.paginate()
         
@@ -1008,6 +1013,7 @@ class MyCtrl(wxControl):
             return
 
         self.sp.removeElementTypes(tdict)
+        self.sp.paginate()
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 

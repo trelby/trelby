@@ -2178,7 +2178,6 @@ class Screenplay:
 
         self.validatePos()
         self.mark = None
-        self.paginate()
         self.markChanged()
 
     # clear mark
