@@ -740,10 +740,6 @@ class FormattingPanel(wxPanel):
         if misc.isWindows:
             pad = 10
 
-        self.marginsCb = wxCheckBox(self, -1, "Show margins (debug)")
-        EVT_CHECKBOX(self, self.marginsCb.GetId(), self.OnMisc)
-        vsizer.Add(self.marginsCb, 0, wxTOP, 10 + pad)
-
         self.lineNumbersCb = wxCheckBox(self, -1, "Show line numbers (debug)")
         EVT_CHECKBOX(self, self.lineNumbersCb.GetId(), self.OnMisc)
         vsizer.Add(self.lineNumbersCb, 0, wxTOP, pad)
@@ -779,7 +775,6 @@ class FormattingPanel(wxPanel):
             self.sceneContinuedIndentEntry)
         self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
         self.cfg.pdfShowSceneNumbers = self.scenesCb.GetValue()
-        self.cfg.pdfShowMargins = self.marginsCb.GetValue()
         self.cfg.pdfShowLineNumbers = self.lineNumbersCb.GetValue()
         
     def cfg2gui(self):
@@ -795,7 +790,6 @@ class FormattingPanel(wxPanel):
         self.sceneContinuedIndentEntry.SetValue(self.cfg.sceneContinuedIndent)
         self.fontSizeEntry.SetValue(self.cfg.fontSize)
         self.scenesCb.SetValue(self.cfg.pdfShowSceneNumbers)
-        self.marginsCb.SetValue(self.cfg.pdfShowMargins)
         self.lineNumbersCb.SetValue(self.cfg.pdfShowLineNumbers)
 
 class KeyboardPanel(wxPanel):
@@ -1211,12 +1205,17 @@ class PDFPanel(wxPanel):
             pad = 10
 
         self.includeTOCCb = self.addCb("Add table of contents", vsizer, pad)
+
         self.showTOCCb = self.addCb("Show table of contents on PDF open",
                                     vsizer, pad)
+
         self.openOnCurrentPageCb = self.addCb("Open PDF on current page",
                                               vsizer, pad)
+        
         self.outlineNotesCb = self.addCb(
             "Draw rectangles around Note elements", vsizer, pad)
+
+        self.marginsCb = self.addCb("Show margins (debug)", vsizer, pad)
 
         self.cfg2gui()
         
@@ -1234,9 +1233,11 @@ class PDFPanel(wxPanel):
         self.cfg.pdfShowTOC = self.showTOCCb.GetValue()
         self.cfg.pdfOpenOnCurrentPage = self.openOnCurrentPageCb.GetValue()
         self.cfg.pdfOutlineNotes = self.outlineNotesCb.GetValue()
+        self.cfg.pdfShowMargins = self.marginsCb.GetValue()
         
     def cfg2gui(self):
         self.includeTOCCb.SetValue(self.cfg.pdfIncludeTOC)
         self.showTOCCb.SetValue(self.cfg.pdfShowTOC)
         self.openOnCurrentPageCb.SetValue(self.cfg.pdfOpenOnCurrentPage)
         self.outlineNotesCb.SetValue(self.cfg.pdfOutlineNotes)
+        self.marginsCb.SetValue(self.cfg.pdfShowMargins)
