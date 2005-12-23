@@ -188,6 +188,29 @@ class PDFExporter:
 
                         continue
 
+                elif op.type == pml.OP_QC:
+                    sX = op.flipX and -1 or 1
+                    sY = op.flipY and -1 or 1
+
+                    # the literature on how to emulate quarter circles
+                    # with Bezier curves is sketchy, but the one thing
+                    # that is clear is that the two control points have to
+                    # be on (1, A) and (A, 1) (on a unit circle), and
+                    # empirically choosing A to be half of the radius
+                    # results in the best looking quarter circle.
+                    A = op.radius * 0.5
+
+                    cont += "%f w\n"\
+                            "%s m\n" % (self.mm2points(op.width),
+                                        self.xy((op.x - op.radius * sX, op.y)))
+
+                    cont += "%f %f %f %f %f %f c\n" % (
+                        self.x(op.x - op.radius * sX), self.y(op.y - A * sY),
+                        self.x(op.x - A * sX), self.y(op.y - op.radius * sY),
+                        self.x(op.x), self.y(op.y - op.radius * sY))
+
+                    cont += "S\n"
+
                 elif op.type == pml.OP_PDF:
                     cont += "%s\n" % op.cmds
                     

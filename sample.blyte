@@ -29,6 +29,7 @@ ShowSceneNumbers:False
 IncludeTOC:True
 ShowTOC:True
 OpenOnCurrentPage:True
+OutlineNotes:True
 ShowMargins:False
 ShowLineNumbers:False
 String/MoreDialogue:(MORE)

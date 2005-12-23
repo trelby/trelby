@@ -20,7 +20,8 @@ import textwrap
 OP_TEXT = 0
 OP_LINE = 1
 OP_RECT = 2
-OP_PDF = 3
+OP_QC = 3
+OP_PDF = 4
 
 # text flags. don't change these unless you know what you're doing.
 NORMAL = 0
@@ -193,6 +194,20 @@ class RectOp(DrawOp):
         self.fillType = fillType
         self.lw = lineWidth
 
+# Draw a quarter circle centered at (x, y) with given radius and line
+# width. By default it will be the upper left quadrant of a circle, but
+# using the flip[XY] parameters you can choose other quadrants.
+class QuarterCircleOp(DrawOp):
+    def __init__(self, x, y, radius, width, flipX = False, flipY = False):
+        DrawOp.__init__(self, OP_QC)
+
+        self.x = x
+        self.y = y
+        self.radius = radius
+        self.width = width
+        self.flipX = flipX
+        self.flipY = flipY
+        
 # Arbitrary PDF commands. Should not have whitespace in the beginning or
 # the end. Should be used only for non-critical things like tweaking line
 # join styles etc, because non-PDF renderers will ignore these.

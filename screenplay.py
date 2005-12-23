@@ -593,7 +593,7 @@ class Screenplay:
     # only be True for callers that do not show the results in any way,
     # just calculate things based on text positions.
     #
-    # if  addDs is True, add demo stamp.
+    # if addDs is True, add demo stamp.
     #
     # can also return None, which means pagination is not up-to-date and
     # the given page number doesn't point to a valid page anymore, and the
@@ -702,6 +702,32 @@ class Screenplay:
                 cfg.marginTop + (y / 10.0) * chY, fs, typ, line = i)
 
             pg.add(to)
+
+            if forPDF and (tcfg.lt == NOTE) and cfg.pdfOutlineNotes:
+                offset = chX / 2.0
+                nx = cfg.marginLeft + tcfg.indent * chX
+                ny = cfg.marginTop + (y / 10.0) * chY
+                nw = tcfg.width * chX
+                lw = 0.25
+                
+                pg.add(pml.genLine(nx - offset, ny, 0.0, chY, lw))
+                pg.add(pml.genLine(nx + nw + offset, ny, 0.0, chY, lw))
+
+                if self.isFirstLineOfElem(i):
+                    pg.add(pml.QuarterCircleOp(nx, ny, offset, lw))
+                    pg.add(pml.genLine(nx, ny - offset, nw, 0.0, lw))
+                    pg.add(pml.QuarterCircleOp(nx + nw, ny, offset, lw, True))
+
+                    pg.add(pml.TextOp("Note",
+                        (nx + nx + nw) / 2.0, ny - offset, 6, pml.ITALIC,
+                        util.ALIGN_CENTER, util.VALIGN_BOTTOM))
+
+                if self.isLastLineOfElem(i):
+                    pg.add(pml.QuarterCircleOp(nx, ny + chY, offset, lw,
+                                               False, True))
+                    pg.add(pml.genLine(nx, ny + chY + offset, nw, 0.0, lw))
+                    pg.add(pml.QuarterCircleOp(nx + nw, ny + chY, offset, lw,
+                                               True, True))
 
             if doExtra and (tcfg.lt == SCENE) and self.isFirstLineOfElem(i):
                 pager.sceneContNr = 0

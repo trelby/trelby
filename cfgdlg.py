@@ -1215,6 +1215,8 @@ class PDFPanel(wxPanel):
                                     vsizer, pad)
         self.openOnCurrentPageCb = self.addCb("Open PDF on current page",
                                               vsizer, pad)
+        self.outlineNotesCb = self.addCb(
+            "Draw rectangles around Note elements", vsizer, pad)
 
         self.cfg2gui()
         
@@ -1231,8 +1233,10 @@ class PDFPanel(wxPanel):
         self.cfg.pdfIncludeTOC = self.includeTOCCb.GetValue()
         self.cfg.pdfShowTOC = self.showTOCCb.GetValue()
         self.cfg.pdfOpenOnCurrentPage = self.openOnCurrentPageCb.GetValue()
+        self.cfg.pdfOutlineNotes = self.outlineNotesCb.GetValue()
         
     def cfg2gui(self):
         self.includeTOCCb.SetValue(self.cfg.pdfIncludeTOC)
         self.showTOCCb.SetValue(self.cfg.pdfShowTOC)
         self.openOnCurrentPageCb.SetValue(self.cfg.pdfOpenOnCurrentPage)
+        self.outlineNotesCb.SetValue(self.cfg.pdfOutlineNotes)
