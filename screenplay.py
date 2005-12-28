@@ -1772,30 +1772,31 @@ class Screenplay:
                         
             else:
 
-                # if the selection ends by removing completely the last
-                # line of an element, we need to mark the element's new
-                # end, otherwise we must set it to LB_NONE so that the new
-                # element is reformatted properly.
-                if self.isLastLineOfElem(marked[1]) and not ls[marked[1]].text:
-                    lb = LB_LAST
-                else:
-                    lb = LB_NONE
-
                 # now find the line whose linebreak we need to adjust. if
                 # the starting line is not completely removed, it is that,
                 # otherwise it is the preceding line, unless we delete the
-                # first line, in which case there's nothing to adjust.
+                # first line of the element, in which case there's nothing
+                # to adjust.
                 if ls[marked[0]].text:
                     ln = ls[marked[0]]
                 else:
-                    if marked[0] != 0:
+                    if not self.isFirstLineOfElem(marked[0]):
                         ln = ls[marked[0] - 1]
                     else:
                         ln = None
 
                 if ln:
-                    ln.lb = lb
-
+                    # if the selection ends by removing completely the
+                    # last line of an element, we need to mark the
+                    # element's new end, otherwise we must set it to
+                    # LB_NONE so that the new element is reformatted
+                    # properly.
+                    if self.isLastLineOfElem(marked[1]) and \
+                           not ls[marked[1]].text:
+                        ln.lb = LB_LAST
+                    else:
+                        ln.lb = LB_NONE
+                    
             # if we're joining two elements of different type, we have to
             # change the line types for the latter element (starting from
             # the last marked line, because everything before that will

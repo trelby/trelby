@@ -58,3 +58,24 @@ def testForcedLb():
     sp.cmd("moveRight")
     sp.getSelectedAsCD(True)
     sp._validate()
+
+# we used to have a bug where if we deleted the first line of an element
+# plus at least some of the later lines, the rest of the element was
+# erroneously joined to the preceding element.
+def testFirstDelete():
+    sp = u.load()
+
+    sp.cmd("moveDown")
+    sp.cmd("setMark")
+    sp.cmd("moveDown")
+    sp.getSelectedAsCD(True)
+
+    assert sp.lines[0].lb == scr.LB_LAST
+    assert sp.lines[0].lt == scr.SCENE
+
+    assert sp.lines[1].lb == scr.LB_SPACE
+    assert sp.lines[1].lt == scr.ACTION
+    assert sp.lines[1].lt == scr.ACTION
+    assert sp.lines[1].text == "lmost zero. Only at brief moments do we catch sight of the"
+
+    sp._validate()
