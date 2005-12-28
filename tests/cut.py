@@ -44,4 +44,17 @@ def testEndPrevPara():
     assert sp.lines[2].lb == scr.LB_LAST
     assert sp.lines[3].lt == scr.CHARACTER
     
+# we used to have a bug where joining two elements when the latter one
+# contained a forced linebreak didn't convert it properly to the preceding
+# element's type.
+def testForcedLb():
+    sp = u.load()
 
+    sp.cmd("moveDown", count = 2)
+    sp.cmd("insertForcedLineBreak")
+    sp.cmd("moveUp", count = 2)
+    sp.cmd("moveLineEnd")
+    sp.cmd("setMark")
+    sp.cmd("moveRight")
+    sp.getSelectedAsCD(True)
+    sp._validate()
