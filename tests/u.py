@@ -15,7 +15,14 @@ def init():
         util.init(False)
 
         initDone = True
+
+# return new, empty Screenplay
+def new():
+    init()
+
+    return screenplay.Screenplay(config.ConfigGlobal())
     
+# load script from the given file
 def load(filename = "test.blyte"):
     init()
 

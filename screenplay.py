@@ -1344,10 +1344,13 @@ class Screenplay:
     # position.
     def joinLines(self, line):
         ls = self.lines
+        ln = ls[line]
         
-        pos = len(ls[line].text)
-        ls[line].text += ls[line + 1].text
-        ls[line].lb = ls[line + 1].lb
+        pos = len(ln.text)
+        ln.text += ls[line + 1].text
+        ln.lb = ls[line + 1].lb
+
+        self.setLineTypes(line + 1, ln.lt)
         del ls[line + 1]
 
         self.line = line
@@ -1400,6 +1403,19 @@ class Screenplay:
             self.column = column
             self.line = line
 
+    # set line types from 'line' to the end of the element to 'lt'.
+    def setLineTypes(self, line, lt):
+        ls = self.lines
+        
+        while 1:
+            ln = ls[line]
+
+            ln.lt = lt
+            if ln.lb == LB_LAST:
+                break
+
+            line += 1
+        
     def line2page(self, line):
         return self.line2pageReal(line, self.pages)
 
