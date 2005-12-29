@@ -318,7 +318,7 @@ def showText(parent, text, title = "Message"):
 class TextInputDlg(wxDialog):
     def __init__(self, parent, text, title, validateFunc = None):
         wxDialog.__init__(self, parent, -1, title,
-                          style = wxDEFAULT_DIALOG_STYLE)
+                          style = wxDEFAULT_DIALOG_STYLE | wxWANTS_CHARS)
 
         # function to call to validate the input string on OK. can be
         # None, in which case it is not called. if it returns "", the
@@ -330,7 +330,7 @@ class TextInputDlg(wxDialog):
 
         vsizer.Add(wxStaticText(self, -1, text), 1, wxEXPAND | wxBOTTOM, 5)
         
-        self.tc = wxTextCtrl(self, -1)
+        self.tc = wxTextCtrl(self, -1, style = wxTE_PROCESS_ENTER)
         vsizer.Add(self.tc, 1, wxEXPAND);
         
         vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 5)
@@ -349,6 +349,8 @@ class TextInputDlg(wxDialog):
 
         EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
         EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+
+        EVT_TEXT_ENTER(self, self.tc.GetId(), self.OnOK)
 
         EVT_CHAR(self.tc, self.OnCharEntry)
         EVT_CHAR(cancelBtn, self.OnCharButton)
