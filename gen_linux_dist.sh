@@ -1,5 +1,6 @@
 #!/bin/bash
 
+set -eu
 VER=$(grep 'misc.version =' blyte.py | cut -b24- | perl -pe 's/"//g;')
 DIR="linux-dist/blyte-$VER"
 
