@@ -28,3 +28,10 @@ def load(filename = "test.blyte"):
 
     return screenplay.Screenplay.load(open(filename, "r").read(),
                                       config.ConfigGlobal())[0]
+
+# load script from given string
+def loadString(s):
+    init()
+
+    return screenplay.Screenplay.load(s, config.ConfigGlobal())[0]
+
