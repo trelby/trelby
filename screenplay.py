@@ -925,6 +925,20 @@ class Screenplay:
         
         line = self.getParaFirstIndexFromLine(line - 1)
         self.rewrapPara(line)
+
+    # rewrap element starting at given line. if line is -1, rewraps
+    # element containing self.line.
+    def rewrapElem(self, line = -1):
+        ls = self.lines
+
+        if line == -1:
+            line = self.getElemFirstIndex()
+        
+        while 1:
+            line += self.rewrapPara(line)
+            
+            if ls[line - 1].lb == LB_LAST:
+                break
         
     def isFirstLineOfElem(self, line):
         return (line == 0) or (self.lines[line - 1].lb == LB_LAST)
@@ -1331,13 +1345,7 @@ class Screenplay:
             ls[first].text = "()"
             self.column = 1
 
-        # rewrap whole element
-        line = first
-        while 1:
-            line += self.rewrapPara(line)
-            if ls[line - 1].lb == LB_LAST:
-                break
-
+        self.rewrapElem(first)
         self.markChanged()
 
     # join lines 'line' and 'line + 1' and position cursor at the join
@@ -1797,14 +1805,10 @@ class Screenplay:
                     else:
                         ln.lb = LB_NONE
                     
-            # if we're joining two elements of different type, we have to
-            # change the line types for the latter element (starting from
-            # the last marked line, because everything before that will
-            # get deleted anyway) to that of the first element, because
-            # otherwise rewrapPara will stop if it sees a forced linebreak
-            # and the rest of the element's lines will have invalid types.
-            # note that we always do this because there is not a case
-            # where doing it would be harmful.
+            # if we're joining two elements we have to change the line
+            # types for the latter element (starting from the last marked
+            # line, because everything before that will get deleted
+            # anyway) to that of the first element.
             self.setLineTypes(marked[1], ls[marked[0]].lt)
             
             del ls[del1:del2 + 1]
@@ -1817,7 +1821,7 @@ class Screenplay:
             self.line = min(marked[0], len(ls) - 1)
             self.column = min(endCol, len(ls[self.line].text))
 
-            self.rewrapPara()
+            self.rewrapElem()
             self.markChanged()
 
         return cd
@@ -2365,7 +2369,7 @@ class Screenplay:
 
                 self.markChanged()
 
-        self.rewrapPara()
+        self.rewrapElem()
 
     def deleteForwardCmd(self, cs):
         if self.column != len(self.lines[self.line].text):
@@ -2386,7 +2390,7 @@ class Screenplay:
 
                 self.markChanged()
 
-        self.rewrapPara()
+        self.rewrapElem()
 
     # aborts stuff, like selection, auto-completion, etc
     def abortCmd(self, cs):

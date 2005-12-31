@@ -67,4 +67,33 @@ def testBackLbForced():
     assert sp.lines[33].text == "brightyellow package at their feet."
     assert sp.lines[33].lb == scr.LB_LAST
 
-# FIXME: test forward deletion
+# test that when joining two elements of different type, the latter of
+# which contains forced linebreaks, that the whole of the latter element
+# is rewrapped correctly.
+def testBackLbForcedTypeConvert():
+    sp = u.load()
+
+    sp.cmd("toTransition")
+    sp.cmd("moveDown", count = 3)
+    sp.cmd("insertForcedLineBreak")
+    sp.cmd("moveUp")
+    sp.cmd("deleteBackward")
+
+    sp._validate()
+    
+# FIXME: more tests for forward deletion
+
+# test that when joining two elements of different type, the latter of
+# which contains forced linebreaks, that the whole of the latter element
+# is rewrapped correctly.
+def testForwardLbForcedTypeConvert():
+    sp = u.load()
+
+    sp.cmd("toTransition")
+    sp.cmd("moveDown", count = 3)
+    sp.cmd("insertForcedLineBreak")
+    sp.cmd("moveUp", count = 2)
+    sp.cmd("moveLineEnd")
+    sp.cmd("deleteForward")
+
+    sp._validate()

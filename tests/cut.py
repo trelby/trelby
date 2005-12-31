@@ -79,3 +79,19 @@ def testFirstDelete():
     assert sp.lines[1].text == "lmost zero. Only at brief moments do we catch sight of the"
 
     sp._validate()
+
+# test that when joining two elements of different type, the latter of
+# which contains forced linebreaks, that the whole of the latter element
+# is rewrapped correctly.
+def testTypeConvert():
+    sp = u.load()
+
+    sp.cmd("toTransition")
+    sp.cmd("moveDown", count = 3)
+    sp.cmd("insertForcedLineBreak")
+    sp.cmd("moveUp")
+    sp.cmd("setMark")
+    sp.cmd("moveLeft")
+    sp.getSelectedAsCD(True)
+
+    sp._validate()
