@@ -854,6 +854,7 @@ class MyCtrl(wxControl):
 
     def OnGotoScene(self):
         self.sp.paginate()
+        self.clearAutoComp()
 
         scenes = self.sp.getSceneLocations()
 
@@ -870,6 +871,7 @@ class MyCtrl(wxControl):
             for it in scenes:
                 if it[0] == dlg.input:
                     self.sp.line = it[1]
+                    self.sp.column = 0
 
                     break
 
@@ -880,6 +882,7 @@ class MyCtrl(wxControl):
 
     def OnGotoPage(self):
         self.sp.paginate()
+        self.clearAutoComp()
 
         pages = self.sp.getPageNumbers()
 
@@ -895,6 +898,7 @@ class MyCtrl(wxControl):
         if dlg.ShowModal() == wxID_OK:
             page = int(dlg.input)
             self.sp.line = self.sp.page2lines(page)[0]
+            self.sp.column = 0
 
         # we need to refresh the screen in all cases because pagination
         # might have changed
