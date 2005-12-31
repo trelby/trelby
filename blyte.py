@@ -288,16 +288,12 @@ class MyCtrl(wxControl):
 
         if not lines:
             return
-        
-        sp = screenplay.Screenplay(cfgGl)
-        sp.lines = lines
 
-        self.clearVars()
-        self.sp = sp
+        self.createEmptySp()
+        
+        self.sp.lines = lines
         self.sp.reformatAll()
-        self.setFile(None)
         self.sp.paginate()
-        self.refreshCache()
 
     # generate exportable text from given screenplay, or None.
     def getExportText(self, sp):
