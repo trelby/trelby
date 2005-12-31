@@ -1972,13 +1972,17 @@ class Screenplay:
         ls = self.lines
         cfg = self.cfg
 
+        # type of previous line, or None when a new element starts
+        prevType = None
+
         msg = None
         while 1:
             if line >= len(ls):
                 break
 
-            l = ls[line]
-
+            ln = ls[line]
+            tcfg = cfg.getType(ln.lt)
+            
             isFirst = self.isFirstLineOfElem(line)
             isLast = self.isLastLineOfElem(line)
             isOnly = isFirst and isLast
@@ -1986,38 +1990,54 @@ class Screenplay:
             prev = self.getTypeOfPrevElem(line)
             next = self.getTypeOfNextElem(line)
             
-            if len(l.text) == 0:
+            if len(ln.text) == 0:
                 msg = "Empty line."
                 break
 
-            if len(l.text.strip()) == 0:
+            if len(ln.text.strip()) == 0:
                 msg = "Empty line (contains only whitespace)."
                 break
 
-            if (l.lt == PAREN) and isOnly and (l.text == "()"):
+            if (ln.lt == PAREN) and isOnly and (ln.text == "()"):
                 msg = "Empty parenthetical."
                 break
 
-            if l.lt == CHARACTER:
+            if ln.text != util.toInputStr(ln.text):
+                msg = "Line contains invalid characters (BUG)."
+                break
+
+            if len(ln.text) > tcfg.width:
+                msg = "Line is too long (BUG)."
+                break
+
+            if ln.lt == CHARACTER:
                 if isLast and next and next not in (PAREN, DIALOGUE):
                     msg = "Element type '%s' can not follow type '%s'." %\
-                          (cfg.getType(next).ti.name,
-                           cfg.getType(l.lt).ti.name)
+                          (cfg.getType(next).ti.name, tcfg.ti.name)
                     break
 
-            if l.lt == PAREN:
+            if ln.lt == PAREN:
                 if isFirst and prev and prev not in (CHARACTER, DIALOGUE):
                     msg = "Element type '%s' can not follow type '%s'." %\
-                          (cfg.getType(l.lt).ti.name,
-                           cfg.getType(prev).ti.name)
+                          (tcfg.ti.name, cfg.getType(prev).ti.name)
                     break
 
-            if l.lt == DIALOGUE:
+            if ln.lt == DIALOGUE:
                 if isFirst and prev and prev not in (CHARACTER, PAREN):
                     msg = "Element type '%s' can not follow type '%s'." %\
-                          (cfg.getType(l.lt).ti.name,
-                           cfg.getType(prev).ti.name)
+                          (tcfg.ti.name, cfg.getType(prev).ti.name)
                     break
+
+            if prevType:
+                if ln.lt != prevType:
+                    msg = "Element contains lines with different line"\
+                          " types (BUG)."
+                    break
+
+            if ln.lb == LB_LAST:
+                prevType = None
+            else:
+                prevType = ln.lt
 
             line += 1
             
@@ -2495,10 +2515,7 @@ class Screenplay:
     # check script for internal consistency. raises an AssertionError on
     # errors. ONLY MEANT TO BE USED IN TEST CODE.
     def _validate(self):
-        # True when we're analyzing the first line of an element
-        startOfElem = True
-
-        # type of previous line
+        # type of previous line, or None when a new element starts
         prevType = None
 
         # there must be at least one line
@@ -2524,12 +2541,13 @@ class Screenplay:
             if ln.lb == LB_NONE:
                 assert ln.text[-1:] != " "
 
-            if not startOfElem:
-                # line type should be the same for all lines in an element
+            if prevType:
                 assert ln.lt == prevType
 
-            prevType = ln.lt
-            startOfElem = ln.lb == LB_LAST
+            if ln.lb == LB_LAST:
+                prevType = None
+            else:
+                prevType = ln.lt
 
 # one line in a screenplay
 class Line:

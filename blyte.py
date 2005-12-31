@@ -1180,6 +1180,7 @@ class MyCtrl(wxControl):
         self.sp.toPrevTypeTabCmd(cs)
 
     def cmdTest(self, cs):
+        self.sp.lines[self.sp.line].lt = screenplay.SCENE
         pass
     
     def OnKeyChar(self, ev):
