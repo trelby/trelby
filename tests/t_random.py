@@ -192,6 +192,7 @@ def runRandomOps():
 
         if not failed:
             try:
+                ops.sp._validate()
                 s = ops.sp.save()
                 u.loadString(s)
             except KeyboardInterrupt:
