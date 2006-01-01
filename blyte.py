@@ -1029,12 +1029,19 @@ class MyCtrl(wxControl):
     def OnSaveScriptAs(self):
         if self.checkEvalSave():
             return
-        
-        dlg = wxFileDialog(mainFrame, "Filename to save as", misc.scriptDir,
+
+        if self.fileName:
+            dDir = os.path.dirname(self.fileName)
+            dFile = os.path.basename(self.fileName)
+        else:
+            dDir = misc.scriptDir
+            dFile = ""
+    
+        dlg = wxFileDialog(mainFrame, "Filename to save as",
+            defaultDir = dDir, defaultFile = dFile,
             wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
             style = wxSAVE | wxOVERWRITE_PROMPT)
         if dlg.ShowModal() == wxID_OK:
-            misc.scriptDir = dlg.GetDirectory()
             if self.saveFile(dlg.GetPath()):
                 gd.mru.add(dlg.GetPath())
 
@@ -2357,8 +2364,8 @@ class MyApp(wxApp):
         refreshGuiConfig()
 
         # cfgGl.scriptDir is the directory used on startup, while
-        # misc.scriptDir is updated every time the user opens/saves
-        # something in a different directory.
+        # misc.scriptDir is updated every time the user opens something in
+        # a different directory.
         misc.scriptDir = cfgGl.scriptDir
 
         if util.fileExists(gd.stateFilename):
