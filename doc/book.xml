@@ -497,6 +497,24 @@
 	</sect1>
 
 	<sect1>
+	  <title>Edit/Goto page</title>
+
+	  <para>This opens a dialog allowing you to type in a page number to
+	  jump to. The Enter/Escape keys can be used as shortcuts for the
+	  OK/Cancel buttons.</para>
+
+	</sect1>
+
+	<sect1>
+	  <title>Edit/Goto scene</title>
+
+	  <para>This opens a dialog allowing you to type in a scene number to
+	  jump to. The Enter/Escape keys can be used as shortcuts for the
+	  OK/Cancel buttons.</para>
+
+	</sect1>
+
+	<sect1>
 	  <title>Edit/Find &amp; Replace</title>
 
 	  <para>This opens a dialog allowing you to search for and possibly
@@ -505,7 +523,7 @@
 	  operates on, which is useful when renaming a character and so
 	  on.</para>
 
-	  <para>Pressing Enter while the cursor is either the text box is
+	  <para>Pressing Enter while the cursor is in either text box is
 	  equivalent to pressing the 'Find next' button. The Esc key will
 	  close the dialog.</para>
 	  
@@ -573,7 +591,7 @@
 
 		<listitem>
 
-		  <para>Empty line, or a parenthetical element containing only
+		  <para>An empty line, or a parenthetical element containing only
 		  ().</para>
 		  
 		</listitem>
@@ -596,6 +614,21 @@
 
 		  <para>A dialogue element that does not follow a character or a
 			parenthetical element.</para>
+		  
+		</listitem>
+
+		<listitem>
+
+		  <para>Various error conditions that can only arise from bugs in
+		  the program. This includes things like overlong lines, elements
+		  that have lines with different element types, invalid characters
+		  in the script, etc. You should never find any of these errors,
+		  but if you do, you should try to fix them before saving the
+		  script, otherwise you might not be able to load it again. You
+		  should also notify us about the problem so we can fix it.</para>
+
+		  <para>The messages for these all say "(BUG)" at the end so they
+		  can be identified from normal errors.</para>
 		  
 		</listitem>
 		
@@ -745,7 +778,7 @@
 	  position. If you want to spell check the entire script, be sure to
 	  position the cursor at the first line of the script.</para>
 	  
-	  <para>If it finds any words it doesn't recognize, it jump to that
+	  <para>If it finds any words it doesn't recognize, it jumps to that
 	  position in the script, highlights the word, and opens a dialog
 	  window that has a text box for editing the word, and the following 5
 	  buttons:</para>
@@ -1196,9 +1229,11 @@
 		to the left and right of each scene element. This is usually only
 		done for scripts in production.</para>
 
-		<para>'Show margins/line numbers' can be considered debug options,
-		for they have no use in normal operation, but can be useful if
-		you're trying to figure out printing related problems.</para>
+		<para>'Show line numbers' prefixes each line with its line number
+		(starting from 1 at the top of the page). It can be considered a
+		debug option as it has no use in normal operation, but it can be
+		useful if you're trying to figure out printing related
+		problems.</para>
 
 	  </sect2>
 	  
@@ -1236,7 +1271,19 @@
 		permanent PDF file opening on a non-standard page, use File/Print
 		and save the PDF file from the PDF viewer application to a
 		different name.</para>
+
+		<para>'Omit Note elements', if on, will cause all Note elements to
+		be omitted from the PDF output.</para>
+
+		<para>'Draw rectangles around Note elements', if on, will cause
+		rounded rectangles to be drawn around Note elements in the PDF
+		output to make them stand out more.</para>
 		
+		<para>'Show margins' draws a rectangle on each page showing the
+		margin settings. It can be considered a debug option as it has no
+		use in normal operation, but it can be useful if you're trying to
+		figure out printing related problems.</para>
+
 	  </sect2>
 	  
 	  <sect2>
@@ -1549,11 +1596,10 @@ Something starts beeping.
 
 	  <para>'Dialogue chart' first opens a window allowing you to specify
 	  what to include in the generated chart. The 'Sorted by:' options
-	  select what orderings to include, while the 'Characters appearing on
-	  a single page' option, if unselected, leaves out all characters
-	  appearing on a single page only from the generated chart. It's
-	  useful for long scripts that have many such characters, or if you
-	  want to concentrate on the more important characters.</para>
+	  select what orderings to include, while the 'Characters &lt; 10
+	  lines' option, if unselected, leaves out all characters that have
+	  less than 10 dialogue lines, which is useful for trimming out minor
+	  characters from long scripts.</para>
 
 	  <para>It then generates a chart with one page for each selected
 	  ordering and shows that.</para>
@@ -1564,7 +1610,9 @@ Something starts beeping.
 	  bottom.</para>
 
 	  <para>If a character speaks on a given page, he will have a black
-	  mark on that page's position on the chart.</para>
+	  bar on that page's position on the chart. The bar's height is scaled
+	  according to how many dialogue lines the character has on that page,
+	  allowing easy visual identification of long monologues, etc.</para>
 
 	  <para>Every other line has a light gray background to allow easier
 	  visual matching of distant markings to character names.</para>
@@ -1574,12 +1622,11 @@ Something starts beeping.
 	  the middle of the script, whether the villain is introduced too
 	  late, and so on.</para>
 
-	  <para>At the top is another chart, this one showing the dialogue
-	  density for each page. Dialogue density is calculated as "number of
-	  dialogue/character/parenthetical lines on page divided by total
-	  number of non-empty lines on page". By looking at the chart you can
-	  easily see where the action scenes are by the lower dialogue density
-	  in those pages.</para>
+	  <para>At the top is another graph showing the percentage of action,
+	  dialogue, character and "other" lines on each page. This graph is
+	  most useful for seeing how the percentage of action lines
+	  fluctuates, allowing one to easily see where the major action scenes
+	  are, etc.</para>
 	  
 	</sect1>
 
