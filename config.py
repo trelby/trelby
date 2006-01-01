@@ -822,6 +822,9 @@ class ConfigGlobal:
         # whether to auto-capitalize start of sentences
         v.addBool("capitalize", True, "CapitalizeSentences")
 
+        # whether to auto-capitalize i -> I
+        v.addBool("capitalizeI", True, "CapitalizeI")
+
         # page break indicators to show
         v.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,
                     PBI_LAST)

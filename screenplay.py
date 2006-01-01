@@ -2467,8 +2467,18 @@ class Screenplay:
             char = util.upper(char)
 
         ls = self.lines
-        
         s = ls[self.line].text
+
+        # we let the sentence capitalizing worry about i's in the first
+        # column to ease the implementation of this one.
+        if self.cfgGl.capitalizeI and (self.column > 1):
+            s = ls[self.line].text
+
+            if s[self.column - 1] == "i":
+                if not util.isAlnum(char) and \
+                       not util.isAlnum(s[self.column - 2]):
+                    s = s[:self.column - 1] + "I" + s[self.column:]
+        
         s = s[:self.column] + char + s[self.column:]
         ls[self.line].text = s
         self.column += 1

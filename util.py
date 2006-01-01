@@ -387,8 +387,12 @@ def isWordBoundary(c):
     if c == "'":
         return False
 
-    return not unicode(c, "ISO-8859-1").isalnum()
+    return not isAlnum(c)
 
+# return True if c is an alphanumeric character
+def isAlnum(c):
+    return unicode(c, "ISO-8859-1").isalnum()
+    
 # return string 's' split into words (as a list), using isWordBoundary.
 def splitToWords(s):
     tmp = ""
