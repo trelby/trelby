@@ -25,7 +25,7 @@ def importTextFile(fileName, frame):
     if len(data) == 0:
         wxMessageBox("File is empty.", "Error", wxOK, frame)
 
-        return
+        return None
 
     data = util.fixNL(data)
     lines = data.split("\n")
@@ -68,7 +68,7 @@ def importTextFile(fileName, frame):
     if len(indDict) == 0:
         wxMessageBox("File contains only empty lines.", "Error", wxOK, frame)
 
-        return
+        return None
 
     # scene/action indent
     setType(SCENE_ACTION, indDict, lambda v: v.sceneStart)
@@ -111,7 +111,7 @@ def importTextFile(fileName, frame):
     if dlg.ShowModal() != wxID_OK:
         dlg.Destroy()
 
-        return
+        return None
 
     dlg.Destroy()
         
