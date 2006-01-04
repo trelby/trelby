@@ -67,6 +67,13 @@ The following config sections exists and appear in the file in this order:
   OpenOnCurrentPage (boolean): If True, display current page in the PDF
   file when opening it.
 
+  RemoveNotes (boolean): Whether to remove Note elements from PDF output.
+
+  OutlineNotes (boolean): Whether to draw a rectangle around Note elements
+  in PDF output.
+
+  Cursor/(Line|Column) (integer): Cursor position.
+
   String/(MoreDialogue|ContinuedPageEnd|ContinuedPageStart|
   DialogueContinued): The "(MORE)", "(CONTINUED)", "CONTINUED:",
   " (cont'd)" texts to use.

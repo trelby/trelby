@@ -365,7 +365,7 @@ class Config:
         # whether scene continueds are enabled
         v.addBool("sceneContinueds", True, "SceneContinueds")
         
-        # whether scene continueds are enabled
+        # scene continued text indent width
         v.addInt("sceneContinuedIndent", 45, "SceneContinuedIndent", -20, 80)
 
         # whether to include scene numbers
@@ -391,6 +391,12 @@ class Config:
 
         # whether to show line numbers next to each line
         v.addBool("pdfShowLineNumbers", False, "ShowLineNumbers")
+
+        # cursor position, line
+        v.addInt("cursorLine", 0, "Cursor/Line", 0, 1000000)
+
+        # cursor position, column
+        v.addInt("cursorColumn", 0, "Cursor/Column", 0, 1000000)
 
         # various strings we add to the script
         v.addStrNoEscape("strMore", "(MORE)", "String/MoreDialogue")
@@ -825,6 +831,9 @@ class ConfigGlobal:
         # whether to auto-capitalize i -> I
         v.addBool("capitalizeI", True, "CapitalizeI")
 
+        # whether to open scripts on their last saved position
+        v.addBool("honorSavedPos", True, "OpenScriptOnSavedPos")
+        
         # page break indicators to show
         v.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,
                     PBI_LAST)

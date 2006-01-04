@@ -131,6 +131,9 @@ class Screenplay:
 
     # save script to a string and return that
     def save(self):
+        self.cfg.cursorLine = self.line
+        self.cfg.cursorColumn = self.column
+        
         output = util.String()
 
         output += codecs.BOM_UTF8
@@ -345,6 +348,11 @@ class Screenplay:
         if sp.lines[-1].lb != LB_LAST:
             raise error.MiscError("Last line doesn't end an element.")
 
+        if cfgGl.honorSavedPos:
+            sp.line = sp.cfg.cursorLine
+            sp.column = sp.cfg.cursorColumn
+            sp.validatePos()
+        
         sp.reformatAll()
         sp.paginate()
         sp.titles.sort()

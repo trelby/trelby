@@ -980,6 +980,11 @@ class MiscPanel(wxPanel):
         EVT_CHECKBOX(self, self.autoCapI.GetId(), self.OnMisc)
         vsizer.Add(self.autoCapI, 0, wxBOTTOM, pad)
 
+        self.honorSavedPos = wxCheckBox(self, -1,
+            "When opening a script, start at last saved position")
+        EVT_CHECKBOX(self, self.honorSavedPos.GetId(), self.OnMisc)
+        vsizer.Add(self.honorSavedPos, 0, wxBOTTOM, pad)
+
         self.checkErrorsCb = wxCheckBox(self, -1,
             "Check script for errors before print, export or compare")
         EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
@@ -1031,6 +1036,7 @@ class MiscPanel(wxPanel):
         self.cfg.pdfViewerArgs = self.argsEntry.GetValue()
         self.cfg.capitalize = self.autoCapSentences.GetValue()
         self.cfg.capitalizeI = self.autoCapI.GetValue()
+        self.cfg.honorSavedPos = self.honorSavedPos.GetValue()
         self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
         self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
         self.cfg.confirmDeletes = util.getSpinValue(self.confDelEntry)
@@ -1066,6 +1072,7 @@ class MiscPanel(wxPanel):
         self.argsEntry.SetValue(self.cfg.pdfViewerArgs)
         self.autoCapSentences.SetValue(self.cfg.capitalize)
         self.autoCapI.SetValue(self.cfg.capitalizeI)
+        self.honorSavedPos.SetValue(self.cfg.honorSavedPos)
         self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
         self.confDelEntry.SetValue(self.cfg.confirmDeletes)

@@ -273,6 +273,10 @@ class MyCtrl(wxControl):
         self.setFile(fileName)
         self.refreshCache()
 
+        # saved cursor position might be anywhere, so we can't just
+        # display the first page
+        self.makeLineVisible(self.sp.line)
+
     # save script to given filename. returns True on success.
     def saveFile(self, fileName):
         if util.writeToFile(fileName, self.sp.save(), mainFrame):
