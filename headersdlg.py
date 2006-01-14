@@ -133,7 +133,7 @@ class HeadersDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(1, 1, 1)
+        hsizer.Add((1, 1), 1)
         
         previewBtn = wxButton(self, -1, "Preview")
         hsizer.Add(previewBtn)

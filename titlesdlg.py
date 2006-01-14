@@ -169,7 +169,7 @@ class TitlesDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(1, 1, 1)
+        hsizer.Add((1, 1), 1)
         
         self.previewBtn = wxButton(self, -1, "Preview")
         hsizer.Add(self.previewBtn)

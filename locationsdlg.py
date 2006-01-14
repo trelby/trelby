@@ -40,7 +40,7 @@ class LocationsDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(1, 1, 1)
+        hsizer.Add((1, 1), 1)
         
         cancelBtn = wxButton(self, -1, "Cancel")
         hsizer.Add(cancelBtn, 0, wxLEFT, 10)

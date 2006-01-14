@@ -107,7 +107,7 @@ class CfgDlg(wxDialog):
         
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        hsizer.Add(1, 1, 1)
+        hsizer.Add((1, 1), 1)
         
         applyBtn = wxButton(self, -1, "Apply")
         hsizer.Add(applyBtn, 0, wxALL, 5)
