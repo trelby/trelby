@@ -88,7 +88,6 @@ class CfgDlg(wxDialog):
             self.AddPage(FormattingPanel, "Formatting")
             self.AddPage(PaperPanel, "Paper")
             self.AddPage(PDFPanel, "PDF")
-            self.AddPage(PDFFontsPanel, "PDF/Fonts")
             self.AddPage(StringsPanel, "Strings")
 
         size = self.listbook.GetContainingSize()
@@ -96,8 +95,7 @@ class CfgDlg(wxDialog):
         hsizer.SetItemMinSize(self.panel, *size)
         self.listbook.SetPageSizes(*size)
 
-        # FIXME
-        self.listbook.SetSelection(4)
+        self.listbook.SetSelection(0)
 
         # it's unclear whether SetSelection sends an event on all
         # platforms or not, so force correct action.
@@ -233,7 +231,7 @@ class DisplayPanel(wxPanel):
         self.cfg.pbi = self.pbRb.GetSelection()
 
     def updateFontLb(self):
-        names = ["Normal", "Bold", "Italic", "Bold-Italic"]
+        names = ["Normal", "Bold", "Italic", "Bold + Italic"]
 
         for i in range(len(names)):
             nfi = wxNativeFontInfo()
@@ -601,9 +599,6 @@ class PaperPanel(wxPanel):
         label2 = wxStaticText(parent, -1, "inch")
         sizer.Add(label2, 0, wxALIGN_CENTER_VERTICAL)
 
-        # TODO: I don't think the LabelMm/LabelInch variables need to be
-        # stored?
-        
         setattr(self, name.lower() + "EntryMm", entry)
         setattr(self, name.lower() + "LabelMm", label)
         
@@ -1266,113 +1261,3 @@ class PDFPanel(wxPanel):
         self.removeNotesCb.SetValue(self.cfg.pdfRemoveNotes)
         self.outlineNotesCb.SetValue(self.cfg.pdfOutlineNotes)
         self.marginsCb.SetValue(self.cfg.pdfShowMargins)
-
-class PDFFontsPanel(wxPanel):
-    def __init__(self, parent, id, cfg):
-        wxPanel.__init__(self, parent, id)
-        self.cfg = cfg
-
-        self.blockEvents = True
-
-        # last directory we chose a font from
-        self.lastDir = ""
-        
-        vsizer = wxBoxSizer(wxVERTICAL)
-
-        vsizer.Add(wxStaticText(self, -1, "blaabeti blaa bllakdjsd lskd\n"
-                                "sdfjlskjflskjflksjflksdj jsdlkf lskd fjl\n"
-                                "sdlkfj sldfj sldkfj lsdkfj lksd\n"))
-
-        hsizer = wxBoxSizer(wxHORIZONTAL)
-        
-        hsizer.Add(wxStaticText(self, -1, "Type:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-
-        self.typeCombo = wxComboBox(self, -1, style = wxCB_READONLY)
-
-        for pfi in self.cfg.getPDFFontIds():
-            pf = self.cfg.getPDFFont(pfi)
-            self.typeCombo.Append(pf.name, pfi)
-
-        hsizer.Add(self.typeCombo, 0)
-
-        vsizer.Add(hsizer, 0, wxEXPAND)
-
-        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 10)
-
-        gsizer = wxFlexGridSizer(2, 3, 5, 5)
-        gsizer.AddGrowableCol(1)
-
-        self.addEntry("nameEntry", "Name:", self, gsizer)
-        gsizer.Add((1,1), 0)
-
-        self.addEntry("fileEntry", "File:", self, gsizer)
-        btn = wxButton(self, -1, "Browse")
-        gsizer.Add(btn)
-
-        EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
-
-        vsizer.Add(gsizer, 0, wxEXPAND)
-
-        util.finishWindow(self, vsizer, center = False)
-
-        EVT_COMBOBOX(self, self.typeCombo.GetId(), self.OnTypeCombo)
-
-        self.typeCombo.SetSelection(0)
-        self.OnTypeCombo()
-
-        self.blockEvents = False
-
-    def addEntry(self, name, descr, parent, sizer):
-        sizer.Add(wxStaticText(parent, -1, descr), 0,
-                  wxALIGN_CENTER_VERTICAL)
-        
-        entry = wxTextCtrl(parent, -1)
-        sizer.Add(entry, 1, wxEXPAND)
-
-        setattr(self, name, entry)
-
-        EVT_TEXT(self, entry.GetId(), self.OnMisc)
-
-    def OnMisc(self, event):
-        if self.blockEvents:
-            return
-
-        self.pf.pdfName = self.nameEntry.GetValue()
-        self.pf.filename = self.fileEntry.GetValue()
-
-    def OnBrowse(self, event):
-        if self.pf.filename:
-            dDir = os.path.dirname(self.pf.filename)
-            dFile = os.path.basename(self.pf.filename)
-        else:
-            dDir = self.lastDir
-            dFile = ""
-                           
-        dlg = wxFileDialog(cfgFrame, "Choose font file",
-            defaultDir = dDir, defaultFile = dFile,
-            wildcard = "TrueType fonts (*.ttf;*.TTF)|*.ttf;*.TTF|All files|*",
-            style = wxOPEN)
-
-        if dlg.ShowModal() == wxID_OK:
-            self.fileEntry.SetValue(dlg.GetPath())
-            self.lastDir = os.path.dirname(dlg.GetPath())
-
-            # FIXME: read font name from font file and fill in
-            # self.pf.pdfName
-            
-        dlg.Destroy()
-
-    def OnTypeCombo(self, event = None):
-        self.blockEvents = True
-
-        pfi = self.typeCombo.GetClientData(self.typeCombo.GetSelection())
-        self.pf = self.cfg.getPDFFont(pfi)
-        
-        self.cfg2gui()
-
-        self.blockEvents = False
-
-    def cfg2gui(self):
-        self.nameEntry.SetValue(self.pf.pdfName)
-        self.fileEntry.SetValue(self.pf.filename)

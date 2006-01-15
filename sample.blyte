@@ -135,14 +135,6 @@ Element/Note/Export/AllCaps:False
 Element/Note/Export/Bold:False
 Element/Note/Export/Italic:True
 Element/Note/Export/Underlined:False
-Font/Bold-Italic/Name:bi1
-Font/Bold-Italic/Filename:bi2
-Font/Bold/Name:b1
-Font/Bold/Filename:b2
-Font/Italic/Name:i1
-Font/Italic/Filename:i2
-Font/Normal/Name:n\E4n n\E4n n\E4\E4
-Font/Normal/Filename:/home/osku/blyte/trunk/yo\0Akaks.ttf
 #End-Config 
 #Begin-Locations 
 Locations:0
@@ -151,11 +143,15 @@ Locations:0
 Words:1
 Words/1:pilots'
 #End-Spell-Checker-Dict 
+#Title-String 0.000000,80.000000,32,cb,Times,,THE KOALA INCIDENT
+#Title-String 0.000000,100.000000,12,c,Courier,,by
+#Title-String 0.000000,108.470000,12,c,Courier,,Anonymous Person
+#Title-String 67.000000,200.000000,12,c,Courier,,Sample script for Blyte.
+#Title-String 160.000000,208.000000,12,c,Courier,,All rights reserved.
 #Header-String 1,0,r,,${PAGE}.
 #Header-Empty-Lines 1
 #Start-Script 
 .\ext. stonehenge - night
-..EXT. STONEHENGE - NIGHT
 ..SUPER: "STONEHENGE - 00:30"
 >.A blizzard rages. Snow is everywhere and visibility is
 >.almost zero. Only at brief moments do we catch sight of the

@@ -82,7 +82,7 @@ class PDFExporter:
                 firstPageNr + doc.defPage * 2)
 
         self.addXref(65535, "f")
-        self.data += "%PDF-1.5\n"
+        self.data += "%PDF-1.4\n"
         
         self.addObj("<< /Type /Catalog\n"
                     "/Pages %d 0 R\n"
@@ -271,61 +271,14 @@ class PDFExporter:
                     self.y(toc.op.y), self.escapeStr(toc.text),
                     prevStr, nextStr))
 
-        fdNr = firstFontNr + self.fontCnt
-
-        #fname = "NimbusMonL-Bold"
-        #ftype = "Type1"
-
-        #fname = "CourierFinalDraft"
-        #fname = "CourierFinalDraftItalic"
-        #fname = "CourierNew"
-        fname = "ComicSansMS"
-        #fname = "Ghostwriter"
-        ftype = "TrueType"
-        
         for fi in self.fonts.itervalues():
             if fi.number != -1:
-                if fi.name == "Courier-Bold":
-                    self.addObj("<< /Type /Font\n"
-                                "/Subtype /%s\n"
-                                "/BaseFont /%s\n"
-                                "/Encoding /WinAnsiEncoding\n"
-                                "/FirstChar 0\n"
-                                "/LastChar 255\n"
-                                "/Widths [%s]\n"
-                                "/FontDescriptor %d 0 R\n"
-                                ">>" % (ftype, fname,
-                                        ("600 " * 256).rstrip(), fdNr))
-                else:
-                    self.addObj("<< /Type /Font\n"
-                                "/Subtype /Type1\n"
-                                "/BaseFont /%s\n"
-                                "/Encoding /WinAnsiEncoding\n"
-                                ">>" % fi.name)
-                    
-        self.addObj("<< /Type /FontDescriptor\n"
-                    "/FontName /%s\n"
+                self.addObj("<< /Type /Font\n"
+                            "/Subtype /Type1\n"
+                            "/BaseFont /%s\n"
+                            "/Encoding /WinAnsiEncoding\n"
+                            ">>" % fi.name)
 
-                    # FIXME: i don't think this does any good?
-                    #"/FontFamily /Courier\n"
-                    
-                    "/FontWeight 400\n"
-                    "/Flags 35\n"
-                    "/FontBBox [-23 -250 715 805]\n"
-                    "/ItalicAngle 0\n"
-                    "/Ascent 629\n"
-                    "/Descent -157\n"
-                    "/CapHeight 562\n"
-                    "/StemV 51\n"
-                    "/FontFile2 %d 0 R\n"
-                    ">>" % (fname, fdNr + 1))
-                    #">>" % fname)
-
-        #fontData = open("Comic_Sans_MS.ttf", "r").read()
-        #fontData = open("Courier_New.ttf", "r").read()
-        fontData = open("Courier Final Draft Bold.TTF", "r").read()
-        self.addFontStream(fontData)
-            
         xrefPos = len(self.data)
 
         self.data += "xref\n0 %d\n" % (self.objectCnt)
@@ -343,7 +296,7 @@ class PDFExporter:
     # add new stream. 's' is all data between 'stream/endstream' tags,
     # excluding newlines.
     def addStream(self, s):
-        compress = False
+        compress = True
 
         filterStr = " "
         if compress:
@@ -354,20 +307,6 @@ class PDFExporter:
                     "stream\n"
                     "%s\n"
                     "endstream" % (len(s), filterStr, s))
-
-    def addFontStream(self, s):
-        compress = True
-
-        filterStr = " "
-        if compress:
-            s = s.encode("zlib")
-            filterStr = "\n/Filter /FlateDecode "
-        
-        self.addObj("<< /Length %d\n"
-                    "/Length1 %d%s>>\n"
-                    "stream\n"
-                    "%s\n"
-                    "endstream" % (len(s), len(s), filterStr, s))
         
     # add new object. 's' is all data between 'obj/endobj' tags, excluding
     # newlines. adds an xref for the object also.
