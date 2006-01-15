@@ -52,6 +52,11 @@ PBI_REAL_AND_UNADJ = 2
 # for range checking above value
 PBI_FIRST, PBI_LAST = PBI_NONE, PBI_REAL_AND_UNADJ
 
+# constants for identifying PDFFontInfos
+PDF_FONT_NORMAL = "Normal"
+PDF_FONT_BOLD = "Bold"
+PDF_FONT_ITALIC = "Italic"
+PDF_FONT_BOLD_ITALIC = "Bold-Italic"
 
 # construct reverse lookup tables
 
@@ -266,6 +271,57 @@ class FontInfo:
         self.fx = 1
         self.fy = 1
 
+# information about one PDF font
+class PDFFontInfo:
+    cvars = None
+
+    # list of characters not allowed in pdfNames (control characters,
+    # whitespace, non-ASCII characters)
+    invalidChars = None
+    
+    def __init__(self, name):
+        # our name for the font (one of the PDF_FONT_* constants)
+        self.name = name
+
+        if not self.__class__.cvars:
+            v = self.__class__.cvars = mypickle.Vars()
+
+            # name to use in generated PDF file (CourierNew, MyFontBold,
+            # etc.). if empty, use the default PDF Courier font.
+            v.addStr("pdfName", "", "Name")
+
+            # filename for the font to embed, or empty meaning don't
+            # embed.
+            v.addStr("filename", "", "Filename")
+            
+            v.makeDicts()
+
+            tmp = ""
+
+            for i in range(256):
+                if (i <= 32) or (i >= 127):
+                    tmp += chr(i)
+
+            self.__class__.invalidChars = tmp
+            
+        self.__class__.cvars.setDefaults(self)
+            
+    def save(self, prefix):
+        prefix += "%s/" % self.name
+
+        return self.cvars.save(prefix, self)
+
+    def load(self, vals, prefix):
+        prefix += "%s/" % self.name
+        
+        self.cvars.load(vals, prefix, self)
+
+        self.refresh()
+
+    # fix up invalid values.
+    def refresh(self):
+        self.pdfName = util.deleteChars(self.pdfName, self.invalidChars)
+
 # per-script config, each script has its own one of these.
 class Config:
     cvars = None
@@ -337,6 +393,12 @@ class Config:
         t.screen.isItalic = True
         t.export.isItalic = True
         self.types[t.lt] = t
+
+        # pdf font configs, key = PDF_FONT_*, value = PdfFontInfo
+        self.pdfFonts = { }
+
+        for fn in self.getPDFFontIds():
+            self.pdfFonts[fn] = PDFFontInfo(fn)
 
         self.recalc()
 
@@ -416,8 +478,8 @@ class Config:
 
         self.cvars.load(vals, "", self)
 
-        for t in self.types.itervalues():
-            t.load(vals, "Element/")
+        for pf in self.pdfFonts.itervalues():
+            pf.load(vals, "Font/")
 
         self.recalc()
         
@@ -428,6 +490,9 @@ class Config:
         for t in self.types.itervalues():
             s += t.save("Element/")
             
+        for pf in self.pdfFonts.itervalues():
+            s += pf.save("Font/")
+
         return s
             
     # fix up all invalid config values and recalculate all variables
@@ -450,6 +515,9 @@ class Config:
         for it in self.cvars.stringNoEscape.itervalues():
             setattr(self, it.name, util.toInputStr(getattr(self, it.name)))
             
+        for pf in self.pdfFonts.itervalues():
+            pf.refresh()
+
         # make sure usable space on the page isn't too small
         if doAll and (self.marginTop + self.marginBottom) >= \
                (self.paperHeight - 100.0):
@@ -463,6 +531,15 @@ class Config:
 
     def getType(self, lt):
         return self.types[lt]
+
+    # get a PDFFontInfo object for the given font type (PDF_FONT_*)
+    def getPDFFont(self, fontType):
+        return self.pdfFonts[fontType]
+
+    # return a tuple of all the PDF font types
+    def getPDFFontIds(self):
+        return (PDF_FONT_NORMAL, PDF_FONT_BOLD, PDF_FONT_ITALIC,
+                PDF_FONT_BOLD_ITALIC)
 
 # global config. there is only ever one of these active.
 class ConfigGlobal:

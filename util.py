@@ -50,11 +50,15 @@ _input_tbl = ""
 # converts everything else to z.
 _normalize_tbl = ""
 
+# identity table that maps each character to itself. used by deleteChars.
+_identity_tbl = ""
+
 # permanent memory DC to get text extents etc
 permDc = None
 
 def init(doWX = True):
-    global _to_upper, _to_lower, _input_tbl, _normalize_tbl, permDc
+    global _to_upper, _to_lower, _input_tbl, _normalize_tbl, _identity_tbl, \
+           permDc
 
     # setup ISO-8859-1 case-conversion stuff
     tmpUpper = []
@@ -91,6 +95,8 @@ def init(doWX = True):
             ch = "z"
 
         _normalize_tbl += ch
+
+    _identity_tbl = "".join([chr(i) for i in range(256)])
 
     if doWX:
         # dunno if the bitmap needs to be big enough to contain the text
@@ -136,6 +142,10 @@ def toInputStr(s):
 # replace s[start:start + width] with toInputStr(new) and return s
 def replace(s, new, start, width):
     return s[0 : start] + toInputStr(new) + s[start + width:]
+
+# delete all characters in 'chars' (a string) from s and return that.
+def deleteChars(s, chars):
+    return s.translate(_identity_tbl, chars)
 
 # returns s with all possible different types of newlines converted to
 # unix newlines, i.e. a single "\n"
