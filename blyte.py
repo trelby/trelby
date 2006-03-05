@@ -195,7 +195,11 @@ class MyPanel(wxPanel):
 class MyCtrl(wxControl):
 
     def __init__(self, parent, id):
-        wxControl.__init__(self, parent, id, style=wxWANTS_CHARS)
+        style = wxWANTS_CHARS
+        if misc.wx26:
+            style |= wxFULL_REPAINT_ON_RESIZE
+            
+        wxControl.__init__(self, parent, id, style = style)
 
         self.panel = parent
         
@@ -2318,12 +2322,12 @@ class MyApp(wxApp):
     def OnInit(self):
         global cfgGl, mainFrame, gd
 
-        if (wxMAJOR_VERSION != 2) or (wxMINOR_VERSION != 4) or (
-            wxRELEASE_NUMBER < 2):
+        if (wxMAJOR_VERSION != 2) or ((wxMINOR_VERSION != 4) and \
+                                      (wxMINOR_VERSION != 6)):
             wxMessageBox("You seem to have an invalid version\n"
                          "(%s) of wxWidgets installed. This\n"
-                         "program needs version 2.4.x, where\n"
-                         "x >= 2." % wxVERSION_STRING, "Error", wxOK)
+                         "program needs version 2.4 or 2.6." %
+                         wxVERSION_STRING, "Error", wxOK)
             sys.exit()
 
         misc.init()

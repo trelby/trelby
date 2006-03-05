@@ -8,7 +8,7 @@ import sys
 from wxPython.wx import *
 
 def init(doWX = True):
-    global isWindows, isUnix, progPath, confPath, tmpPrefix
+    global isWindows, isUnix, wx26, progPath, confPath, tmpPrefix
 
     # prefix used for temp files
     tmpPrefix = "oskusoft-blyte-tmp-"
@@ -20,6 +20,8 @@ def init(doWX = True):
         isWindows = True
     else:
         isUnix = True
+
+    wx26 = (wxMAJOR_VERSION == 2) and (wxMINOR_VERSION == 6)
 
     # stupid hack to keep testcases working, since they don't initialize
     # opts (the doWX name is just for similary with util, and to confuse
