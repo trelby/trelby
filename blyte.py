@@ -2356,6 +2356,20 @@ class MyApp(wxApp):
                              "requirement for this program.", "Error", wxOK)
                 sys.exit()
 
+            # since we only distribute self-contained bundles on Windows,
+            # this should not happen, but let's catch any mistakes as soon
+            # as possible.
+            if not misc.wx26:
+                wxMessageBox("On Windows, only wxWidgets 2.6 is supported.",
+                             "Error", wxOK)
+                sys.exit()
+
+        if misc.wx26 and not misc.wxIsUnicode:
+            wxMessageBox("You seem to be using a non-Unicode build of\n"
+                         "wxWidgets 2.6. This is not supported.",
+                         "Error", wxOK)
+            sys.exit()
+
         os.chdir(misc.progPath)
         
         cfgGl = config.ConfigGlobal()

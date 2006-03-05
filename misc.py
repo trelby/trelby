@@ -8,7 +8,8 @@ import sys
 from wxPython.wx import *
 
 def init(doWX = True):
-    global isWindows, isUnix, wx26, progPath, confPath, tmpPrefix
+    global isWindows, isUnix, unicodeFS, wx26, wxIsUnicode, progPath, \
+           confPath, tmpPrefix
 
     # prefix used for temp files
     tmpPrefix = "oskusoft-blyte-tmp-"
@@ -21,7 +22,16 @@ def init(doWX = True):
     else:
         isUnix = True
 
+    # are we using wxWidgets 2.6
     wx26 = (wxMAJOR_VERSION == 2) and (wxMINOR_VERSION == 6)
+
+    # are we using a Unicode build of wxWidgets
+    wxIsUnicode = wx26 and ("unicode" in wxPlatformInfo)
+
+    # does this platform support using Python's unicode strings in various
+    # filesystem calls; if not, we need to convert filenames to UTF-8
+    # before using them.
+    unicodeFS = isWindows
 
     # stupid hack to keep testcases working, since they don't initialize
     # opts (the doWX name is just for similary with util, and to confuse
