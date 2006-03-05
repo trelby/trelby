@@ -212,11 +212,12 @@ class FindDlg(wxDialog):
             self.moreButton.SetLabel("<<< Less")
             pos = self.elements.GetPosition()
             h = pos.y + len(self.elementTypes) * \
-                util.getFontHeight(self.elements.GetFont()) + 10
+                util.getFontHeight(self.elements.GetFont()) + 15
         else:
             self.moreButton.SetLabel("More >>>")
-            pos = self.extraLabel.GetPosition()
-            h = pos.y
+            h = max(self.extraLabel.GetPosition().y,
+                    self.moreButton.GetPosition().y +
+                    self.moreButton.GetClientSize().height)
 
         self.SetSizeHints(self.GetClientSize().width, h)
         util.setWH(self, h = h)
