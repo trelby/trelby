@@ -800,6 +800,7 @@ def removeTempFiles(prefix):
 # return True if given file exists.
 def fileExists(path):
     try:
+        # FIXME: unicode path handling
         os.stat(path)
     except OSError:
         return False
@@ -935,14 +936,15 @@ class TimerDev:
 
 # show PDF file.
 def showPDF(filename, cfgGl, frame):
-    try:
-        os.stat(cfgGl.pdfViewerPath)
-    except OSError:
+    def complain():
         wxMessageBox("PDF viewer application not found.\n\n"
                      "You can change your PDF viewer\n"
                      "settings at File/Settings/Change.", "Error", wxOK,
                      frame)
 
+    if not fileExists(cfgGl.pdfViewerPath):
+        complain()
+        
         return
     
     # on Windows, Acrobat complains about "invalid path" if we
@@ -950,7 +952,13 @@ def showPDF(filename, cfgGl, frame):
     # dummy arg.
     args = ["pdf"] + cfgGl.pdfViewerArgs.split() + [filename]
 
-    # FIXME: investigate if spawnv supports unicode string as program name
-    # in Python 2.3 (maybe also test Python 2.4 and switch to it on
-    # Windows if needed?)
-    os.spawnv(os.P_NOWAIT, cfgGl.pdfViewerPath, args)
+    # there's a race condition in checking if the path exists, above, and
+    # using it, below. if the file disappears between those two we get an
+    # OSError exception from spawnv, so we need to catch it and handle it.
+    
+    # TODO: spawnv does not support Unicode paths as of this moment
+    # (Python 2.4). for now, convert it to UTF-8 and hope for the best.
+    try:
+        os.spawnv(os.P_NOWAIT, cfgGl.pdfViewerPath.encode("UTF-8"), args)
+    except OSError:
+        complain()

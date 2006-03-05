@@ -846,11 +846,10 @@ class ConfigGlobal:
             s1 = r"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe"
             s2 = ""
         else:
-            s1 = "not set yet (unknown platform %s)"\
-                                 % wxPlatform
+            s1 = "not set yet (unknown platform %s)" % wxPlatform
             s2 = ""
 
-        v.addStrUnicode("pdfViewerPath", s1, "PDF/ViewerPath")
+        v.addStrUnicode("pdfViewerPath", unicode(s1), "PDF/ViewerPath")
         v.addStrBinary("pdfViewerArgs", s2, "PDF/ViewerArguments")
 
         # fonts

@@ -47,6 +47,10 @@ def init(doWX = True):
             progPath = r"C:\Program Files\Oskusoft\Blyte"
             confPath = progPath + r"\conf"
 
+    # convert the path settings to Unicode
+    progPath = unicode(progPath, "UTF-8")
+    confPath = unicode(confPath, "UTF-8")
+
 class MyColorSample(wxWindow):
     def __init__(self, parent, id, size):
         wxWindow.__init__(self, parent, id, size = size)

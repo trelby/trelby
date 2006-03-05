@@ -102,7 +102,7 @@ class GlobalData:
         v.addStrBinary("license", "", "License")
 
         v.addList("files", [], "Files",
-                  mypickle.StrUnicodeVar("", "", ""))
+                  mypickle.StrUnicodeVar("", u"", ""))
         
         v.makeDicts()
         v.setDefaults(self)
