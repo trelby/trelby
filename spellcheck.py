@@ -22,7 +22,7 @@ def loadDict(frame):
         return True
 
     # use dict_en.dat if if exists, dict_en.dat.gz otherwise
-    fname = "dict_en.dat"
+    fname = u"dict_en.dat"
     doGz = False
     
     if not util.fileExists(fname):
@@ -44,7 +44,7 @@ def loadDict(frame):
             s = f.read()
         except:
             wxMessageBox("Error loading file '%s': Decompression failed" % \
-                         fname, "Error", wxOK, frame)
+                         misc.toGUIUnicode(fname), "Error", wxOK, frame)
 
             return False
     

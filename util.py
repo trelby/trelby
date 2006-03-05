@@ -2,6 +2,7 @@ from error import *
 
 import datetime
 import glob
+import misc
 import os
 import re
 import sha
@@ -753,9 +754,9 @@ class String:
 # as parent on errors.
 def loadFile(filename, frame, maxSize = -1):
     ret = None
-    
+
     try:
-        f = open(filename, "rb")
+        f = open(misc.toPath(filename), "rb")
 
         try:
             ret = f.read(maxSize)
@@ -763,8 +764,8 @@ def loadFile(filename, frame, maxSize = -1):
             f.close()
 
     except IOError, (errno, strerror):
-        wxMessageBox("Error loading file '%s': %s" % (filename, strerror),
-                     "Error", wxOK, frame)
+        wxMessageBox("Error loading file '%s': %s" % (
+            misc.toGUIUnicode(filename), strerror), "Error", wxOK, frame)
         ret = None
 
     return ret
@@ -773,7 +774,7 @@ def loadFile(filename, frame, maxSize = -1):
 # parent on errors. returns True on success.
 def writeToFile(filename, data, frame):
     try:
-        f = open(filename, "wb")
+        f = open(misc.toPath(filename), "wb")
 
         try:
             f.write(data)
@@ -783,8 +784,8 @@ def writeToFile(filename, data, frame):
         return True
     
     except IOError, (errno, strerror):
-        wxMessageBox("Error writing file '%s': %s" % (filename, strerror),
-                     "Error", wxOK, frame)
+        wxMessageBox("Error writing file '%s': %s" % (
+            misc.toGUIUnicode(filename), strerror), "Error", wxOK, frame)
 
         return False
 
@@ -800,8 +801,7 @@ def removeTempFiles(prefix):
 # return True if given file exists.
 def fileExists(path):
     try:
-        # FIXME: unicode path handling
-        os.stat(path)
+        os.stat(misc.toPath(path))
     except OSError:
         return False
 

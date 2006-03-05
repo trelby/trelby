@@ -143,8 +143,9 @@ class FindDlg(wxDialog):
     def saveState(self):
         self.getParams()
         
-        self.ctrl.findDlgFindText = self.findEntry.GetValue()
-        self.ctrl.findDlgReplaceText = self.replaceEntry.GetValue()
+        self.ctrl.findDlgFindText = misc.fromGUI(self.findEntry.GetValue())
+        self.ctrl.findDlgReplaceText = misc.fromGUI(
+            self.replaceEntry.GetValue())
         self.ctrl.findDlgMatchWholeWord = self.matchWhole
         self.ctrl.findDlgMatchCase = self.matchCase
         self.ctrl.findDlgDirUp = self.dirUp
@@ -241,7 +242,7 @@ class FindDlg(wxDialog):
         if not autoFind:
             self.getParams()
 
-        value = self.findEntry.GetValue()
+        value = misc.fromGUI(self.findEntry.GetValue())
         if not self.matchCase:
             value = util.upper(value)
 
@@ -359,7 +360,7 @@ class FindDlg(wxDialog):
             
     def OnReplace(self, event = None, autoFind = False):
         if self.ctrl.searchLine != -1:
-            value = util.toInputStr(self.replaceEntry.GetValue())
+            value = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue()))
             ls = self.ctrl.sp.lines
 
             ls[self.ctrl.searchLine].text = util.replace(

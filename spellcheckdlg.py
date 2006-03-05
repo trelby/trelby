@@ -115,7 +115,7 @@ class SpellCheckDlg(wxDialog):
         if not self.sc.word:
             return
         
-        word = util.toInputStr(self.replaceEntry.GetValue())
+        word = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue()))
         ls = self.ctrl.sp.lines
 
         ls[self.sc.line].text = util.replace(

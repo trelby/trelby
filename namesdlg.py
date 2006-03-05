@@ -135,7 +135,7 @@ class NamesDlg(wxDialog):
 
         wxBeginBusyCursor()
         
-        s = util.lower(self.searchEntry.GetValue())
+        s = util.lower(misc.fromGUI(self.searchEntry.GetValue()))
         sex = self.sexRb.GetSelection()
         nt = self.nameRb.GetSelection()
 

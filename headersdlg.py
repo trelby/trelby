@@ -291,7 +291,7 @@ class HeadersDlg(wxDialog):
 
         h = self.headers.hdrs[self.hdrIndex]
         
-        h.text = util.toInputStr(self.textEntry.GetValue())
+        h.text = util.toInputStr(misc.fromGUI(self.textEntry.GetValue()))
         self.stringsLb.SetString(self.hdrIndex, h.text)
         
         h.xoff = util.getSpinValue(self.xoffEntry)

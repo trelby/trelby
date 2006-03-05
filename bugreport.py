@@ -86,4 +86,4 @@ class BugReportDlg(wxDialog):
             self.brh.copyPos = len(self.brh.data)
             s = str(self.brh.data).encode("base64").encode("rot13")
             
-            util.writeToFile(dlg.GetPath(), s, self)
+            util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()), s, self)

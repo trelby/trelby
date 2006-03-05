@@ -1,3 +1,4 @@
+import misc
 import util
 
 from wxPython.wx import *
@@ -50,7 +51,7 @@ class SCDictDlg(wxDialog):
         self.EndModal(wxID_CANCEL)
 
     def OnMisc(self, event):
-        self.scDict.set(self.itemsEntry.GetValue().split("\n"))
-                         
+        self.scDict.set(misc.fromGUI(self.itemsEntry.GetValue()).split("\n"))
+
     def cfg2gui(self):
         self.itemsEntry.SetValue("\n".join(self.scDict.get()))

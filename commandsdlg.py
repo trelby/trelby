@@ -1,3 +1,4 @@
+import misc
 import util
 
 import xml.sax.saxutils as xss
@@ -84,6 +85,7 @@ R                      Replace
             style = wxSAVE | wxOVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wxID_OK:
-            util.writeToFile(dlg.GetPath(), self.html, self)
+            util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()), self.html,
+                             self)
             
         dlg.Destroy()

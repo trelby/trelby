@@ -51,6 +51,44 @@ def init(doWX = True):
     progPath = unicode(progPath, "UTF-8")
     confPath = unicode(confPath, "UTF-8")
 
+# convert s, which is returned from the wxWidgets GUI and is either an
+# Unicode string or a normal string, to a normal string.
+def fromGUI(s):
+    if not wxIsUnicode:
+        return s
+    else:
+        return s.encode("ISO-8859-1", "ignore")
+
+# convert s, which is returned from the wxWidgets GUI and is either an
+# Unicode string or a normal string, to a Unicode string. since the only
+# thing we use full Unicode for is file/directory names, and those are
+# UTF-8 on UNIXes, we use that instead of ISO-8859-1 here.
+def fromGUIUnicode(s):
+    if wxIsUnicode:
+        return s
+    else:
+        return unicode(s, "UTF-8", "ignore")
+
+# convert s, which is an Unicode string, to a form suitable for passing to
+# wxWidgets for display. since the only thing we use full Unicode for is
+# file/directory names, and those are UTF-8 on UNIXes, we use that instead
+# of ISO-8859-1 here.
+def toGUIUnicode(s):
+    if wxIsUnicode:
+        return s
+    else:
+        return s.encode("UTF-8")
+
+# convert s, which is an Unicode string, to an object suitable for passing
+# to Python's file APIs. this is either the Unicode string itself, if the
+# platform supports Unicode-based APIs (and Python has implemented support
+# for it), or the Unicode string converted to UTF-8 on other platforms.
+def toPath(s):
+    if unicodeFS:
+        return s
+    else:
+        return s.encode("UTF-8")
+
 class MyColorSample(wxWindow):
     def __init__(self, parent, id, size):
         wxWindow.__init__(self, parent, id, size = size)
@@ -393,7 +431,7 @@ class TextInputDlg(wxDialog):
             event.Skip()
 
     def OnOK(self, event = None):
-        self.input = self.tc.GetValue()
+        self.input = fromGUI(self.tc.GetValue())
 
         if self.validateFunc:
             msg = self.validateFunc(self.input)
@@ -439,13 +477,13 @@ class KeyDlgWidget(wxWindow):
         p.key = util.Key.fromKE(ev)
         p.EndModal(wxID_OK)
 
-# handles the "Most recently used" list of files in a menu. uses 
+# handles the "Most recently used" list of files in a menu.
 class MRUFiles:
     def __init__(self, maxCount):
         # max number of items
         self.maxCount = maxCount
 
-        # items (strings)
+        # items (Unicode strings)
         self.items = []
 
         for i in range(self.maxCount):
@@ -502,7 +540,8 @@ class MRUFiles:
         # add new menu items
         for i in range(self.getCount()):
             self.menu.Insert(self.menuPos + i, self.firstId + i,
-                             "&%d %s" % (i + 1, os.path.basename(self.get(i))))
+                             "&%d %s" % (
+                i + 1, toGUIUnicode(os.path.basename(self.get(i)))))
 
     # return number of items.
     def getCount(self):

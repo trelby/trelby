@@ -1,3 +1,4 @@
+import misc
 import util
 
 from wxPython.wx import *
@@ -87,7 +88,7 @@ class AutoCompletionDlg(wxDialog):
         # but I don't want to call that since it does all types, this does
         # just the changed one.
         tmp = []
-        for v in self.itemsEntry.GetValue().split("\n"):
+        for v in misc.fromGUI(self.itemsEntry.GetValue()).split("\n"):
             v = util.toInputStr(v).strip()
 
             if len(v) > 0:

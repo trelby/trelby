@@ -1,3 +1,4 @@
+import misc
 import namearray
 import array
 
@@ -140,7 +141,7 @@ def readNames(filename):
     names = namearray.NameArray()
     
     try:
-        f = open(filename, "rb")
+        f = open(misc.toPath(filename), "rb")
 
         try:
             data = f.read()

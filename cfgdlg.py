@@ -1031,9 +1031,10 @@ class MiscPanel(wxPanel):
         event.Skip()
 
     def OnMisc(self, event = None):
-        self.cfg.scriptDir = self.scriptDirEntry.GetValue().rstrip("/\\")
-        self.cfg.pdfViewerPath = self.progEntry.GetValue()
-        self.cfg.pdfViewerArgs = self.argsEntry.GetValue()
+        self.cfg.scriptDir = misc.fromGUIUnicode(
+            self.scriptDirEntry.GetValue()).rstrip("/\\")
+        self.cfg.pdfViewerPath = misc.fromGUIUnicode(self.progEntry.GetValue())
+        self.cfg.pdfViewerArgs = misc.fromGUI(self.argsEntry.GetValue())
         self.cfg.capitalize = self.autoCapSentences.GetValue()
         self.cfg.capitalizeI = self.autoCapI.GetValue()
         self.cfg.honorSavedPos = self.honorSavedPos.GetValue()
@@ -1043,8 +1044,9 @@ class MiscPanel(wxPanel):
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
 
     def OnBrowse(self, event):
-        dlg = wxDirDialog(cfgFrame, defaultPath = self.cfg.scriptDir,
-                          style = wxDD_NEW_DIR_BUTTON)
+        dlg = wxDirDialog(cfgFrame,
+            defaultPath = misc.toGUIUnicode(self.cfg.scriptDir),
+            style = wxDD_NEW_DIR_BUTTON)
 
         if dlg.ShowModal() == wxID_OK:
             self.scriptDirEntry.SetValue(dlg.GetPath())
@@ -1053,8 +1055,8 @@ class MiscPanel(wxPanel):
             
     def OnBrowsePDF(self, event):
         dlg = wxFileDialog(cfgFrame, "Choose program",
-            os.path.dirname(self.cfg.pdfViewerPath), self.cfg.pdfViewerPath,
-            style = wxOPEN)
+            misc.toGUIUnicode(os.path.dirname(self.cfg.pdfViewerPath)),
+            misc.toGUIUnicode(self.cfg.pdfViewerPath), style = wxOPEN)
 
         if dlg.ShowModal() == wxID_OK:
             self.progEntry.SetValue(dlg.GetPath())
@@ -1067,8 +1069,8 @@ class MiscPanel(wxPanel):
         self.paginateEntry.SetValue(5)
         self.confDelEntry.SetValue(5)
 
-        self.scriptDirEntry.SetValue(self.cfg.scriptDir)
-        self.progEntry.SetValue(self.cfg.pdfViewerPath)
+        self.scriptDirEntry.SetValue(misc.toGUIUnicode(self.cfg.scriptDir))
+        self.progEntry.SetValue(misc.toGUIUnicode(self.cfg.pdfViewerPath))
         self.argsEntry.SetValue(self.cfg.pdfViewerArgs)
         self.autoCapSentences.SetValue(self.cfg.capitalize)
         self.autoCapI.SetValue(self.cfg.capitalizeI)
@@ -1198,7 +1200,7 @@ class StringsPanel(wxPanel):
 
     def OnMisc(self, event = None):
         for it in self.items:
-            setattr(self.cfg, it, getattr(self, it).GetValue())
+            setattr(self.cfg, it, misc.fromGUI(getattr(self, it).GetValue()))
 
     def cfg2gui(self):
         for it in self.items:

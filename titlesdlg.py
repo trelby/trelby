@@ -384,7 +384,7 @@ class TitlesDlg(wxDialog):
 
         ts = self.titles.pages[self.pageIndex][self.tsIndex]
         
-        ts.text = util.toInputStr(self.textEntry.GetValue())
+        ts.text = util.toInputStr(misc.fromGUI(self.textEntry.GetValue()))
         self.stringsLb.SetString(self.tsIndex, ts.text)
         
         ts.x = util.str2float(self.xEntry.GetValue(), 0.0)
