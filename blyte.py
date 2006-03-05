@@ -1207,6 +1207,10 @@ class MyCtrl(wxControl):
 
         if not ev.ControlDown() and not ev.AltDown() and \
                util.isValidInputChar(kc):
+            # WX2.6-FIXME: we should probably use GetUnicodeKey() (dunno
+            # how to get around the isValidInputChar test in the preceding
+            # line, need to test what GetUnicodeKey() returns on
+            # non-input-character events)
             cs.char = chr(kc)
 
             if opts.isTest and (cs.char == "å"):

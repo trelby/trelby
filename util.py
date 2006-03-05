@@ -329,7 +329,8 @@ def getTextWidth(text, style, size):
     return (fontinfo.getTextWidth(text, style, size) / 72.0) * 25.4
 
 # create font that's height is <= 'height' pixels. other parameters are
-# the same as in wxFont's constructor.
+# the same as in wxFont's constructor. WX2.6-FIXME: wxFont now supports
+# this natively, research whether it's as good as this.
 def createPixelFont(height, family, style, weight):
     fs = 6
 

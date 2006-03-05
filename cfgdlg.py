@@ -10,8 +10,8 @@ from wxPython.wx import *
 # stupid hack to get correct window modality stacking for dialogs
 cfgFrame = None
 
-# we can delete this when/if we switch to using wxListBook in wxwidgets
-# 2.5
+# WX2.6-FIXME: we can delete this when/if we switch to using wxListBook in
+# wxWidgets 2.6
 class MyListBook(wxListBox):
     def __init__(self, parent):
         wxListBox.__init__(self, parent, -1)
