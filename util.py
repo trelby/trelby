@@ -382,6 +382,9 @@ def setWH(ctrl, w = -1, h = -1):
         
     ctrl.SetClientSizeWH(size.width, size.height)
 
+    if misc.wx26:
+        ctrl.SetMinSize(wxSize(size.width, size.height))
+
 # wxMSW doesn't respect the control's min/max values at all, so we have to
 # implement this ourselves
 def getSpinValue(spinCtrl):
