@@ -399,13 +399,13 @@ class Config:
         v.addInt("cursorColumn", 0, "Cursor/Column", 0, 1000000)
 
         # various strings we add to the script
-        v.addStrNoEscape("strMore", "(MORE)", "String/MoreDialogue")
-        v.addStrNoEscape("strContinuedPageEnd", "(CONTINUED)",
-                         "String/ContinuedPageEnd")
-        v.addStrNoEscape("strContinuedPageStart", "CONTINUED:",
-                         "String/ContinuedPageStart")
-        v.addStrNoEscape("strDialogueContinued", " (cont'd)",
-                         "String/DialogueContinued")
+        v.addStrLatin1("strMore", "(MORE)", "String/MoreDialogue")
+        v.addStrLatin1("strContinuedPageEnd", "(CONTINUED)",
+                       "String/ContinuedPageEnd")
+        v.addStrLatin1("strContinuedPageStart", "CONTINUED:",
+                       "String/ContinuedPageStart")
+        v.addStrLatin1("strDialogueContinued", " (cont'd)",
+                       "String/DialogueContinued")
 
         v.makeDicts()
         
@@ -447,7 +447,7 @@ class Config:
             for it in el.cvars.numeric.itervalues():
                 util.clampObj(el, it.name, it.minVal, it.maxVal)
 
-        for it in self.cvars.stringNoEscape.itervalues():
+        for it in self.cvars.stringLatin1.itervalues():
             setattr(self, it.name, util.toInputStr(getattr(self, it.name)))
             
         # make sure usable space on the page isn't too small
@@ -850,26 +850,27 @@ class ConfigGlobal:
                                  % wxPlatform
             s2 = ""
 
-        v.addStr("pdfViewerPath", s1, "PDF/ViewerPath")
-        v.addStr("pdfViewerArgs", s2, "PDF/ViewerArguments")
+        v.addStrUnicode("pdfViewerPath", s1, "PDF/ViewerPath")
+        v.addStrBinary("pdfViewerArgs", s2, "PDF/ViewerArguments")
 
         # fonts
         if misc.isUnix:
-            v.addStr("fontNormal", "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1", "FontNormal")
-            v.addStr("fontBold", "0;-adobe-courier-bold-r-normal-*-*-140-*-*-m-*-iso8859-1", "FontBold")
-            v.addStr("fontItalic", "0;-adobe-courier-medium-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontItalic")
-            v.addStr("fontBoldItalic", "0;-adobe-courier-bold-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontBoldItalic")
+            v.addStrBinary("fontNormal", "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1", "FontNormal")
+            v.addStrBinary("fontBold", "0;-adobe-courier-bold-r-normal-*-*-140-*-*-m-*-iso8859-1", "FontBold")
+            v.addStrBinary("fontItalic", "0;-adobe-courier-medium-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontItalic")
+            v.addStrBinary("fontBoldItalic", "0;-adobe-courier-bold-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontBoldItalic")
             
         elif misc.isWindows:
-            v.addStr("fontNormal", "0;-13;0;0;0;400;0;0;0;0;3;2;1;49;Courier New", "FontNormal")
-            v.addStr("fontBold", "0;-13;0;0;0;700;0;0;0;0;3;2;1;49;Courier New", "FontBold")
-            v.addStr("fontItalic", "0;-13;0;0;0;400;255;0;0;0;3;2;1;49;Courier New", "FontItalic")
-            v.addStr("fontBoldItalic", "0;-13;0;0;0;700;255;0;0;0;3;2;1;49;Courier New", "FontBoldItalic")
+            v.addStrBinary("fontNormal", "0;-13;0;0;0;400;0;0;0;0;3;2;1;49;Courier New", "FontNormal")
+            v.addStrBinary("fontBold", "0;-13;0;0;0;700;0;0;0;0;3;2;1;49;Courier New", "FontBold")
+            v.addStrBinary("fontItalic", "0;-13;0;0;0;400;255;0;0;0;3;2;1;49;Courier New", "FontItalic")
+            v.addStrBinary("fontBoldItalic", "0;-13;0;0;0;700;255;0;0;0;3;2;1;49;Courier New", "FontBoldItalic")
         else:
             raise ConfigError("unknown platform")
         
         # default script directory
-        v.addStr("scriptDir", misc.progPath, "DefaultScriptDirectory")
+        v.addStrUnicode("scriptDir", misc.progPath,
+                        "DefaultScriptDirectory")
         
         # colors
         v.addColor("text", 0, 0, 0, "TextFG", "Text foreground")

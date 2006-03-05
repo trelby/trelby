@@ -134,7 +134,7 @@ class TitleString:
     #
     # sample of the format: '0.000000,70.000000,24,cb,Helvetica,,text here'
     def load(self, s):
-        a = s.split(",", 6)
+        a = util.fromUTF8(s).split(",", 6)
 
         if len(a) != 7:
             return
@@ -170,4 +170,4 @@ class TitleString:
 
         s += ",,%s" % self.text
 
-        return s
+        return util.toUTF8(s)

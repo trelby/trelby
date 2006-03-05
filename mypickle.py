@@ -17,7 +17,7 @@ class Vars:
         self.all = self.getDict()
         self.color = self.getDict(ColorVar)
         self.numeric = self.getDict(NumericVar)
-        self.stringNoEscape = self.getDict(StrNoEscapeVar)
+        self.stringLatin1 = self.getDict(StrLatin1Var)
 
     # return dictionary containing given type of variable objects, or all
     # if typeObj is None.
@@ -100,11 +100,14 @@ class Vars:
     def addInt(self, *params):
         self.addVar(IntVar(*params))
 
-    def addStr(self, *params):
-        self.addVar(StrVar(*params))
+    def addStrLatin1(self, *params):
+        self.addVar(StrLatin1Var(*params))
 
-    def addStrNoEscape(self, *params):
-        self.addVar(StrNoEscapeVar(*params))
+    def addStrUnicode(self, *params):
+        self.addVar(StrUnicodeVar(*params))
+
+    def addStrBinary(self, *params):
+        self.addVar(StrBinaryVar(*params))
 
     def addElemName(self, *params):
         self.addVar(ElementNameVar(*params))
@@ -176,8 +179,33 @@ class IntVar(NumericVar):
 
     def fromStr(self, vals, val, prefix):
         return util.str2int(val, self.defVal, self.minVal, self.maxVal)
+
+# ISO-8859-1 (Latin 1) string.
+class StrLatin1Var(ConfVar):
+    def __init__(self, name, defVal, name2):
+        ConfVar.__init__(self, name, defVal, name2)
         
-class StrVar(ConfVar):
+    def toStr(self, val, prefix):
+        return "%s:%s\n" % (prefix, util.toUTF8(val))
+
+    def fromStr(self, vals, val, prefix):
+        return util.fromUTF8(val)
+
+# Unicode string.
+class StrUnicodeVar(ConfVar):
+    def __init__(self, name, defVal, name2):
+        ConfVar.__init__(self, name, defVal, name2)
+        
+    def toStr(self, val, prefix):
+        return "%s:%s\n" % (prefix, val.encode("UTF-8"))
+
+    def fromStr(self, vals, val, prefix):
+        return val.decode("UTF-8", "ignore")
+
+# binary string, can contain anything. characters outside of printable
+# ASCII (and \ itself) are encoded as \XX, where XX is the hex code of the
+# character.
+class StrBinaryVar(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
         
@@ -186,20 +214,6 @@ class StrVar(ConfVar):
 
     def fromStr(self, vals, val, prefix):
         return util.decodeStr(val)
-
-# like StrVar, but doesn't do any escaping. this is useful if you have
-# e.g. Latin1 text without newlines that you want to transcode to UTF-8
-# later on, which is impossible to do with StrVar since it's escaped the
-# Latin1 characters already.
-class StrNoEscapeVar(ConfVar):
-    def __init__(self, name, defVal, name2):
-        ConfVar.__init__(self, name, defVal, name2)
-        
-    def toStr(self, val, prefix):
-        return "%s:%s\n" % (prefix, val)
-
-    def fromStr(self, vals, val, prefix):
-        return val
 
 # screenplay.ACTION <-> "Action"
 class ElementNameVar(ConfVar):

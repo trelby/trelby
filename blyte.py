@@ -99,10 +99,10 @@ class GlobalData:
         v.addInt("height", 830, "Height", 300, 9999)
         v.addInt("viewMode", VIEWMODE_LAYOUT, "ViewMode", VIEWMODE_DRAFT,
                  VIEWMODE_OVERVIEW_LARGE)
-        v.addStr("license", "", "License")
+        v.addStrBinary("license", "", "License")
 
         v.addList("files", [], "Files",
-                  mypickle.StrNoEscapeVar("", "", ""))
+                  mypickle.StrUnicodeVar("", "", ""))
         
         v.makeDicts()
         v.setDefaults(self)
@@ -165,8 +165,7 @@ class GlobalData:
 
     # save global spell checker dictionary to disk
     def saveScDict(self):
-        util.writeToFile(self.scDictFilename,
-                         util.toUTF8(self.scDict.save()), mainFrame)
+        util.writeToFile(self.scDictFilename, self.scDict.save(), mainFrame)
 
 class MyPanel(wxPanel):
 
@@ -2381,7 +2380,7 @@ class MyApp(wxApp):
         gd.setViewMode(gd.viewMode)
 
         if util.fileExists(gd.scDictFilename):
-            s = util.fromUTF8(util.loadFile(gd.scDictFilename, None))
+            s = util.loadFile(gd.scDictFilename, None)
 
             if s:
                 gd.scDict.load(s)

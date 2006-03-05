@@ -95,7 +95,7 @@ class HeaderString:
     #
     # sample of the format: '1,0,r,,${PAGE}.'
     def load(self, s):
-        a = s.split(",", 4)
+        a = util.fromUTF8(s).split(",", 4)
 
         if len(a) != 5:
             return
@@ -130,4 +130,4 @@ class HeaderString:
 
         s += ",,%s" % self.text
 
-        return s
+        return util.toUTF8(s)

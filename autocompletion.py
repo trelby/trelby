@@ -79,7 +79,7 @@ class Type:
 
             v.addBool("enabled", True, "Enabled")
             v.addList("items", [], "Items",
-                      mypickle.StrNoEscapeVar("", "", ""))
+                      mypickle.StrLatin1Var("", "", ""))
 
             v.makeDicts()
             

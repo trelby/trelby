@@ -948,5 +948,8 @@ def showPDF(filename, cfgGl, frame):
     # give the full path of the program as first arg, so give a
     # dummy arg.
     args = ["pdf"] + cfgGl.pdfViewerArgs.split() + [filename]
-    
+
+    # FIXME: investigate if spawnv supports unicode string as program name
+    # in Python 2.3 (maybe also test Python 2.4 and switch to it on
+    # Windows if needed?)
     os.spawnv(os.P_NOWAIT, cfgGl.pdfViewerPath, args)

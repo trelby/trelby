@@ -140,19 +140,19 @@ class Screenplay:
         output += "#Version 3\n"
 
         output += "#Begin-Auto-Completion \n"
-        output += util.toUTF8(self.autoCompletion.save())
+        output += self.autoCompletion.save()
         output += "#End-Auto-Completion \n"
 
         output += "#Begin-Config \n"
-        output += util.toUTF8(self.cfg.save())
+        output += self.cfg.save()
         output += "#End-Config \n"
 
         output += "#Begin-Locations \n"
-        output += util.toUTF8(self.locations.save())
+        output += self.locations.save()
         output += "#End-Locations \n"
 
         output += "#Begin-Spell-Checker-Dict \n"
-        output += util.toUTF8(self.scDict.save())
+        output += self.scDict.save()
         output += "#End-Spell-Checker-Dict \n"
         
         pgs = self.titles.pages
@@ -161,10 +161,10 @@ class Screenplay:
                 output += "#Title-Page \n"
 
             for i in xrange(len(pgs[pg])):
-                output += "#Title-String %s\n" % util.toUTF8(str(pgs[pg][i]))
+                output += "#Title-String %s\n" % str(pgs[pg][i])
 
         for h in self.headers.hdrs:
-            output += "#Header-String %s\n" % util.toUTF8(str(h))
+            output += "#Header-String %s\n" % str(h)
 
         output += "#Header-Empty-Lines %d\n" % self.headers.emptyLinesAfter
 
@@ -189,32 +189,6 @@ class Screenplay:
 
         # remove default empty line
         sp.lines = []
-
-        # did we encounter characters not in ISO-8859-1
-        invalidChars = False
-
-        # did we encounter characters in ISO-8859-1, but undesired
-        unwantedChars = False
-
-        # convert to ISO-8859-1, remove invalid characters
-        for i in xrange(len(lines)):
-            try:
-                s = unicode(lines[i], "UTF-8")
-            except ValueError:
-                raise error.MiscError("Line %d contains invalid UTF-8 data."
-                                      % (i + 1))
-
-            try:
-                s = s.encode("ISO-8859-1")
-            except ValueError:
-                invalidChars = True
-                s = s.encode("ISO-8859-1", "backslashreplace")
-
-            newS = util.toInputStr(s)
-            if s != newS:
-                unwantedChars = True
-
-            lines[i] = newS
 
         if len(lines) < 2:
             raise error.MiscError("File has too few lines to be a valid\n"
@@ -314,7 +288,7 @@ class Screenplay:
 
                 lb = config.char2lb(s[0], False)
                 lt = config.char2lt(s[1], False)
-                text = s[2:]
+                text = util.toInputStr(util.fromUTF8(s[2:]))
 
                 # convert unknown lb types into LB_SPACE
                 if lb == None:
@@ -374,18 +348,6 @@ class Screenplay:
                         " newer version of this program.\n\n"
                         "  You'll lose that information if you save over"
                         " the existing file.")
-
-        if invalidChars:
-            msgs.append("Screenplay contained characters not in the"
-                        " ISO-8859-1 character set, which is all that this"
-                        " version of the program supports.\n\n"
-                        "  These characters have been converted to their"
-                        " Unicode escape sequences. Search for '\u' to find"
-                        " them.")
-
-        if unwantedChars:
-            msgs.append("Screenplay contained invalid characters. These"
-                        " characters have been converted to '|'.")
 
         return (sp, "\n\n".join(msgs))
 
