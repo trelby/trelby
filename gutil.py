@@ -35,11 +35,20 @@ def listBoxAdd(lb, name, cdata):
 
     lb.Append(name, cdata)
 
-# create stock button. id is wxID_APPLY etc. WX2.6-FIXME: remove this,
-# have callers do this directly.
-def createStockButton(parent, id, label):
+# create stock button. WX2.6-FIXME: remove this, have callers do this
+# directly.
+def createStockButton(parent, label):
     if misc.wx26:
-        return wxButton(parent, id)
+        ids = {
+            "OK" : wxID_OK,
+            "Cancel" : wxID_CANCEL,
+            "Apply" : wxID_APPLY,
+            "Add" : wxID_ADD,
+            "Delete" : wxID_DELETE,
+            "Preview" : wxID_PREVIEW
+            }
+        
+        return wxButton(parent, ids[label])
     else:
         return wxButton(parent, -1, label)
     

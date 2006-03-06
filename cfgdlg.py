@@ -110,13 +110,13 @@ class CfgDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        applyBtn = gutil.createStockButton(self, wxID_APPLY, "Apply")
+        applyBtn = gutil.createStockButton(self, "Apply")
         hsizer.Add(applyBtn, 0, wxALL, 5)
 
-        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
+        cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn, 0, wxALL, 5)
         
-        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
+        okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wxALL, 5)
 
         vsizer.Add(hsizer, 0, wxEXPAND)

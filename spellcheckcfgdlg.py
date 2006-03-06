@@ -28,10 +28,10 @@ class SCDictDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
+        cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn, 0, wxLEFT, 10)
         
-        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
+        okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)

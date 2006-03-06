@@ -50,11 +50,11 @@ class HeadersDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
-        self.addBtn = gutil.createStockButton(self, wxID_ADD, "Add")
+        self.addBtn = gutil.createStockButton(self, "Add")
         hsizer.Add(self.addBtn)
         EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
 
-        self.delBtn = gutil.createStockButton(self, wxID_DELETE, "Delete")
+        self.delBtn = gutil.createStockButton(self, "Delete")
         hsizer.Add(self.delBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
 
@@ -135,16 +135,16 @@ class HeadersDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        previewBtn = gutil.createStockButton(self, wxID_PREVIEW, "Preview")
+        previewBtn = gutil.createStockButton(self, "Preview")
         hsizer.Add(previewBtn)
 
-        applyBtn = gutil.createStockButton(self, wxID_APPLY, "Apply")
+        applyBtn = gutil.createStockButton(self, "Apply")
         hsizer.Add(applyBtn, 0, wxLEFT, 10)
 
-        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
+        cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn, 0, wxLEFT, 10)
         
-        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
+        okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
