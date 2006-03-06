@@ -65,8 +65,8 @@ class CfgDlg(wxDialog):
         
         self.listbook = MyListBook(self)
         w = util.getTextExtent(self.listbook.GetFont(), "Formatting")[0]
-        self.listbook.SetClientSizeWH(w + 20, 200)
-
+        util.setWH(self.listbook, w + 20, 200)
+        
         hsizer.Add(self.listbook, 0, wxEXPAND)
 
         self.panel = wxPanel(self, -1)

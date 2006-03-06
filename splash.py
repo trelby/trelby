@@ -34,8 +34,7 @@ class SplashWindow(wxFrame):
         if (w != 640) or (h != 440):
             self.abort()
 
-        self.SetClientSizeWH(w, h)
-
+        util.setWH(self, w, h)
         self.CenterOnScreen()
 
         self.textColor = wxColour(0, 0, 0)

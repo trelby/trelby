@@ -62,7 +62,7 @@ class MyCharMap(wxWindow):
         EVT_MOTION(self, self.OnMotion)
         EVT_SIZE(self, self.OnSize)
 
-        self.SetClientSizeWH(self.cols * self.cellSize + 2 * self.offset, 460)
+        util.setWH(self, self.cols * self.cellSize + 2 * self.offset, 460)
 
     def OnSize(self, event):
         size = self.GetClientSize()

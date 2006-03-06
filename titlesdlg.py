@@ -76,7 +76,7 @@ class TitlesDlg(wxDialog):
         hsizer.Add(vsizer2)
         
         self.previewCtrl = TitlesPreview(self, self, self.cfg)
-        self.previewCtrl.SetClientSizeWH(150, 150)
+        util.setWH(self.previewCtrl, 150, 150)
         hsizer.Add(self.previewCtrl, 1, wxEXPAND | wxLEFT, 10)
         
         vsizer.Add(hsizer, 0, wxEXPAND)
