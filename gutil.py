@@ -35,6 +35,14 @@ def listBoxAdd(lb, name, cdata):
 
     lb.Append(name, cdata)
 
+# create stock button. id is wxID_APPLY etc. WX2.6-FIXME: remove this,
+# have callers do this directly.
+def createStockButton(parent, id, label):
+    if misc.wx26:
+        return wxButton(parent, id)
+    else:
+        return wxButton(parent, -1, label)
+    
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF
 # viewer application. 'mainFrame' is used as a parent for message boxes in

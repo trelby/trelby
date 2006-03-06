@@ -1,3 +1,4 @@
+import gutil
 import opts
 import util
 
@@ -128,10 +129,10 @@ class ScriptChooserDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        cancelBtn = wxButton(self, -1, "Cancel")
+        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
         hsizer.Add(cancelBtn)
         
-        okBtn = wxButton(self, -1, "OK")
+        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
@@ -220,10 +221,10 @@ class CheckBoxDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        cancelBtn = wxButton(self, -1, "Cancel")
+        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
         hsizer.Add(cancelBtn)
         
-        okBtn = wxButton(self, -1, "OK")
+        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
@@ -350,7 +351,7 @@ class TextDlg(wxDialog):
         
         vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 5)
         
-        okBtn = wxButton(self, -1, "OK")
+        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
         vsizer.Add(okBtn, 0, wxALIGN_CENTER)
 
         util.finishWindow(self, vsizer)
@@ -391,10 +392,10 @@ class TextInputDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
 
-        cancelBtn = wxButton(self, -1, "Cancel")
+        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
         hsizer.Add(cancelBtn)
         
-        okBtn = wxButton(self, -1, "OK")
+        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 5)

@@ -21,11 +21,11 @@ class LocationsDlg(wxDialog):
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
-        self.addBtn = wxButton(self, -1, "Add")
+        self.addBtn = gutil.createStockButton(self, wxID_ADD, "Add")
         hsizer.Add(self.addBtn)
         EVT_BUTTON(self, self.addBtn.GetId(), self.OnAdd)
 
-        self.delBtn = wxButton(self, -1, "Delete")
+        self.delBtn = gutil.createStockButton(self, wxID_DELETE, "Delete")
         hsizer.Add(self.delBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delBtn.GetId(), self.OnDelete)
 
@@ -42,10 +42,10 @@ class LocationsDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        cancelBtn = wxButton(self, -1, "Cancel")
+        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
         hsizer.Add(cancelBtn, 0, wxLEFT, 10)
         
-        okBtn = wxButton(self, -1, "OK")
+        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)

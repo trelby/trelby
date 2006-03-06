@@ -1,4 +1,5 @@
 import config
+import gutil
 import misc
 import screenplay
 import util
@@ -109,13 +110,13 @@ class CfgDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        applyBtn = wxButton(self, -1, "Apply")
+        applyBtn = gutil.createStockButton(self, wxID_APPLY, "Apply")
         hsizer.Add(applyBtn, 0, wxALL, 5)
 
-        cancelBtn = wxButton(self, -1, "Cancel")
+        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
         hsizer.Add(cancelBtn, 0, wxALL, 5)
         
-        okBtn = wxButton(self, -1, "OK")
+        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
         hsizer.Add(okBtn, 0, wxALL, 5)
 
         vsizer.Add(hsizer, 0, wxEXPAND)

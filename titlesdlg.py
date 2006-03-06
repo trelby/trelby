@@ -63,11 +63,11 @@ class TitlesDlg(wxDialog):
 
         hsizer2 = wxBoxSizer(wxHORIZONTAL)
         
-        self.addBtn = wxButton(self, -1, "Add")
+        self.addBtn = gutil.createStockButton(self, wxID_ADD, "Add")
         hsizer2.Add(self.addBtn)
         EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
 
-        self.delBtn = wxButton(self, -1, "Delete")
+        self.delBtn = gutil.createStockButton(self, wxID_DELETE, "Delete")
         hsizer2.Add(self.delBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
 
@@ -171,13 +171,14 @@ class TitlesDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        self.previewBtn = wxButton(self, -1, "Preview")
+        self.previewBtn = gutil.createStockButton(self, wxID_PREVIEW,
+                                                  "Preview")
         hsizer.Add(self.previewBtn)
 
-        cancelBtn = wxButton(self, -1, "Cancel")
+        cancelBtn = gutil.createStockButton(self, wxID_CANCEL, "Cancel")
         hsizer.Add(cancelBtn, 0, wxLEFT, 10)
         
-        okBtn = wxButton(self, -1, "OK")
+        okBtn = gutil.createStockButton(self, wxID_OK, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
