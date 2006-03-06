@@ -202,11 +202,13 @@ class MyListCtrl(wxListCtrl):
         self.SetColumnWidth(0, 120)
         self.SetColumnWidth(1, 120)
 
-        # 'female' is 6 letters
-        w = self.GetCharWidth() * 6
+        # we can't use wxLIST_AUTOSIZE since this is a virtual control, so
+        # calculate the size ourselves since we know the longest string
+        # possible.
+        w = util.getTextExtent(self.GetFont(), "Female")[0] + 10
         self.SetColumnWidth(2, w)
 
-        util.setWH(self, w = w + 240 + 15)
+        util.setWH(self, w = 120*2 + w + 15)
 
     def OnGetItemText(self, item, col):
         n = self.items[item]
