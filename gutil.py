@@ -35,10 +35,13 @@ def listBoxAdd(lb, name, cdata):
 
     lb.Append(name, cdata)
 
-# create stock button. WX2.6-FIXME: remove this, have callers do this
-# directly.
+# create stock button.
 def createStockButton(parent, label):
-    if misc.wx26:
+    # wx2.4 does not have these, and wxMSW does not really have them: it
+    # does not have any icons and it inconsistently adds the shortcut key
+    # to some buttons, but not to all, so it's better not to use them at
+    # all on Windows.
+    if misc.wx26 and misc.isUnix:
         ids = {
             "OK" : wxID_OK,
             "Cancel" : wxID_CANCEL,
