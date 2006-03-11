@@ -892,6 +892,11 @@ class ConfigGlobal:
         v.addColor("pagebreakNoAdjust", 128, 128, 128,
                    "PageBreakNoAdjustLine",
                    "Page-break (original, not adjusted) line")
+        v.addColor("tabFg", 0, 0, 0, "TabFG", "Tab foreground")
+        v.addColor("tabHighlight", 255, 255, 255, "TabHighlight",
+                   "Tab highlight")
+        v.addColor("tabSelectedBg", 238, 238, 238, "TabSelectedBG",
+                   "Tab background, selected")
 
         v.makeDicts()
         
@@ -1043,6 +1048,12 @@ class ConfigGui:
         self.pagebreakPen = wxPen(self.pagebreakColor)
         self.pagebreakNoAdjustPen = wxPen(self.pagebreakNoAdjustColor,
                                           style = wxDOT)
+
+        self.tabFgPen = wxPen(self.tabFgColor)
+        self.tabHighlightPen = wxPen(self.tabHighlightColor)
+
+        self.tabSelectedBgBrush = wxBrush(self.tabSelectedBgColor)
+        self.tabSelectedBgPen = wxPen(self.tabSelectedBgColor)
 
         # a 4-item list of FontInfo objects, indexed by the two lowest
         # bits of pml.TextOp.flags.

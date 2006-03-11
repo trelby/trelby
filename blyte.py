@@ -165,7 +165,10 @@ class GlobalData:
 class MyPanel(wxPanel):
 
     def __init__(self, parent, id):
-        wxPanel.__init__(self, parent, id, style = wxWANTS_CHARS)
+        wxPanel.__init__(self, parent, id,
+                         # wxMSW/Windows does not seem to support
+                         # wxNO_BORDER, which sucks
+                         style = wxWANTS_CHARS | wxNO_BORDER)
 
         hsizer = wxBoxSizer(wxHORIZONTAL)
         
@@ -179,7 +182,7 @@ class MyPanel(wxPanel):
                            self.ctrl.OnScroll)
 
         EVT_SET_FOCUS(self.scrollBar, self.OnScrollbarFocus)
-                           
+        
         self.SetSizer(hsizer)
 
     # we never want the scrollbar to get the keyboard focus, pass it on to
@@ -461,6 +464,9 @@ class MyCtrl(wxControl):
 
         self.updateScreen()
 
+        # in case tab colors have been changed
+        mainFrame.tabCtrl.Refresh(False)
+        
         if writeCfg:
             util.writeToFile(gd.confFilename, cfgGl.save(), mainFrame)
 
@@ -643,7 +649,7 @@ class MyCtrl(wxControl):
         scriptreport.genScriptReport(mainFrame, self.sp, not misc.license)
 
     def OnCompareScripts(self):
-        if mainFrame.notebook.GetPageCount() < 2:
+        if mainFrame.tabCtrl.getPageCount() < 2:
             wxMessageBox("You need at least two scripts open to"
                          " compare them.", "Error", wxOK, mainFrame)
 
@@ -673,8 +679,8 @@ class MyCtrl(wxControl):
 
             return
         
-        c1 = mainFrame.notebook.GetPage(sel1).ctrl
-        c2 = mainFrame.notebook.GetPage(sel2).ctrl
+        c1 = mainFrame.tabCtrl.getPage(sel1).ctrl
+        c2 = mainFrame.tabCtrl.getPage(sel2).ctrl
         
         sp1 = c1.getExportable("compare")
         sp2 = c2.getExportable("compare")
@@ -1671,11 +1677,13 @@ class MyFrame(wxFrame):
             
         hsizer.Add(self.typeCb)
 
-        vsizer.Add(hsizer, 0, wxALL, 5)
-        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND)
+        self.tabCtrl = misc.MyTabCtrl(self, -1)
+        hsizer.Add(self.tabCtrl, 1, wxEXPAND)
 
-        self.notebook = wxNotebook(self, -1, style = wxCLIP_CHILDREN)
-        vsizer.Add(self.notebook, 1, wxEXPAND)
+        vsizer.Add(hsizer, 0, wxEXPAND)
+
+        tmp = misc.MyTabCtrl2(self, -1, self.tabCtrl)
+        vsizer.Add(tmp, 1, wxEXPAND)
 
         vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND)
 
@@ -1687,9 +1695,8 @@ class MyFrame(wxFrame):
         gd.mru.useMenu(fileMenu, 14)
 
         EVT_MENU_HIGHLIGHT_ALL(self, self.OnMenuHighlight)
-        
-        EVT_NOTEBOOK_PAGE_CHANGED(self, self.notebook.GetId(),
-                                  self.OnPageChange)
+
+        self.tabCtrl.setPageChangedFunc(self.OnPageChange)
         
         EVT_COMBOBOX(self, self.typeCb.GetId(), self.OnTypeCombo)
 
@@ -1846,8 +1853,8 @@ class MyFrame(wxFrame):
             g[n] = wxNewId()
 
     def createNewPanel(self):
-        newPanel = MyPanel(self.notebook, -1)
-        self.notebook.AddPage(newPanel, "", True)
+        newPanel = MyPanel(self.tabCtrl.getTabParent(), -1)
+        self.tabCtrl.addPage(newPanel, u"")
         newPanel.ctrl.setTabText()
         newPanel.ctrl.SetFocus()
 
@@ -1859,16 +1866,25 @@ class MyFrame(wxFrame):
     def setTabText(self, panel, text):
         i = self.findPage(panel)
         if i != -1:
-            self.notebook.SetPageText(i, misc.toGUIUnicode(text))
+            # strip out ".blyte" suffix from tab names (it's a bit
+            # complicated since if we open the same file multiple times,
+            # we have e.g. "foo.blyte" and "foo.blyte<2>", so actually we
+            # just strip out ".blyte" if it's found anywhere in the
+            # string)
+
+            pos = text.find(u".blyte")
+            if pos != -1:
+                s = text[0:pos] + text[pos + 6:]
+            else:
+                s = text
+
+            self.tabCtrl.setTabText(i, misc.toGUIUnicode(s))
     
-    # notebook.GetSelection() returns invalid values, eg. it can return 1
-    # when there is only one tab in existence, so it can't be relied on.
-    # this is currently worked around by never using that function,
-    # instead this iterates over all tabs and finds out the correct page
-    # number.
+    # iterates over all tabs and finds out the corresponding page number
+    # for the given panel.
     def findPage(self, panel):
-        for i in range(self.notebook.GetPageCount()):
-            p = self.notebook.GetPage(i)
+        for i in range(self.tabCtrl.getPageCount()):
+            p = self.tabCtrl.getPage(i)
             if p == panel:
                 return i
 
@@ -1878,8 +1894,8 @@ class MyFrame(wxFrame):
     def getCtrls(self):
         l = []
 
-        for i in range(self.notebook.GetPageCount()):
-            l.append(self.notebook.GetPage(i).ctrl)
+        for i in range(self.tabCtrl.getPageCount()):
+            l.append(self.tabCtrl.getPage(i).ctrl)
 
         return l
 
@@ -1931,7 +1947,7 @@ class MyFrame(wxFrame):
     # open script, in the current tab if it's untouched, or in a new one
     # otherwise
     def openScript(self, filename):
-        if not self.notebook.GetPage(self.findPage(self.panel))\
+        if not self.tabCtrl.getPage(self.findPage(self.panel))\
                .ctrl.isUntouched():
             self.panel = self.createNewPanel()
 
@@ -1944,9 +1960,8 @@ class MyFrame(wxFrame):
         # override it and do nothing
         pass
 
-    def OnPageChange(self, event):
-        newPage = event.GetSelection()
-        self.panel = self.notebook.GetPage(newPage)
+    def OnPageChange(self, page):
+        self.panel = self.tabCtrl.getPage(page)
         self.panel.ctrl.SetFocus()
         self.panel.ctrl.updateCommon()
         self.setTitle(self.panel.ctrl.fileNameDisplay)
@@ -1985,7 +2000,7 @@ class MyFrame(wxFrame):
         if dlg.ShowModal() == wxID_OK:
             misc.scriptDir = misc.fromGUIUnicode(dlg.GetDirectory())
 
-            if not self.notebook.GetPage(self.findPage(self.panel))\
+            if not self.tabCtrl.getPage(self.findPage(self.panel))\
                    .ctrl.isUntouched():
                 self.panel = self.createNewPanel()
 
@@ -2001,8 +2016,8 @@ class MyFrame(wxFrame):
         if not self.panel.ctrl.canBeClosed():
             return
         
-        if self.notebook.GetPageCount() > 1:
-            self.notebook.DeletePage(self.findPage(self.panel))
+        if self.tabCtrl.getPageCount() > 1:
+            self.tabCtrl.deletePage()
         else:
             self.panel.ctrl.createEmptySp()
             self.panel.ctrl.updateScreen()
