@@ -1966,6 +1966,18 @@ class MyFrame(wxFrame):
         self.panel.ctrl.updateCommon()
         self.setTitle(self.panel.ctrl.fileNameDisplay)
 
+    def OnScriptNext(self, event = None):
+        next = self.tabCtrl.getSelectedPageIndex() + 1
+
+        if next < self.tabCtrl.getPageCount():
+            self.tabCtrl.selectPage(next)
+
+    def OnScriptPrev(self, event = None):
+        prev = self.tabCtrl.getSelectedPageIndex() - 1
+
+        if prev >= 0:
+            self.tabCtrl.selectPage(prev)
+
     def OnNewScript(self, event = None):
         self.panel = self.createNewPanel()
 

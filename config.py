@@ -750,6 +750,12 @@ class ConfigGlobal:
             Command("SaveScriptAs", "Save the current script to a new file.",
                     isMenu = True),
             
+            Command("ScriptNext", "Change to next open script.",
+                    isMenu = True),
+
+            Command("ScriptPrev", "Change to previous open script.",
+                    isMenu = True),
+
             Command("ScriptSettings", "Change script-specific settings.",
                     isMenu = True),
             

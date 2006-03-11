@@ -158,6 +158,10 @@ class MyTabCtrl(wxWindow):
     def getPageCount(self):
         return len(self.pages)
 
+    # get selected page index
+    def getSelectedPageIndex(self):
+        return self.selected
+
     # get given page
     def getPage(self, i):
         return self.pages[i][0]
