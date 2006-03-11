@@ -1,4 +1,5 @@
 import config
+import gutil
 import screenplay
 import util
 
@@ -256,10 +257,10 @@ class ImportDlg(wxDialog):
 
         hsizer.Add((1, 1), 1)
         
-        cancelBtn = wxButton(self, -1, "Cancel")
+        cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn)
         
-        okBtn = wxButton(self, -1, "OK")
+        okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wxLEFT, 10)
 
         vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
