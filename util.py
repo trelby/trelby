@@ -661,6 +661,16 @@ class Key:
         if (kc < 256) and (ctrl or alt):
             kc = ord(upper(chr(kc)))
 
+        # even though the wxWidgets documentation clearly states that
+        # CTRL+[A-Z] should be returned as keycodes 1-26, wxGTK2 2.6 does
+        # not do this (wxGTK1 and wxMSG do follow the documentation).
+        #
+        # so, we normalize to the wxWidgets official form here if necessary.
+
+        # "A" - "Z"
+        if ctrl and (kc >= 65) and (kc <= 90):
+            kc -= 64
+
         # ASCII/Latin-1 keycode (0-255) or one of the WXK_ constants (>255)
         self.kc = kc
 
