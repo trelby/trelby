@@ -844,19 +844,10 @@ class ConfigGlobal:
         v.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,
                     PBI_LAST)
         
-        # PDF viewer program and args
-        if misc.isUnix:
-            s1 = "/usr/local/Adobe/Acrobat7.0/bin/acroread"
-            s2 = "-tempFile"
-        elif misc.isWindows:
-            s1 = r"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe"
-            s2 = ""
-        else:
-            s1 = "not set yet (unknown platform %s)" % wxPlatform
-            s2 = ""
-
-        v.addStrUnicode("pdfViewerPath", unicode(s1), "PDF/ViewerPath")
-        v.addStrBinary("pdfViewerArgs", s2, "PDF/ViewerArguments")
+        # PDF viewer program and args. defaults are empty since generating
+        # them is a complex process handled by findPDFViewer.
+        v.addStrUnicode("pdfViewerPath", u"", "PDF/ViewerPath")
+        v.addStrBinary("pdfViewerArgs", "", "PDF/ViewerArguments")
 
         # fonts
         if misc.isUnix:
@@ -874,8 +865,7 @@ class ConfigGlobal:
             raise ConfigError("unknown platform")
         
         # default script directory
-        v.addStrUnicode("scriptDir", misc.progPath,
-                        "DefaultScriptDirectory")
+        v.addStrUnicode("scriptDir", misc.progPath, "DefaultScriptDirectory")
         
         # colors
         v.addColor("text", 0, 0, 0, "TextFG", "Text foreground")
@@ -996,6 +986,57 @@ class ConfigGlobal:
             return None
         else:
             return s
+
+    # set PDF viewer program to the best one found on the machine.
+    def findPDFViewer(self):
+        # list of programs to look for. each item is of the form (name,
+        # args). if name is an absolute path only that exact location is
+        # looked at, otherwise PATH is searched for the program (on
+        # Windows, all paths are interpreted as absolute). args is the
+        # list of arguments for the program.
+        progs = []
+
+        if misc.isUnix:
+            progs = [
+                (u"/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
+                (u"xpdf", ""),
+                (u"evince", ""),
+                (u"gpdf", ""),
+                (u"kpdf", ""),
+                ]
+        elif misc.isWindows:
+            progs = [
+                (ur"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe",
+                 ""),
+                (ur"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe",
+                 ""),
+                (ur"C:\Program Files\Adobe\Acrobat 5.0\Reader\AcroRd32.exe",
+                 ""),
+                (ur"C:\Program Files\Adobe\Acrobat 4.0\Reader\AcroRd32.exe",
+                 ""),
+                ]
+        else:
+            pass
+
+        success = False
+        
+        for name, args in progs:
+            if misc.isWindows or (name[0] == u"/"):
+                if util.fileExists(name):
+                    success = True
+
+                    break
+            else:
+                name = util.findFileInPath(name)
+
+                if name:
+                    success = True
+
+                    break
+
+        if success:
+            self.pdfViewerPath = name
+            self.pdfViewerArgs = args
 
 # config stuff that are wxwindows objects, so can't be in normal
 # ConfigGlobal (deepcopy dies)

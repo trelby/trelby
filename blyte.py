@@ -2415,9 +2415,12 @@ class MyApp(wxApp):
             if s:
                 cfgGl.load(s)
         else:
-            # we want to write out a default config file at startup
-            # for various reasons, if no default config file yet
-            # exists
+            # only try to look for PDF viewer programs if we do not have
+            # an existing config file to load
+            cfgGl.findPDFViewer()
+
+            # we want to write out a default config file at startup for
+            # various reasons, if no default config file yet exists
             util.writeToFile(gd.confFilename, cfgGl.save(), None)
 
         refreshGuiConfig()

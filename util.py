@@ -812,13 +812,45 @@ def removeTempFiles(prefix):
             continue
 
 # return True if given file exists.
-def fileExists(path):
+def fileExists(filename):
     try:
-        os.stat(misc.toPath(path))
+        os.stat(misc.toPath(filename))
     except OSError:
         return False
 
     return True
+
+# look for file 'filename' in all the directories listed in 'dirs', which
+# is a list of absolute directory paths. if found, return the absolute
+# filename, otherwise None.
+def findFile(filename, dirs):
+    for d in dirs:
+        if d[-1] != u"/":
+            d += u"/"
+
+        path = d + filename
+
+        if fileExists(path):
+            return path
+
+    return None
+
+# look for file 'filename' in all the directories listed in $PATH. if
+# found, return the absolute filename, otherwise None.
+def findFileInPath(filename):
+    dirs = os.getenv("PATH")
+    if not dirs:
+        return None
+
+    # I have no idea how one should try to cope if PATH contains entries
+    # with non-UTF8 characters, so just ignore any errors
+    dirs = unicode(dirs, "UTF-8", "ignore").split(u":")
+
+    # only accept absolute paths. this strips out things like "~/bin/"
+    # etc.
+    dirs = [d for d in dirs if d[0] == u"/"]
+
+    return findFile(filename, dirs)
 
 # handles license stuff. format of license string:
 #
