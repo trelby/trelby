@@ -999,6 +999,7 @@ class ConfigGlobal:
         if misc.isUnix:
             progs = [
                 (u"/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
+                (u"acroread", "-tempFile"),
                 (u"xpdf", ""),
                 (u"evince", ""),
                 (u"gpdf", ""),
