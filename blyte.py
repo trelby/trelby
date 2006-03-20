@@ -1865,6 +1865,7 @@ class MyFrame(wxFrame):
 
     def setTabText(self, panel, text):
         i = self.findPage(panel)
+
         if i != -1:
             # strip out ".blyte" suffix from tab names (it's a bit
             # complicated since if we open the same file multiple times,
@@ -1878,7 +1879,7 @@ class MyFrame(wxFrame):
             else:
                 s = text
 
-            self.tabCtrl.setTabText(i, misc.toGUIUnicode(s))
+            self.tabCtrl.setTabText(i, s)
     
     # iterates over all tabs and finds out the corresponding page number
     # for the given panel.
