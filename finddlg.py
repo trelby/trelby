@@ -211,8 +211,12 @@ class FindDlg(wxDialog):
         if flag:
             self.moreButton.SetLabel("<<< Less")
             pos = self.elements.GetPosition()
+
+            # don't know of a way to get the vertical spacing of items in
+            # a wxCheckListBox, so estimate it at font height + 5 pixels,
+            # which is close enough on everything I've tested.
             h = pos.y + len(self.elementTypes) * \
-                util.getFontHeight(self.elements.GetFont()) + 15
+                (util.getFontHeight(self.elements.GetFont()) + 5) + 15
         else:
             self.moreButton.SetLabel("More >>>")
             h = max(self.extraLabel.GetPosition().y,

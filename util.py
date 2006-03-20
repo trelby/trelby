@@ -308,18 +308,16 @@ def mm2twips(mm):
 def isFixedWidth(font):
     return getTextExtent(font, "iiiii")[0] == getTextExtent(font, "OOOOO")[0]
 
-# get extent of 's' as (w, h) (may or may not include descend values)
+# get extent of 's' as (w, h)
 def getTextExtent(font, s):
     permDc.SetFont(font)
 
     return permDc.GetTextExtent(s)
 
-# get real height of font, including descend
+# get height of font in pixels
 def getFontHeight(font):
     permDc.SetFont(font)
-    ext = permDc.GetFullTextExtent("_\xC5")
-
-    return ext[1] + ext[2]
+    return permDc.GetTextExtent("_\xC5")[1]
 
 # return how many mm tall given font size is.
 def getTextHeight(size):
@@ -329,16 +327,17 @@ def getTextHeight(size):
 def getTextWidth(text, style, size):
     return (fontinfo.getTextWidth(text, style, size) / 72.0) * 25.4
 
-# create font that's height is <= 'height' pixels. other parameters are
-# the same as in wxFont's constructor. WX2.6-FIXME: wxFont now supports
-# this natively, research whether it's as good as this.
-def createPixelFont(height, family, style, weight):
+# create a font that's height is at most 'height' pixels. other parameters
+# are the same as in wxFont's constructor.
+def createPixelFont(height, family, style, weight, accurate = False):
     fs = 6
 
     selected = fs
     closest = 1000
     over = 0
-    
+
+    # FIXME: what's this "keep trying even once we go over the max height"
+    # stuff? get rid of it.
     while 1:
         fn = wxFont(fs, family, style, weight,
                     encoding = wxFONTENCODING_ISO8859_1)

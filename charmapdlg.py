@@ -51,11 +51,12 @@ class MyCharMap(wxWindow):
         # size of the zoomed-in character boxes
         self.boxSize = 60
         
-        self.smallFont = util.createPixelFont(20, wxSWISS, wxNORMAL, wxNORMAL)
-        self.normalFont = util.createPixelFont(self.cellSize, wxMODERN,
-                                               wxNORMAL, wxBOLD)
-        self.bigFont = util.createPixelFont(self.boxSize, wxMODERN,
-                                            wxNORMAL, wxBOLD)
+        self.smallFont = util.createPixelFont(20,
+            wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL)
+        self.normalFont = util.createPixelFont(self.cellSize - 2,
+            wxFONTFAMILY_MODERN, wxNORMAL, wxBOLD)
+        self.bigFont = util.createPixelFont(self.boxSize - 2,
+            wxFONTFAMILY_MODERN, wxNORMAL, wxBOLD)
         
         EVT_PAINT(self, self.OnPaint)
         EVT_LEFT_DOWN(self, self.OnLeftDown)
@@ -113,8 +114,8 @@ class MyCharMap(wxWindow):
                 i = y * self.cols + x
                 if i < len(self.chars):
                     util.drawText(dc, self.chars[i],
-                        x * self.cellSize + self.offset + self.cellSize // 2,
-                        y * self.cellSize + self.offset + self.cellSize // 2,
+                        x * self.cellSize + self.offset + self.cellSize // 2 + 1,
+                        y * self.cellSize + self.offset + self.cellSize // 2 + 1,
                         util.ALIGN_CENTER, util.VALIGN_CENTER)
             
         y = self.offset + self.rows * self.cellSize
@@ -152,5 +153,5 @@ class MyCharMap(wxWindow):
         dc.DrawRectangle(boxX, y, self.boxSize, self.boxSize)
 
         dc.SetFont(self.bigFont)
-        util.drawText(dc, char, boxX + self.boxSize // 2,
-            y + self.boxSize // 2, util.ALIGN_CENTER, util.VALIGN_CENTER)
+        util.drawText(dc, char, boxX + self.boxSize // 2 + 1,
+            y + self.boxSize // 2 + 1, util.ALIGN_CENTER, util.VALIGN_CENTER)

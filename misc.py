@@ -131,6 +131,9 @@ class MyTabCtrl(wxWindow):
         # control, and within each tab
         self.paddingX = 5
 
+        # starting Y-pos of text in labels
+        self.textY = 5
+
         # width of a single tab
         self.tabWidth = 150
 
@@ -139,6 +142,9 @@ class MyTabCtrl(wxWindow):
         self.arrowHeight = 13
         self.arrowSpacing = 3
         self.arrowY = 5
+
+        # initialized in OnPaint since we don't know our height yet
+        self.font = None
 
         if wx26:
             self.SetMinSize(wxSize(self.paddingX * 2 + self.arrowWidth * 2 + \
@@ -306,9 +312,6 @@ class MyTabCtrl(wxWindow):
         cfgGui = self.pages[0][0].ctrl.getCfgGui()
         
         w, h = self.GetClientSizeTuple()
-        
-        font = util.createPixelFont(18, wxDEFAULT, wxNORMAL, wxNORMAL)
-        dc.SetFont(font)
 
         dc.SetBrush(cfgGui.workspaceBrush)
         dc.SetPen(cfgGui.workspacePen)
@@ -322,6 +325,13 @@ class MyTabCtrl(wxWindow):
         tabW = self.tabWidth
         tabH = h - 2
         tabY = h - tabH
+
+        if not self.font:
+            textH = h - self.textY - 1
+            self.font = util.createPixelFont(textH, wxFONTFAMILY_DEFAULT,
+                                             wxNORMAL, wxNORMAL)
+
+        dc.SetFont(self.font)
 
         maxTab = self.getLastVisibleTab()
         
@@ -344,7 +354,7 @@ class MyTabCtrl(wxWindow):
             util.drawLine(dc, xpos + tabW - 1, tabY + 2, 0, tabH - 2)
             dc.DrawPoint(xpos + tabW - 2, tabY + 1)
 
-            dc.DrawText(toGUIUnicode(p[1]), xpos + self.paddingX, 5)
+            dc.DrawText(toGUIUnicode(p[1]), xpos + self.paddingX, self.textY)
 
             xpos += tabW
 
@@ -581,7 +591,10 @@ class CheckBoxDlg(wxDialog):
         else:
             h = min(10, len(items))
 
-        h *= util.getFontHeight(tmp.GetFont())
+        # don't know of a way to get the vertical spacing of items in a
+        # wxCheckListBox, so estimate it at font height + 5 pixels, which
+        # is close enough on everything I've tested.
+        h *= util.getFontHeight(tmp.GetFont()) + 5
         h += 5
         h = max(25, h)
         
