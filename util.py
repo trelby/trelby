@@ -329,7 +329,7 @@ def getTextWidth(text, style, size):
 
 # create a font that's height is at most 'height' pixels. other parameters
 # are the same as in wxFont's constructor.
-def createPixelFont(height, family, style, weight, accurate = False):
+def createPixelFont(height, family, style, weight):
     fs = 6
 
     selected = fs
