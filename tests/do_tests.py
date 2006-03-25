@@ -6,6 +6,7 @@
 import glob
 import optparse
 import os
+import re
 import sys
 import time
 import traceback
@@ -28,18 +29,25 @@ def main():
     else:
         doTests(opts)
 
-# returns a list of all functions from the given module that start with
+# returns a list of all function names from the given file that start with
 # "test".
-def getTestFuncs(mod):
-    funcs = []
+def getTestFuncs(filename):
+    funcs = {}
 
-    for a in dir(mod):
-        if a.startswith("test"):
-            av = getattr(mod, a)
-            if type(av) is types.FunctionType:
-                funcs.append(a)
+    f = open(filename, "r")
+    
+    for line in f:
+        mo = re.match("def (test[a-zA-Z0-9_]*)\(", line)
+        
+        if mo:
+            name = mo.group(1)
 
-    return funcs
+            if name in funcs:
+                sys.exit("Error: Function '%s' defined twice." % name)
+
+            funcs[name] = None
+
+    return list(funcs)
 
 # read lines from file 'filename' until one starting with not '#' is
 # found, looking for strings matching 'ut:key=val', and storing the
@@ -81,7 +89,7 @@ def doTest(opts):
         mod.init()
 
     if opts.faat:
-        funcs = getTestFuncs(mod)
+        funcs = getTestFuncs(opts.file)
     else:
         funcs = [opts.func]
 
@@ -130,10 +138,7 @@ def doTests(opts):
             if ret != 0:
                 cntFailed += 1
         else:
-            exec("import %s as mod" % name)
-            attr = dir(mod)
-
-            funcs = getTestFuncs(mod)
+            funcs = getTestFuncs(fname)
 
             if not funcs:
                 print "[--- No tests found in %s ---]" % name
