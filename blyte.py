@@ -1448,7 +1448,7 @@ class MyCtrl(wxControl):
 
         w = 0
         for i in range(len(ac)):
-            tw, tmp = dc.GetTextExtent(ac[i])
+            tw = dc.GetTextExtent(ac[i])[0]
             w = max(w, tw)
 
         w += offset * 2
