@@ -1,4 +1,5 @@
 import fontinfo
+import misc
 import pml
 import util
 
@@ -197,6 +198,7 @@ class PDFExporter:
         pages = len(doc.pages)
 
         self.catalogObj = self.addObj()
+        self.infoObj = self.createInfoObj()
         pagesObj = self.addObj()
 
         if doc.tocs:
@@ -274,6 +276,27 @@ class PDFExporter:
                 self.genOutline(i)
 
         return self.genPDF()
+
+    def createInfoObj(self):
+        version = self.escapeStr(misc.version)
+
+        if misc.license:
+            author = misc.license.userId.lstrip()
+
+            # get rid of the email part since users probably don't want to
+            # disseminate that
+            pos = author.find("<")
+            if pos != -1:
+                author = author[:pos - 1]
+
+            author = self.escapeStr(author)
+        else:
+            author = "Evaluation version"
+
+        return self.addObj("<< /Author (%s)\n"
+                           "/Creator (Oskusoft Blyte %s)\n"
+                           "/Producer (Oskusoft Blyte %s)\n"
+                           ">>" % (author, version, version))
 
     # generate a single page
     def genPage(self, pageNr):
@@ -367,8 +390,11 @@ class PDFExporter:
 
         data += "\n"
 
-        data += "trailer\n<< /Size %d\n/Root %d 0 R\n>>\n"\
-                % (self.objectCnt, self.catalogObj.nr)
+        data += ("trailer\n"
+                 "<< /Size %d\n"
+                 "/Root %d 0 R\n"
+                 "/Info %d 0 R\n>>\n" % (
+            self.objectCnt, self.catalogObj.nr, self.infoObj.nr))
             
         data += "startxref\n%d\n%%%%EOF\n" % xrefStartPos
 
