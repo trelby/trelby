@@ -314,7 +314,7 @@ class PDFExporter:
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
     def genStream(self, s):
-        compress = False
+        compress = True
 
         filterStr = " "
         if compress:
