@@ -12,16 +12,10 @@
 
 # All measurements in PML are in (floating point) millimeters.
 
+import pdf
 import util
 
 import textwrap
-
-# types of drawing operations
-OP_TEXT = 0
-OP_LINE = 1
-OP_RECT = 2
-OP_QC = 3
-OP_PDF = 4
 
 # text flags. don't change these unless you know what you're doing.
 NORMAL = 0
@@ -123,19 +117,18 @@ class TOCItem:
 
 # An abstract base class for all drawing operations.
 class DrawOp:
-    def __init__(self, type):
-        self.type = type
+    pass
 
 # Draw text string 'text', at position (x, y) mm from the upper left
 # corner of the page. Font used is 'size' points, and Courier / Times/
 # Helvetica as indicated by the flags, possibly being bold / italic /
 # underlined.
 class TextOp(DrawOp):
+    pdfOp = pdf.PDFTextOp()
+    
     def __init__(self, text, x, y, size, flags = NORMAL | COURIER,
                  align = util.ALIGN_LEFT, valign = util.VALIGN_TOP,
                  line = -1):
-        DrawOp.__init__(self, OP_TEXT)
-
         self.text = text
         self.x = x
         self.y = y
@@ -170,9 +163,9 @@ class TextOp(DrawOp):
 # line. if 'isClosed' is True, the last point on the list is connected to
 # the first one.
 class LineOp(DrawOp):
-    def __init__(self, points, width, isClosed = False):
-        DrawOp.__init__(self, OP_LINE)
+    pdfOp = pdf.PDFLineOp()
 
+    def __init__(self, points, width, isClosed = False):
         self.points = points
         self.width = width
         self.isClosed = isClosed
@@ -184,9 +177,9 @@ def genLine(x, y, xd, yd, width):
 # Draw a rectangle, possibly filled, with specified lineWidth (which can
 # be -1 if fillType is FILL). (x, y) is position of upper left corner.
 class RectOp(DrawOp):
-    def __init__(self, x, y, width, height, fillType = FILL, lineWidth = -1):
-        DrawOp.__init__(self, OP_RECT)
+    pdfOp = pdf.PDFRectOp()
 
+    def __init__(self, x, y, width, height, fillType = FILL, lineWidth = -1):
         self.x = x
         self.y = y
         self.width = width
@@ -198,9 +191,9 @@ class RectOp(DrawOp):
 # width. By default it will be the upper left quadrant of a circle, but
 # using the flip[XY] parameters you can choose other quadrants.
 class QuarterCircleOp(DrawOp):
-    def __init__(self, x, y, radius, width, flipX = False, flipY = False):
-        DrawOp.__init__(self, OP_QC)
+    pdfOp = pdf.PDFQuarterCircleOp()
 
+    def __init__(self, x, y, radius, width, flipX = False, flipY = False):
         self.x = x
         self.y = y
         self.radius = radius
@@ -212,9 +205,9 @@ class QuarterCircleOp(DrawOp):
 # the end. Should be used only for non-critical things like tweaking line
 # join styles etc, because non-PDF renderers will ignore these.
 class PDFOp(DrawOp):
-    def __init__(self, cmds):
-        DrawOp.__init__(self, OP_PDF)
+    pdfOp = pdf.PDFArbitraryOp()
 
+    def __init__(self, cmds):
         self.cmds = cmds
 
 # create a PML document containing text (possibly linewrapped) divided

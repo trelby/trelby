@@ -238,6 +238,7 @@ class ViewModeLayout(ViewMode):
 
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
         cfgGui = ctrl.getCfgGui()
+        textOp = pml.TextOp
         
         texts = []
         dpages = []
@@ -270,7 +271,7 @@ class ViewModeLayout(ViewMode):
 
         topOfPage = True
         for op in pg.ops:
-            if (op.type != pml.OP_TEXT) or (op.line == -1):
+            if not isinstance(op, textOp) or (op.line == -1):
                 continue
 
             if op.line == topLine:
@@ -316,7 +317,7 @@ class ViewModeLayout(ViewMode):
             pageY = y
 
             for op in pg.ops:
-                if op.type != pml.OP_TEXT:
+                if not isinstance(op, textOp):
                     continue
 
                 ypos = int(pageY + op.y * mm2p)
@@ -375,6 +376,7 @@ class ViewModeSideBySide(ViewMode):
 
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
         cfgGui = ctrl.getCfgGui()
+        textOp = pml.TextOp
         
         texts = []
         dpages = []
@@ -425,7 +427,7 @@ class ViewModeSideBySide(ViewMode):
             dpages.append(dp)
 
             for op in pg.ops:
-                if op.type != pml.OP_TEXT:
+                if not isinstance(op, textOp):
                     continue
 
                 texts.append(TextString(op.line, op.text,
@@ -507,6 +509,7 @@ class ViewModeOverview(ViewMode):
         
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
         cfgGui = ctrl.getCfgGui()
+        textOp = pml.TextOp
 
         texts = []
         dpages = []
@@ -555,7 +558,7 @@ class ViewModeOverview(ViewMode):
             dpages.append(dp)
 
             for op in pg.ops:
-                if op.type != pml.OP_TEXT:
+                if not isinstance(op, textOp):
                     continue
 
                 texts.append(TextString(op.line, op.text,

@@ -7,6 +7,122 @@ def generate(doc):
     tmp = PDFExporter(doc)
     return tmp.generate()
 
+# An abstract base class for all PDF drawing operations.
+class PDFDrawOp:
+
+    # write PDF drawing operations corresponding to the PML object pmlOp
+    # to output (util.String). pe = PDFExporter.
+    def draw(self, pmlOp, pageNr, output, pe):
+        raise "draw not implemented"
+
+class PDFTextOp(PDFDrawOp):
+    def draw(self, pmlOp, pageNr, output, pe):
+        if pmlOp.toc:
+            pmlOp.toc.pageObjNr = pe.pageObjs[pageNr].nr
+
+        # we need to adjust y position since PDF uses baseline of text as
+        # the y pos, but pml uses top of the text as y pos. The Adobe
+        # standard Courier family font metrics give 157 units in 1/1000
+        # point units as the Descender value, thus giving (1000 - 157) =
+        # 843 units from baseline to top of text.
+
+        # http://partners.adobe.com/asn/tech/type/ftechnotes.jsp contains
+        # the "Font Metrics for PDF Core 14 Fonts" document.
+
+        x = pe.x(pmlOp.x)
+        y = pe.y(pmlOp.y) - 0.843 * pmlOp.size
+
+        newFont = "F%d %d" % (pe.getFontNr(pmlOp.flags), pmlOp.size)
+        if newFont != pe.currentFont:
+            output += "/%s Tf\n" % newFont
+            pe.currentFont = newFont
+
+        output += "BT\n"\
+                  "%f %f Td\n"\
+                  "(%s) Tj\n"\
+                  "ET\n" % (x, y, pe.escapeStr(pmlOp.text))
+
+        if pmlOp.flags & pml.UNDERLINED:
+
+            undLen = fontinfo.getTextWidth(pmlOp.text, pmlOp.flags, pmlOp.size)
+
+            # all standard PDF fonts have the underline line 100 units
+            # below baseline with a thickness of 50
+            undY = y - 0.1 * pmlOp.size
+
+            output += "%f w\n"\
+                      "%f %f m\n"\
+                      "%f %f l\n"\
+                      "S\n" % (0.05 * pmlOp.size, x, undY, x + undLen, undY)
+
+class PDFLineOp(PDFDrawOp):
+    def draw(self, pmlOp, pageNr, output, pe):
+        p = pmlOp.points
+
+        pc = len(p)
+
+        if pc < 2:
+            print "LineOp contains only %d points" % pc
+
+            return
+
+        output += "%f w\n"\
+                  "%s m\n" % (pe.mm2points(pmlOp.width), pe.xy(p[0]))
+
+        for i in range(1, pc):
+            output += "%s l\n" % (pe.xy(p[i]))
+
+        if pmlOp.isClosed:
+            output += "s\n"
+        else:
+            output += "S\n"
+
+class PDFRectOp(PDFDrawOp):
+    def draw(self, pmlOp, pageNr, output, pe):
+        if pmlOp.lw != -1:
+            output += "%f w\n" % pe.mm2points(pmlOp.lw)
+
+        output += "%f %f %f %f re\n" % (
+            pe.x(pmlOp.x),
+            pe.y(pmlOp.y) - pe.mm2points(pmlOp.height),
+            pe.mm2points(pmlOp.width), pe.mm2points(pmlOp.height))
+
+        if pmlOp.fillType == pml.NO_FILL:
+            output += "S\n"
+        elif pmlOp.fillType == pml.FILL:
+            output += "f\n"
+        elif pmlOp.fillType == pml.STROKE_FILL:
+            output += "B\n"
+        else:
+            print "Invalid fill type for RectOp"
+
+class PDFQuarterCircleOp(PDFDrawOp):
+    def draw(self, pmlOp, pageNr, output, pe):
+        sX = pmlOp.flipX and -1 or 1
+        sY = pmlOp.flipY and -1 or 1
+
+        # the literature on how to emulate quarter circles with Bezier
+        # curves is sketchy, but the one thing that is clear is that the
+        # two control points have to be on (1, A) and (A, 1) (on a unit
+        # circle), and empirically choosing A to be half of the radius
+        # results in the best looking quarter circle.
+        A = pmlOp.radius * 0.5
+
+        output += "%f w\n"\
+                  "%s m\n" % (pe.mm2points(pmlOp.width),
+                              pe.xy((pmlOp.x - pmlOp.radius * sX, pmlOp.y)))
+
+        output += "%f %f %f %f %f %f c\n" % (
+            pe.x(pmlOp.x - pmlOp.radius * sX), pe.y(pmlOp.y - A * sY),
+            pe.x(pmlOp.x - A * sX), pe.y(pmlOp.y - pmlOp.radius * sY),
+            pe.x(pmlOp.x), pe.y(pmlOp.y - pmlOp.radius * sY))
+
+        output += "S\n"
+
+class PDFArbitraryOp(PDFDrawOp):
+    def draw(self, pmlOp, pageNr, output, pe):
+        output += "%s\n" % pmlOp.cmds
+
 # used for keeping track of used fonts
 class FontInfo:
     def __init__(self, name):
@@ -166,123 +282,10 @@ class PDFExporter:
         # content stream
         cont = util.String()
 
-        currentFont = ""
+        self.currentFont = ""
 
         for op in pg.ops:
-            if op.type == pml.OP_TEXT:
-
-                if op.toc:
-                    op.toc.pageObjNr = self.pageObjs[pageNr].nr
-
-                # we need to adjust y position since PDF uses baseline of
-                # text as the y pos, but pml uses top of the text as y
-                # pos. The Adobe standard Courier family font metrics give
-                # 157 units in 1/1000 point units as the Descender value,
-                # thus giving (1000 - 157) = 843 units from baseline to
-                # top of text.
-
-                # http://partners.adobe.com/asn/tech/type/ftechnotes.jsp
-                # contains the "Font Metrics for PDF Core 14 Fonts"
-                # document.
-
-                x = self.x(op.x)
-                y = self.y(op.y) - 0.843 * op.size
-
-                newFont = "F%d %d" % (self.getFontNr(op.flags), op.size)
-                if newFont != currentFont:
-                    cont += "/%s Tf\n" % newFont
-                    currentFont = newFont
-
-                cont += "BT\n"\
-                        "%f %f Td\n"\
-                        "(%s) Tj\n"\
-                        "ET\n" % (x, y, self.escapeStr(op.text))
-
-                if op.flags & pml.UNDERLINED:
-
-                    undLen = fontinfo.getTextWidth(op.text, op.flags,
-                                                   op.size)
-
-                    # all standard PDF fonts have the underline line 100
-                    # units below baseline with a thickness of 50
-                    undY = y - 0.1 * op.size
-
-                    cont += "%f w\n"\
-                            "%f %f m\n"\
-                            "%f %f l\n"\
-                            "S\n" % (0.05 * op.size, x, undY,
-                                     x + undLen, undY)
-
-            elif op.type == pml.OP_LINE:
-                p = op.points
-
-                pc = len(p)
-
-                if pc < 2:
-                    print "LineOp contains only %d points" % pc
-
-                    continue
-
-                cont += "%f w\n"\
-                        "%s m\n" % (self.mm2points(op.width),
-                                    self.xy(p[0]))
-
-                for i in range(1, pc):
-                    cont += "%s l\n" % (self.xy(p[i]))
-
-                if op.isClosed:
-                    cont += "s\n"
-                else:
-                    cont += "S\n"
-
-            elif op.type == pml.OP_RECT:
-                if op.lw != -1:
-                    cont += "%f w\n" % self.mm2points(op.lw)
-
-                cont += "%f %f %f %f re\n" % (
-                    self.x(op.x),
-                    self.y(op.y) - self.mm2points(op.height),
-                    self.mm2points(op.width), self.mm2points(op.height))
-
-                if op.fillType == pml.NO_FILL:
-                    cont += "S\n"
-                elif op.fillType == pml.FILL:
-                    cont += "f\n"
-                elif op.fillType == pml.STROKE_FILL:
-                    cont += "B\n"
-                else:
-                    print "Invalid fill type for pml.OP_RECT"
-
-                    continue
-
-            elif op.type == pml.OP_QC:
-                sX = op.flipX and -1 or 1
-                sY = op.flipY and -1 or 1
-
-                # the literature on how to emulate quarter circles with
-                # Bezier curves is sketchy, but the one thing that is
-                # clear is that the two control points have to be on (1,
-                # A) and (A, 1) (on a unit circle), and empirically
-                # choosing A to be half of the radius results in the best
-                # looking quarter circle.
-                A = op.radius * 0.5
-
-                cont += "%f w\n"\
-                        "%s m\n" % (self.mm2points(op.width),
-                                    self.xy((op.x - op.radius * sX, op.y)))
-
-                cont += "%f %f %f %f %f %f c\n" % (
-                    self.x(op.x - op.radius * sX), self.y(op.y - A * sY),
-                    self.x(op.x - A * sX), self.y(op.y - op.radius * sY),
-                    self.x(op.x), self.y(op.y - op.radius * sY))
-
-                cont += "S\n"
-
-            elif op.type == pml.OP_PDF:
-                cont += "%s\n" % op.cmds
-
-            else:
-                print "unknown op type %d" % op.type
+            op.pdfOp.draw(op, pageNr, cont, self)
 
         self.pageContentObjs[pageNr].data = self.genStream(str(cont))
         
