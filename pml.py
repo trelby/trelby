@@ -12,6 +12,7 @@
 
 # All measurements in PML are in (floating point) millimeters.
 
+import misc
 import pdf
 import util
 
@@ -50,6 +51,26 @@ class Document:
 
         # page number to display on document open, or -1
         self.defPage = -1
+
+        # when running testcases, misc.version does not exist, so store
+        # dummy values in that case, correct values otherwise.
+        if hasattr(misc, "version"):
+            if misc.license:
+                author = misc.license.userId.lstrip()
+
+                # get rid of the email part since users probably don't
+                # want to disseminate that
+                pos = author.find("<")
+                if pos != -1:
+                    author = author[:pos - 1]
+            else:
+                author = "Evaluation version"
+
+            self.version = misc.version
+            self.author = author
+        else:
+            self.version = "dummy_version"
+            self.author = "dummy_author"
 
     def add(self, page):
         self.pages.append(page)

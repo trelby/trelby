@@ -1,5 +1,4 @@
 import fontinfo
-import misc
 import pml
 import util
 
@@ -278,20 +277,8 @@ class PDFExporter:
         return self.genPDF()
 
     def createInfoObj(self):
-        version = self.escapeStr(misc.version)
-
-        if misc.license:
-            author = misc.license.userId.lstrip()
-
-            # get rid of the email part since users probably don't want to
-            # disseminate that
-            pos = author.find("<")
-            if pos != -1:
-                author = author[:pos - 1]
-
-            author = self.escapeStr(author)
-        else:
-            author = "Evaluation version"
+        version = self.escapeStr(self.doc.version)
+        author = self.escapeStr(self.doc.author)
 
         return self.addObj("<< /Author (%s)\n"
                            "/Creator (Oskusoft Blyte %s)\n"
