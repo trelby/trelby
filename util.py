@@ -325,7 +325,7 @@ def getTextHeight(size):
 
 # return how many mm wide given text is at given style with given size.
 def getTextWidth(text, style, size):
-    return (fontinfo.getTextWidth(text, style, size) / 72.0) * 25.4
+    return (fontinfo.getMetrics(style).getTextWidth(text, size) / 72.0) * 25.4
 
 # create a font that's height is at most 'height' pixels. other parameters
 # are the same as in wxFont's constructor.

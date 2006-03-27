@@ -1,38 +1,78 @@
 import pml
 
-# character widths for each font. acquired from the PDF font metrics.
-# ((width / 1000) * point_size) / 72.0 = how many inches wide that character
-# is.
+# character widths and general font information for each font. acquired
+# from the PDF font metrics. ((width / 1000) * point_size) / 72.0 = how
+# many inches wide that character is.
 #
 # all Courier-* fonts have characters 600 units wide.
 
-
-# calculate width of 'text' in 'style' with 'size', and return it in 1/72
-# inch units.
-def getTextWidth(text, style, size):
-
+# get the FontMetrics object for the given style
+def getMetrics(style):
     # the "& 15" gets rid of the underline flag
-    widths = _fontMetrics[style & 15]
+    return _fontMetrics[style & 15]
 
-    # courier
-    if widths == -1:
-        return 0.6 * size * len(text)
+class FontMetrics:
+    def __init__(self, fontWeight, flags, bbox, italicAngle, ascent, descent,
+                 capHeight, stemV, stemH, xHeight, widths):
 
-    total = 0
-    for i in range(len(text)):
-        total += widths[ord(text[i])]
+        # character widths in an array of 256 integers, or None for the
+        # Courier fonts.
+        self.widths = widths
+        
+        # see the PDF spec for the details on what these are.
+        self.fontWeight = fontWeight
+        self.flags = flags
+        self.bbox = bbox
+        self.italicAngle = italicAngle
+        self.ascent = ascent
+        self.descent = descent
+        self.capHeight = capHeight
+        self.stemV = stemV
+        self.stemH = stemH
+        self.xHeight = xHeight
 
-    return (total / 1000.0) * size
-    
+    # calculate width of 'text' in 'size', and return it in 1/72 inch
+    # units.
+    def getTextWidth(self, text, size):
+        widths = self.widths
+
+        # Courier
+        if not widths:
+            return 0.6 * (size * len(text))
+
+        total = 0
+        for ch in text:
+            total += widths[ord(ch)]
+
+        return (total / 1000.0) * size
+
 _fontMetrics = {
 
-    # special courier markers since they're all the same width
-    pml.COURIER : -1,
-    pml.COURIER | pml.BOLD : -1,
-    pml.COURIER | pml.ITALIC : -1,
-    pml.COURIER | pml.BOLD | pml.ITALIC : -1,
+    pml.COURIER : FontMetrics(
+    fontWeight = 400, flags = 35, bbox = (-23, -250, 715, 805),
+    italicAngle = 0, ascent = 629, descent = -157, capHeight = 562,
+    stemV = 51, stemH = 51, xHeight = 426, widths = None),
+                              
+    pml.COURIER | pml.BOLD : FontMetrics(
+    fontWeight = 700, flags = 35, bbox = (-113, -250, 749, 801),
+    italicAngle = 0, ascent = 629, descent = -157, capHeight = 562,
+    stemV = 106, stemH = 84, xHeight = 439, widths = None),
+    
+    pml.COURIER | pml.ITALIC : FontMetrics(
+    fontWeight = 400, flags = 99, bbox = (-27, -250, 849, 805),
+    italicAngle = -12, ascent = 629, descent = -157, capHeight = 562,
+    stemV = 51, stemH = 51, xHeight = 426, widths = None),
+    
+    pml.COURIER | pml.BOLD | pml.ITALIC : FontMetrics(
+    fontWeight = 700, flags = 99, bbox = (-57, -250, 869, 801),
+    italicAngle = -12, ascent = 629, descent = -157, capHeight = 562,
+    stemV = 106, stemH = 84, xHeight = 439, widths = None),
 
-    pml.HELVETICA : [
+
+    pml.HELVETICA : FontMetrics(
+    fontWeight = 400, flags = 32, bbox = (-166, -225, 1000, 931),
+    italicAngle = 0, ascent = 718, descent = -207, capHeight = 718,
+    stemV = 88, stemH = 76, xHeight = 523, widths = [
     545, 545, 545, 545, 545, 545, 545, 545,
     545, 545, 545, 545, 545, 545, 545, 545,
     545, 545, 545, 545, 545, 545, 545, 545,
@@ -64,10 +104,13 @@ _fontMetrics = {
     556, 556, 556, 556, 556, 556, 889, 500,
     556, 556, 556, 556, 278, 278, 278, 278,
     556, 556, 556, 556, 556, 556, 556, 584,
-    611, 556, 556, 556, 556, 500, 556, 500,
-    ],
+    611, 556, 556, 556, 556, 500, 556, 500
+    ]),
     
-    pml.HELVETICA | pml.BOLD : [
+    pml.HELVETICA | pml.BOLD : FontMetrics(
+    fontWeight = 700, flags = 32, bbox = (-170, -228, 1003, 962),
+    italicAngle = 0, ascent = 718, descent = -207, capHeight = 718,
+    stemV = 140, stemH = 118, xHeight = 532, widths = [
     564, 564, 564, 564, 564, 564, 564, 564,
     564, 564, 564, 564, 564, 564, 564, 564,
     564, 564, 564, 564, 564, 564, 564, 564,
@@ -100,9 +143,12 @@ _fontMetrics = {
     556, 556, 556, 556, 278, 278, 278, 278,
     611, 611, 611, 611, 611, 611, 611, 584,
     611, 611, 611, 611, 611, 556, 611, 556,
-    ],
+    ]),
     
-    pml.HELVETICA | pml.ITALIC : [
+    pml.HELVETICA | pml.ITALIC : FontMetrics(
+    fontWeight = 400, flags = 96, bbox = (-170, -225, 1116, 931),
+    italicAngle = -12, ascent = 718, descent = -207, capHeight = 718,
+    stemV = 88, stemH = 76, xHeight = 523, widths = [
     545, 545, 545, 545, 545, 545, 545, 545,
     545, 545, 545, 545, 545, 545, 545, 545,
     545, 545, 545, 545, 545, 545, 545, 545,
@@ -135,9 +181,12 @@ _fontMetrics = {
     556, 556, 556, 556, 278, 278, 278, 278,
     556, 556, 556, 556, 556, 556, 556, 584,
     611, 556, 556, 556, 556, 500, 556, 500,
-    ],
+    ]),
     
-    pml.HELVETICA | pml.BOLD | pml.ITALIC : [
+    pml.HELVETICA | pml.BOLD | pml.ITALIC : FontMetrics(
+    fontWeight = 700, flags = 96, bbox = (-174, -228, 1114, 962),
+    italicAngle = -12, ascent = 718, descent = -207, capHeight = 718,
+    stemV = 140, stemH = 118, xHeight = 532, widths = [
     564, 564, 564, 564, 564, 564, 564, 564,
     564, 564, 564, 564, 564, 564, 564, 564,
     564, 564, 564, 564, 564, 564, 564, 564,
@@ -170,9 +219,13 @@ _fontMetrics = {
     556, 556, 556, 556, 278, 278, 278, 278,
     611, 611, 611, 611, 611, 611, 611, 584,
     611, 611, 611, 611, 611, 556, 611, 556,
-    ],
-    
-    pml.TIMES_ROMAN : [
+    ]),
+
+
+    pml.TIMES_ROMAN : FontMetrics(
+    fontWeight = 400, flags = 34, bbox = (-168, -218, 1000, 898),
+    italicAngle = 0, ascent = 683, descent = -217, capHeight = 662,
+    stemV = 84, stemH = 28, xHeight = 450, widths = [
     516, 516, 516, 516, 516, 516, 516, 516,
     516, 516, 516, 516, 516, 516, 516, 516,
     516, 516, 516, 516, 516, 516, 516, 516,
@@ -205,9 +258,12 @@ _fontMetrics = {
     444, 444, 444, 444, 278, 278, 278, 278,
     500, 500, 500, 500, 500, 500, 500, 564,
     500, 500, 500, 500, 500, 500, 500, 500,
-    ],
+    ]),
 
-    pml.TIMES_ROMAN | pml.BOLD : [
+    pml.TIMES_ROMAN | pml.BOLD : FontMetrics(
+    fontWeight = 700, flags = 34, bbox = (-168, -218, 1000, 935),
+    italicAngle = 0, ascent = 683, descent = -217, capHeight = 676,
+    stemV = 139, stemH = 44, xHeight = 461, widths = [
     540, 540, 540, 540, 540, 540, 540, 540,
     540, 540, 540, 540, 540, 540, 540, 540,
     540, 540, 540, 540, 540, 540, 540, 540,
@@ -240,9 +296,12 @@ _fontMetrics = {
     444, 444, 444, 444, 278, 278, 278, 278,
     500, 556, 500, 500, 500, 500, 500, 570,
     500, 556, 556, 556, 556, 500, 556, 500,
-    ],
+    ]),
 
-    pml.TIMES_ROMAN | pml.ITALIC : [
+    pml.TIMES_ROMAN | pml.ITALIC : FontMetrics(
+    fontWeight = 400, flags = 98, bbox = (-169, -217, 1010, 883),
+    italicAngle = -15.5, ascent = 683, descent = -217, capHeight = 653,
+    stemV = 76, stemH = 32, xHeight = 441, widths = [
     513, 513, 513, 513, 513, 513, 513, 513,
     513, 513, 513, 513, 513, 513, 513, 513,
     513, 513, 513, 513, 513, 513, 513, 513,
@@ -275,9 +334,12 @@ _fontMetrics = {
     444, 444, 444, 444, 278, 278, 278, 278,
     500, 500, 500, 500, 500, 500, 500, 675,
     500, 500, 500, 500, 500, 444, 500, 444,
-    ],
+    ]),
 
-    pml.TIMES_ROMAN | pml.BOLD | pml.ITALIC : [
+    pml.TIMES_ROMAN | pml.BOLD | pml.ITALIC : FontMetrics(
+    fontWeight = 700, flags = 98, bbox = (-200, -218, 996, 921),
+    italicAngle = -15, ascent = 683, descent = -217, capHeight = 669,
+    stemV = 121, stemH = 42, xHeight = 462, widths = [
     523, 523, 523, 523, 523, 523, 523, 523,
     523, 523, 523, 523, 523, 523, 523, 523,
     523, 523, 523, 523, 523, 523, 523, 523,
@@ -310,5 +372,5 @@ _fontMetrics = {
     444, 444, 444, 444, 278, 278, 278, 278,
     500, 556, 500, 500, 500, 500, 500, 570,
     500, 556, 556, 556, 556, 444, 500, 444,
-    ]
+    ])
     }

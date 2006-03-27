@@ -44,7 +44,8 @@ class PDFTextOp(PDFDrawOp):
 
         if pmlOp.flags & pml.UNDERLINED:
 
-            undLen = fontinfo.getTextWidth(pmlOp.text, pmlOp.flags, pmlOp.size)
+            undLen = fontinfo.getMetrics(pmlOp.flags).getTextWidth(
+                pmlOp.text, pmlOp.size)
 
             # all standard PDF fonts have the underline line 100 units
             # below baseline with a thickness of 50
