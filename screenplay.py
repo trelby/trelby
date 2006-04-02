@@ -396,13 +396,6 @@ class Screenplay:
         self.paginate()
         self.markChanged()
         
-    # load script config from string s, reformat and repaginate script
-    # afterwards.
-    def loadCfg(self, s):
-        # hackish, but works
-        self.cfg.load(s)
-        self.applyCfg(self.cfg)
-
     # return script config as a string.
     def saveCfg(self):
         return self.cfg.save()

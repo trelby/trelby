@@ -2202,10 +2202,9 @@ class MyFrame(wxFrame):
             s = util.loadFile(misc.fromGUIUnicode(dlg.GetPath()), self)
 
             if s:
-                self.panel.ctrl.sp.loadCfg(s)
-
-                # kinda hacky, but very simple and works
-                self.panel.ctrl.applyCfg(self.panel.ctrl.sp.cfg)
+                cfg = config.Config()
+                cfg.load(s)
+                self.panel.ctrl.applyCfg(cfg)
                 
                 gd.scriptSettingsPath = os.path.dirname(
                     misc.fromGUIUnicode(dlg.GetPath()))
