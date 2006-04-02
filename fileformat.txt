@@ -75,8 +75,13 @@ The following config sections exists and appear in the file in this order:
   Cursor/(Line|Column) (integer): Cursor position.
 
   String/(MoreDialogue|ContinuedPageEnd|ContinuedPageStart|
-  DialogueContinued): The "(MORE)", "(CONTINUED)", "CONTINUED:",
+  DialogueContinued) (string): The "(MORE)", "(CONTINUED)", "CONTINUED:",
   " (cont'd)" texts to use.
+
+  Font/(Normal|Bold|Italic|Bold-Italic)/(Name|Filename) (string): If using
+  user-specified Courier fonts, these contain the Postscript name of the
+  font and if embedded in the PDF file, the filename of the .ttf file. See
+  the manual for details.
 
   In addition, there are element-type specific config directives, which
   are named "Element/x/y", where x is (Scene|Action|Character|Dialogue|

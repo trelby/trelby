@@ -135,6 +135,14 @@ Element/Note/Export/AllCaps:False
 Element/Note/Export/Bold:False
 Element/Note/Export/Italic:True
 Element/Note/Export/Underlined:False
+Font/Bold-Italic/Name:
+Font/Bold-Italic/Filename:
+Font/Bold/Name:
+Font/Bold/Filename:
+Font/Italic/Name:
+Font/Italic/Filename:
+Font/Normal/Name:
+Font/Normal/Filename:
 #End-Config 
 #Begin-Locations 
 Locations:0

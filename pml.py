@@ -46,6 +46,10 @@ class Document:
         # a collection of TOCItem objects
         self.tocs = []
 
+        # user-specified fonts, if any. key = 2 lowest bits of
+        # TextOp.flags, value = pml.PDFFontInfo
+        self.fonts = {}
+
         # whether to show TOC by default on document open
         self.showTOC = False
 
@@ -77,6 +81,9 @@ class Document:
 
     def addTOC(self, toc):
         self.tocs.append(toc)
+
+    def addFont(self, style, pfi):
+        self.fonts[style] = pfi
 
 class Page:
     def __init__(self, doc):
@@ -135,6 +142,17 @@ class TOCItem:
 
         # the PDF object number of the page we point to
         self.pageObjNr = -1
+
+# information about one PDF font
+class PDFFontInfo:
+    def __init__(self, name, fontProgram):
+        # name to use in generated PDF file ("CourierNew", "MyFontBold",
+        # etc.). if empty, use the default PDF font.
+        self.name = name
+
+        # the font program (in practise, the contents of the .ttf file for
+        # the font), or None, in which case the font is not embedded.
+        self.fontProgram = fontProgram
 
 # An abstract base class for all drawing operations.
 class DrawOp:

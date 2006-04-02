@@ -155,6 +155,9 @@ class PDFObject:
         output += "\nendobj\n"
 
 class PDFExporter:
+    # see genWidths
+    _widthsStr = None
+
     def __init__(self, doc):
         # pml.Document
         self.doc = doc
@@ -200,6 +203,9 @@ class PDFExporter:
         self.catalogObj = self.addObj()
         self.infoObj = self.createInfoObj()
         pagesObj = self.addObj()
+
+        # we only create this when needed, in genWidths
+        self.widthsObj = None
 
         if doc.tocs:
             self.outlinesObj = self.addObj()
@@ -286,6 +292,17 @@ class PDFExporter:
                            "/Producer (Oskusoft Blyte %s)\n"
                            ">>" % (author, version, version))
 
+    # create a PDF object containing a 256-entry array for the widths of a
+    # font, with all widths being 600
+    def genWidths(self):
+        if self.widthsObj:
+            return
+
+        if not self.__class__._widthsStr:
+            self.__class__._widthsStr = "[%s]" % ("600 " * 256).rstrip()
+
+        self.widthsObj = self.addObj(self.__class__._widthsStr)
+                                         
     # generate a single page
     def genPage(self, pageNr):
         pg = self.doc.pages[pageNr]
@@ -327,18 +344,25 @@ class PDFExporter:
 
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
-    def genStream(self, s):
+    def genStream(self, s, isFontStream = False):
         compress = True
+
+        # embedded TrueType font program streams for some reason need a
+        # Length1 entry that records the uncompressed length of the stream
+        if isFontStream:
+            lenStr = "/Length1 %d\n" % len(s)
+        else:
+            lenStr = ""
 
         filterStr = " "
         if compress:
             s = s.encode("zlib")
-            filterStr = "\n/Filter /FlateDecode "
+            filterStr = "/Filter /FlateDecode\n"
         
-        return ("<< /Length %d%s>>\n"
+        return ("<< /Length %d\n%s%s>>\n"
                 "stream\n"
                 "%s\n"
-                "endstream" % (len(s), filterStr, s))
+                "endstream" % (len(s), lenStr, filterStr, s))
 
     # add a new object and return it. 'data' is all data between
     # 'obj/endobj' tags, excluding newlines.
@@ -363,7 +387,7 @@ class PDFExporter:
     def genPDF(self):
         data = util.String()
         
-        data += "%PDF-1.4\n"
+        data += "%PDF-1.5\n"
 
         for obj in self.objects:
             self.writeObj(data, obj)
@@ -401,12 +425,70 @@ class PDFExporter:
 
         if fi.number == -1:
             fi.number = self.fontCnt
-            fi.pdfObj = self.addObj("<< /Type /Font\n"
-                                    "/Subtype /Type1\n"
-                                    "/BaseFont /%s\n"
-                                    "/Encoding /WinAnsiEncoding\n"
-                                    ">>" % fi.name)
             self.fontCnt += 1
+
+            # the "& 15" gets rid of the underline flag
+            pfi = self.doc.fonts.get(flags & 15)
+
+            if not pfi:
+                fi.pdfObj = self.addObj("<< /Type /Font\n"
+                                        "/Subtype /Type1\n"
+                                        "/BaseFont /%s\n"
+                                        "/Encoding /WinAnsiEncoding\n"
+                                        ">>" % fi.name)
+            else:
+                self.genWidths()
+
+                fi.pdfObj = self.addObj("<< /Type /Font\n"
+                                        "/Subtype /TrueType\n"
+                                        "/BaseFont /%s\n"
+                                        "/Encoding /WinAnsiEncoding\n"
+                                        "/FirstChar 0\n"
+                                        "/LastChar 255\n"
+                                        "/Widths %d 0 R\n"
+                                        "/FontDescriptor %d 0 R\n"
+                                        ">>" % (pfi.name, self.widthsObj.nr,
+                                                self.objectCnt + 1))
+            
+                fm = fontinfo.getMetrics(flags)
+
+                if pfi.fontProgram:
+                    fpStr = "/FontFile2 %d 0 R\n" % (self.objectCnt + 1)
+                else:
+                    fpStr = ""
+
+                # we use a %s format specifier for the italic angle since
+                # it sometimes contains integers, sometimes floating point
+                # values.
+                self.addObj("<< /Type /FontDescriptor\n"
+                            "/FontName /%s\n"
+                            "/FontWeight %d\n"
+                            "/Flags %d\n"
+                            "/FontBBox [%d %d %d %d]\n"
+                            "/ItalicAngle %s\n"
+                            "/Ascent %s\n"
+                            "/Descent %s\n"
+                            "/CapHeight %s\n"
+                            "/StemV %s\n"
+                            "/StemH %s\n"
+                            "/XHeight %d\n"
+                            "%s"
+                            ">>" % (pfi.name,
+                                    fm.fontWeight,
+                                    fm.flags,
+                                    fm.bbox[0], fm.bbox[1],
+                                    fm.bbox[2], fm.bbox[3],
+                                    fm.italicAngle,
+                                    fm.ascent,
+                                    fm.descent,
+                                    fm.capHeight,
+                                    fm.stemV,
+                                    fm.stemH,
+                                    fm.xHeight,
+                                    fpStr))
+
+                if pfi.fontProgram:
+                    self.addObj(self.genStream(pfi.fontProgram, True))
 
         return fi.number
 

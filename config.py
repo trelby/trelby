@@ -4,6 +4,7 @@
 from error import *
 import misc
 import mypickle
+import pml
 import screenplay
 import util
 
@@ -52,6 +53,11 @@ PBI_REAL_AND_UNADJ = 2
 # for range checking above value
 PBI_FIRST, PBI_LAST = PBI_NONE, PBI_REAL_AND_UNADJ
 
+# constants for identifying PDFFontInfos
+PDF_FONT_NORMAL = "Normal"
+PDF_FONT_BOLD = "Bold"
+PDF_FONT_ITALIC = "Italic"
+PDF_FONT_BOLD_ITALIC = "Bold-Italic"
 
 # construct reverse lookup tables
 
@@ -266,6 +272,58 @@ class FontInfo:
         self.fx = 1
         self.fy = 1
 
+# information about one PDF font
+class PDFFontInfo:
+    cvars = None
+
+    # list of characters not allowed in pdfNames (control characters,
+    # whitespace, non-ASCII characters)
+    invalidChars = None
+    
+    def __init__(self, name, style):
+        # our name for the font (one of the PDF_FONT_* constants)
+        self.name = name
+
+        # 2 lowest bits of pml.TextOp.flags
+        self.style = style
+
+        if not self.__class__.cvars:
+            v = self.__class__.cvars = mypickle.Vars()
+
+            # name to use in generated PDF file (CourierNew, MyFontBold,
+            # etc.). if empty, use the default PDF Courier font.
+            v.addStrLatin1("pdfName", "", "Name")
+
+            # filename for the font to embed, or empty meaning don't
+            # embed.
+            v.addStrUnicode("filename", u"", "Filename")
+            
+            v.makeDicts()
+
+            tmp = ""
+
+            for i in range(256):
+                if (i <= 32) or (i >= 127):
+                    tmp += chr(i)
+
+            self.__class__.invalidChars = tmp
+            
+        self.__class__.cvars.setDefaults(self)
+            
+    def save(self, prefix):
+        prefix += "%s/" % self.name
+
+        return self.cvars.save(prefix, self)
+
+    def load(self, vals, prefix):
+        prefix += "%s/" % self.name
+        
+        self.cvars.load(vals, prefix, self)
+
+    # fix up invalid values.
+    def refresh(self):
+        self.pdfName = util.deleteChars(self.pdfName, self.invalidChars)
+
 # per-script config, each script has its own one of these.
 class Config:
     cvars = None
@@ -337,6 +395,16 @@ class Config:
         t.screen.isItalic = True
         t.export.isItalic = True
         self.types[t.lt] = t
+
+        # pdf font configs, key = PDF_FONT_*, value = PdfFontInfo
+        self.pdfFonts = { }
+
+        for name, style in (
+            (PDF_FONT_NORMAL, pml.COURIER),
+            (PDF_FONT_BOLD, pml.COURIER | pml.BOLD),
+            (PDF_FONT_ITALIC, pml.COURIER | pml.ITALIC),
+            (PDF_FONT_BOLD_ITALIC, pml.COURIER | pml.BOLD | pml.ITALIC)):
+            self.pdfFonts[name] = PDFFontInfo(name, style)
 
         self.recalc()
 
@@ -419,6 +487,9 @@ class Config:
         for t in self.types.itervalues():
             t.load(vals, "Element/")
 
+        for pf in self.pdfFonts.itervalues():
+            pf.load(vals, "Font/")
+
         self.recalc()
         
     # save config into a string and return that.
@@ -428,6 +499,9 @@ class Config:
         for t in self.types.itervalues():
             s += t.save("Element/")
             
+        for pf in self.pdfFonts.itervalues():
+            s += pf.save("Font/")
+
         return s
             
     # fix up all invalid config values and recalculate all variables
@@ -450,6 +524,9 @@ class Config:
         for it in self.cvars.stringLatin1.itervalues():
             setattr(self, it.name, util.toInputStr(getattr(self, it.name)))
             
+        for pf in self.pdfFonts.itervalues():
+            pf.refresh()
+
         # make sure usable space on the page isn't too small
         if doAll and (self.marginTop + self.marginBottom) >= \
                (self.paperHeight - 100.0):
@@ -463,6 +540,15 @@ class Config:
 
     def getType(self, lt):
         return self.types[lt]
+
+    # get a PDFFontInfo object for the given font type (PDF_FONT_*)
+    def getPDFFont(self, fontType):
+        return self.pdfFonts[fontType]
+
+    # return a tuple of all the PDF font types
+    def getPDFFontIds(self):
+        return (PDF_FONT_NORMAL, PDF_FONT_BOLD, PDF_FONT_ITALIC,
+                PDF_FONT_BOLD_ITALIC)
 
 # global config. there is only ever one of these active.
 class ConfigGlobal:

@@ -89,6 +89,7 @@ class CfgDlg(wxDialog):
             self.AddPage(FormattingPanel, "Formatting")
             self.AddPage(PaperPanel, "Paper")
             self.AddPage(PDFPanel, "PDF")
+            self.AddPage(PDFFontsPanel, "PDF/Fonts")
             self.AddPage(StringsPanel, "Strings")
 
         size = self.listbook.GetContainingSize()
@@ -232,7 +233,7 @@ class DisplayPanel(wxPanel):
         self.cfg.pbi = self.pbRb.GetSelection()
 
     def updateFontLb(self):
-        names = ["Normal", "Bold", "Italic", "Bold + Italic"]
+        names = ["Normal", "Bold", "Italic", "Bold-Italic"]
 
         for i in range(len(names)):
             nfi = wxNativeFontInfo()
@@ -601,10 +602,7 @@ class PaperPanel(wxPanel):
         sizer.Add(label2, 0, wxALIGN_CENTER_VERTICAL)
 
         setattr(self, name.lower() + "EntryMm", entry)
-        setattr(self, name.lower() + "LabelMm", label)
-        
         setattr(self, name.lower() + "EntryInch", entry2)
-        setattr(self, name.lower() + "LabelInch", label2)
 
         EVT_TEXT(self, entry.GetId(), self.OnMarginMm)
         EVT_TEXT(self, entry2.GetId(), self.OnMarginInch)
@@ -1264,3 +1262,127 @@ class PDFPanel(wxPanel):
         self.removeNotesCb.SetValue(self.cfg.pdfRemoveNotes)
         self.outlineNotesCb.SetValue(self.cfg.pdfOutlineNotes)
         self.marginsCb.SetValue(self.cfg.pdfShowMargins)
+
+class PDFFontsPanel(wxPanel):
+    def __init__(self, parent, id, cfg):
+        wxPanel.__init__(self, parent, id)
+        self.cfg = cfg
+
+        self.blockEvents = True
+
+        # last directory we chose a font from
+        self.lastDir = u""
+        
+        vsizer = wxBoxSizer(wxVERTICAL)
+
+        vsizer.Add(wxStaticText(self, -1,
+            "Leave all the fields empty to use the default PDF Courier\n"
+            "fonts. This is highly recommended.\n"
+            "\n"
+            "Otherwise, fill in the font name (e.g. CourierNew-Bold) to\n"
+            "use the specified TrueType font. If you want to embed the\n"
+            "font in the generated PDF files, fill in the font filename as\n"
+            "well.\n"
+            "\n"
+            "See the manual for the full details.\n"))
+
+        hsizer = wxBoxSizer(wxHORIZONTAL)
+        
+        hsizer.Add(wxStaticText(self, -1, "Type:"), 0,
+                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+
+        self.typeCombo = wxComboBox(self, -1, style = wxCB_READONLY)
+
+        for pfi in self.cfg.getPDFFontIds():
+            pf = self.cfg.getPDFFont(pfi)
+            self.typeCombo.Append(pf.name, pf)
+
+        hsizer.Add(self.typeCombo, 0)
+
+        vsizer.Add(hsizer, 0, wxEXPAND)
+
+        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 10)
+
+        gsizer = wxFlexGridSizer(2, 3, 5, 5)
+        gsizer.AddGrowableCol(1)
+
+        self.addEntry("nameEntry", "Name:", self, gsizer)
+        gsizer.Add((1,1), 0)
+
+        self.addEntry("fileEntry", "File:", self, gsizer)
+        btn = wxButton(self, -1, "Browse")
+        gsizer.Add(btn)
+
+        EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
+
+        vsizer.Add(gsizer, 0, wxEXPAND)
+
+        util.finishWindow(self, vsizer, center = False)
+
+        EVT_COMBOBOX(self, self.typeCombo.GetId(), self.OnTypeCombo)
+
+        self.typeCombo.SetSelection(0)
+        self.OnTypeCombo()
+
+        self.blockEvents = False
+
+    # FIXME: have a checkForErrors func, have parent call it for each
+    # panel that has such a function on apply and ok, and make it complain
+    # if filename is given but fontname is empty.
+
+    def addEntry(self, name, descr, parent, sizer):
+        sizer.Add(wxStaticText(parent, -1, descr), 0,
+                  wxALIGN_CENTER_VERTICAL)
+        
+        entry = wxTextCtrl(parent, -1)
+        sizer.Add(entry, 1, wxEXPAND)
+
+        setattr(self, name, entry)
+
+        EVT_TEXT(self, entry.GetId(), self.OnMisc)
+
+    def OnMisc(self, event):
+        if self.blockEvents:
+            return
+
+        self.pf.pdfName = misc.fromGUI(self.nameEntry.GetValue())
+        self.pf.filename = misc.fromGUIUnicode(self.fileEntry.GetValue())
+
+    def OnBrowse(self, event):
+        if self.pf.filename:
+            dDir = os.path.dirname(self.pf.filename)
+            dFile = os.path.basename(self.pf.filename)
+        else:
+            dDir = self.lastDir
+            dFile = u""
+                           
+        dlg = wxFileDialog(cfgFrame, "Choose font file",
+            defaultDir = misc.toGUIUnicode(dDir),
+            defaultFile = misc.toGUIUnicode(dFile),
+            wildcard = "TrueType fonts (*.ttf;*.TTF)|*.ttf;*.TTF|All files|*",
+            style = wxOPEN)
+
+        if dlg.ShowModal() == wxID_OK:
+            self.fileEntry.SetValue(dlg.GetPath())
+            self.fileEntry.SetInsertionPointEnd()
+            
+            self.lastDir = os.path.dirname(misc.fromGUIUnicode(dlg.GetPath()))
+
+            # FIXME: read font name from font file and fill in
+            # self.pf.pdfName. also warn if font has flags to disallow
+            # embedding and/or printing.
+            
+        dlg.Destroy()
+
+    def OnTypeCombo(self, event = None):
+        self.blockEvents = True
+
+        self.pf = self.typeCombo.GetClientData(self.typeCombo.GetSelection())
+        self.cfg2gui()
+
+        self.blockEvents = False
+
+    def cfg2gui(self):
+        self.nameEntry.SetValue(self.pf.pdfName)
+        self.fileEntry.SetValue(misc.toGUIUnicode(self.pf.filename))
+        self.fileEntry.SetInsertionPointEnd()

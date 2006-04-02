@@ -76,12 +76,6 @@ def testRemoveElementTypes():
     sp.removeElementTypes({ scr.ACTION : 0 })
     assert sp.isModified()
 
-def testLoadCfg():
-    sp = u.load()
-    # dummy config, no need for real one
-    sp.loadCfg("")
-    assert sp.isModified()
-
 def testApplyCfg():
     sp = u.load()
     sp.applyCfg(config.Config())
