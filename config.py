@@ -324,6 +324,11 @@ class PDFFontInfo:
     def refresh(self):
         self.pdfName = util.deleteChars(self.pdfName, self.invalidChars)
 
+        # to avoid confused users not understanding why their embedded
+        # font isn't working, put in an arbitrary font name if needed
+        if self.filename and not self.pdfName:
+            self.pdfName = "SampleFontName"
+
 # per-script config, each script has its own one of these.
 class Config:
     cvars = None

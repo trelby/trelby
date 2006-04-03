@@ -1326,10 +1326,6 @@ class PDFFontsPanel(wxPanel):
 
         self.blockEvents = False
 
-    # FIXME: have a checkForErrors func, have parent call it for each
-    # panel that has such a function on apply and ok, and make it complain
-    # if filename is given but fontname is empty.
-
     def addEntry(self, name, descr, parent, sizer):
         sizer.Add(wxStaticText(parent, -1, descr), 0,
                   wxALIGN_CENTER_VERTICAL)
