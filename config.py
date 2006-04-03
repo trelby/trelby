@@ -276,8 +276,7 @@ class FontInfo:
 class PDFFontInfo:
     cvars = None
 
-    # list of characters not allowed in pdfNames (control characters,
-    # whitespace, non-ASCII characters)
+    # list of characters not allowed in pdfNames
     invalidChars = None
     
     def __init__(self, name, style):
@@ -303,7 +302,12 @@ class PDFFontInfo:
             tmp = ""
 
             for i in range(256):
-                if (i <= 32) or (i >= 127):
+                # the OpenType font specification 1.4, of all places,
+                # contains the most detailed discussion of characters
+                # allowed in Postscript font names, in the section on
+                # 'name' tables, describing name ID 6 (=Postscript name).
+                if (i <= 32) or (i >= 127) or chr(i) in (
+                    "[", "]", "(", ")", "{", "}", "<", ">", "/", "%"):
                     tmp += chr(i)
 
             self.__class__.invalidChars = tmp
