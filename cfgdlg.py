@@ -2,6 +2,7 @@ import config
 import gutil
 import misc
 import screenplay
+import truetype
 import util
 
 import os.path
@@ -19,6 +20,15 @@ class MyListBook(wxListBox):
 
         EVT_LISTBOX(self, self.GetId(), self.OnPageChange)
 
+    # get a list of all the pages
+    def GetPages(self):
+        ret = []
+
+        for i in range(self.GetCount()):
+            ret.append(self.GetClientData(i))
+
+        return ret
+
     def AddPage(self, page, name):
         self.Append(name, page)
 
@@ -26,8 +36,7 @@ class MyListBook(wxListBox):
     def GetContainingSize(self):
         w, h = 0, 0
 
-        for i in range(self.GetCount()):
-            page = self.GetClientData(i)
+        for page in self.GetPages():
             size = page.GetClientSize()
             w = max(w, size.width)
             h = max(h, size.height)
@@ -36,12 +45,12 @@ class MyListBook(wxListBox):
 
     # set all page sizes
     def SetPageSizes(self, w, h):
-        for i in range(self.GetCount()):
-            self.GetClientData(i).SetClientSizeWH(w, h)
+        for page in self.GetPages():
+            page.SetClientSizeWH(w, h)
         
     def OnPageChange(self, event = None):
-        for i in range(self.GetCount()):
-            self.GetClientData(i).Hide()
+        for page in self.GetPages():
+            page.Hide()
 
         panel = self.GetClientData(self.GetSelection())
 
@@ -49,7 +58,7 @@ class MyListBook(wxListBox):
             panel.doForcedUpdate()
 
         panel.Show()
-    
+
 class CfgDlg(wxDialog):
     def __init__(self, parent, cfg, applyFunc, isGlobal):
         wxDialog.__init__(self, parent, -1, "",
@@ -133,11 +142,19 @@ class CfgDlg(wxDialog):
     def AddPage(self, classObj, name):
         p = classObj(self.panel, -1, self.cfg)
         self.listbook.AddPage(p, name)
-        
+
+    # check for errors in each panel
+    def checkForErrors(self):
+        for panel in self.listbook.GetPages():
+            if hasattr(panel, "checkForErrors"):
+                panel.checkForErrors()
+
     def OnOK(self, event):
+        self.checkForErrors()
         self.EndModal(wxID_OK)
 
     def OnApply(self, event):
+        self.checkForErrors()
         self.applyFunc(self.cfg)
 
     def OnCancel(self, event):
@@ -1279,10 +1296,9 @@ class PDFFontsPanel(wxPanel):
             "Leave all the fields empty to use the default PDF Courier\n"
             "fonts. This is highly recommended.\n"
             "\n"
-            "Otherwise, fill in the font name (e.g. CourierNew-Bold) to\n"
-            "use the specified TrueType font. If you want to embed the\n"
-            "font in the generated PDF files, fill in the font filename as\n"
-            "well.\n"
+            "Otherwise, fill in the font name (e.g. AndaleMono) to use\n"
+            "the specified TrueType font. If you want to embed the font\n"
+            "in the generated PDF files, fill in the font filename as well.\n"
             "\n"
             "See the manual for the full details.\n"))
 
@@ -1326,6 +1342,14 @@ class PDFFontsPanel(wxPanel):
 
         self.blockEvents = False
 
+    # check that all embedded TrueType fonts are OK
+    def checkForErrors(self):
+        for pfi in self.cfg.getPDFFontIds():
+            pf = self.cfg.getPDFFont(pfi)
+
+            if pf.filename:
+                self.getFontPostscriptName(pf.filename)
+        
     def addEntry(self, name, descr, parent, sizer):
         sizer.Add(wxStaticText(parent, -1, descr), 0,
                   wxALIGN_CENTER_VERTICAL)
@@ -1361,13 +1385,12 @@ class PDFFontsPanel(wxPanel):
         if dlg.ShowModal() == wxID_OK:
             self.fileEntry.SetValue(dlg.GetPath())
             self.fileEntry.SetInsertionPointEnd()
-            
-            self.lastDir = os.path.dirname(misc.fromGUIUnicode(dlg.GetPath()))
 
-            # FIXME: read font name from font file and fill in
-            # self.pf.pdfName. also warn if font has flags to disallow
-            # embedding and/or printing.
-            
+            fname = misc.fromGUIUnicode(dlg.GetPath())
+
+            self.nameEntry.SetValue(self.getFontPostscriptName(fname))
+            self.lastDir = os.path.dirname(fname)
+
         dlg.Destroy()
 
     def OnTypeCombo(self, event = None):
@@ -1382,3 +1405,34 @@ class PDFFontsPanel(wxPanel):
         self.nameEntry.SetValue(self.pf.pdfName)
         self.fileEntry.SetValue(misc.toGUIUnicode(self.pf.filename))
         self.fileEntry.SetInsertionPointEnd()
+
+    # read TrueType font from given file and return its Postscript name,
+    # or "" on errors.
+    def getFontPostscriptName(self, filename):
+        # we load at most 10 MB to avoid a denial-of-service attack by
+        # passing around scripts containing references to fonts with
+        # filenames like "/dev/zero" etc. no real font that I know of is
+        # this big so it shouldn't hurt.
+        fontProgram = util.loadFile(filename, cfgFrame, 10 * 1024 * 1024)
+
+        if fontProgram is None:
+            return ""
+
+        f = truetype.Font(fontProgram)
+
+        if not f.isOK():
+            wxMessageBox("File '%s'\n"
+                         "does not appear to be a valid TrueType font."
+                         % misc.toGUIUnicode(filename),
+                         "Error", wxOK, cfgFrame)
+
+            return ""
+
+        if not f.allowsEmbedding():
+            wxMessageBox("Font '%s'\n"
+                         "does not allow embedding in its license terms.\n"
+                         "You may encounter problems using this font"
+                         " embedded." % misc.toGUIUnicode(filename),
+                         "Error", wxOK, cfgFrame)
+
+        return f.getPostscriptName()
