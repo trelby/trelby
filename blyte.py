@@ -1197,6 +1197,15 @@ class MyCtrl(wxControl):
     def cmdTabPrev(self, cs):
         self.sp.toPrevTypeTabCmd(cs)
 
+    def cmdSpeedTest(self, cs):
+        zz = util.TimerDev("50 paints")
+        
+        for i in xrange(50):
+            self.OnKeyChar(util.MyKeyEvent(ord("a")))
+            self.Update()
+
+        del zz
+
     def cmdTest(self, cs):
         pass
     
@@ -1221,6 +1230,8 @@ class MyCtrl(wxControl):
                 self.loadFile(u"sample.blyte")
             elif opts.isTest and (cs.char == "¤"):
                 self.cmdTest(cs)
+            elif opts.isTest and (cs.char == "½"):
+                self.cmdSpeedTest(cs)
             else:
                 self.sp.addCharCmd(cs)
                 
