@@ -524,15 +524,16 @@ class MyCtrl(wxControl):
         pass
         
     def OnSize(self, event):
-        size = self.GetClientSize()
+        if misc.doDblBuf:
+            size = self.GetClientSize()
 
-        sb = wxEmptyBitmap(size.width, size.height)
-        old = getattr(self.__class__, "screenBuf", None)
+            sb = wxEmptyBitmap(size.width, size.height)
+            old = getattr(self.__class__, "screenBuf", None)
 
-        if (old == None) or (old.GetDepth() != sb.GetDepth()) or \
-           (old.GetHeight() != sb.GetHeight()) or \
-           (old.GetWidth() != sb.GetWidth()):
-            self.__class__.screenBuf = sb
+            if (old == None) or (old.GetDepth() != sb.GetDepth()) or \
+               (old.GetHeight() != sb.GetHeight()) or \
+               (old.GetWidth() != sb.GetWidth()):
+                self.__class__.screenBuf = sb
         
         self.makeLineVisible(self.sp.line)
     
@@ -1256,7 +1257,11 @@ class MyCtrl(wxControl):
         #ldkjfldsj = util.TimerDev("paint")
         
         ls = self.sp.lines
-        dc = wxBufferedPaintDC(self, self.screenBuf)
+
+        if misc.doDblBuf:
+            dc = wxBufferedPaintDC(self, self.screenBuf)
+        else:
+            dc = wxPaintDC(self)
 
         size = self.GetClientSize()
         marked = self.sp.getMarkedLines()

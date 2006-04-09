@@ -9,8 +9,8 @@ import sys
 from wxPython.wx import *
 
 def init(doWX = True):
-    global isWindows, isUnix, unicodeFS, wx26, wxIsUnicode, progPath, \
-           confPath, tmpPrefix
+    global isWindows, isUnix, unicodeFS, wx26, wxIsUnicode, doDblBuf, \
+           progPath, confPath, tmpPrefix
 
     # prefix used for temp files
     tmpPrefix = "oskusoft-blyte-tmp-"
@@ -33,6 +33,9 @@ def init(doWX = True):
     # filesystem calls; if not, we need to convert filenames to UTF-8
     # before using them.
     unicodeFS = isWindows
+
+    # wxGTK2 does not need us to do double buffering ourselves, others do
+    doDblBuf = not (wx26 and isUnix)
 
     # stupid hack to keep testcases working, since they don't initialize
     # opts (the doWX name is just for similary with util, and to confuse
