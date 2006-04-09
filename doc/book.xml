@@ -1134,6 +1134,14 @@
 		want capitalized, write another letter, and then replace the
 		capitalized letter by a lowercase one.</para>
 
+		<para>'Auto-capitalize i -> I', if on, causes solitary 'i'
+		characters in the middle of sentences to be changed to a 'I'
+		character automatically.</para>
+
+		<para>'When opening a script, start at last saved position' causes
+		the cursor position be restored to the point it was at when the
+		script was saved.</para>
+
 		<para>'Check script for errors before print, export or compare',
 		if checked, causes the program to run 'Script/Find next error' for
 		the entire script automatically before print/export/compare
@@ -1285,7 +1293,106 @@
 		figure out printing related problems.</para>
 
 	  </sect2>
-	  
+
+	  <sect2>
+		<title>PDF/Fonts</title>
+
+		<para>Here you can configure the fonts used in generating the PDF
+		files. Normally they use the standard PDF Courier fonts that are
+		guaranteed to work everywhere, and it is strongly recommended to
+		leave things as they are unless you have specific reasons to use
+		other fonts.</para>
+
+		<para>So, assuming you have a good enough reason, you can use the
+		TrueType fonts of your choosing. There are four different font
+		settings, one for each font style (Normal / Bold / Italic /
+		Bold-Italic).</para>
+
+		<para>Each font setting has two parts: a 'Name' field and a 'File'
+		field. The 'Name' field is the Postscript name of the font and is
+		used by the PDF viewer application to recognize the font to use.
+		Some examples of the names that would go here are 'AndaleMono',
+		'CourierNewPSMT', and 'BitstreamVeraSansMono-Roman'. These names
+		are, in general, impossible for human beings to know for arbitrary
+		fonts. See the next paragraphs for ways around this.</para>
+
+		<para>The 'File' field is the filename of the TrueType font to
+		use. If you fill in this field, the font file is embedded in the
+		generated PDF files. If you leave this field empty but fill in the
+		'Name' field, the font file is not embedded in the PDF file, just
+		the 'Name' reference is used to indicate what font the PDF viewer
+		application should use.</para>
+
+		<para>There are many factors affecting whether you should embed a
+		font or not. Embedding a font makes it much more likely that the
+		PDF file will display properly on other people's computers and/or
+		print properly. However, it will also increase the size of the PDF
+		files drastically, and not all fonts allow embedding in their
+		license terms.</para>
+
+		<para>When you use the 'Browse' button to locate a font file, the
+		following things happen:</para>
+
+		<itemizedlist>
+
+		  <listitem>
+
+			<para>The file is checked to be a valid TrueType font file.</para>
+
+		  </listitem>
+		  
+		  <listitem>
+
+			<para>The font's Postscript name is located from the font file
+			and put in the 'Name' field.</para>
+
+		  </listitem>
+		  
+		  <listitem>
+
+			<para>The licensing terms of the font are checked and if
+			embedding is not allowed, a warning is printed.</para>
+
+		  </listitem>
+		  
+		</itemizedlist>
+
+		<para>Note that the chosen fonts have to be able to be substituted
+		in place of the normal Courier fonts with no changes to the text
+		layout, i.e., they have to be fixed width fonts with the same size
+		as the Courier fonts are. If this is not the case, you will see
+		characters overlapping each other and other errors in the
+		output.</para>
+
+		<para>Also note that random fonts downloaded from the Internet are
+		very often broken in every sense of the word. They have names that
+		violate the Postscript/PDF specifications, they lack essential
+		characters (it is very rare for them to contain anything outside
+		of the ASCII character set), and their quality is bad. So, if you
+		feel you must use something besides the normal Courier fonts, at
+		least use professional fonts made by people who know what they're
+		doing.</para>
+
+		<para>Note for Windows users: Microsoft, in their infinite wisdom,
+		have found yet another way to obstruct people from using their
+		computers. When you use the 'Browse' button and navigate to e.g.
+		the 'C:\Windows\Fonts' directory to choose a TrueType font file,
+		the files are listed correctly but you can't select them! One
+		wonders what goes on in those meetings at Microsoft where things
+		like this are decided... "Why would anyone ever want to select a
+		font file from a normal file open dialog?" "Gee Bob, I don't know,
+		maybe we should disallow that so that users aren't confused?"
+		"Good idea Jim, let's do that!".</para>
+
+		<para>To work around this bit of brokenness, once you're in the
+		directory containing the font file you want to use, switch the
+		keyboard focus to the filename entry field and type in the first
+		few characters of the filename, after which a completion pop-up
+		should show up from which you can select the correct
+		filename.</para>
+		
+	  </sect2>
+
 	  <sect2>
 		<title>Strings</title>
 
