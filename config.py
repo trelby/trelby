@@ -944,20 +944,11 @@ class ConfigGlobal:
         v.addStrUnicode("pdfViewerPath", u"", "PDF/ViewerPath")
         v.addStrBinary("pdfViewerArgs", "", "PDF/ViewerArguments")
 
-        # fonts
-        if misc.isUnix:
-            v.addStrBinary("fontNormal", "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1", "FontNormal")
-            v.addStrBinary("fontBold", "0;-adobe-courier-bold-r-normal-*-*-140-*-*-m-*-iso8859-1", "FontBold")
-            v.addStrBinary("fontItalic", "0;-adobe-courier-medium-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontItalic")
-            v.addStrBinary("fontBoldItalic", "0;-adobe-courier-bold-o-normal-*-*-140-*-*-m-*-iso8859-1", "FontBoldItalic")
-            
-        elif misc.isWindows:
-            v.addStrBinary("fontNormal", "0;-13;0;0;0;400;0;0;0;0;3;2;1;49;Courier New", "FontNormal")
-            v.addStrBinary("fontBold", "0;-13;0;0;0;700;0;0;0;0;3;2;1;49;Courier New", "FontBold")
-            v.addStrBinary("fontItalic", "0;-13;0;0;0;400;255;0;0;0;3;2;1;49;Courier New", "FontItalic")
-            v.addStrBinary("fontBoldItalic", "0;-13;0;0;0;700;255;0;0;0;3;2;1;49;Courier New", "FontBoldItalic")
-        else:
-            raise ConfigError("unknown platform")
+        # fonts. real defaults are set in setDefaultFonts.
+        v.addStrBinary("fontNormal", "", "FontNormal")
+        v.addStrBinary("fontBold", "", "FontBold")
+        v.addStrBinary("fontItalic", "", "FontItalic")
+        v.addStrBinary("fontBoldItalic", "", "FontBoldItalic")
         
         # default script directory
         v.addStrUnicode("scriptDir", misc.progPath, "DefaultScriptDirectory")
@@ -1082,6 +1073,43 @@ class ConfigGlobal:
         else:
             return s
 
+    # set default values that vary depending on platform, wxWidgets
+    # version, etc. this is not at the end of __init__ because
+    # non-interactive uses have no needs for these.
+    def setDefaults(self):
+        self.setDefaultFonts()
+        self.findPDFViewer()
+
+    # set default fonts
+    def setDefaultFonts(self):
+        fn = ["", "", "", ""]
+
+        if misc.isUnix:
+            if misc.wxIsUnicode:
+                fn[0] = "Monospace 10"
+                fn[1] = "Monospace Bold 10"
+                fn[2] = "Monospace Italic 10"
+                fn[3] = "Monospace Bold Italic 10"
+            else:
+                fn[0] = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
+                fn[1] = "0;-adobe-courier-bold-r-normal-*-*-140-*-*-m-*-iso8859-1"
+                fn[2] = "0;-adobe-courier-medium-o-normal-*-*-140-*-*-m-*-iso8859-1"
+                fn[3] = "0;-adobe-courier-bold-o-normal-*-*-140-*-*-m-*-iso8859-1"
+            
+        elif misc.isWindows:
+                fn[0] = "0;-13;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
+                fn[1] = "0;-13;0;0;0;700;0;0;0;0;3;2;1;49;Courier New"
+                fn[2] = "0;-13;0;0;0;400;255;0;0;0;3;2;1;49;Courier New"
+                fn[3] = "0;-13;0;0;0;700;255;0;0;0;3;2;1;49;Courier New"
+                
+        else:
+            raise ConfigError("Unknown platform")
+
+        self.fontNormal = fn[0]
+        self.fontBold = fn[1]
+        self.fontItalic = fn[2]
+        self.fontBoldItalic = fn[3]
+        
     # set PDF viewer program to the best one found on the machine.
     def findPDFViewer(self):
         # list of programs to look for. each item is of the form (name,
@@ -1205,12 +1233,37 @@ class ConfigGui:
         for fname in ["fontNormal", "fontBold", "fontItalic",
                       "fontBoldItalic"]:
             fi = FontInfo()
-            
-            nfi = wxNativeFontInfo()
-            nfi.FromString(getattr(cfgGl, fname))
-            nfi.SetEncoding(wxFONTENCODING_ISO8859_1)
 
-            fi.font = wxFontFromNativeInfo(nfi)
+            s = getattr(cfgGl, fname)
+
+            # evil users can set the font name to empty by modifying the
+            # config file, and some wxWidgets ports crash hard when trying
+            # to create a font from an empty string, so we must guard
+            # against that.
+            if s:
+                nfi = wxNativeFontInfo()
+                nfi.FromString(s)
+                nfi.SetEncoding(wxFONTENCODING_ISO8859_1)
+
+                fi.font = wxFontFromNativeInfo(nfi)
+
+                # likewise, evil users can set the font name to "z" or
+                # something equally silly, resulting in an
+                # invalid/non-existent font. on wxGTK2 and wxMSW we can
+                # detect this by checking the point size of the font.
+                # wxGTK1 chooses some weird chinese font and I can't find
+                # a way to detect that, but it's irrelevant since we'll
+                # rip out support for it in a few months.
+                if fi.font.GetPointSize() == 0:
+                    fi.font = None
+
+            # if either of the above failures happened, create a dummy
+            # font and use it. this sucks but is preferable to crashing or
+            # displaying an empty screen.
+            if not fi.font:
+                fi.font = wxFont(10, wxMODERN, wxNORMAL, wxNORMAL,
+                                 encoding = wxFONTENCODING_ISO8859_1)
+                setattr(cfgGl, fname, fi.font.GetNativeFontInfo().ToString())
 
             fx, fy = util.getTextExtent(fi.font, "O")
 
