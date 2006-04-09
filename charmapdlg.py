@@ -1,3 +1,4 @@
+import gutil
 import misc
 import util
 
@@ -17,6 +18,7 @@ class CharMapDlg(wxDialog):
         self.insertButton = wxButton(self, -1, " Insert character ")
         hsizer.Add(self.insertButton, 0, wxALL, 10)
         EVT_BUTTON(self, self.insertButton.GetId(), self.OnInsert)
+        gutil.btnDblClick(self.insertButton, self.OnInsert)
 
         util.finishWindow(self, hsizer, 0)
 

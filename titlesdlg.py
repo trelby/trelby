@@ -33,18 +33,22 @@ class TitlesDlg(wxDialog):
         tmp = wxButton(self, -1, "Add")
         hsizer.Add(tmp)
         EVT_BUTTON(self, tmp.GetId(), self.OnAddPage)
+        gutil.btnDblClick(tmp, self.OnAddPage)
 
         self.delPageBtn = wxButton(self, -1, "Delete")
         hsizer.Add(self.delPageBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delPageBtn.GetId(), self.OnDeletePage)
+        gutil.btnDblClick(self.delPageBtn, self.OnDeletePage)
 
         self.moveBtn = wxButton(self, -1, "Move")
         hsizer.Add(self.moveBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.moveBtn.GetId(), self.OnMovePage)
+        gutil.btnDblClick(self.moveBtn, self.OnMovePage)
 
         self.nextBtn = wxButton(self, -1, "Next")
         hsizer.Add(self.nextBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.nextBtn.GetId(), self.OnNextPage)
+        gutil.btnDblClick(self.nextBtn, self.OnNextPage)
 
         vsizer.Add(hsizer, 0, wxTOP, 5)
         
@@ -66,10 +70,12 @@ class TitlesDlg(wxDialog):
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer2.Add(self.addBtn)
         EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
+        gutil.btnDblClick(self.addBtn, self.OnAddString)
 
         self.delBtn = gutil.createStockButton(self, "Delete")
         hsizer2.Add(self.delBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
+        gutil.btnDblClick(self.delBtn, self.OnDeleteString)
 
         vsizer2.Add(hsizer2, 0, wxTOP, 5)
 

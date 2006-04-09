@@ -1,4 +1,5 @@
 import config
+import gutil
 import misc
 import util
 
@@ -94,6 +95,9 @@ class FindDlg(wxDialog):
         EVT_BUTTON(self, replace.GetId(), self.OnReplace)
         EVT_BUTTON(self, replaceAll.GetId(), self.OnReplaceAll)
         EVT_BUTTON(self, self.moreButton.GetId(), self.OnMore)
+
+        gutil.btnDblClick(find, self.OnFind)
+        gutil.btnDblClick(replace, self.OnReplace)
 
         EVT_TEXT(self, self.findEntry.GetId(), self.OnText)
 

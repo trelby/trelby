@@ -53,10 +53,12 @@ class HeadersDlg(wxDialog):
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer.Add(self.addBtn)
         EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
+        gutil.btnDblClick(self.addBtn, self.OnAddString)
 
         self.delBtn = gutil.createStockButton(self, "Delete")
         hsizer.Add(self.delBtn, 0, wxLEFT, 10)
         EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
+        gutil.btnDblClick(self.delBtn, self.OnDeleteString)
 
         vsizer.Add(hsizer, 0, wxTOP, 5)
 

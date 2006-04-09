@@ -54,6 +54,16 @@ def createStockButton(parent, label):
         return wxButton(parent, ids[label])
     else:
         return wxButton(parent, -1, label)
+
+# wxWidgets has a bug in 2.6 on wxGTK2 where double clicking on a button
+# does not send two EVT_BUTTON events, only one. since the wxWidgets
+# maintainers do not seem interested in fixing this
+# (http://sourceforge.net/tracker/index.php?func=detail&aid=1449838&group_id=9863&atid=109863),
+# we work around it ourselves by binding the left mouse button double
+# click event to the same callback function on the buggy platforms.
+def btnDblClick(btn, func):
+    if misc.wx26 and misc.isUnix:
+        EVT_LEFT_DCLICK(btn, func)
     
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF
