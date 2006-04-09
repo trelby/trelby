@@ -1463,6 +1463,17 @@
 	<para>This chapter discusses the import/export support of the
 	program.</para>
 
+	<para>It is unfortunate that the screenplay industry does not have a
+	universally recognized vendor-neutral format for exchanging scripts
+	between programs. Designing such a format (probably XML-based) would
+	be almost trivial, but when we contacted the authors of other
+	screenplay writing programs none of them were interested in supporting
+	it. They seem more interested in trying to lock their users to their
+	own programs than helping them.</para>
+
+	<para>So, for now, the best format for exchanging data between
+	programs is plain old ASCII (with ISO-8859-1 extensions).</para>
+
 	<sect1>
 	  <title>Import</title>
 
