@@ -11,7 +11,7 @@ class SplashWindow(wxFrame):
     
     def __init__(self, parent, delay):
         wxFrame.__init__(self, parent, -1, "Splash",
-            style = wxFRAME_FLOAT_ON_PARENT | wxSTAY_ON_TOP | wxSIMPLE_BORDER)
+            style = wxFRAME_FLOAT_ON_PARENT | wxSTAY_ON_TOP | wxNO_BORDER)
 
         if not SplashWindow.inited:
             SplashWindow.inited = True
@@ -20,9 +20,9 @@ class SplashWindow(wxFrame):
         fileName = u"logo.jpg"
         fileData = util.loadFile(fileName, parent)
 
-        if not fileData or (len(fileData) != 130047) or \
+        if not fileData or (len(fileData) != 131850) or \
                (md5.new(fileData).digest() != \
-          "\x07\xfe\x07\x65\xbe\xd7\x3c\xb1\x7f\xfd\x9b\x64\x77\x92\x3a\x5a"):
+          "\x3e\x0b\x6f\x5f\xe7\xe3\x2a\xbe\x6c\xf1\xf6\xfb\x16\x60\x25\x72"):
             self.abort()
         
         self.pic = wxBitmap(fileName, wxBITMAP_TYPE_JPEG)
