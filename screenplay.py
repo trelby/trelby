@@ -2461,15 +2461,23 @@ class Screenplay:
         ls = self.lines
         s = ls[self.line].text
 
-        # we let the sentence capitalizing worry about i's in the first
-        # column to ease the implementation of this one.
-        if self.cfgGl.capitalizeI and (self.column > 1):
+        if self.cfgGl.capitalizeI and (self.column > 0):
             s = ls[self.line].text
 
             if s[self.column - 1] == "i":
-                if not util.isAlnum(char) and \
-                       not util.isAlnum(s[self.column - 2]):
-                    s = s[:self.column - 1] + "I" + s[self.column:]
+                if not util.isAlnum(char):
+                    doIt = False
+
+                    if self.column > 1:
+                        if not util.isAlnum(s[self.column - 2]):
+                            doIt = True
+                    else:
+                        if (self.line == 0) or \
+                               (ls[self.line - 1].lb != LB_NONE):
+                            doIt = True
+                        
+                    if doIt:
+                        s = util.replace(s, "I", self.column - 1, 1)
         
         s = s[:self.column] + char + s[self.column:]
         ls[self.line].text = s
