@@ -24,11 +24,11 @@ def testBackJoinElements():
     assert sp.lines[0].text == "ext. stonehenge - nightA blizzard rages."\
            " Snow is everywhere"
 
-def testBackLbSpace2():
+def testBackLbSpace():
     sp = u.load()
     sp.gotoPos(16, 60)
     sp.cmd("addChar", char = " ")
-    assert sp.lines[16].lb == scr.LB_SPACE2
+    assert sp.lines[16].lb == scr.LB_SPACE
     sp.cmd("moveDown")
     sp.cmd("moveLineStart")
     sp.cmd("deleteBackward")

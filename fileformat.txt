@@ -201,8 +201,6 @@ Linebreak types:
 
 '>' - A single space.
 
-'+' - Two spaces.
-
 '&' - Nothing.
 
 '|' - Forced.

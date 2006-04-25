@@ -1,6 +1,11 @@
 # linebreak types
+
 LB_SPACE = 1
+
+# we don't use this anymore, but we have to keep it in order to be able to
+# load old scripts
 LB_SPACE2 = 2
+
 LB_NONE = 3
 LB_FORCED = 4
 LB_LAST = 5
@@ -335,8 +340,7 @@ class Screenplay:
         msgs = []
         
         if unknownLb:
-            msgs.append("Screenplay contained unknown linebreak types. These"
-                        " have been converted to a space.")
+            msgs.append("Screenplay contained unknown linebreak types.")
 
         if unknownTypes:
             msgs.append("Screenplay contained unknown element types. These"
@@ -503,7 +507,7 @@ class Screenplay:
                 lb = ln.lb
                 text += ln.text
                 
-                if lb in (LB_SPACE, LB_SPACE2, LB_NONE):
+                if lb in (LB_SPACE, LB_NONE):
                     text += config.lb2str(lb)
                 elif lb == LB_FORCED:
                     text += magicslash + "line "
@@ -791,6 +795,8 @@ class Screenplay:
         self._topLine = util.clamp(line, 0, len(self.lines) - 1)
 
     def reformatAll(self):
+        #sfdlksjf = util.TimerDev("reformatAll")
+        
         line = 0
         
         while 1:
@@ -834,10 +840,34 @@ class Screenplay:
             else:
                 i = text.rfind(" ", 0, w + 1)
 
-                if (i == w) and (text[w + 1:w + 2] == " "):
-                    
-                    ret.append(Line(LB_SPACE2, line.lt, text[0:i]))
-                    text = text[i + 2:]
+                if i == w:
+
+                    # we allow space characters to go over the line
+                    # length, for two reasons:
+                    #
+                    # 1) it is impossible to get the behavior right
+                    # otherwise in situations where a line ends in two
+                    # spaces and the user inserts a non-space character at
+                    # the end of the line. the cursor must be positioned
+                    # at the second space character for this to work
+                    # right, and the only way to get that is to allow
+                    # spaces to go over the normal line length.
+                    #
+                    # 2) doing this results in no harm, since space
+                    # characters print as empty, so they don't overwrite
+                    # anything.
+
+                    i += 1
+                    while text[i:i + 1] == " ":
+                        i += 1
+
+                    if i == len(text):
+                        ret.append(Line(line.lb, line.lt, text))
+
+                        break
+                    else:
+                        ret.append(Line(LB_SPACE, line.lt, text[0:i - 1]))
+                        text = text[i:]
 
                 elif i >= 0:
                     ret.append(Line(LB_SPACE, line.lt, text[0:i]))
@@ -1923,7 +1953,7 @@ class Screenplay:
                 if lb == LB_LAST:
                     return True
 
-                elif lb in (LB_SPACE, LB_SPACE2):
+                elif lb == LB_SPACE:
                     char = " "
                     column = len(ls[line].text)
 
@@ -1986,8 +2016,8 @@ class Screenplay:
                 msg = "Empty line."
                 break
 
-            if len(ln.text.strip()) == 0:
-                msg = "Empty line (contains only whitespace)."
+            if len(ln.text.strip(" ")) == 0:
+                msg = "Empty line (contains only spaces)."
                 break
 
             if (ln.lt == PAREN) and isOnly and (ln.text == "()"):
@@ -1998,7 +2028,7 @@ class Screenplay:
                 msg = "Line contains invalid characters (BUG)."
                 break
 
-            if len(ln.text) > tcfg.width:
+            if len(ln.text.rstrip(" ")) > tcfg.width:
                 msg = "Line is too long (BUG)."
                 break
 
@@ -2370,14 +2400,11 @@ class Screenplay:
             if self.line != 0:
                 ln = self.lines[self.line - 1]
 
-                if ln.lb == LB_SPACE2:
-                    ln.lb = LB_SPACE
-                else:
-                    if ln.lb == LB_NONE:
-                        self.deleteChar(self.line - 1, len(ln.text) - 1,
-                                        False)
+                if ln.lb == LB_NONE:
+                    self.deleteChar(self.line - 1, len(ln.text) - 1,
+                                    False)
 
-                    self.joinLines(self.line - 1)
+                self.joinLines(self.line - 1)
 
                 self.markChanged()
 
@@ -2392,13 +2419,10 @@ class Screenplay:
             if self.line != (len(self.lines) - 1):
                 ln = self.lines[self.line]
 
-                if ln.lb == LB_SPACE2:
-                    ln.lb = LB_SPACE
-                else:
-                    if ln.lb == LB_NONE:
-                        self.deleteChar(self.line + 1, 0, False)
+                if ln.lb == LB_NONE:
+                    self.deleteChar(self.line + 1, 0, False)
 
-                    self.joinLines(self.line)
+                self.joinLines(self.line)
 
                 self.markChanged()
 
@@ -2543,11 +2567,12 @@ class Screenplay:
             # lines should not contain invalid characters
             assert ln.text == util.toInputStr(ln.text)
 
-            # lines should never be longer than the type's maximum width
-            assert len(ln.text) <= tcfg.width
-            
+            # lines shouldn't be longer than the type's maximum width,
+            # unless the extra characters are all spaces
+            assert len(ln.text.rstrip(" ")) <= tcfg.width
+
             # lines with LB_NONE linebreaks that end in a space should be
-            # LB_SPACE[2] instead
+            # LB_SPACE instead
             if ln.lb == LB_NONE:
                 assert ln.text[-1:] != " "
 
