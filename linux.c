@@ -27,7 +27,7 @@ static void error(char* msg, int appendErrno)
     {
         fprintf(stderr, "Error: %s\n", msg);
     }
-    
+
     exit(1);
 }
 
@@ -55,7 +55,7 @@ void unscramble(uint8_t* block, int blockSize, fileStruct* fs)
     int i;
     int nameDone = 0;
     uint8_t* blockStart = block;
-    
+
     for (i = 0; i < blockSize; i++, block++)
     {
         int ch = unscrambleChar(*block);
@@ -71,7 +71,7 @@ void unscramble(uint8_t* block, int blockSize, fileStruct* fs)
 
                 fs->data = block + 1;
                 fs->dataSize = blockSize - i - 1;
-                    
+
                 nameDone = 1;
             }
         }
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 {
     /* $HOME/.oskusoft-tmp */
     char tmpDir[1024];
-    
+
     /* $HOME/.blyte */
     char bconfdir[1024];
 
@@ -90,7 +90,7 @@ int main(int argc, char** argv)
     char lockfile[1024];
 
     char tmpBuf[1024];
-    
+
     char* home = getenv("HOME");
     int ret, pid;
     int lockFd;
@@ -113,7 +113,7 @@ int main(int argc, char** argv)
     {
         error("Couldn't create $HOME/.blyte directory", TRUE);
     }
-    
+
     lockFd = open(lockfile, O_RDWR | O_CREAT, S_IRWXU);
     if (lockFd == -1)
     {
@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     fl.l_whence = SEEK_SET;
     fl.l_start = 0;
     fl.l_len = 0;
-    
+
     ret = fcntl(lockFd, F_SETLK, &fl);
     if (ret == -1)
     {
@@ -134,7 +134,7 @@ int main(int argc, char** argv)
 
     snprintf(tmpBuf, sizeof(tmpBuf), "/bin/rm -rf %s", tmpDir);
     system(tmpBuf);
-    
+
     ret = mkdir(tmpDir, S_IRWXU);
     if (ret == -1)
     {
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
         uint8_t* curPtr;
         uint8_t* lastPtr;
         int firstBlock = 1;
-        
+
         int arcFd = open(BLYTE_PATH "/data.dat", O_RDONLY);
         if (arcFd == -1)
         {
@@ -165,14 +165,14 @@ int main(int argc, char** argv)
 
         /* skip 3 junk bytes at start */
         curPtr = buf + 3;
-        
+
         while (1)
         {
             uint8_t buf2[512000];
             z_stream zs;
             fileStruct fs;
             int blockSize;
-            
+
             if (curPtr > lastPtr)
             {
                 break;
@@ -189,7 +189,7 @@ int main(int argc, char** argv)
 
             blockSize += *curPtr++ << 8;
             blockSize += *curPtr++;
-            
+
             zs.next_in = curPtr;
             zs.avail_in = blockSize;
 
@@ -218,11 +218,11 @@ int main(int argc, char** argv)
             if (!firstBlock)
             {
                 int tmpFd;
-                
+
                 unscramble(buf2, zs.total_out, &fs);
 
                 snprintf(tmpBuf, sizeof(tmpBuf), "%s/%s", tmpDir, fs.name);
-                
+
                 tmpFd = open(tmpBuf, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR);
                 if (tmpFd == -1)
                 {
@@ -242,7 +242,7 @@ int main(int argc, char** argv)
             firstBlock = 0;
         }
     }
-    
+
     pid = fork();
     if (pid == -1)
     {
@@ -251,20 +251,34 @@ int main(int argc, char** argv)
 
     if (pid == 0)
     {
-        ret == close(lockFd);
+        int i;
+        char** args = malloc(sizeof(char*) * (4 + argc - 1 + 1));
+
+        args[0] = "/usr/bin/env";
+        args[1] = "python";
+        args[2] = "-O";
+        args[3] = "blyte.pyo";
+
+        for (i = 1; i < argc; i++)
+        {
+            args[3 + i] = argv[i];
+        }
+
+        args[3 + i] = NULL;
+
+        ret = close(lockFd);
         if (ret == -1)
         {
             error("closing lock file failed", TRUE);
         }
-        
+
         ret = chdir(tmpDir);
         if (ret == -1)
         {
             error("chdir failed", TRUE);
         }
-        
-        execl("/usr/bin/env", "/usr/bin/env", "python", "-O", "blyte.pyo",
-            (char*)NULL);
+
+        execv("/usr/bin/env", args);
 
         error("execl failed", TRUE);
     }
@@ -275,6 +289,6 @@ int main(int argc, char** argv)
         snprintf(tmpBuf, sizeof(tmpBuf), "/bin/rm -rf %s", tmpDir);
         system(tmpBuf);
     }
-    
+
     return 0;
 }
