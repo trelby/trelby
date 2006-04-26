@@ -148,8 +148,21 @@ Font/Normal/Filename:
 Locations:0
 #End-Locations 
 #Begin-Spell-Checker-Dict 
-Words:1
-Words/1:pilots'
+Words:14
+Words/1:ak
+Words/2:aw
+Words/3:comin'
+Words/4:dna
+Words/5:dvd
+Words/6:fuckin'
+Words/7:icbm
+Words/8:jelizovo
+Words/9:kevin's
+Words/10:pilots'
+Words/11:rock'n'roll
+Words/12:suv
+Words/13:walkie
+Words/14:zzzz
 #End-Spell-Checker-Dict 
 #Title-String 0.000000,80.000000,32,cb,Times,,THE KOALA INCIDENT
 #Title-String 0.000000,100.000000,12,c,Courier,,by
@@ -160,15 +173,14 @@ Words/1:pilots'
 #Header-Empty-Lines 1
 #Start-Script 
 .\ext. stonehenge - night
-..SUPER: "STONEHENGE - 00:30"
+..SUPER: "STONEHENGE"
 >.A blizzard rages. Snow is everywhere and visibility is
 >.almost zero. Only at brief moments do we catch sight of the
 >.stones forming the monument. No one in his right mind would
 ..be out in this kind of weather.
->.However, the rumble of engines appears, growing louder by
->.the second. A dozen huge trucks emerge from the storm and
->.drive up to the stones. One of the trucks has a crane
-..attached.
+>.However, the rumble of engines appears, growing louder. A
+>.dozen huge trucks emerge from the storm and drive up to the
+..stones. One of the trucks has a crane attached.
 >.Men jump down from the trucks and start attaching heavy
 >.lifting cables to a stone, which is then lifted onto the
 ..flatbed of the truck beside it.
@@ -180,9 +192,7 @@ Words/1:pilots'
 >.Stonehenge monument is just a few holes in the ground,
 ..rapidly filling with snow.
 .\ext. airport - night
-..SUPER: "AIRPORT - 02:15"
->.A small local airport, seemingly abandoned for the night,
-..with the storm still raging.
+..A small local airport, with the storm still raging.
 >.The trucks roll into view, smash through the gates and drive
 >.towards the runway, where a gigantic transport plane is
 >.waiting. As the trucks near it, it opens its rear cargo door
@@ -191,7 +201,7 @@ Words/1:pilots'
 >.stones unloaded by the plane's internal crane, after which
 ..the truck drives out again.
 ..LATER
->.All the trucks are emptied and abandoned beside the runway.
+>.All the trucks are empty and abandoned beside the runway.
 >.The plane's cargo door closes and the plane begins to take
 >.off. It is so heavily loaded that it just barely gets into
 ..the air before the runway ends.
@@ -216,8 +226,7 @@ Words/1:pilots'
 >:storage locker twelve. I trust you
 .:know what to do with it.
 >.The crowd cheers and surges toward the locker. Jason
->.clambers down from the pile and heads toward the cockpit. A
-..few of the people follow him.
+..clambers down from the pile and heads toward the cockpit.
 .\int. airplane cockpit - night
 >.KEVIN, in his forties, is flying the plane. Jason enters,
 >.followed by SARAH, in her twenties and stunningly beautiful.
@@ -265,8 +274,8 @@ Words/1:pilots'
 ..yelling threats.
 .\INT. AIRPLANE COCKPIT - NIGHT
 >.They've been watching the events in the cargo bay on a
->.monitor. They don't appear remotely worried about this turn
-..of events.
+>.monitor. They don't appear remotely worried at this turn of
+..events.
 ._KEVIN
 .:Time for plan B.
 >.Kevin pulls his stick back, sending the plane on a steep
@@ -278,7 +287,7 @@ Words/1:pilots'
 >.people look up to see the huge mass of stones beginning to
 >.slide toward them. They try to escape to the sides of the
 >.cargo bay, but it's no use, the stones come down in a huge
->.avalanche crushing everything in the way, including the
+>.avalanche crushing everything in their way, including the
 ..cargo door which is ripped straight off.
 .\EXT. OUTSIDE THE AIRPLANE - NIGHT
 >.It's a stunning sight as the plane is climbing on a 45
@@ -370,11 +379,9 @@ Words/1:pilots'
 ..SUPER: "JASON'S HOUSE - LOS ANGELES"
 ..A luxurious mansion with a swimming pool in the backyard.
 .\int. jason'S living room - DAY
->.Jason, Kevin and Sarah are sitting around sipping drinks and
->.watching the TV, which is showing a special report about the
-..Stonehenge incident.
+>.Jason, Kevin and Sarah are watching the TV which is showing
+..a special report about the Stonehenge incident.
 ._Reporter
->:We still have no idea who did this.
 >:The British government is
 >:investigating several ransom
 >:demands about the stones, but so
@@ -393,37 +400,405 @@ Words/1:pilots'
 ._SARAH
 .:So, what's next on the agenda?
 ._JASON
->:A strange letter was delivered to
->:here while we were away. It reads:
->:"Greetings. You may be wondering
->:how I knew how to contact you. When
->:I want something done, it gets
->:done, and when I wanted to know who
->:was the best thief in the world,
->:your name eventually surfaced. But
->:I digress. I have a job for you: I
->:want you to steal the rarest animal
->:in the world for me, the Russian
->:koala. It's a mutant offspring of
->:Australian koalas, developed by
->:Soviet scientists during the cold
->:war to eat the leaves off of all
->:trees, thus dooming all of North
->:America to starve to death as the
->:ecosystem collapses. There are only
->:five of these animals still alive,
->:and they're kept in a heavily
->:guarded secret Russian laboratory
->:near Vladivostok. I will contact
->:you again with further details in
-.:the near future."
-._SARAH
-.:Does it say who sent it?
+.:We have a --
+>.Jason is interrupted by loud cracks as three canisters shoot
+>.through the windows into the room. As soon as the canisters
+..hit the floor, they start releasing some sort of gas.
+>.Whoever is behind this knows what he's doing; the canisters
+>.were strategically placed at the exit points from the room.
+>.Jason, Kevin and Sarah have nowhere to go. They desperately
+>.try to get out, but each one passes out as soon as they come
+..into contact with the gas.
+./FADE OUT
+.\int. jason'S living room - night
+>.Jason and Kevin are lying on the floor, unconscious. Sarah
+..is nowhere to be seen.
+>.Jason seems to be slowly waking up. His eyelids tremble and
+>.eventually open. With a great effort he raises himself and
+..prods Kevin until he too is awake.
 ._JASON
->:The letter is signed by someone who
->:calls himself "ME USSR KOALA",
-.:whatever that means.
-._SARAH
-.:Intriguing.
+>:Maybe they left Sarah in one of the
+>:other rooms. You check the
+>:upstairs, I'll check the
+.:downstairs.
+..2 MINUTES LATER
+>.They're back in the living room, the search unsuccessful.
+>.Now they conduct a more thorough investigation of the living
+..room, looking for any clues.
+>.Jason notices the DVD player's tray is open and that there's
+..a disc in it, with "WATCH THIS" written on it.
 ._JASON
-.:Very.
+.:Looks like they left us a message.
+>.He turns on the TV and closes the tray on the DVD player. A
+>.blank brick wall appears on the TV and a voice begins to
+..speak.
+._Kidnapper
+>:Hello. This is your new worst enemy
+.:speaking.
+._KEVIN
+.:I hate him already.
+._KIDNAPPER
+>:You are probably wondering who I am
+>:and what I want. The former is
+>:irrelevant, and the latter is
+>:simple: I have a job for you. Now,
+>:why did I not simply hire you?
+>:Because I knew you would not
+>:accept. Why did I not hire somebody
+>:else with lower standards? Because
+>:nobody but you can do the job.
+>:Faced with this seemingly
+>:impossible equation, I solved it by
+>:making it impossible for you to
+>:refuse. Impossible, that is, if you
+>:want to see Sarah returned to you
+.:alive.
+._JASON
+>:I'm going to kill him if it's the
+.:last thing I do.
+._KIDNAPPER
+>:What I need you to do for me is
+.:this.
+>.The TV changes from the blank wall to a map of the world
+..that zooms in on eastern Russia.
+._KIDNAPPER
+>:There is a top-secret Russian
+>:research laboratory near Jelizovo
+>:on the Kamchatka peninsula. I want
+>:you to penetrate the facility,
+>:steal all of the koalas they have
+>:in captivity there, and bring them
+.:back here.
+..The TV shows a cute koala clinging to an eucalyptus tree.
+._KEVIN
+.:Koalas? Is he fucking crazy?
+._KIDNAPPER
+>:This DVD contains all of the
+>:details you need to know,
+>:accessible from the main menu. You
+>:have two weeks to accomplish the
+>:mission; after that, it's bye-bye
+.:Sarah.
+._KEVIN
+.:Are we going to do this?
+._JASON
+>:I don't see that we have much of a
+>:choice. It's the only way to have
+.:any chance of getting Sarah back.
+.\Ext. Forest - day
+..SUPER: "KAMCHATKA"
+>.Jason and Kevin are lying on the ground at the edge of a
+>.thick fir forest, both wearing green army fatigues. Far away
+>.in the distance is an unremarkable looking gray building.
+..Jason is watching it through binoculars.
+._JASON
+>:He wasn't lying when he said the
+>:security at this place was almost
+>:non-existent. I see only two guards
+.:at the front entrance.
+._KEVIN
+>:I guess the Russians don't have the
+.:money to spend that they used to.
+._JASON
+>:It's also a way to avoid drawing
+.:unwanted attention to this place.
+..Jason resumes his watching.
+._JASON
+>:We'll wait until the workers have
+>:left for the day. The place should
+.:be almost deserted at night.
+.\Ext. Research laboratory - night
+>.The two guards are standing in front of the building. Both
+..have AK-74 assault rifles hanging from their shoulders.
+._Guard #1
+.((in Russian)
+.:Gimme a light.
+>.The second guard lights the cigarette the first guard is
+>.holding out to him. Once it's lighted, he puts it to his
+>.mouth. As he's drawing the first hit of nicotine to his
+>.addicted braincells, those same braincells are splattered to
+>.the ground behind him as his skull explodes from a bullet's
+..impact.
+>.Before his body has managed to collapse to the ground, the
+..second guard is shot in the chest in a similar fashion.
+>.A few moments pass, then Jason appears in a crouched run. He
+>.checks that the guards are dead and then pulls out a
+..walkie-talkie from his pocket.
+._JASON
+>:The eagle has landed, I repeat, the
+.:eagle has landed.
+._KEVIN (os)
+.:Comin' in.
+>.Jason drags the guards to the bushes and throws their
+>.weapons away. Just as he's finishing, Kevin drives up in a
+..small truck and dismounts.
+._JASON
+.:Ready to rock'n'roll?
+>.In response, Kevin jams a clip into his AK-74. They take
+>.positions on both sides of the door. Kevin does a
+>.three-finger countdown and on zero, Jason pivots, kicks in
+>.the door, and charges in. Kevin waits five seconds and
+..follows him in.
+.\int. Research laboratory - night
+>.Jason and Kevin duck in and out of the various rooms full of
+>.esoteric equipment searching for anyone still being there at
+..this time of the night, and find nobody.
+>.They meet up at the animal storage area, containing about
+..ten cages filled with koalas.
+._JASON
+>:Look like perfectly normal koalas
+>:to me, but I'm no marsupial
+>:biologist. Let's load them on the
+.:truck and get the hell out of here.
+.\EXT. RESEARCH LABORATORY - NIGHT
+>.Kevin ties down the last tarpaulin on the truck. Loading is
+>.complete. He's about to start for the cabin of the truck
+>.when he notices something in the bushes where the dead
+..guards were dragged to.
+._KEVIN
+>((shouting to Jason in the
+.(cabin)
+>:Aw man, you didn't finish them off
+>:properly and now I have to do your
+.:dirty work!
+>.Kevin switches his rifle's safety off and saunters to the
+..bushes.
+>.As he enters the bushes, instead of the crawling, mortally
+>.wounded guard he's been expecting, he's face-to-face with an
+..enormous bear that's eating the dead guards.
+>.The bear notices him, lifts its blood-covered head and
+..growls.
+>.Kevin makes a passable attempt at a new world record as he
+..runs to the truck, jumps in, and slams the door shut.
+.\Int. Truck's cabin - night
+._KEVIN
+.:DRIVE!!!
+>.Jason knows better than to ask any questions, so he starts
+>.the truck and drives off, gravel from the tires pelting the
+..bear who's come up to investigate this strange new thing.
+._KEVIN
+.:That was a fuckin' bear!
+._JASON
+>:Oh yeah, did I forget to mention
+>:that Kamchatka has the world's
+>:largest density of bears? And
+>:they're also bigger than normal due
+.:to all the fish available here.
+..Jason grins.
+.\Ext. Harbor - night
+>.Jason and Kevin finish loading the koala cages to a Japanese
+..fishing boat.
+.\Map of the pacific ocean
+>.The red line snakes along the Kurile islands to Hokkaido,
+..and from there it arcs to Los Angeles.
+.\INT. JASON'S LIVING ROOM - DAY
+>.Jason and Kevin are sitting around, watching the clock. At
+>.the exact same time that it changes to 12:00, the doorbell
+..rings.
+>.Kevin stands up and disappears through a doorway. There's a
+>.sound of a door opening closing, and then Kevin and an
+..another man walk in.
+._JASON
+.:Where's Sarah?
+._KIDNAPPER
+>:First things first. Where are my
+.:koalas?
+._JASON
+.:They're in the garage.
+._KIDNAPPER
+.:I want to see them.
+._JASON
+.:Fine.
+.\Int. Jason's garage - day
+>.The koala cages are stacked around the edges. The koalas are
+..mostly sleeping.
+._KIDNAPPER
+.:No joeys?
+._KEVIN
+.:What?
+._KIDNAPPER
+>:A "joey" is what a baby koala is
+>:called. I gather they only had
+>:adult koalas then? Unfortunate, but
+.:acceptable.
+._JASON
+>:I don't give a rat's ass about your
+>:koalas. You have 10 seconds to tell
+>:me where Sarah is before I kill
+.:you.
+._KIDNAPPER
+>:My my, such hostile feelings. Try
+>:to contain your impulses while I
+>:describe my plans for these
+.:wonderful animals.
+..The kidnapper examines one of the koalas intently.
+._KIDNAPPER
+>:You see, normal koalas only eat
+>:eucalyptus leaves. During the cold
+>:war, Soviet scientists started
+>:experimenting with imported koalas,
+>:trying to get them to adapt to
+>:eating any kind of plant matter and
+>:radically speeding up their
+>:reproductive cycle. They were not
+>:successful, and everyone thought
+>:the program was dead when the
+>:Soviet Union collapsed. However, 6
+>:months ago, I received information
+>:that the program had been
+>:restarted, this time using genetic
+>:engineering techniques to directly
+>:modify the koala's DNA. These
+>:animals here are the first batch of
+.:the modified koalas.
+._KEVIN
+>:This is ludicrous. Even if I were
+>:to believe you, which I don't, what
+.:are you planning to do with them?
+._KIDNAPPER
+>:I'm going to breed them until I
+>:have tens of thousands of them, and
+>:then I'm going to release them
+>:throughout Northern America,
+>:thereby destroying its ecosystem
+>:and resulting in total collapse of
+.:the government!
+._JASON
+>:That's the stupidest thing I've
+>:ever heard, but whatever rocks your
+>:boat. Now, this is the third time
+>:I'm asking you where Sarah is, and
+>:it's also the last, if you get my
+.:drift.
+._KIDNAPPER
+.:Very well. I always keep my word.
+..He takes out his cell phone and dials.
+._KIDNAPPER
+.:Bring her in.
+>.He pushes a button on the wall and the garage door opens. A
+>.black SUV is just turning in and drives in to the garage.
+>.The front doors open and two men exit. One of them opens the
+..back door, reaches in, and out comes Sarah.
+._JASON
+.:You okay?
+._SARAH
+.:Yeah.
+._KIDNAPPER
+>:Now, I'm sorry to say, I have to
+>:kill you. I lied when I said I
+>:always keep my word. Any last
+.:requests?
+._JASON
+>:Can I close the garage door? I
+>:don't like to disturb my neighbors
+>:with the sound of gunfire this
+.:early in the morning.
+._KIDNAPPER
+.((laughing)
+.:Sure, go ahead.
+>.Jason walks over to the switch and pushes it. The door
+>.begins to close. Jason makes a point of catching Kevin's
+>.eye, and clearly some kind of communication just happened
+..between them. What are they up to?
+>.The exact moment the door finishes closing, Jason presses
+>.another button on the wall. The lights switch off and
+>.heavy-duty shutters fall to cover the windows. It is pitch
+..black.
+>.For 10 seconds we see nothing, but the sounds we hear are
+>.somehow heightened. A metallic clink. A fleshy thump
+..followed by a groan. A sick snapping sound. Silence.
+>.A click, and the lights are on again. The kidnapper and his
+..two henchmen are on the floor, their necks obviously broken.
+._JASON
+>:Remember when I said I'd kill you?
+.:I always keep my word too.
+._KEVIN
+>:What do you wanna do with the
+>:koalas? Do you think he was serious
+>:about them being a threat to the
+.:ecosystem?
+._JASON
+>:Nah, he was obviously crazy. Let's
+>:just dump the koalas at the nearest
+>:forest. Some good samaritan will
+.:find them and call animal control.
+.\Ext. Forest - night
+>.Sarah is opening the last cage. The koala doesn't want to
+>.come out, but eventually it sees that all the other koalas
+>.are already climbing trees all around it and doesn't want to
+>.be left alone, so it scurries off and finds a tree of its
+..own.
+._SARAH
+>:Now don't go destroying any
+.:ecosystems, you hear!
+..She heads back to the truck, laughing.
+..SUPER: "5 YEARS LATER"
+.\INT. OVAL OFFICE, WHITE HOUSE - DAY
+>.The president is sitting behind his desk. There is a knock
+..on the door and his aide enters.
+._AIDE
+>:They're waiting for you in the
+.:situation room, Mister President.
+._President
+.:Tell them I'll be right there.
+._AIDE
+.:Very well, sir.
+>.The aide leaves. The president continues staring at the
+..wall, then sighs.
+.\INT. situation room, WHITE HOUSE - DAY
+>.The room is full of high-ranking people, with a lot of army
+..personnel present. The president enters and sits down.
+._PRESIDENT
+>:Tell me you've found another
+.:option.
+._Scientist
+>:Afraid not, Mister President. All
+>:the lesser options we've tried so
+>:far have not been able to stop the
+>:koalas from spreading, so this is
+>:the only option left. We've already
+>:lost the four western states
+>:because; if we want to keep the
+>:rest of the states habitable, we
+.:need to do this, and do it now.
+._PRESIDENT
+>:I still can't believe we're even
+.:discussing this.
+.((looks around the room)
+>:One last time: does anyone of you
+.:have an alternative ideas?
+>.Everyone suddenly finds the papers in front of them in need
+..of attention to avoid having to look at the president.
+._PRESIDENT
+>:Very well. I shall go down in
+>:history as the bloodiest murderer
+>:of all time, but if that's what's
+>:needed to save the lives of over
+>:200 million Americans, I'm ready to
+>:accept that title. Bring me the
+.:suitcase.
+>.A man in army uniform steps over to the president and opens
+>.a metallic suitcase that's handcuffed to his wrist. There
+>.are two keyholes inside the case; he inserts his key in one
+>.of them, and the president inserts his in the other. They
+..turn the keys in unison.
+>.There is a moment of shocked silence, then people start
+..weeping incoherently.
+.\Ext. Prairie - day
+>.A featureless prairie on a clear summer day. Featureless,
+>.that is, until a gap appears in the ground accompanied by a
+>.loud rumbling sound. The gap widens, until it is a huge
+..black hole measuring 20 meters by 20 meters.
+>.The rumbling stops, but is replaced by a loud whining sound
+..that suddenly increases to a deafening roar.
+>.A sleek ICBM erupts from the ground and shoots up into the
+..sky. We follow its path, zooming out, until we get to:
+.\MAP OF THE UNITED STATES OF AMERICA
+>.The missile we've been following was launched from North
+..Dakota. Its progress eastward is tracked by a red line.
+>.It is joined by dozens, then hundreds of similar lines, from
+>.all over the map, all heading towards the eastern states:
+>.Washington, Oregon, California, and Nevada. The lines
+>.terminate all over the four states, blanketing them in
+>.pulsing red circles, until the whole of eastern United
+..States is a slowly fading red color.
