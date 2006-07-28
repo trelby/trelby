@@ -1633,8 +1633,8 @@ class MyFrame(wxFrame):
             self.typeCb.Append(t.name, t.lt)
 
         # FIXME: move these to misc.py?
-        misc.version = "1.4.0"
-        misc.releaseDate = datetime.date(2006, 4, 26)
+        misc.version = "1.5.0"
+        misc.releaseDate = datetime.date(2006, 7, 28)
 
         hsizer.Add(self.typeCb)
 
