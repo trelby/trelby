@@ -2261,15 +2261,6 @@ class MyApp(wxApp):
         misc.init()
         util.init()
 
-        # if we're on linux and running a released version, remove all
-        # ~/.oskusoft-tmp/*.pyo files now, we've already loaded them all,
-        # and we don't want them lying around for the user to stumble on.
-        if misc.isUnix and not opts.isTest:
-            tmpDir = os.environ["HOME"] + "/.oskusoft-tmp"
-            os.chdir(tmpDir)
-            os.system("rm -f *.pyo")
-            os.rmdir(tmpDir)
-            
         gd = GlobalData()
 
         if misc.isWindows:

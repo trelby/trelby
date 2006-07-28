@@ -6,5 +6,5 @@ copy names.dat dist
 copy sample.blyte dist
 copy manual.pdf dist
 copy fileformat.txt dist
-copy license.txt dist
+copy LICENSE dist
 copy dict_en.dat.gz dist

@@ -1,3 +1,0 @@
-Python: 2.3
-
-wxPython: Only one tested is 2.4.2.4.
