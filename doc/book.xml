@@ -945,41 +945,6 @@
 	</sect1>
 
 	<sect1>
-	  <title>Help/License</title>
-
-	  <para>The license submenu contains three commands for dealing with
-	  licenses:</para>
-
-	  <variablelist>
-		
-		<varlistentry>
-		  <term>Information</term>
-		  <listitem>
-			<para>Shows information about the current license.</para>
-		  </listitem>
-		</varlistentry>
-
-		<varlistentry>
-		  <term>Update</term>
-		  <listitem>
-			<para>Opens a file dialog allowing you to load a new
-			license.</para>
-		  </listitem>
-		</varlistentry>
-
-		<varlistentry>
-		  <term>Release</term>
-		  <listitem>
-			<para>Releases your license, i.e. goes back to evaluation
-			  mode.</para>
-		  </listitem>
-		</varlistentry>
-		
-	  </variablelist>
-	  
-	</sect1>
-	
-	<sect1>
 	  <title>Help/About</title>
 
 	  <para>'About' opens the about screen for &blyte;, showing
@@ -996,9 +961,9 @@
 	<para>&blyte; has 4 levels of settings: super-global settings, global
 	settings, script format settings, and script-specific settings.</para>
 
-	<para>Super-global settings are the current view mode, license
-	information, window size and position, and the global spell checker
-	dictionary. There can only be one set of these.</para>
+	<para>Super-global settings are the current view mode, window size and
+	position, and the global spell checker dictionary. There can only be
+	one set of these.</para>
 	
 	<para>Global settings are things like interface colors, keyboard
 	shortcuts, display fonts and other settings that only affect the user
