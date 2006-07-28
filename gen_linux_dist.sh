@@ -17,8 +17,8 @@ file_contains() {
 set_dist_name() {
   if file_contains "/etc/debian_version" "^3.1$"; then
     DIST_NAME="debian-3.1"
-  elif file_contains "/etc/issue" "^Ubuntu 5\.10 "; then
-    DIST_NAME="ubuntu-5.10"
+  elif file_contains "/etc/issue" "^Ubuntu 6\.06 "; then
+    DIST_NAME="ubuntu-6.06"
   elif file_contains "/etc/fedora-release" "^Fedora Core release 5 "; then
     DIST_NAME="fedora-5"
   elif file_contains "/etc/issue" " SUSE LINUX 10\.0 "; then
