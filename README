@@ -1,0 +1,76 @@
+This file is intented for people wishing to run Blyte using the sources,
+i.e., not using a released package. This means mostly developers who want
+to inspect/modify the code.
+
+1. Requirements
+===============
+
+You will need Python (at least 2.3) and wxWidgets (2.4 or 2.6) and its
+Python bindings to run Blyte.
+
+To build the manual, you will need:
+
+ -HTML: xsltproc
+
+ -PDF: FOP
+
+2. Preparing data files
+=======================
+
+Blyte needs special preparation for 3 of its data files. If you do not do
+this, that aspect of the program will not work.
+
+ * Name list
+
+  $ make names.dat
+
+ * Dictionary
+
+  $ make dict_en.dat.gz
+
+ * Manual (PDF)
+
+  $ make manual.pdf
+
+You can run "make dist", which prepares all 3 and also generates a Linux
+distribution package which you can ignore.
+
+3. Running Blyte
+================
+
+On Linux:
+
+ $ cd ~/blyte/src
+ $ ./blyte.py --test
+
+On Windows:
+
+ $ cd \blyte\src
+ $ \python23\python blyte.py --test sample.blyte
+
+ (Substitute correct path to python.) The file t.bat contains the
+ last command.
+
+4. Differences from packaged versions
+=====================================
+
+The "--test" command line argument makes Blyte differ from normal running
+as follows:
+
+ -No splash window is displayed on startup.
+
+ -No global directory locations are used; configuration/state files
+ instead go under ".blyte" in the current directory.
+
+ -Unhandled exceptions are not caught and reported in a dialog box,
+  instead, they are printed normally to stderr.
+
+ -The following characters activate special behavior:
+
+  -"å": Load "sample.blyte".
+
+  -"¤": Call function MyCtrl.cmdTest.
+
+  -"½": Time how long 50 screen refreshes take.
+
+   (The above characters are in the ISO-8859-1 character set.)

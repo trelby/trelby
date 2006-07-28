@@ -1,7 +1,10 @@
 .PHONY = dist
 
 dist: names.dat dict_en.dat.gz manual.pdf
-	./gen_linux_dist.sh
+	./gen_linux_dist.sh linux
+
+src:
+	./gen_linux_dist.sh src
 
 names.dat: names.txt
 	cd tools && ./make_names.py

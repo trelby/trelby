@@ -1,4 +1,7 @@
 #!/bin/bash
+#
+# this script handles preparing either the source package or the linux
+# installable package
 
 set -eu
 
@@ -8,14 +11,21 @@ DIR="linux-dist/blyte-$VER"
 rm -rf linux-dist
 mkdir -p $DIR
 
-cp *.py icon16.png icon32.png logo.jpg names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL $DIR
-rm $DIR/setup.py
-cp Makefile.install $DIR/Makefile
-cd linux-dist
-tar cvf "blyte-$VER.tar" "blyte-$VER"
-gzip -9 "blyte-$VER.tar"
+if test $1 = "src"; then
+ FNAME="blyte-src-$VER.tar"
+ svn export --force . $DIR
+else
+ FNAME="blyte-$VER.tar"
+ cp *.py icon16.png icon32.png logo.jpg names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL $DIR
+ rm $DIR/setup.py
+ cp Makefile.install $DIR/Makefile
+fi
 
-mv "blyte-$VER.tar.gz" ..
+cd linux-dist
+tar cvf $FNAME "blyte-$VER"
+gzip -9 $FNAME
+
+mv "${FNAME}.gz" ..
 
 cd ..
 rm -rf linux-dist
