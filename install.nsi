@@ -37,9 +37,6 @@ SetCompressor lzma
 
 ; Welcome page
 !insertmacro MUI_PAGE_WELCOME
-; License page
-!define MUI_LICENSEPAGE_CHECKBOX
-!insertmacro MUI_PAGE_LICENSE "license.txt"
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
@@ -150,7 +147,7 @@ Section Uninstall
   Delete "$INSTDIR\_winreg.pyd"
   Delete "$INSTDIR\manual.pdf"
   Delete "$INSTDIR\fileformat.txt"
-  Delete "$INSTDIR\license.txt"
+  Delete "$INSTDIR\LICENSE"
 
   Delete "$SMPROGRAMS\Blyte\Uninstall.lnk"
   Delete "$SMPROGRAMS\Blyte\Website.lnk"
