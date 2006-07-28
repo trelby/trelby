@@ -99,7 +99,6 @@ class GlobalData:
         v.addInt("height", 830, "Height", 300, 9999)
         v.addInt("viewMode", VIEWMODE_LAYOUT, "ViewMode", VIEWMODE_DRAFT,
                  VIEWMODE_OVERVIEW_LARGE)
-        v.addStrBinary("license", "", "License")
 
         v.addList("files", [], "Files",
                   mypickle.StrUnicodeVar("", u"", ""))
@@ -475,22 +474,6 @@ class MyCtrl(wxControl):
         self.sp.markChanged()
         self.OnPaginate()
 
-    # if we have a valid license, or the script is shorter than ~20 pages,
-    # return False, otherwise True. in the latter case, also display a
-    # message box about this.
-    def checkEvalSave(self):
-
-        # slightly obscured 25000...
-        stackPtr = 18 * 14 * 16 * 6 + 80 * 11 - 72
-        
-        if not misc.license and (self.sp.getCharCount() > stackPtr):
-            wxMessageBox("The evaluation version of this program doesn't\n"
-                         "support saving scripts over 20 pages or so.",
-                         "Error", wxOK, mainFrame)
-            return True
-
-        return False
-
     # return an exportable, paginated Screenplay object, or None if for
     # some reason that's not possible / wanted. 'action' is the name of
     # the action, e.g. "export" or "print", that'll be done to the script,
@@ -507,15 +490,10 @@ class MyCtrl(wxControl):
                     return None
 
         sp = self.sp
-        if not misc.license or sp.cfg.pdfRemoveNotes:
+        if sp.cfg.pdfRemoveNotes:
             sp = copy.deepcopy(self.sp)
-
-            if sp.cfg.pdfRemoveNotes:
-                sp.removeElementTypes({screenplay.NOTE : None})
+            sp.removeElementTypes({screenplay.NOTE : None})
                 
-            if not misc.license:
-                sp.replace()
-
         sp.paginate()
         
         return sp
@@ -630,24 +608,23 @@ class MyCtrl(wxControl):
 
     def OnReportDialogueChart(self):
         self.sp.paginate()
-        dialoguechart.genDialogueChart(mainFrame, self.sp, not misc.license)
+        dialoguechart.genDialogueChart(mainFrame, self.sp)
 
     def OnReportCharacter(self):
         self.sp.paginate()
-        characterreport.genCharacterReport(mainFrame, self.sp,
-                                           not misc.license)
+        characterreport.genCharacterReport(mainFrame, self.sp)
 
     def OnReportLocation(self):
         self.sp.paginate()
-        locationreport.genLocationReport(mainFrame, self.sp, not misc.license)
+        locationreport.genLocationReport(mainFrame, self.sp)
 
     def OnReportScene(self):
         self.sp.paginate()
-        scenereport.genSceneReport(mainFrame, self.sp, not misc.license)
+        scenereport.genSceneReport(mainFrame, self.sp)
 
     def OnReportScript(self):
         self.sp.paginate()
-        scriptreport.genScriptReport(mainFrame, self.sp, not misc.license)
+        scriptreport.genScriptReport(mainFrame, self.sp)
 
     def OnCompareScripts(self):
         if mainFrame.tabCtrl.getPageCount() < 2:
@@ -695,19 +672,13 @@ class MyCtrl(wxControl):
             sp2.reformatAll()
             sp2.paginate()
             
-        s = sp1.compareScripts(sp2, not misc.license)
+        s = sp1.compareScripts(sp2)
 
         if s:
             gutil.showTempPDF(s, cfgGl, mainFrame)
         else:
-            s = "The scripts are identical."
-            if not misc.license:
-                s += "\n\nHowever, this is the evaluation version of the\n"\
-                     "program, which replaces some words in the\n"\
-                     "scripts before doing the comparison, which\n"\
-                     "might have affected the result."
-                
-            wxMessageBox(s, "Results", wxOK, mainFrame)
+            wxMessageBox("The scripts are identical.", "Results", wxOK,
+                         mainFrame)
 
     def canBeClosed(self):
         if self.sp.isModified():
@@ -781,9 +752,6 @@ class MyCtrl(wxControl):
 
         tmpSp = screenplay.Screenplay(cfgGl)
         tmpSp.lines = cd.lines
-
-        if not misc.license:
-            tmpSp.replace()
 
         s = util.String()
         for ln in tmpSp.lines:
@@ -1027,18 +995,12 @@ class MyCtrl(wxControl):
         self.updateScreen()
 
     def OnSave(self):
-        if self.checkEvalSave():
-            return
-        
         if self.fileName:
             self.saveFile(self.fileName)
         else:
             self.OnSaveScriptAs()
 
     def OnSaveScriptAs(self):
-        if self.checkEvalSave():
-            return
-
         if self.fileName:
             dDir = os.path.dirname(self.fileName)
             dFile = os.path.basename(self.fileName)
@@ -1072,7 +1034,7 @@ class MyCtrl(wxControl):
 
             choice = dlg.GetFilterIndex()
             if choice == 0:
-                data = sp.generatePDF(not misc.license, True)
+                data = sp.generatePDF(True)
             elif choice == 1:
                 data = sp.generateRTF()
             else:
@@ -1089,7 +1051,7 @@ class MyCtrl(wxControl):
         if not sp:
             return
         
-        s = sp.generatePDF(not misc.license, False)
+        s = sp.generatePDF(False)
         gutil.showTempPDF(s, cfgGl, mainFrame)
 
     def OnSettings(self):
@@ -1645,14 +1607,6 @@ class MyFrame(wxFrame):
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
         helpMenu.Append(ID_HELP_MANUAL, "&Manual")
         helpMenu.AppendSeparator()
-
-        tmp = wxMenu()
-        tmp.Append(ID_LICENSE_INFO, "&Information...")
-        tmp.Append(ID_LICENSE_UPDATE, "&Update...")
-        tmp.Append(ID_LICENSE_RELEASE, "&Release")
-        
-        helpMenu.AppendMenu(ID_HELP_LICENSE, "&License", tmp)
-        helpMenu.AppendSeparator()
         helpMenu.Append(ID_HELP_ABOUT, "&About...")
         
         self.menuBar = wxMenuBar()
@@ -1678,19 +1632,10 @@ class MyFrame(wxFrame):
         for t in config.getTIs():
             self.typeCb.Append(t.name, t.lt)
 
-        # this is hidden here because it's somewhat harder to find here
-        # than in misc.pyo
+        # FIXME: move these to misc.py?
         misc.version = "1.4.0"
+        misc.releaseDate = datetime.date(2006, 4, 26)
 
-        # slightly obfuscated in a desperate attempt to fool at least some
-        # people...
-        misc.releaseDate = datetime.date(500 * 4 + 6, 10 - 6, 42 - 16)
-
-        misc.license = None
-
-        if gd.license:
-            self.setLicense(gd.license, None, True)
-            
         hsizer.Add(self.typeCb)
 
         self.tabCtrl = misc.MyTabCtrl(self, -1)
@@ -1769,9 +1714,6 @@ class MyFrame(wxFrame):
         EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         EVT_MENU(self, ID_HELP_MANUAL, self.OnHelpManual)
         EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
-        EVT_MENU(self, ID_LICENSE_INFO, self.OnLicenseInfo)
-        EVT_MENU(self, ID_LICENSE_UPDATE, self.OnUpdateLicense)
-        EVT_MENU(self, ID_LICENSE_RELEASE, self.OnReleaseLicense)
         EVT_MENU_RANGE(self, gd.mru.getIds()[0], gd.mru.getIds()[1],
                        self.OnMRUFile)
 
@@ -1826,11 +1768,7 @@ class MyFrame(wxFrame):
             "ID_FILE_SETTINGS",
             "ID_HELP_ABOUT",
             "ID_HELP_COMMANDS",
-            "ID_HELP_LICENSE",
             "ID_HELP_MANUAL",
-            "ID_LICENSE_INFO",
-            "ID_LICENSE_RELEASE",
-            "ID_LICENSE_UPDATE",
             "ID_REPORTS_CHARACTER_REP",
             "ID_REPORTS_DIALOGUE_CHART",
             "ID_REPORTS_LOCATION_REP",
@@ -1923,27 +1861,6 @@ class MyFrame(wxFrame):
                 return True
 
         return False
-
-    # try to set license from s.
-    def setLicense(self, s, frame, isStarting):
-        lic = util.License.fromStr(s, frame)
-
-        if lic:
-            if misc.releaseDate > lic.lastDate:
-                wxMessageBox("License is only valid for program\n"
-                    "versions released before %s." % lic.lastDate.isoformat(),
-                    "Error", wxOK, frame)
-
-                return
-                
-            misc.license = lic
-            gd.license = s
-
-            if not isStarting:
-                util.writeToFile(gd.stateFilename, gd.save(), frame)
-
-                wxMessageBox("License successfully updated.",
-                             "Information", wxOK, frame)
 
     def updateKbdCommands(self):
         cfgGl.addShiftKeys()
@@ -2297,44 +2214,6 @@ class MyFrame(wxFrame):
     def OnAbout(self, event = None):
         win = splash.SplashWindow(self, -1)
         win.Show()
-
-    def OnLicenseInfo(self, event = None):
-        if misc.license:
-            s = "Licensed to: '%s'\n" % misc.license.userId.lstrip()
-
-            s += "License type: %s\n" % misc.license.getTypeStr()
-            s += "Upgradable until: %s\n" % misc.license.lastDate.isoformat()
-
-        else:
-            s = "Evaluation copy."
-
-        wxMessageBox(s, "License info", wxOK, self)
-        
-    def OnUpdateLicense(self, event = None):
-        dlg = wxFileDialog(self, "License file to open", ".",
-            wildcard = "License files (*.lic)|*.lic|All files|*",
-            style = wxOPEN)
-        
-        if dlg.ShowModal() == wxID_OK:
-            data = util.loadFile(misc.fromGUIUnicode(dlg.GetPath()), self)
-
-            if data != None:
-                self.setLicense(data, self, False);
-
-        dlg.Destroy()
-    
-    def OnReleaseLicense(self, event = None):
-        if misc.license == None:
-            wxMessageBox("You already are in evaluation mode.", "Error",
-                         wxOK, self)
-        else:
-            if wxMessageBox("Are you sure you want to release your\n"
-                            "license information, i.e. go back to\n"
-                            "evaluation mode?", "Confirm",
-                            wxYES_NO | wxNO_DEFAULT, self) == wxYES:
-                misc.license = None
-                gd.license = ""
-                util.writeToFile(gd.stateFilename, gd.save(), self)
 
     def OnTypeCombo(self, event):
         self.panel.ctrl.OnTypeCombo(event)

@@ -7,7 +7,7 @@ import util
 
 from wxPython.wx import *
 
-def genCharacterReport(mainFrame, sp, addDs):
+def genCharacterReport(mainFrame, sp):
     report = CharacterReport(sp)
 
     if not report.cinfo:
@@ -36,7 +36,7 @@ def genCharacterReport(mainFrame, sp, addDs):
     if not ok:
         return
     
-    data = report.generate(addDs)
+    data = report.generate()
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
     
@@ -120,9 +120,9 @@ class CharacterReport:
     def sum(self, name):
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
         
-    def generate(self, addDs):
+    def generate(self):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 20.0, 12, addDs)
+                               self.sp.cfg.paperHeight, 20.0, 12)
 
         for ci in self.cinfo:
             if not ci.include:

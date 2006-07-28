@@ -7,7 +7,7 @@ import util
 
 from wxPython.wx import *
 
-def genDialogueChart(mainFrame, sp, addDs):
+def genDialogueChart(mainFrame, sp):
     # TODO: would be nice if this behaved like the other reports, i.e. the
     # junk below would be inside the class, not outside. this would allow
     # testcases to be written. only complication is the minLines thing
@@ -52,7 +52,7 @@ def genDialogueChart(mainFrame, sp, addDs):
 
         return
         
-    data = chart.generate(inf, addDs)
+    data = chart.generate(inf)
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
     
@@ -170,23 +170,20 @@ class DialogueChart:
         # spacing from one legend item to next
         self.legendSize = 4.0 
 
-    def generate(self, cbil, addDs):
+    def generate(self, cbil):
         doc = pml.Document(self.sp.cfg.paperHeight,
                            self.sp.cfg.paperWidth)
 
         for it in cbil:
             if it.selected:
                 self.cinfo.sort(it.cdata)
-                doc.add(self.generatePage(it.text, doc, addDs))
+                doc.add(self.generatePage(it.text, doc))
         
         return pdf.generate(doc)
 
-    def generatePage(self, title, doc, addDs):
+    def generatePage(self, title, doc):
         pg = pml.Page(doc)
 
-        if addDs:
-            pg.addDemoStamp()
-        
         pg.add(pml.TextOp(title, doc.w / 2.0, self.margin, 18,
             pml.BOLD | pml.ITALIC | pml.UNDERLINED, util.ALIGN_CENTER))
 
@@ -278,12 +275,7 @@ class DialogueChart:
             y = self.chartY + i * self.charY
             ci = self.cinfo[i]
             
-            if misc.license:
-                name = ci.name
-            else:
-                name = "EVALUATION"
-                
-            pg.add(pml.TextOp(name, self.margin, y + self.charY / 2.0,
+            pg.add(pml.TextOp(ci.name, self.margin, y + self.charY / 2.0,
                 self.charFs, valign = util.VALIGN_CENTER))
             
             for i in xrange(pageCnt):

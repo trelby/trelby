@@ -56,25 +56,9 @@ class Document:
         # page number to display on document open, or -1
         self.defPage = -1
 
-        # when running testcases, misc.version does not exist, so store
-        # dummy values in that case, correct values otherwise.
-        if hasattr(misc, "version"):
-            if misc.license:
-                author = misc.license.userId.lstrip()
-
-                # get rid of the email part since users probably don't
-                # want to disseminate that
-                pos = author.find("<")
-                if pos != -1:
-                    author = author[:pos - 1]
-            else:
-                author = "Evaluation version"
-
-            self.version = misc.version
-            self.author = author
-        else:
-            self.version = "dummy_version"
-            self.author = "dummy_author"
+        # when running testcases, misc.version does not exist, so store a
+        # dummy value in that case, correct value otherwise.
+        self.version = getattr(misc, "version", "dummy_version")
 
     def add(self, page):
         self.pages.append(page)
@@ -96,39 +80,6 @@ class Page:
 
     def add(self, op):
         self.ops.append(op)
-
-    # add demo stamp.
-    def addDemoStamp(self):
-        # list of lines which together draw a "DEMO" in a 45-degree angle
-        # over the page. coordinates are percentages of page width/height.
-        dl = [
-            # D
-            [ (0.056, 0.286), (0.208, 0.156), (0.23, 0.31), (0.056, 0.286) ],
-
-            # E
-            [ (0.356, 0.542), (0.238, 0.42), (0.38, 0.302), (0.502, 0.4) ],
-            [ (0.328, 0.368), (0.426, 0.452) ],
-
-            # M
-            [ (0.432, 0.592), (0.574, 0.466), (0.522, 0.650),
-              (0.722, 0.62), (0.604, 0.72) ],
-
-            # O
-            [ (0.67, 0.772), (0.794, 0.678), (0.896, 0.766),
-              (0.772, 0.858), (0.67, 0.772) ]
-            ]
-
-        self.add(PDFOp("q 0.5 G")) 
-        self.add(PDFOp("1 J 1 j"))
-
-        for path in dl:
-            p = []
-            for point in path:
-                p.append((point[0] * self.doc.w, point[1] * self.doc.h))
-
-            self.add(LineOp(p, 10))
-
-        self.add(PDFOp("Q"))
 
 # Table of content item (Outline item, in PDF lingo)
 class TOCItem:
@@ -252,7 +203,7 @@ class PDFOp(DrawOp):
 # create a PML document containing text (possibly linewrapped) divided
 # into pages automatically.
 class TextFormatter:
-    def __init__(self, width, height, margin, fontSize, addDs):
+    def __init__(self, width, height, margin, fontSize):
         self.doc = Document(width, height)
 
         # how much to leave empty on each side (mm)
@@ -261,9 +212,6 @@ class TextFormatter:
         # font size
         self.fontSize = fontSize
 
-        # whether to add a demo stamp to each page
-        self.addDs = addDs
-        
         # number of chararacters that fit on a single line
         self.charsToLine = int((width - margin * 2.0) /
                                util.getTextWidth(" ", COURIER, fontSize))
@@ -274,9 +222,6 @@ class TextFormatter:
     def createPage(self):
         self.pg = Page(self.doc)
 
-        if self.addDs:
-            self.pg.addDemoStamp()
-            
         self.doc.add(self.pg)
         self.y = self.margin
 

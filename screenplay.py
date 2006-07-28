@@ -102,10 +102,6 @@ class Screenplay:
         else:
             return tcfg.intraSpacing
 
-    def replace(self):
-        for i in xrange(len(self.lines)):
-            self.lines[i].replace()
-            
     # this is ~8x faster than the generic deepcopy, which makes a
     # noticeable difference at least on an Athlon 1.3GHz (0.06s versus
     # 0.445s)
@@ -127,8 +123,8 @@ class Screenplay:
             ln = self.lines[i]
             l.append(Line(ln.lb, ln.lt, ln.text))
 
-        # "open PDF on current page" breaks on evaluation version if we
-        # don't copy these
+        # "open PDF on current page" breaks on scripts we're removing
+        # notes from before printing if we don't copy these
         sp.line = self.line
         sp.column = self.column
 
@@ -525,11 +521,10 @@ class Screenplay:
         return str(s)
 
     # generate PDF and return it as a string. assumes paginate/reformat is
-    # 100% correct for the screenplay. if addDs is True, add demo stamp to
-    # each page. isExport is True if this is an "export to file"
-    # operation, False if we're just going to launch a PDF viewer with the
-    # data.
-    def generatePDF(self, addDs, isExport):
+    # 100% correct for the screenplay. isExport is True if this is an
+    # "export to file" operation, False if we're just going to launch a
+    # PDF viewer with the data.
+    def generatePDF(self, isExport):
         pager = mypager.Pager(self.cfg)
         self.titles.generatePages(pager.doc)
 
@@ -540,7 +535,7 @@ class Screenplay:
                                 self.line2page(self.line) - 1
             
         for i in xrange(1, len(self.pages)):
-            pg = self.generatePMLPage(pager, i, True, True, addDs)
+            pg = self.generatePMLPage(pager, i, True, True)
 
             if pg:
                 pager.doc.add(pg)
@@ -580,8 +575,7 @@ class Screenplay:
 
     # generate one page of PML data and return it.
     #
-    # if forPDF is True, output is meant for PDF generation (demo stamps,
-    # print settings, etc).
+    # if forPDF is True, output is meant for PDF generation.
     #
     # if doExtra is False, omits headers and other stuff that is
     # automatically added, i.e. outputs only actual screenplay lines. also
@@ -589,13 +583,11 @@ class Screenplay:
     # only be True for callers that do not show the results in any way,
     # just calculate things based on text positions.
     #
-    # if addDs is True, add demo stamp.
-    #
     # can also return None, which means pagination is not up-to-date and
     # the given page number doesn't point to a valid page anymore, and the
     # caller should stop calling this since all pages have been generated
     # (assuming 1-to-n calling sequence).
-    def generatePMLPage(self, pager, pageNr, forPDF, doExtra, addDs = False):
+    def generatePMLPage(self, pager, pageNr, forPDF, doExtra):
         #lsdjflksj = util.TimerDev("generatePMLPage")
 
         cfg = self.cfg
@@ -624,9 +616,6 @@ class Screenplay:
             end = util.clamp(self.pages[pageNr], maxVal = length - 1)
 
         pg = pml.Page(pager.doc)
-
-        if forPDF and addDs:
-            pg.addDemoStamp()
 
         # what line we're on, counted from first line after top
         # margin, units = line / 10
@@ -2069,9 +2058,8 @@ class Screenplay:
         return (line, msg)
 
     # compare this script to sp2 (Screenplay), return a PDF file (as a
-    # string) of the differences, or None if the scripts are identical. if
-    # addDs is True, add demo stamp to each page.
-    def compareScripts(self, sp2, addDs):
+    # string) of the differences, or None if the scripts are identical.
+    def compareScripts(self, sp2):
         s1 = self.generateText(False).split("\n")
         s2 = sp2.generateText(False).split("\n")
 
@@ -2150,8 +2138,6 @@ class Screenplay:
         y = 0
 
         pg = pml.Page(doc)
-        if addDs:
-            pg.addDemoStamp()
 
         # we need to gather text ops for each page into a separate list
         # and add that list to the page only after all other ops are
@@ -2166,8 +2152,6 @@ class Screenplay:
                 doc.add(pg)
 
                 pg = pml.Page(doc)
-                if addDs:
-                    pg.addDemoStamp()
 
                 textOps = []
                 y = 0
@@ -2600,11 +2584,6 @@ class Line:
     def __str__(self):
         return config.lb2char(self.lb) + config.lt2char(self.lt)\
                + self.text
-
-    # replace some words, rendering the script useless except for
-    # evaluation purposes
-    def replace(self):
-        self.text = re.sub(r"\b(\w){5}\b", "x" * 5, self.text)
 
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.

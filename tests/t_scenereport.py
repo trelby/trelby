@@ -6,7 +6,7 @@ import u
 def testBasic():
     sp = u.load()
     report = scenereport.SceneReport(sp)
-    data = report.generate(False)
+    data = report.generate()
 
     # try to catch cases where generate returns something other than a PDF
     # document

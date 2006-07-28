@@ -285,12 +285,10 @@ class PDFExporter:
 
     def createInfoObj(self):
         version = self.escapeStr(self.doc.version)
-        author = self.escapeStr(self.doc.author)
 
-        return self.addObj("<< /Author (%s)\n"
-                           "/Creator (Oskusoft Blyte %s)\n"
+        return self.addObj("<< /Creator (Oskusoft Blyte %s)\n"
                            "/Producer (Oskusoft Blyte %s)\n"
-                           ">>" % (author, version, version))
+                           ">>" % (version, version))
 
     # create a PDF object containing a 256-entry array for the widths of a
     # font, with all widths being 600

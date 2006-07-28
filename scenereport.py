@@ -7,7 +7,7 @@ import util
 
 from wxPython.wx import *
 
-def genSceneReport(mainFrame, sp, addDs):
+def genSceneReport(mainFrame, sp):
     report = SceneReport(sp)
 
     dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
@@ -22,7 +22,7 @@ def genSceneReport(mainFrame, sp, addDs):
     if not ok:
         return
 
-    data = report.generate(addDs)
+    data = report.generate()
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
 
@@ -58,9 +58,9 @@ class SceneReport:
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
-    def generate(self, addDs):
+    def generate(self):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 15.0, 12, addDs)
+                               self.sp.cfg.paperHeight, 15.0, 12)
 
         for si in self.scenes:
             tf.addSpace(5.0)

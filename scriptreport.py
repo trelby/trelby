@@ -7,9 +7,9 @@ import scenereport
 import screenplay
 import util
 
-def genScriptReport(mainFrame, sp, addDs):
+def genScriptReport(mainFrame, sp):
     report = ScriptReport(sp)
-    data = report.generate(addDs)
+    data = report.generate()
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
 
@@ -19,9 +19,9 @@ class ScriptReport:
         self.sr = scenereport.SceneReport(sp)
         self.cr = characterreport.CharacterReport(sp)
 
-    def generate(self, addDs):
+    def generate(self):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 15.0, 12, addDs)
+                               self.sp.cfg.paperHeight, 15.0, 12)
 
         ls = self.sp.lines
 

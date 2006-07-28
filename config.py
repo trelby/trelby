@@ -733,9 +733,6 @@ class ConfigGlobal:
             
             Command("ImportScript", "Import a script.", isMenu = True),
             
-            Command("LicenseInfo", "Show information about your license.",
-                    isMenu = True),
-            
             Command("LoadSettings", "Load global settings.", isMenu = True),
             
             Command("LoadScriptSettings", "Load script-specific settings.",
@@ -812,8 +809,6 @@ class ConfigGlobal:
                     [util.Key(17, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
 
-            Command("ReleaseLicense", "Release your license.", isMenu = True),
-            
             Command("ReportCharacter", "Generate character report.",
                     isMenu = True),
             
@@ -886,8 +881,6 @@ class ConfigGlobal:
             
             Command("ToggleShowFormatting", "Toggle 'Show formatting'"
                     " display.", isMenu = True),
-
-            Command("UpdateLicense", "Update your license.", isMenu = True),
 
             Command("ViewModeDraft", "Change view mode to draft.",
                     isMenu = True),

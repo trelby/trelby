@@ -8,7 +8,7 @@ import util
 
 from wxPython.wx import *
 
-def genLocationReport(mainFrame, sp, addDs):
+def genLocationReport(mainFrame, sp):
     report = LocationReport(scenereport.SceneReport(sp))
 
     dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
@@ -23,7 +23,7 @@ def genLocationReport(mainFrame, sp, addDs):
     if not ok:
         return
     
-    data = report.generate(addDs)
+    data = report.generate()
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
 
@@ -81,9 +81,9 @@ class LocationReport:
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
-    def generate(self, addDs):
+    def generate(self):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 15.0, 12, addDs)
+                               self.sp.cfg.paperHeight, 15.0, 12)
 
         scriptLines = sum([li.lines for li in self.locations])
 

@@ -1,4 +1,3 @@
-import os
 import sys
 
 import misc
@@ -16,7 +15,7 @@ class BugReportHandler:
         # way back to oskusoft.
         self.data = util.String()
 
-        # size of data last time it was copied to the clipboard
+        # size of data last time it was written to a file
         self.copyPos = 0
 
         # possible open BugReportDlg
@@ -79,11 +78,11 @@ class BugReportDlg(wxDialog):
         
     def OnSave(self, event):
         dlg = wxFileDialog(self, "Filename to save as",
-            defaultFile = "error_report.dat",
+            defaultFile = "error_report.txt",
             style = wxSAVE | wxOVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wxID_OK:
             self.brh.copyPos = len(self.brh.data)
-            s = str(self.brh.data).encode("base64").encode("rot13")
-            
+            s = str(self.brh.data)
+
             util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()), s, self)
