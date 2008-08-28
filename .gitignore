@@ -1,0 +1,8 @@
+*.pyc
+*.pyo
+.blyte/
+names.dat
+manual.pdf
+data.dat
+blyte
+dict_en.dat.gz
