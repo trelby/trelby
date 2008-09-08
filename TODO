@@ -1,3 +1,3 @@
 -pml->pdf font baseline wrong for non-courier fonts?
 
--lis‰‰ loppuliite automaattisesti jos puuttuu save/exportissa
+-add suffix automatically if missing in save/export
