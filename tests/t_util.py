@@ -51,5 +51,5 @@ def testFromUTF8():
     assert f("") == ""
     assert f("yo") == "yo"
     assert f("yÃ¶") == "yö"
-    assert f("yö12345") == "y45"
+    assert f("yö12345") == "y12345"
     assert f("a\xE2\x82\xACb") == "ab"
