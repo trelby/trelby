@@ -2,58 +2,58 @@ import gutil
 import locations
 import util
 
-from wxPython.wx import *
+import wx
 
-class LocationsDlg(wxDialog):
+class LocationsDlg(wx.Dialog):
     def __init__(self, parent, sp):
-        wxDialog.__init__(self, parent, -1, "Locations",
-                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+        wx.Dialog.__init__(self, parent, -1, "Locations",
+                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         self.sp = sp
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        tmp = wxStaticText(self, -1, "Locations:")
+        tmp = wx.StaticText(self, -1, "Locations:")
         vsizer.Add(tmp)
         
-        self.locationsLb = wxListBox(self, -1, size = (450, 200))
-        vsizer.Add(self.locationsLb, 1, wxEXPAND)
+        self.locationsLb = wx.ListBox(self, -1, size = (450, 200))
+        vsizer.Add(self.locationsLb, 1, wx.EXPAND)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer.Add(self.addBtn)
-        EVT_BUTTON(self, self.addBtn.GetId(), self.OnAdd)
+        wx.EVT_BUTTON(self, self.addBtn.GetId(), self.OnAdd)
 
         self.delBtn = gutil.createStockButton(self, "Delete")
-        hsizer.Add(self.delBtn, 0, wxLEFT, 10)
-        EVT_BUTTON(self, self.delBtn.GetId(), self.OnDelete)
+        hsizer.Add(self.delBtn, 0, wx.LEFT, 10)
+        wx.EVT_BUTTON(self, self.delBtn.GetId(), self.OnDelete)
 
-        vsizer.Add(hsizer, 0, wxALIGN_CENTER | wxTOP, 10)
+        vsizer.Add(hsizer, 0, wx.ALIGN_CENTER | wx.TOP, 10)
 
-        tmp = wxStaticText(self, -1, "Scenes:")
+        tmp = wx.StaticText(self, -1, "Scenes:")
         vsizer.Add(tmp)
         
-        self.scenesLb = wxListBox(self, -1, size = (450, 200),
-                                  style = wxLB_EXTENDED)
-        vsizer.Add(self.scenesLb, 1, wxEXPAND)
+        self.scenesLb = wx.ListBox(self, -1, size = (450, 200),
+                                   style = wx.LB_EXTENDED)
+        vsizer.Add(self.scenesLb, 1, wx.EXPAND)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
         
         cancelBtn = gutil.createStockButton(self, "Cancel")
-        hsizer.Add(cancelBtn, 0, wxLEFT, 10)
+        hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 10)
 
         util.finishWindow(self, vsizer)
 
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
         self.fillGui()
 
@@ -76,17 +76,17 @@ class LocationsDlg(wxDialog):
         self.sp.locations.locations = ml
         self.sp.locations.refresh(self.sp.getSceneNames())
         
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
     def OnAdd(self, event):
         selected = self.scenesLb.GetSelections()
 
         if not selected:
-            wxMessageBox("No scenes selected in the lower list.", "Error",
-                         wxOK, self)
+            wx.MessageBox("No scenes selected in the lower list.", "Error",
+                          wx.OK, self)
 
             return
 
@@ -134,8 +134,8 @@ class LocationsDlg(wxDialog):
             scene = self.locationsLb.GetClientData(idx)
 
         if scene == None:
-            wxMessageBox("No scene selected in the upper list.", "Error",
-                         wxOK, self)
+            wx.MessageBox("No scene selected in the upper list.", "Error",
+                          wx.OK, self)
 
             return
 

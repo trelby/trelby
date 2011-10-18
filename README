@@ -5,8 +5,8 @@ to inspect/modify the code.
 1. Requirements
 ===============
 
-You will need Python (at least 2.3) and wxWidgets (2.4 or 2.6) and its
-Python bindings to run Blyte.
+You will need Python (at least 2.6) and wxWidgets (2.8) and its Python
+bindings to run Blyte.
 
 To build the manual, you will need:
 

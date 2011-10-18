@@ -6,10 +6,10 @@ import os
 import os.path
 import sys
 
-from wxPython.wx import *
+import wx
 
 def init(doWX = True):
-    global isWindows, isUnix, unicodeFS, wx26, wxIsUnicode, doDblBuf, \
+    global isWindows, isUnix, unicodeFS, wxIsUnicode, doDblBuf, \
            progPath, confPath, tmpPrefix
 
     # prefix used for temp files
@@ -18,16 +18,13 @@ def init(doWX = True):
     isWindows = False
     isUnix = False
 
-    if wxPlatform == "__WXMSW__":
+    if wx.Platform == "__WXMSW__":
         isWindows = True
     else:
         isUnix = True
 
-    # are we using wxWidgets 2.6
-    wx26 = (wxMAJOR_VERSION == 2) and (wxMINOR_VERSION == 6)
-
     # are we using a Unicode build of wxWidgets
-    wxIsUnicode = wx26 and ("unicode" in wxPlatformInfo)
+    wxIsUnicode = "unicode" in wx.PlatformInfo
 
     # does this platform support using Python's unicode strings in various
     # filesystem calls; if not, we need to convert filenames to UTF-8
@@ -35,11 +32,10 @@ def init(doWX = True):
     unicodeFS = isWindows
 
     # wxGTK2 does not need us to do double buffering ourselves, others do
-    doDblBuf = not (wx26 and isUnix)
+    doDblBuf = not isUnix
 
     # stupid hack to keep testcases working, since they don't initialize
-    # opts (the doWX name is just for similary with util, and to confuse
-    # people trying to disassemble the code)
+    # opts (the doWX name is just for similarity with util)
     if not doWX or opts.isTest:
         progPath = "."
         confPath = ".blyte"
@@ -93,34 +89,31 @@ def toPath(s):
     else:
         return s.encode("UTF-8")
 
-class MyColorSample(wxWindow):
+class MyColorSample(wx.Window):
     def __init__(self, parent, id, size):
-        wxWindow.__init__(self, parent, id, size = size)
+        wx.Window.__init__(self, parent, id, size = size)
 
-        EVT_PAINT(self, self.OnPaint)
+        wx.EVT_PAINT(self, self.OnPaint)
 
     def OnPaint(self, event):
-        dc = wxPaintDC(self)
+        dc = wx.PaintDC(self)
 
         w, h = self.GetClientSizeTuple()
-        br = wxBrush(self.GetBackgroundColour())
+        br = wx.Brush(self.GetBackgroundColour())
         dc.SetBrush(br)
         dc.DrawRectangle(0, 0, w, h)
 
 # our own version of a tab control, which exists for two reasons: it does
 # not care where it is physically located, which allows us to combine it
 # with other controls on a horizontal row, and it consumes less vertical
-# space than wxNotebook. note that this control is divided into two parts,
+# space than wx.Notebook. note that this control is divided into two parts,
 # MyTabCtrl and MyTabCtrl2, and both must be created.
-class MyTabCtrl(wxWindow):
+class MyTabCtrl(wx.Window):
     def __init__(self, parent, id):
-        style = 0
-        if wx26:
-            style |= wxFULL_REPAINT_ON_RESIZE
+        style = wx.FULL_REPAINT_ON_RESIZE
+        wx.Window.__init__(self, parent, id, style = style)
 
-        wxWindow.__init__(self, parent, id, style = style)
-
-        # pages, i.e., [wxWindow, name] lists. note that 'name' must be an
+        # pages, i.e., [wx.Window, name] lists. note that 'name' must be an
         # Unicode string.
         self.pages = []
 
@@ -149,15 +142,14 @@ class MyTabCtrl(wxWindow):
         # initialized in OnPaint since we don't know our height yet
         self.font = None
 
-        if wx26:
-            self.SetMinSize(wxSize(self.paddingX * 2 + self.arrowWidth * 2 + \
-                                   self.arrowSpacing + self.tabWidth, 20))
+        self.SetMinSize(wx.Size(self.paddingX * 2 + self.arrowWidth * 2 + \
+                                    self.arrowSpacing + self.tabWidth, 20))
 
-        EVT_LEFT_DOWN(self, self.OnLeftDown)
-        EVT_LEFT_DCLICK(self, self.OnLeftDown)
-        EVT_SIZE(self, self.OnSize)
-        EVT_PAINT(self, self.OnPaint)
-        EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
+        wx.EVT_LEFT_DOWN(self, self.OnLeftDown)
+        wx.EVT_LEFT_DCLICK(self, self.OnLeftDown)
+        wx.EVT_SIZE(self, self.OnSize)
+        wx.EVT_PAINT(self, self.OnPaint)
+        wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
 
     # get the ctrl that the tabbed windows should use as a parent
     def getTabParent(self):
@@ -303,13 +295,13 @@ class MyTabCtrl(wxWindow):
 
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wxEmptyBitmap(size.width, size.height)
+        self.screenBuf = wx.EmptyBitmap(size.width, size.height)
 
     def OnEraseBackground(self, event):
         pass
 
     def OnPaint(self, event):
-        dc = wxBufferedPaintDC(self, self.screenBuf)
+        dc = wx.BufferedPaintDC(self, self.screenBuf)
 
         # a kludge, but it works for now
         cfgGui = self.pages[0][0].ctrl.getCfgGui()
@@ -331,8 +323,8 @@ class MyTabCtrl(wxWindow):
 
         if not self.font:
             textH = h - self.textY - 1
-            self.font = util.createPixelFont(textH, wxFONTFAMILY_DEFAULT,
-                                             wxNORMAL, wxNORMAL)
+            self.font = util.createPixelFont(
+                textH, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL)
 
         dc.SetFont(self.font)
 
@@ -387,18 +379,18 @@ class MyTabCtrl(wxWindow):
                           self.arrowWidth - 1, -(self.arrowHeight // 2 + 1))
 
 # second part of MyTabCtrl
-class MyTabCtrl2(wxWindow):
+class MyTabCtrl2(wx.Window):
     def __init__(self, parent, id, tabCtrl):
-        wxWindow.__init__(self, parent, id)
+        wx.Window.__init__(self, parent, id)
 
         # MyTabCtrl
         self.tabCtrl = tabCtrl
 
         self.tabCtrl.add2(self)
 
-        EVT_PAINT(self, self.OnPaint)
-        EVT_SIZE(self, self.OnSize)
-        EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
+        wx.EVT_PAINT(self, self.OnPaint)
+        wx.EVT_SIZE(self, self.OnSize)
+        wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
 
     def OnEraseBackground(self, event):
         pass
@@ -410,30 +402,30 @@ class MyTabCtrl2(wxWindow):
     # trying to make sure that in the cases when this does get called, as
     # little (useless) work as possible is done.
     def OnPaint(self, event):
-        dc = wxPaintDC(self)
+        dc = wx.PaintDC(self)
 
 # dialog that shows two lists of script names, allowing user to choose one
 # from both. stores indexes of selections in members named 'sel1' and
 # 'sel2' when OK is pressed. 'items' must have at least two items.
-class ScriptChooserDlg(wxDialog):
+class ScriptChooserDlg(wx.Dialog):
     def __init__(self, parent, items):
-        wxDialog.__init__(self, parent, -1, "Choose scripts",
-                          style = wxDEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, -1, "Choose scripts",
+                           style = wx.DEFAULT_DIALOG_STYLE)
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        gsizer = wxFlexGridSizer(2, 2, 5, 0)
+        gsizer = wx.FlexGridSizer(2, 2, 5, 0)
 
         self.addCombo("first", "Compare script", self, gsizer, items, 0)
         self.addCombo("second", "to", self, gsizer, items, 1)
 
         vsizer.Add(gsizer)
 
-        self.forceCb = wxCheckBox(self, -1, "Use same configuration")
+        self.forceCb = wx.CheckBox(self, -1, "Use same configuration")
         self.forceCb.SetValue(True)
-        vsizer.Add(self.forceCb, 0, wxTOP, 10)
+        vsizer.Add(self.forceCb, 0, wx.TOP, 10)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
         
@@ -441,25 +433,25 @@ class ScriptChooserDlg(wxDialog):
         hsizer.Add(cancelBtn)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 10)
 
         util.finishWindow(self, vsizer)
 
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
         okBtn.SetFocus()
 
     def addCombo(self, name, descr, parent, sizer, items, sel):
-        al = wxALIGN_CENTER_VERTICAL | wxRIGHT
+        al = wx.ALIGN_CENTER_VERTICAL | wx.RIGHT
         if sel == 1:
-            al |= wxALIGN_RIGHT
+            al |= wx.ALIGN_RIGHT
             
-        sizer.Add(wxStaticText(parent, -1, descr), 0, al, 10)
+        sizer.Add(wx.StaticText(parent, -1, descr), 0, al, 10)
         
-        combo = wxComboBox(parent, -1, style = wxCB_READONLY)
+        combo = wx.ComboBox(parent, -1, style = wx.CB_READONLY)
         util.setWH(combo, w = 200)
         
         for s in items:
@@ -476,10 +468,10 @@ class ScriptChooserDlg(wxDialog):
         self.sel2 = self.secondCombo.GetSelection()
         self.forceSameCfg = bool(self.forceCb.GetValue())
         
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
 # CheckBoxDlg below handles lists of these
 class CheckBoxItem:
@@ -509,13 +501,13 @@ class CheckBoxItem:
 # CheckBoxItems. btns[12] are bools for whether or not to include helper
 # buttons. if OK is pressed, the incoming lists' items' selection status
 # will be modified.
-class CheckBoxDlg(wxDialog):
+class CheckBoxDlg(wx.Dialog):
     def __init__(self, parent, title, cbil1, descr1, btns1,
                  cbil2 = None, descr2 = None, btns2 = None):
-        wxDialog.__init__(self, parent, -1, title,
-                          style = wxDEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, -1, title,
+                           style = wx.DEFAULT_DIALOG_STYLE)
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
         self.cbil1 = cbil1
         self.list1 = self.addList(descr1, self, vsizer, cbil1, btns1, True)
@@ -525,7 +517,7 @@ class CheckBoxDlg(wxDialog):
             self.list2 = self.addList(descr2, self, vsizer, cbil2, btns2,
                                       False, 20)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
         
@@ -533,43 +525,43 @@ class CheckBoxDlg(wxDialog):
         hsizer.Add(cancelBtn)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 10)
 
         util.finishWindow(self, vsizer)
 
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
         okBtn.SetFocus()
         
     def addList(self, descr, parent, sizer, items, doBtns, isFirst, pad = 0):
-        sizer.Add(wxStaticText(parent, -1, descr), 0, wxTOP, pad)
+        sizer.Add(wx.StaticText(parent, -1, descr), 0, wx.TOP, pad)
 
         if doBtns:
-            hsizer = wxBoxSizer(wxHORIZONTAL)
+            hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
             if isFirst:
                 funcs = [ self.OnSet1, self.OnClear1, self.OnToggle1 ]
             else:
                 funcs = [ self.OnSet2, self.OnClear2, self.OnToggle2 ]
 
-            tmp = wxButton(parent, -1, "Set")
+            tmp = wx.Button(parent, -1, "Set")
             hsizer.Add(tmp)
-            EVT_BUTTON(self, tmp.GetId(), funcs[0])
+            wx.EVT_BUTTON(self, tmp.GetId(), funcs[0])
 
-            tmp = wxButton(parent, -1, "Clear")
-            hsizer.Add(tmp, 0, wxLEFT, 10)
-            EVT_BUTTON(self, tmp.GetId(), funcs[1])
+            tmp = wx.Button(parent, -1, "Clear")
+            hsizer.Add(tmp, 0, wx.LEFT, 10)
+            wx.EVT_BUTTON(self, tmp.GetId(), funcs[1])
 
-            tmp = wxButton(parent, -1, "Toggle")
-            hsizer.Add(tmp, 0, wxLEFT, 10)
-            EVT_BUTTON(self, tmp.GetId(), funcs[2])
+            tmp = wx.Button(parent, -1, "Toggle")
+            hsizer.Add(tmp, 0, wx.LEFT, 10)
+            wx.EVT_BUTTON(self, tmp.GetId(), funcs[2])
 
-            sizer.Add(hsizer, 0, wxTOP | wxBOTTOM, 5)
+            sizer.Add(hsizer, 0, wx.TOP | wx.BOTTOM, 5)
         
-        tmp = wxCheckListBox(parent, -1)
+        tmp = wx.CheckListBox(parent, -1)
 
         longest = -1
         for i in range(len(items)):
@@ -595,14 +587,14 @@ class CheckBoxDlg(wxDialog):
             h = min(10, len(items))
 
         # don't know of a way to get the vertical spacing of items in a
-        # wxCheckListBox, so estimate it at font height + 5 pixels, which
+        # wx.CheckListBox, so estimate it at font height + 5 pixels, which
         # is close enough on everything I've tested.
         h *= util.getFontHeight(tmp.GetFont()) + 5
         h += 5
         h = max(25, h)
         
         util.setWH(tmp, w, h)
-        sizer.Add(tmp, 0, wxEXPAND)
+        sizer.Add(tmp, 0, wx.EXPAND)
 
         return tmp
 
@@ -642,37 +634,37 @@ class CheckBoxDlg(wxDialog):
         if hasattr(self, "list2"):
             self.storeResults(self.cbil2, self.list2)
         
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
 # shows a multi-line string to the user in a scrollable text control.
-class TextDlg(wxDialog):
+class TextDlg(wx.Dialog):
     def __init__(self, parent, text, title):
-        wxDialog.__init__(self, parent, -1, title,
-                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+        wx.Dialog.__init__(self, parent, -1, title,
+                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        tc = wxTextCtrl(self, -1, size = wxSize(400, 200),
-            style = wxTE_MULTILINE | wxTE_READONLY | wxTE_LINEWRAP)
+        tc = wx.TextCtrl(self, -1, size = wx.Size(400, 200),
+                         style = wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_LINEWRAP)
         tc.SetValue(text)
-        vsizer.Add(tc, 1, wxEXPAND);
+        vsizer.Add(tc, 1, wx.EXPAND);
         
-        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 5)
+        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
         
         okBtn = gutil.createStockButton(self, "OK")
-        vsizer.Add(okBtn, 0, wxALIGN_CENTER)
+        vsizer.Add(okBtn, 0, wx.ALIGN_CENTER)
 
         util.finishWindow(self, vsizer)
 
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
         okBtn.SetFocus()
 
     def OnOK(self, event):
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
 # helper function for using TextDlg
 def showText(parent, text, title = "Message"):
@@ -681,10 +673,10 @@ def showText(parent, text, title = "Message"):
     dlg.Destroy()
 
 # ask user for a single-line text input.
-class TextInputDlg(wxDialog):
+class TextInputDlg(wx.Dialog):
     def __init__(self, parent, text, title, validateFunc = None):
-        wxDialog.__init__(self, parent, -1, title,
-                          style = wxDEFAULT_DIALOG_STYLE | wxWANTS_CHARS)
+        wx.Dialog.__init__(self, parent, -1, title,
+                           style = wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS)
 
         # function to call to validate the input string on OK. can be
         # None, in which case it is not called. if it returns "", the
@@ -692,35 +684,35 @@ class TextInputDlg(wxDialog):
         # a message box and the dialog is not closed.
         self.validateFunc = validateFunc
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer.Add(wxStaticText(self, -1, text), 1, wxEXPAND | wxBOTTOM, 5)
+        vsizer.Add(wx.StaticText(self, -1, text), 1, wx.EXPAND | wx.BOTTOM, 5)
         
-        self.tc = wxTextCtrl(self, -1, style = wxTE_PROCESS_ENTER)
-        vsizer.Add(self.tc, 1, wxEXPAND);
+        self.tc = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
+        vsizer.Add(self.tc, 1, wx.EXPAND);
         
-        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 5)
+        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 5)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 5)
 
         util.finishWindow(self, vsizer)
 
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
-        EVT_TEXT_ENTER(self, self.tc.GetId(), self.OnOK)
+        wx.EVT_TEXT_ENTER(self, self.tc.GetId(), self.OnOK)
 
-        EVT_CHAR(self.tc, self.OnCharEntry)
-        EVT_CHAR(cancelBtn, self.OnCharButton)
-        EVT_CHAR(okBtn, self.OnCharButton)
+        wx.EVT_CHAR(self.tc, self.OnCharEntry)
+        wx.EVT_CHAR(cancelBtn, self.OnCharButton)
+        wx.EVT_CHAR(okBtn, self.OnCharButton)
 
         self.tc.SetFocus()
 
@@ -733,10 +725,10 @@ class TextInputDlg(wxDialog):
     def OnChar(self, event, isEntry):
         kc = event.GetKeyCode()
 
-        if kc == WXK_ESCAPE:
+        if kc == wx.WXK_ESCAPE:
             self.OnCancel()
             
-        elif (kc == WXK_RETURN) and isEntry:
+        elif (kc == wx.WXK_RETURN) and isEntry:
                 self.OnOK()
 
         else:
@@ -749,24 +741,24 @@ class TextInputDlg(wxDialog):
             msg = self.validateFunc(self.input)
 
             if msg:
-                wxMessageBox(msg, "Error", wxOK, self)
+                wx.MessageBox(msg, "Error", wx.OK, self)
 
                 return
         
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event = None):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
 # asks the user for a keypress and stores it.
-class KeyDlg(wxDialog):
+class KeyDlg(wx.Dialog):
     def __init__(self, parent, cmdName):
-        wxDialog.__init__(self, parent, -1, "Key capture",
-                          style = wxDEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, -1, "Key capture",
+                           style = wx.DEFAULT_DIALOG_STYLE)
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer.Add(wxStaticText(self, -1, "Press the key combination you\n"
+        vsizer.Add(wx.StaticText(self, -1, "Press the key combination you\n"
             "want to bind to the command\n'%s'." % cmdName))
 
         tmp = KeyDlgWidget(self, -1, (1, 1))
@@ -777,17 +769,17 @@ class KeyDlg(wxDialog):
         tmp.SetFocus()
 
 # used by KeyDlg
-class KeyDlgWidget(wxWindow):
+class KeyDlgWidget(wx.Window):
     def __init__(self, parent, id, size):
-        wxWindow.__init__(self, parent, id, size = size,
-                          style = wxWANTS_CHARS)
+        wx.Window.__init__(self, parent, id, size = size,
+                           style = wx.WANTS_CHARS)
 
-        EVT_CHAR(self, self.OnKeyChar)
+        wx.EVT_CHAR(self, self.OnKeyChar)
 
     def OnKeyChar(self, ev):
         p = self.GetParent()
         p.key = util.Key.fromKE(ev)
-        p.EndModal(wxID_OK)
+        p.EndModal(wx.ID_OK)
 
 # handles the "Most recently used" list of files in a menu.
 class MRUFiles:
@@ -799,7 +791,7 @@ class MRUFiles:
         self.items = []
 
         for i in range(self.maxCount):
-            id = wxNewId()
+            id = wx.NewId()
 
             if i == 0:
                 # first menu id

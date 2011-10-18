@@ -5,7 +5,7 @@ import util
 import os
 import tempfile
 
-from wxPython.wx import *
+import wx
 
 # this contains misc GUI-related functions
 
@@ -37,33 +37,32 @@ def listBoxAdd(lb, name, cdata):
 
 # create stock button.
 def createStockButton(parent, label):
-    # wx2.4 does not have these, and wxMSW does not really have them: it
-    # does not have any icons and it inconsistently adds the shortcut key
-    # to some buttons, but not to all, so it's better not to use them at
-    # all on Windows.
-    if misc.wx26 and misc.isUnix:
+    # wxMSW does not really have them: it does not have any icons and it
+    # inconsistently adds the shortcut key to some buttons, but not to
+    # all, so it's better not to use them at all on Windows.
+    if misc.isUnix:
         ids = {
-            "OK" : wxID_OK,
-            "Cancel" : wxID_CANCEL,
-            "Apply" : wxID_APPLY,
-            "Add" : wxID_ADD,
-            "Delete" : wxID_DELETE,
-            "Preview" : wxID_PREVIEW
+            "OK" : wx.ID_OK,
+            "Cancel" : wx.ID_CANCEL,
+            "Apply" : wx.ID_APPLY,
+            "Add" : wx.ID_ADD,
+            "Delete" : wx.ID_DELETE,
+            "Preview" : wx.ID_PREVIEW
             }
         
-        return wxButton(parent, ids[label])
+        return wx.Button(parent, ids[label])
     else:
-        return wxButton(parent, -1, label)
+        return wx.Button(parent, -1, label)
 
 # wxWidgets has a bug in 2.6 on wxGTK2 where double clicking on a button
-# does not send two EVT_BUTTON events, only one. since the wxWidgets
+# does not send two wx.EVT_BUTTON events, only one. since the wxWidgets
 # maintainers do not seem interested in fixing this
 # (http://sourceforge.net/tracker/index.php?func=detail&aid=1449838&group_id=9863&atid=109863),
 # we work around it ourselves by binding the left mouse button double
 # click event to the same callback function on the buggy platforms.
 def btnDblClick(btn, func):
-    if misc.wx26 and misc.isUnix:
-        EVT_LEFT_DCLICK(btn, func)
+    if misc.isUnix:
+        wx.EVT_LEFT_DCLICK(btn, func)
     
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF
@@ -88,5 +87,5 @@ def showTempPDF(pdfData, cfgGl, mainFrame):
             raise MiscError("IOError: %s" % strerror)
 
     except BlyteError, e:
-        wxMessageBox("Error writing temporary PDF file: %s" % e,
-                     "Error", wxOK, mainFrame)
+        wx.MessageBox("Error writing temporary PDF file: %s" % e,
+                      "Error", wx.OK, mainFrame)

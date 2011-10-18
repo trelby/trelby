@@ -6,7 +6,7 @@ import scenereport
 import screenplay
 import util
 
-from wxPython.wx import *
+import wx
 
 def genLocationReport(mainFrame, sp):
     report = LocationReport(scenereport.SceneReport(sp))
@@ -15,7 +15,7 @@ def genLocationReport(mainFrame, sp):
         "Information to include:", False)
 
     ok = False
-    if dlg.ShowModal() == wxID_OK:
+    if dlg.ShowModal() == wx.ID_OK:
         ok = True
 
     dlg.Destroy()

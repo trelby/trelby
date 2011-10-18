@@ -5,11 +5,10 @@ import glob
 import misc
 import os
 import re
-import sha
 import tempfile
 import time
 
-from wxPython.wx import *
+import wx
 
 # alignment values
 ALIGN_LEFT    = 0
@@ -102,8 +101,8 @@ def init(doWX = True):
     if doWX:
         # dunno if the bitmap needs to be big enough to contain the text
         # we're measuring...
-        permDc = wxMemoryDC()
-        permDc.SelectObject(wxEmptyBitmap(512, 32))
+        permDc = wx.MemoryDC()
+        permDc.SelectObject(wx.EmptyBitmap(512, 32))
     
 # like string.upper/lower/capitalize, but we do our own charset-handling
 # that doesn't need locales etc
@@ -328,7 +327,7 @@ def getTextWidth(text, style, size):
     return (fontinfo.getMetrics(style).getTextWidth(text, size) / 72.0) * 25.4
 
 # create a font that's height is at most 'height' pixels. other parameters
-# are the same as in wxFont's constructor.
+# are the same as in wx.Font's constructor.
 def createPixelFont(height, family, style, weight):
     fs = 6
 
@@ -339,8 +338,8 @@ def createPixelFont(height, family, style, weight):
     # FIXME: what's this "keep trying even once we go over the max height"
     # stuff? get rid of it.
     while 1:
-        fn = wxFont(fs, family, style, weight,
-                    encoding = wxFONTENCODING_ISO8859_1)
+        fn = wx.Font(fs, family, style, weight,
+                     encoding = wx.FONTENCODING_ISO8859_1)
         h = getFontHeight(fn)
         diff = height -h
 
@@ -356,8 +355,8 @@ def createPixelFont(height, family, style, weight):
 
         fs += 2
 
-    return wxFont(selected, family, style, weight,
-                  encoding = wxFONTENCODING_ISO8859_1)
+    return wx.Font(selected, family, style, weight,
+                   encoding = wx.FONTENCODING_ISO8859_1)
     
 def reverseComboSelect(combo, clientData):
     for i in range(combo.GetCount()):
@@ -379,9 +378,7 @@ def setWH(ctrl, w = -1, h = -1):
     if h != -1:
         size.height = h
 
-    if misc.wx26:
-        ctrl.SetMinSize(wxSize(size.width, size.height))
-
+    ctrl.SetMinSize(wx.Size(size.width, size.height))
     ctrl.SetClientSizeWH(size.width, size.height)
 
 # wxMSW doesn't respect the control's min/max values at all, so we have to
@@ -528,15 +525,15 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
 # 'pad' pixels of padding on each side, resize window to correct size, and
 # optionally center it.
 def finishWindow(window, topSizer, pad = 10, center = True):
-    padSizer = wxBoxSizer(wxVERTICAL)
-    padSizer.Add(topSizer, 1, wxEXPAND | wxALL, pad)
+    padSizer = wx.BoxSizer(wx.VERTICAL)
+    padSizer.Add(topSizer, 1, wx.EXPAND | wx.ALL, pad)
     window.SetSizerAndFit(padSizer)
     window.Layout()
     
     if center:
         window.Center()
 
-# wxColour replacement that can safely be copy.deepcopy'd
+# wx.Colour replacement that can safely be copy.deepcopy'd
 class MyColor:
     def __init__(self, r, g, b):
         self.r = r
@@ -544,7 +541,7 @@ class MyColor:
         self.b = b
 
     def toWx(self):
-        return wxColour(self.r, self.g, self.b)
+        return wx.Colour(self.r, self.g, self.b)
 
     def fromWx(c):
         o = MyColor(0, 0, 0)
@@ -611,46 +608,44 @@ class Key:
         24 : "X",
         25 : "Y",
         26 : "Z",
-        WXK_BACK : "Backspace",
-        WXK_TAB : "Tab",
-        WXK_RETURN : "Enter",
-        WXK_ESCAPE : "Escape",
-        WXK_DELETE : "Delete",
-        WXK_PRIOR : "Page up",
-        WXK_NEXT : "Page down",
-        WXK_END : "End",
-        WXK_HOME : "Home",
-        WXK_LEFT : "Left",
-        WXK_UP : "Up",
-        WXK_RIGHT : "Right",
-        WXK_DOWN : "Down",
-        WXK_INSERT : "Insert",
-        WXK_F1 : "F1",
-        WXK_F2 : "F2",
-        WXK_F3 : "F3",
-        WXK_F4 : "F4",
-        WXK_F5 : "F5",
-        WXK_F6 : "F6",
-        WXK_F7 : "F7",
-        WXK_F8 : "F8",
-        WXK_F9 : "F9",
-        WXK_F10 : "F10",
-        WXK_F11 : "F11",
-        WXK_F12 : "F12",
-        WXK_F13 : "F13",
-        WXK_F14 : "F14",
-        WXK_F15 : "F15",
-        WXK_F16 : "F16",
-        WXK_F17 : "F17",
-        WXK_F18 : "F18",
-        WXK_F19 : "F19",
-        WXK_F20 : "F20",
-        WXK_F21 : "F21",
-        WXK_F22 : "F22",
-        WXK_F23 : "F23",
-        WXK_F24 : "F24",
-        WXK_PAGEUP : "Page up (Mac)",
-        WXK_PAGEDOWN : "Page down (Mac)",
+        wx.WXK_BACK : "Backspace",
+        wx.WXK_TAB : "Tab",
+        wx.WXK_RETURN : "Enter",
+        wx.WXK_ESCAPE : "Escape",
+        wx.WXK_DELETE : "Delete",
+        wx.WXK_END : "End",
+        wx.WXK_HOME : "Home",
+        wx.WXK_LEFT : "Left",
+        wx.WXK_UP : "Up",
+        wx.WXK_RIGHT : "Right",
+        wx.WXK_DOWN : "Down",
+        wx.WXK_PAGEUP : "Page up",
+        wx.WXK_PAGEDOWN : "Page down",
+        wx.WXK_INSERT : "Insert",
+        wx.WXK_F1 : "F1",
+        wx.WXK_F2 : "F2",
+        wx.WXK_F3 : "F3",
+        wx.WXK_F4 : "F4",
+        wx.WXK_F5 : "F5",
+        wx.WXK_F6 : "F6",
+        wx.WXK_F7 : "F7",
+        wx.WXK_F8 : "F8",
+        wx.WXK_F9 : "F9",
+        wx.WXK_F10 : "F10",
+        wx.WXK_F11 : "F11",
+        wx.WXK_F12 : "F12",
+        wx.WXK_F13 : "F13",
+        wx.WXK_F14 : "F14",
+        wx.WXK_F15 : "F15",
+        wx.WXK_F16 : "F16",
+        wx.WXK_F17 : "F17",
+        wx.WXK_F18 : "F18",
+        wx.WXK_F19 : "F19",
+        wx.WXK_F20 : "F20",
+        wx.WXK_F21 : "F21",
+        wx.WXK_F22 : "F22",
+        wx.WXK_F23 : "F23",
+        wx.WXK_F24 : "F24",
         }
 
     def __init__(self, kc, ctrl = False, alt = False, shift = False):
@@ -670,7 +665,7 @@ class Key:
         if ctrl and (kc >= 65) and (kc <= 90):
             kc -= 64
 
-        # ASCII/Latin-1 keycode (0-255) or one of the WXK_ constants (>255)
+        # ASCII/Latin-1 keycode (0-255) or one of the wx.WXK_ constants (>255)
         self.kc = kc
 
         self.ctrl = ctrl
@@ -698,7 +693,7 @@ class Key:
 
     fromInt = staticmethod(fromInt)
 
-    # construct from wxKeyEvent
+    # construct from wx.KeyEvent
     def fromKE(ev):
         return Key(ev.GetKeyCode(), ev.ControlDown(), ev.AltDown(),
                    ev.ShiftDown())
@@ -718,7 +713,7 @@ class Key:
             s += "SHIFT+"
 
         if isValidInputChar(self.kc):
-            if self.kc == WXK_SPACE:
+            if self.kc == wx.WXK_SPACE:
                 s += "Space"
             else:
                 s += chr(self.kc)
@@ -776,8 +771,8 @@ def loadFile(filename, frame, maxSize = -1):
             f.close()
 
     except IOError, (errno, strerror):
-        wxMessageBox("Error loading file '%s': %s" % (
-            misc.toGUIUnicode(filename), strerror), "Error", wxOK, frame)
+        wx.MessageBox("Error loading file '%s': %s" % (
+                misc.toGUIUnicode(filename), strerror), "Error", wx.OK, frame)
         ret = None
 
     return ret
@@ -796,8 +791,8 @@ def writeToFile(filename, data, frame):
         return True
     
     except IOError, (errno, strerror):
-        wxMessageBox("Error writing file '%s': %s" % (
-            misc.toGUIUnicode(filename), strerror), "Error", wxOK, frame)
+        wx.MessageBox("Error writing file '%s': %s" % (
+                misc.toGUIUnicode(filename), strerror), "Error", wx.OK, frame)
 
         return False
 
@@ -871,10 +866,10 @@ class TimerDev:
 # show PDF file.
 def showPDF(filename, cfgGl, frame):
     def complain():
-        wxMessageBox("PDF viewer application not found.\n\n"
-                     "You can change your PDF viewer\n"
-                     "settings at File/Settings/Change.", "Error", wxOK,
-                     frame)
+        wx.MessageBox("PDF viewer application not found.\n\n"
+                      "You can change your PDF viewer\n"
+                      "settings at File/Settings/Change.", "Error", wx.OK,
+                      frame)
 
     if not fileExists(cfgGl.pdfViewerPath):
         complain()

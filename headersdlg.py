@@ -5,12 +5,12 @@ import pdf
 import pml
 import util
 
-from wxPython.wx import *
+import wx
 
-class HeadersDlg(wxDialog):
+class HeadersDlg(wx.Dialog):
     def __init__(self, parent, headers, cfg, cfgGl, applyFunc):
-        wxDialog.__init__(self, parent, -1, "Headers",
-                          style = wxDEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, -1, "Headers",
+                           style = wx.DEFAULT_DIALOG_STYLE)
 
         self.headers = headers
         self.cfg = cfg
@@ -24,98 +24,98 @@ class HeadersDlg(wxDialog):
         if len(self.headers.hdrs) > 0:
             self.hdrIndex = 0
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         
-        hsizer.Add(wxStaticText(self, -1, "Empty lines after headers:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
+        hsizer.Add(wx.StaticText(self, -1, "Empty lines after headers:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
         
-        self.elinesEntry = wxSpinCtrl(self, -1)
+        self.elinesEntry = wx.SpinCtrl(self, -1)
         self.elinesEntry.SetRange(0, 5)
-        EVT_SPINCTRL(self, self.elinesEntry.GetId(), self.OnMisc)
-        EVT_KILL_FOCUS(self.elinesEntry, self.OnKillFocus)
-        hsizer.Add(self.elinesEntry, 0, wxLEFT, 10)
+        wx.EVT_SPINCTRL(self, self.elinesEntry.GetId(), self.OnMisc)
+        wx.EVT_KILL_FOCUS(self.elinesEntry, self.OnKillFocus)
+        hsizer.Add(self.elinesEntry, 0, wx.LEFT, 10)
 
         vsizer.Add(hsizer)
         
-        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM,
+        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM,
                    10)
         
-        tmp = wxStaticText(self, -1, "Strings:")
+        tmp = wx.StaticText(self, -1, "Strings:")
         vsizer.Add(tmp)
         
-        self.stringsLb = wxListBox(self, -1, size = (200, 100))
-        vsizer.Add(self.stringsLb, 0, wxEXPAND)
+        self.stringsLb = wx.ListBox(self, -1, size = (200, 100))
+        vsizer.Add(self.stringsLb, 0, wx.EXPAND)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer.Add(self.addBtn)
-        EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
+        wx.EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
         gutil.btnDblClick(self.addBtn, self.OnAddString)
 
         self.delBtn = gutil.createStockButton(self, "Delete")
-        hsizer.Add(self.delBtn, 0, wxLEFT, 10)
-        EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
+        hsizer.Add(self.delBtn, 0, wx.LEFT, 10)
+        wx.EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
         gutil.btnDblClick(self.delBtn, self.OnDeleteString)
 
-        vsizer.Add(hsizer, 0, wxTOP, 5)
+        vsizer.Add(hsizer, 0, wx.TOP, 5)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wxStaticText(self, -1, "Text:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
+        hsizer.Add(wx.StaticText(self, -1, "Text:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
 
-        self.textEntry = wxTextCtrl(self, -1)
-        hsizer.Add(self.textEntry, 1, wxLEFT, 10)
-        EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
+        self.textEntry = wx.TextCtrl(self, -1)
+        hsizer.Add(self.textEntry, 1, wx.LEFT, 10)
+        wx.EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
 
-        vsizer.Add(wxStaticText(self, -1,
+        vsizer.Add(wx.StaticText(self, -1,
             "'${PAGE}' will be replaced by the page number."), 0,
-            wxALIGN_CENTER | wxTOP, 5)
+            wx.ALIGN_CENTER | wx.TOP, 5)
 
-        hsizerTop = wxBoxSizer(wxHORIZONTAL)
+        hsizerTop = wx.BoxSizer(wx.HORIZONTAL)
 
-        gsizer = wxFlexGridSizer(3, 2, 5, 0)
+        gsizer = wx.FlexGridSizer(3, 2, 5, 0)
 
-        gsizer.Add(wxStaticText(self, -1, "Header line:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
+        gsizer.Add(wx.StaticText(self, -1, "Header line:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
 
-        self.lineEntry = wxSpinCtrl(self, -1)
+        self.lineEntry = wx.SpinCtrl(self, -1)
         self.lineEntry.SetRange(1, 5)
-        EVT_SPINCTRL(self, self.lineEntry.GetId(), self.OnMisc)
-        EVT_KILL_FOCUS(self.lineEntry, self.OnKillFocus)
+        wx.EVT_SPINCTRL(self, self.lineEntry.GetId(), self.OnMisc)
+        wx.EVT_KILL_FOCUS(self.lineEntry, self.OnKillFocus)
         gsizer.Add(self.lineEntry)
 
-        gsizer.Add(wxStaticText(self, -1, "X offset (characters):"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        gsizer.Add(wx.StaticText(self, -1, "X offset (characters):"), 0,
+                   wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
 
-        self.xoffEntry = wxSpinCtrl(self, -1)
+        self.xoffEntry = wx.SpinCtrl(self, -1)
         self.xoffEntry.SetRange(-100, 100)
-        EVT_SPINCTRL(self, self.xoffEntry.GetId(), self.OnMisc)
-        EVT_KILL_FOCUS(self.xoffEntry, self.OnKillFocus)
+        wx.EVT_SPINCTRL(self, self.xoffEntry.GetId(), self.OnMisc)
+        wx.EVT_KILL_FOCUS(self.xoffEntry, self.OnKillFocus)
         gsizer.Add(self.xoffEntry)
 
-        gsizer.Add(wxStaticText(self, -1, "Alignment:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.alignCombo = wxComboBox(self, -1, style = wxCB_READONLY)
+        gsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
+        self.alignCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
 
         for it in [ ("Left", util.ALIGN_LEFT), ("Center", util.ALIGN_CENTER),
                     ("Right", util.ALIGN_RIGHT) ]:
             self.alignCombo.Append(it[0], it[1])
 
         gsizer.Add(self.alignCombo)
-        EVT_COMBOBOX(self, self.alignCombo.GetId(), self.OnMisc)
+        wx.EVT_COMBOBOX(self, self.alignCombo.GetId(), self.OnMisc)
 
         hsizerTop.Add(gsizer)
         
-        bsizer = wxStaticBoxSizer(wxStaticBox(self, -1, "Style"),
-                                  wxHORIZONTAL)
+        bsizer = wx.StaticBoxSizer(
+            wx.StaticBox(self, -1, "Style"), wx.HORIZONTAL)
 
-        vsizer2 = wxBoxSizer(wxVERTICAL)
+        vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
         # wxGTK adds way more space by default than wxMSW between the
         # items, have to adjust for that
@@ -129,11 +129,11 @@ class HeadersDlg(wxDialog):
             
         bsizer.Add(vsizer2)
 
-        hsizerTop.Add(bsizer, 0, wxLEFT, 40)
+        hsizerTop.Add(bsizer, 0, wx.LEFT, 40)
 
-        vsizer.Add(hsizerTop, 0, wxTOP, 20)
+        vsizer.Add(hsizerTop, 0, wx.TOP, 20)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
         
@@ -141,24 +141,24 @@ class HeadersDlg(wxDialog):
         hsizer.Add(previewBtn)
 
         applyBtn = gutil.createStockButton(self, "Apply")
-        hsizer.Add(applyBtn, 0, wxLEFT, 10)
+        hsizer.Add(applyBtn, 0, wx.LEFT, 10)
 
         cancelBtn = gutil.createStockButton(self, "Cancel")
-        hsizer.Add(cancelBtn, 0, wxLEFT, 10)
+        hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
 
         util.finishWindow(self, vsizer)
 
-        EVT_BUTTON(self, previewBtn.GetId(), self.OnPreview)
-        EVT_BUTTON(self, applyBtn.GetId(), self.OnApply)
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, previewBtn.GetId(), self.OnPreview)
+        wx.EVT_BUTTON(self, applyBtn.GetId(), self.OnApply)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
-        EVT_LISTBOX(self, self.stringsLb.GetId(), self.OnStringsLb)
+        wx.EVT_LISTBOX(self, self.stringsLb.GetId(), self.OnStringsLb)
 
         # list of widgets that are specific to editing the selected string
         self.widList = [ self.textEntry, self.xoffEntry, self.alignCombo,
@@ -170,16 +170,16 @@ class HeadersDlg(wxDialog):
         self.textEntry.SetFocus()
 
     def addCheckBox(self, name, parent, sizer, pad):
-        cb = wxCheckBox(parent, -1, name)
-        EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
-        sizer.Add(cb, 0, wxTOP, pad)
+        cb = wx.CheckBox(parent, -1, name)
+        wx.EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
+        sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, name.lower() + "Cb", cb)
         
     def OnOK(self, event):
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
     def OnApply(self, event):
         self.applyFunc(self.headers)

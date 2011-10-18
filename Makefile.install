@@ -1,7 +1,7 @@
 DIR := /usr/local/blyte
 
 install:
-	rm -rf $(DIR)
-	mkdir -p $(DIR)
+	rm -rf $(DIR)/*
 	cp * $(DIR)
 	rm -f $(DIR)/INSTALL $(DIR)/Makefile
+	echo Installation finished

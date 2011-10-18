@@ -5,7 +5,7 @@ import pml
 import screenplay
 import util
 
-from wxPython.wx import *
+import wx
 
 def genSceneReport(mainFrame, sp):
     report = SceneReport(sp)
@@ -14,7 +14,7 @@ def genSceneReport(mainFrame, sp):
         "Information to include:", False)
 
     ok = False
-    if dlg.ShowModal() == wxID_OK:
+    if dlg.ShowModal() == wx.ID_OK:
         ok = True
 
     dlg.Destroy()

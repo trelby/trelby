@@ -1,31 +1,29 @@
 import misc
 import util
 
-import md5
 import sys
 
-from wxPython.wx import *
+import wx
 
-class SplashWindow(wxFrame):
+class SplashWindow(wx.Frame):
     inited = False
     
     def __init__(self, parent, delay):
-        wxFrame.__init__(self, parent, -1, "Splash",
-            style = wxFRAME_FLOAT_ON_PARENT | wxSTAY_ON_TOP | wxNO_BORDER)
+        wx.Frame.__init__(
+            self, parent, -1, "Splash",
+            style = wx.FRAME_FLOAT_ON_PARENT | wx.STAY_ON_TOP | wx.NO_BORDER)
 
         if not SplashWindow.inited:
             SplashWindow.inited = True
-            wxImage_AddHandler(wxJPEGHandler())
+            wx.Image_AddHandler(wx.JPEGHandler())
 
         fileName = u"logo.jpg"
         fileData = util.loadFile(fileName, parent)
 
-        if not fileData or (len(fileData) != 131850) or \
-               (md5.new(fileData).digest() != \
-          "\x3e\x0b\x6f\x5f\xe7\xe3\x2a\xbe\x6c\xf1\xf6\xfb\x16\x60\x25\x72"):
+        if not fileData:
             self.abort()
         
-        self.pic = wxBitmap(fileName, wxBITMAP_TYPE_JPEG)
+        self.pic = wx.Bitmap(fileName, wx.BITMAP_TYPE_JPEG)
         if not self.pic.Ok():
             self.abort()
 
@@ -37,30 +35,31 @@ class SplashWindow(wxFrame):
         util.setWH(self, w, h)
         self.CenterOnScreen()
 
-        self.textColor = wxColour(0, 0, 0)
+        self.textColor = wx.Colour(0, 0, 0)
 
-        self.font = util.createPixelFont(17, wxFONTFAMILY_MODERN, wxNORMAL,
-                                         wxNORMAL)
+        self.font = util.createPixelFont(
+            17, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.NORMAL)
+
         if delay != -1:
-            self.timer = wxTimer(self)
-            EVT_TIMER(self, -1, self.OnTimer)
+            self.timer = wx.Timer(self)
+            wx.EVT_TIMER(self, -1, self.OnTimer)
             self.timer.Start(delay, True)
         else:
-            EVT_LEFT_DOWN(self, self.OnClick)
+            wx.EVT_LEFT_DOWN(self, self.OnClick)
 
-        EVT_PAINT(self, self.OnPaint)
-        EVT_CLOSE(self, self.OnCloseWindow)
+        wx.EVT_PAINT(self, self.OnPaint)
+        wx.EVT_CLOSE(self, self.OnCloseWindow)
 
     def abort(self):
-        wxMessageBox("Error opening splash screen.", "Error", wxOK,
-                     self.GetParent())
+        wx.MessageBox("Error opening splash screen.", "Error", wx.OK,
+                      self.GetParent())
         sys.exit()
         
     def OnClick(self, event):
         self.Close()
 
     def OnPaint(self, event):
-        dc = wxPaintDC(self)
+        dc = wx.PaintDC(self)
 
         dc.SetFont(self.font)
         dc.SetTextForeground(self.textColor)

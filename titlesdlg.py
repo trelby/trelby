@@ -7,12 +7,12 @@ import util
 
 import copy
 
-from wxPython.wx import *
+import wx
 
-class TitlesDlg(wxDialog):
+class TitlesDlg(wx.Dialog):
     def __init__(self, parent, titles, cfg, cfgGl):
-        wxDialog.__init__(self, parent, -1, "Title pages",
-                          style = wxDEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, -1, "Title pages",
+                           style = wx.DEFAULT_DIALOG_STYLE)
 
         self.titles = titles
         self.cfg = cfg
@@ -23,138 +23,138 @@ class TitlesDlg(wxDialog):
         
         self.setPage(0)
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.pageLabel = wxStaticText(self, -1, "")
-        vsizer.Add(self.pageLabel, 0, wxADJUST_MINSIZE)
+        self.pageLabel = wx.StaticText(self, -1, "")
+        vsizer.Add(self.pageLabel, 0, wx.ADJUST_MINSIZE)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         
-        tmp = wxButton(self, -1, "Add")
+        tmp = wx.Button(self, -1, "Add")
         hsizer.Add(tmp)
-        EVT_BUTTON(self, tmp.GetId(), self.OnAddPage)
+        wx.EVT_BUTTON(self, tmp.GetId(), self.OnAddPage)
         gutil.btnDblClick(tmp, self.OnAddPage)
 
-        self.delPageBtn = wxButton(self, -1, "Delete")
-        hsizer.Add(self.delPageBtn, 0, wxLEFT, 10)
-        EVT_BUTTON(self, self.delPageBtn.GetId(), self.OnDeletePage)
+        self.delPageBtn = wx.Button(self, -1, "Delete")
+        hsizer.Add(self.delPageBtn, 0, wx.LEFT, 10)
+        wx.EVT_BUTTON(self, self.delPageBtn.GetId(), self.OnDeletePage)
         gutil.btnDblClick(self.delPageBtn, self.OnDeletePage)
 
-        self.moveBtn = wxButton(self, -1, "Move")
-        hsizer.Add(self.moveBtn, 0, wxLEFT, 10)
-        EVT_BUTTON(self, self.moveBtn.GetId(), self.OnMovePage)
+        self.moveBtn = wx.Button(self, -1, "Move")
+        hsizer.Add(self.moveBtn, 0, wx.LEFT, 10)
+        wx.EVT_BUTTON(self, self.moveBtn.GetId(), self.OnMovePage)
         gutil.btnDblClick(self.moveBtn, self.OnMovePage)
 
-        self.nextBtn = wxButton(self, -1, "Next")
-        hsizer.Add(self.nextBtn, 0, wxLEFT, 10)
-        EVT_BUTTON(self, self.nextBtn.GetId(), self.OnNextPage)
+        self.nextBtn = wx.Button(self, -1, "Next")
+        hsizer.Add(self.nextBtn, 0, wx.LEFT, 10)
+        wx.EVT_BUTTON(self, self.nextBtn.GetId(), self.OnNextPage)
         gutil.btnDblClick(self.nextBtn, self.OnNextPage)
 
-        vsizer.Add(hsizer, 0, wxTOP, 5)
+        vsizer.Add(hsizer, 0, wx.TOP, 5)
         
-        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM,
+        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM,
                    10)
         
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        vsizer2 = wxBoxSizer(wxVERTICAL)
+        vsizer2 = wx.BoxSizer(wx.VERTICAL)
         
-        tmp = wxStaticText(self, -1, "Strings:")
+        tmp = wx.StaticText(self, -1, "Strings:")
         vsizer2.Add(tmp)
         
-        self.stringsLb = wxListBox(self, -1, size = (200, 150))
+        self.stringsLb = wx.ListBox(self, -1, size = (200, 150))
         vsizer2.Add(self.stringsLb)
 
-        hsizer2 = wxBoxSizer(wxHORIZONTAL)
+        hsizer2 = wx.BoxSizer(wx.HORIZONTAL)
         
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer2.Add(self.addBtn)
-        EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
+        wx.EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
         gutil.btnDblClick(self.addBtn, self.OnAddString)
 
         self.delBtn = gutil.createStockButton(self, "Delete")
-        hsizer2.Add(self.delBtn, 0, wxLEFT, 10)
-        EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
+        hsizer2.Add(self.delBtn, 0, wx.LEFT, 10)
+        wx.EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
         gutil.btnDblClick(self.delBtn, self.OnDeleteString)
 
-        vsizer2.Add(hsizer2, 0, wxTOP, 5)
+        vsizer2.Add(hsizer2, 0, wx.TOP, 5)
 
         hsizer.Add(vsizer2)
         
         self.previewCtrl = TitlesPreview(self, self, self.cfg)
         util.setWH(self.previewCtrl, 150, 150)
-        hsizer.Add(self.previewCtrl, 1, wxEXPAND | wxLEFT, 10)
+        hsizer.Add(self.previewCtrl, 1, wx.EXPAND | wx.LEFT, 10)
         
-        vsizer.Add(hsizer, 0, wxEXPAND)
+        vsizer.Add(hsizer, 0, wx.EXPAND)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wxStaticText(self, -1, "Text:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.textEntry = wxTextCtrl(self, -1)
-        hsizer.Add(self.textEntry, 1, wxLEFT, 10)
-        EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
+        hsizer.Add(wx.StaticText(self, -1, "Text:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
+        self.textEntry = wx.TextCtrl(self, -1)
+        hsizer.Add(self.textEntry, 1, wx.LEFT, 10)
+        wx.EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
 
-        hsizerTop = wxBoxSizer(wxHORIZONTAL)
+        hsizerTop = wx.BoxSizer(wx.HORIZONTAL)
 
-        vsizer2 = wxBoxSizer(wxVERTICAL)
+        vsizer2 = wx.BoxSizer(wx.VERTICAL)
         
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wxStaticText(self, -1, "X-Pos (mm):"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.xEntry = wxTextCtrl(self, -1)
-        hsizer.Add(self.xEntry, 0, wxLEFT, 10)
-        EVT_TEXT(self, self.xEntry.GetId(), self.OnMisc)
+        hsizer.Add(wx.StaticText(self, -1, "X-Pos (mm):"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
+        self.xEntry = wx.TextCtrl(self, -1)
+        hsizer.Add(self.xEntry, 0, wx.LEFT, 10)
+        wx.EVT_TEXT(self, self.xEntry.GetId(), self.OnMisc)
 
-        vsizer2.Add(hsizer, 0, wxTOP, 5)
+        vsizer2.Add(hsizer, 0, wx.TOP, 5)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wxStaticText(self, -1, "Y-Pos (mm):"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.yEntry = wxTextCtrl(self, -1)
-        hsizer.Add(self.yEntry, 0, wxLEFT, 10)
-        EVT_TEXT(self, self.yEntry.GetId(), self.OnMisc)
+        hsizer.Add(wx.StaticText(self, -1, "Y-Pos (mm):"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
+        self.yEntry = wx.TextCtrl(self, -1)
+        hsizer.Add(self.yEntry, 0, wx.LEFT, 10)
+        wx.EVT_TEXT(self, self.yEntry.GetId(), self.OnMisc)
 
-        vsizer2.Add(hsizer, 0, wxTOP, 5)
+        vsizer2.Add(hsizer, 0, wx.TOP, 5)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         
-        hsizer.Add(wxStaticText(self, -1, "Font:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.fontCombo = wxComboBox(self, -1, style = wxCB_READONLY)
+        hsizer.Add(wx.StaticText(self, -1, "Font:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
+        self.fontCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
 
         for it in [ ("Courier", pml.COURIER), ("Helvetica", pml.HELVETICA),
                     ("Times-Roman", pml.TIMES_ROMAN) ]:
             self.fontCombo.Append(it[0], it[1])
 
-        hsizer.Add(self.fontCombo, 0, wxLEFT, 10)
-        EVT_COMBOBOX(self, self.fontCombo.GetId(), self.OnMisc)
+        hsizer.Add(self.fontCombo, 0, wx.LEFT, 10)
+        wx.EVT_COMBOBOX(self, self.fontCombo.GetId(), self.OnMisc)
 
-        vsizer2.Add(hsizer, 0, wxTOP, 10)
+        vsizer2.Add(hsizer, 0, wx.TOP, 10)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wxStaticText(self, -1, "Size:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
+        hsizer.Add(wx.StaticText(self, -1, "Size:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
         
-        self.sizeEntry = wxSpinCtrl(self, -1)
+        self.sizeEntry = wx.SpinCtrl(self, -1)
         self.sizeEntry.SetRange(4, 288)
-        EVT_SPINCTRL(self, self.sizeEntry.GetId(), self.OnMisc)
-        EVT_KILL_FOCUS(self.sizeEntry, self.OnKillFocus)
-        hsizer.Add(self.sizeEntry, 0, wxLEFT, 10)
+        wx.EVT_SPINCTRL(self, self.sizeEntry.GetId(), self.OnMisc)
+        wx.EVT_KILL_FOCUS(self.sizeEntry, self.OnKillFocus)
+        hsizer.Add(self.sizeEntry, 0, wx.LEFT, 10)
 
-        vsizer2.Add(hsizer, 0, wxTOP, 5)
+        vsizer2.Add(hsizer, 0, wx.TOP, 5)
 
         hsizerTop.Add(vsizer2)
         
-        bsizer = wxStaticBoxSizer(wxStaticBox(self, -1, "Style"),
-                                  wxHORIZONTAL)
+        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, "Style"),
+                                   wx.HORIZONTAL)
 
-        vsizer2 = wxBoxSizer(wxVERTICAL)
+        vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
         # wxGTK adds way more space by default than wxMSW between the
         # items, have to adjust for that
@@ -169,11 +169,11 @@ class TitlesDlg(wxDialog):
             
         bsizer.Add(vsizer2)
 
-        hsizerTop.Add(bsizer, 0, wxLEFT, 20)
+        hsizerTop.Add(bsizer, 0, wx.LEFT, 20)
 
-        vsizer.Add(hsizerTop, 0, wxTOP, 10)
+        vsizer.Add(hsizerTop, 0, wx.TOP, 10)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
         
@@ -181,20 +181,20 @@ class TitlesDlg(wxDialog):
         hsizer.Add(self.previewBtn)
 
         cancelBtn = gutil.createStockButton(self, "Cancel")
-        hsizer.Add(cancelBtn, 0, wxLEFT, 10)
+        hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 20)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
 
         util.finishWindow(self, vsizer)
 
-        EVT_BUTTON(self, self.previewBtn.GetId(), self.OnPreview)
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, self.previewBtn.GetId(), self.OnPreview)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
-        EVT_LISTBOX(self, self.stringsLb.GetId(), self.OnStringsLb)
+        wx.EVT_LISTBOX(self, self.stringsLb.GetId(), self.OnStringsLb)
 
         # list of widgets that are specific to editing the selected string
         self.widList = [ self.textEntry, self.xEntry, self.centeredCb,
@@ -206,17 +206,17 @@ class TitlesDlg(wxDialog):
         self.textEntry.SetFocus()
 
     def addCheckBox(self, name, parent, sizer, pad):
-        cb = wxCheckBox(parent, -1, name)
-        EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
-        sizer.Add(cb, 0, wxTOP, pad)
+        cb = wx.CheckBox(parent, -1, name)
+        wx.EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
+        sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, name.lower() + "Cb", cb)
         
     def OnOK(self, event):
         self.titles.sort()
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
     def OnPreview(self, event):
         doc = pml.Document(self.cfg.paperWidth, self.cfg.paperHeight)
@@ -409,32 +409,32 @@ class TitlesDlg(wxDialog):
         self.previewCtrl.Refresh()
 
 
-class TitlesPreview(wxWindow):
+class TitlesPreview(wx.Window):
     def __init__(self, parent, ctrl, cfg):
-        wxWindow.__init__(self, parent, -1)
+        wx.Window.__init__(self, parent, -1)
 
         self.cfg = cfg
         self.ctrl = ctrl
         
-        EVT_SIZE(self, self.OnSize)
-        EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
-        EVT_PAINT(self, self.OnPaint)
+        wx.EVT_SIZE(self, self.OnSize)
+        wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
+        wx.EVT_PAINT(self, self.OnPaint)
 
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wxEmptyBitmap(size.width, size.height)
+        self.screenBuf = wx.EmptyBitmap(size.width, size.height)
         
     def OnEraseBackground(self, event):
         pass
     
     def OnPaint(self, event):
-        dc = wxBufferedPaintDC(self, self.screenBuf)
+        dc = wx.BufferedPaintDC(self, self.screenBuf)
 
         # widget size
         ww, wh = self.GetClientSizeTuple()
 
-        dc.SetBrush(wxBrush(self.GetBackgroundColour()))
-        dc.SetPen(wxPen(self.GetBackgroundColour()))
+        dc.SetBrush(wx.Brush(self.GetBackgroundColour()))
+        dc.SetPen(wx.Pen(self.GetBackgroundColour()))
         dc.DrawRectangle(0, 0, ww, wh)
         
         # aspect ratio of paper
@@ -452,8 +452,8 @@ class TitlesPreview(wxWindow):
         ox = (ww - w) // 2
         oy = (wh - h) // 2
         
-        dc.SetPen(wxBLACK_PEN)
-        dc.SetBrush(wxWHITE_BRUSH)
+        dc.SetPen(wx.BLACK_PEN)
+        dc.SetBrush(wx.WHITE_BRUSH)
         dc.DrawRectangle(ox, oy, w, h)
 
         if self.ctrl.pageIndex != -1:
@@ -481,10 +481,10 @@ class TitlesPreview(wxWindow):
                 yp = int((ts.y / self.cfg.paperHeight) * h)
                 
                 if i == self.ctrl.tsIndex:
-                    dc.SetPen(wxRED_PEN)
-                    dc.SetBrush(wxRED_BRUSH)
+                    dc.SetPen(wx.RED_PEN)
+                    dc.SetBrush(wx.RED_BRUSH)
                 else:
-                    dc.SetPen(wxBLACK_PEN)
-                    dc.SetBrush(wxBLACK_BRUSH)
+                    dc.SetPen(wx.BLACK_PEN)
+                    dc.SetBrush(wx.BLACK_BRUSH)
                     
                 dc.DrawRectangle(ox + xp, oy + yp, textW, textH)

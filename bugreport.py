@@ -3,7 +3,7 @@ import sys
 import misc
 import util
 
-from wxPython.wx import *
+import wx
 
 # main program should set this as soon as the main frame is created
 mainFrame = None
@@ -33,13 +33,13 @@ class BugReportHandler:
             self.dlg = BugReportDlg(mainFrame, self)
             self.dlg.Show()
         
-class BugReportDlg(wxDialog):
+class BugReportDlg(wx.Dialog):
     def __init__(self, parent, brh):
-        wxDialog.__init__(self, parent, -1, "Error")
+        wx.Dialog.__init__(self, parent, -1, "Error")
 
         self.brh = brh
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
         s = "An error has occurred in the program. To help us fix it," \
             " please send a report to bugreport@oskusoft.com explaining" \
@@ -57,17 +57,17 @@ class BugReportDlg(wxDialog):
             "After doing all this, save your work (if possible), and" \
             " restart the program."
 
-        vsizer.Add(wxTextCtrl(self, -1, s,
-            size = wxSize(400, 300), style = wxTE_MULTILINE | wxTE_READONLY),
-            1, wxEXPAND)
+        vsizer.Add(wx.TextCtrl(self, -1, s,
+            size = wx.Size(400, 300), style = wx.TE_MULTILINE | wx.TE_READONLY),
+            1, wx.EXPAND)
         
-        btn = wxButton(self, -1, "Save")
-        EVT_BUTTON(self, btn.GetId(), self.OnSave)
-        vsizer.Add(btn, 0, wxALIGN_CENTER | wxTOP, 10)
+        btn = wx.Button(self, -1, "Save")
+        wx.EVT_BUTTON(self, btn.GetId(), self.OnSave)
+        vsizer.Add(btn, 0, wx.ALIGN_CENTER | wx.TOP, 10)
 
         util.finishWindow(self, vsizer)
 
-        EVT_CLOSE(self, self.OnCloseWindow)
+        wx.EVT_CLOSE(self, self.OnCloseWindow)
 
     def OnCloseWindow(self, event):
         self.Destroy()
@@ -77,11 +77,11 @@ class BugReportDlg(wxDialog):
         self.brh.copyPos = 0
         
     def OnSave(self, event):
-        dlg = wxFileDialog(self, "Filename to save as",
+        dlg = wx.FileDialog(self, "Filename to save as",
             defaultFile = "error_report.txt",
-            style = wxSAVE | wxOVERWRITE_PROMPT)
+            style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
-        if dlg.ShowModal() == wxID_OK:
+        if dlg.ShowModal() == wx.ID_OK:
             self.brh.copyPos = len(self.brh.data)
             s = str(self.brh.data)
 

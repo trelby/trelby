@@ -3,12 +3,12 @@ import misc
 import spellcheck
 import util
 
-from wxPython.wx import *
+import wx
 
-class SpellCheckDlg(wxDialog):
+class SpellCheckDlg(wx.Dialog):
     def __init__(self, parent, ctrl, sc, gScDict):
-        wxDialog.__init__(self, parent, -1, "Spell checker",
-                          style = wxDEFAULT_DIALOG_STYLE | wxWANTS_CHARS)
+        wx.Dialog.__init__(self, parent, -1, "Spell checker",
+                           style = wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS)
 
         self.ctrl = ctrl
 
@@ -24,52 +24,52 @@ class SpellCheckDlg(wxDialog):
         # have we added any words to global dictionary
         self.changedGlobalDict = False
         
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
         
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         
-        hsizer.Add(wxStaticText(self, -1, "Word:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
-        self.replaceEntry = wxTextCtrl(self, -1, style = wxTE_PROCESS_ENTER)
-        hsizer.Add(self.replaceEntry, 1, wxEXPAND)
+        hsizer.Add(wx.StaticText(self, -1, "Word:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        self.replaceEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
+        hsizer.Add(self.replaceEntry, 1, wx.EXPAND)
         
-        vsizer.Add(hsizer, 1, wxEXPAND | wxBOTTOM, 15)
+        vsizer.Add(hsizer, 1, wx.EXPAND | wx.BOTTOM, 15)
 
-        gsizer = wxFlexGridSizer(2, 2, 10, 10)
+        gsizer = wx.FlexGridSizer(2, 2, 10, 10)
         gsizer.AddGrowableCol(1)
         
-        replaceBtn = wxButton(self, -1, "&Replace")
+        replaceBtn = wx.Button(self, -1, "&Replace")
         gsizer.Add(replaceBtn)
 
-        addScriptBtn = wxButton(self, -1, "Add to &script dictionary")
-        gsizer.Add(addScriptBtn, 0, wxEXPAND)
+        addScriptBtn = wx.Button(self, -1, "Add to &script dictionary")
+        gsizer.Add(addScriptBtn, 0, wx.EXPAND)
 
-        skipBtn = wxButton(self, -1, "S&kip")
+        skipBtn = wx.Button(self, -1, "S&kip")
         gsizer.Add(skipBtn)
 
-        addGlobalBtn = wxButton(self, -1, "Add to &global dictionary")
-        gsizer.Add(addGlobalBtn, 0, wxEXPAND)
+        addGlobalBtn = wx.Button(self, -1, "Add to &global dictionary")
+        gsizer.Add(addGlobalBtn, 0, wx.EXPAND)
 
-        vsizer.Add(gsizer, 0, wxEXPAND, 0)
+        vsizer.Add(gsizer, 0, wx.EXPAND, 0)
 
-        suggestBtn = wxButton(self, -1, "S&uggest replacement")
-        vsizer.Add(suggestBtn, 0, wxEXPAND | wxTOP, 10)
+        suggestBtn = wx.Button(self, -1, "S&uggest replacement")
+        vsizer.Add(suggestBtn, 0, wx.EXPAND | wx.TOP, 10)
 
-        EVT_TEXT_ENTER(self, self.replaceEntry.GetId(), self.OnReplace)
+        wx.EVT_TEXT_ENTER(self, self.replaceEntry.GetId(), self.OnReplace)
 
-        EVT_BUTTON(self, replaceBtn.GetId(), self.OnReplace)
-        EVT_BUTTON(self, addScriptBtn.GetId(), self.OnAddScript)
-        EVT_BUTTON(self, addGlobalBtn.GetId(), self.OnAddGlobal)
-        EVT_BUTTON(self, skipBtn.GetId(), self.OnSkip)
-        EVT_BUTTON(self, suggestBtn.GetId(), self.OnSuggest)
+        wx.EVT_BUTTON(self, replaceBtn.GetId(), self.OnReplace)
+        wx.EVT_BUTTON(self, addScriptBtn.GetId(), self.OnAddScript)
+        wx.EVT_BUTTON(self, addGlobalBtn.GetId(), self.OnAddGlobal)
+        wx.EVT_BUTTON(self, skipBtn.GetId(), self.OnSkip)
+        wx.EVT_BUTTON(self, suggestBtn.GetId(), self.OnSuggest)
 
-        EVT_CHAR(self, self.OnChar)
-        EVT_CHAR(self.replaceEntry, self.OnChar)
-        EVT_CHAR(replaceBtn, self.OnChar)
-        EVT_CHAR(addScriptBtn, self.OnChar)
-        EVT_CHAR(skipBtn, self.OnChar)
-        EVT_CHAR(addGlobalBtn, self.OnChar)
-        EVT_CHAR(suggestBtn, self.OnChar)
+        wx.EVT_CHAR(self, self.OnChar)
+        wx.EVT_CHAR(self.replaceEntry, self.OnChar)
+        wx.EVT_CHAR(replaceBtn, self.OnChar)
+        wx.EVT_CHAR(addScriptBtn, self.OnChar)
+        wx.EVT_CHAR(skipBtn, self.OnChar)
+        wx.EVT_CHAR(addGlobalBtn, self.OnChar)
+        wx.EVT_CHAR(suggestBtn, self.OnChar)
 
         util.finishWindow(self, vsizer)
 
@@ -92,10 +92,10 @@ class SpellCheckDlg(wxDialog):
             self.sc.col += len(self.sc.word)
 
         if not self.sc.findNext():
-            wxMessageBox("No more incorrect words found.", "Results",
-                         wxOK, self)
+            wx.MessageBox("No more incorrect words found.", "Results",
+                          wx.OK, self)
 
-            self.EndModal(wxID_OK)
+            self.EndModal(wx.ID_OK)
 
             return
 
@@ -104,8 +104,8 @@ class SpellCheckDlg(wxDialog):
     def OnChar(self, event):
         kc = event.GetKeyCode()
 
-        if kc == WXK_ESCAPE:
-            self.EndModal(wxID_OK)
+        if kc == wx.WXK_ESCAPE:
+            self.EndModal(wx.ID_OK)
             
             return
 
@@ -167,7 +167,7 @@ class SpellCheckDlg(wxDialog):
         wstart = word[:2]
         d = 500
         fifo = util.FIFO(5)
-        wxBeginBusyCursor()
+        wx.BeginBusyCursor()
 
         for w in spellcheck.prefixDict[util.getWordPrefix(word)].iterkeys():
             if w.startswith(wstart):
@@ -183,18 +183,18 @@ class SpellCheckDlg(wxDialog):
 
         items = fifo.get()
 
-        wxEndBusyCursor()
+        wx.EndBusyCursor()
 
         if len(items) == 0:
-            wxMessageBox("No similar words found.", "Results",
-                         wxOK, self)
+            wx.MessageBox("No similar words found.", "Results",
+                          wx.OK, self)
 
             return
 
-        dlg = wxSingleChoiceDialog(self, "Most similar words:",
-                                   "Suggestions", items)
+        dlg = wx.SingleChoiceDialog(
+            self, "Most similar words:", "Suggestions", items)
         
-        if dlg.ShowModal() == wxID_OK:
+        if dlg.ShowModal() == wx.ID_OK:
             sel = dlg.GetSelection()
 
             newWord = items[sel]

@@ -2,22 +2,22 @@ import gutil
 import misc
 import util
 
-from wxPython.wx import *
+import wx
 
-class CharMapDlg(wxDialog):
+class CharMapDlg(wx.Dialog):
     def __init__(self, parent, ctrl):
-        wxDialog.__init__(self, parent, -1, "Character map")
+        wx.Dialog.__init__(self, parent, -1, "Character map")
 
         self.ctrl = ctrl
         
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.charMap = MyCharMap(self)
         hsizer.Add(self.charMap)
 
-        self.insertButton = wxButton(self, -1, " Insert character ")
-        hsizer.Add(self.insertButton, 0, wxALL, 10)
-        EVT_BUTTON(self, self.insertButton.GetId(), self.OnInsert)
+        self.insertButton = wx.Button(self, -1, " Insert character ")
+        hsizer.Add(self.insertButton, 0, wx.ALL, 10)
+        wx.EVT_BUTTON(self, self.insertButton.GetId(), self.OnInsert)
         gutil.btnDblClick(self.insertButton, self.OnInsert)
 
         util.finishWindow(self, hsizer, 0)
@@ -26,9 +26,9 @@ class CharMapDlg(wxDialog):
         if self.charMap.selected:
             self.ctrl.OnKeyChar(util.MyKeyEvent(ord(self.charMap.selected)))
             
-class MyCharMap(wxWindow):
+class MyCharMap(wx.Window):
     def __init__(self, parent):
-        wxWindow.__init__(self, parent, -1)
+        wx.Window.__init__(self, parent, -1)
 
         self.selected = None
 
@@ -54,22 +54,22 @@ class MyCharMap(wxWindow):
         self.boxSize = 60
         
         self.smallFont = util.createPixelFont(20,
-            wxFONTFAMILY_SWISS, wxNORMAL, wxNORMAL)
+            wx.FONTFAMILY_SWISS, wx.NORMAL, wx.NORMAL)
         self.normalFont = util.createPixelFont(self.cellSize - 2,
-            wxFONTFAMILY_MODERN, wxNORMAL, wxBOLD)
+            wx.FONTFAMILY_MODERN, wx.NORMAL, wx.BOLD)
         self.bigFont = util.createPixelFont(self.boxSize - 2,
-            wxFONTFAMILY_MODERN, wxNORMAL, wxBOLD)
+            wx.FONTFAMILY_MODERN, wx.NORMAL, wx.BOLD)
         
-        EVT_PAINT(self, self.OnPaint)
-        EVT_LEFT_DOWN(self, self.OnLeftDown)
-        EVT_MOTION(self, self.OnMotion)
-        EVT_SIZE(self, self.OnSize)
+        wx.EVT_PAINT(self, self.OnPaint)
+        wx.EVT_LEFT_DOWN(self, self.OnLeftDown)
+        wx.EVT_MOTION(self, self.OnMotion)
+        wx.EVT_SIZE(self, self.OnSize)
 
         util.setWH(self, self.cols * self.cellSize + 2 * self.offset, 460)
 
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wxEmptyBitmap(size.width, size.height)
+        self.screenBuf = wx.EmptyBitmap(size.width, size.height)
 
     def OnLeftDown(self, event):
         pos = event.GetPosition()
@@ -91,15 +91,15 @@ class MyCharMap(wxWindow):
             self.OnLeftDown(event)
             
     def OnPaint(self, event):
-        dc = wxBufferedPaintDC(self, self.screenBuf)
+        dc = wx.BufferedPaintDC(self, self.screenBuf)
 
         size = self.GetClientSize()
-        dc.SetBrush(wxWHITE_BRUSH)
-        dc.SetPen(wxWHITE_PEN)
+        dc.SetBrush(wx.WHITE_BRUSH)
+        dc.SetPen(wx.WHITE_PEN)
         dc.DrawRectangle(0, 0, size.width, size.height)
 
-        dc.SetPen(wxBLACK_PEN)
-        dc.SetTextForeground(wxBLACK)
+        dc.SetPen(wx.BLACK_PEN)
+        dc.SetTextForeground(wx.BLACK)
         
         for y in range(self.rows + 1):
             util.drawLine(dc, self.offset, self.offset + y * self.cellSize,

@@ -3,7 +3,7 @@ import mypager
 import pml
 import util
 
-from wxPython.wx import wxPen
+import wx
 
 # a piece of text on screen.
 class TextString:
@@ -578,7 +578,7 @@ class ViewModeOverview(ViewMode):
 
     def drawTexts(self, ctrl, dc, tl):
         for i in xrange(len(tl[1][0])):
-            dc.SetPen(wxPen(tl[1][2][i]))
+            dc.SetPen(wx.Pen(tl[1][2][i]))
             
             s = tl[1][0][i]
             sx, sy = tl[1][1][i]

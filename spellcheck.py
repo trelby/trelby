@@ -4,7 +4,7 @@ import util
 import gzip
 import StringIO
 
-from wxPython.wx import *
+import wx
 
 # PY2.4: use a Set object
 # dict of words loaded from dict_en.dat. key = word, value = None.
@@ -43,8 +43,8 @@ def loadDict(frame):
             f = gzip.GzipFile(mode = "r", fileobj = buf)
             s = f.read()
         except:
-            wxMessageBox("Error loading file '%s': Decompression failed" % \
-                         misc.toGUIUnicode(fname), "Error", wxOK, frame)
+            wx.MessageBox("Error loading file '%s': Decompression failed" % \
+                              misc.toGUIUnicode(fname), "Error", wx.OK, frame)
 
             return False
     

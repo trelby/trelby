@@ -2,54 +2,54 @@ import gutil
 import misc
 import util
 
-from wxPython.wx import *
+import wx
 
-class SCDictDlg(wxDialog):
+class SCDictDlg(wx.Dialog):
     def __init__(self, parent, scDict, isGlobal):
-        wxDialog.__init__(self, parent, -1, "Spell checker dictionary",
-                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+        wx.Dialog.__init__(self, parent, -1, "Spell checker dictionary",
+                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         self.scDict = scDict
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
         
         if isGlobal:
             s = "Global words:"
         else:
             s = "Script-specific words:"
             
-        vsizer.Add(wxStaticText(self, -1, s))
+        vsizer.Add(wx.StaticText(self, -1, s))
 
-        self.itemsEntry = wxTextCtrl(self, -1, style = wxTE_MULTILINE |
-                                     wxTE_DONTWRAP, size = (300, 300))
-        vsizer.Add(self.itemsEntry, 1, wxEXPAND)
+        self.itemsEntry = wx.TextCtrl(self, -1, style = wx.TE_MULTILINE |
+                                     wx.TE_DONTWRAP, size = (300, 300))
+        vsizer.Add(self.itemsEntry, 1, wx.EXPAND)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
         
         cancelBtn = gutil.createStockButton(self, "Cancel")
-        hsizer.Add(cancelBtn, 0, wxLEFT, 10)
+        hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 10)
 
         self.cfg2gui()
 
         util.finishWindow(self, vsizer)
 
-        EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
     def OnOK(self, event):
         self.scDict.refresh()
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
     def OnMisc(self, event):
         self.scDict.set(misc.fromGUI(self.itemsEntry.GetValue()).split("\n"))

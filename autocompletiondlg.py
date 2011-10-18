@@ -2,72 +2,72 @@ import gutil
 import misc
 import util
 
-from wxPython.wx import *
+import wx
 
-class AutoCompletionDlg(wxDialog):
+class AutoCompletionDlg(wx.Dialog):
     def __init__(self, parent, autoCompletion):
-        wxDialog.__init__(self, parent, -1, "Auto-completion",
-                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+        wx.Dialog.__init__(self, parent, -1, "Auto-completion",
+                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         self.autoCompletion = autoCompletion
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wxStaticText(self, -1, "Element:"), 0,
-                   wxALIGN_CENTER_VERTICAL | wxRIGHT, 10)
+        hsizer.Add(wx.StaticText(self, -1, "Element:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
 
-        self.elementsCombo = wxComboBox(self, -1, style = wxCB_READONLY)
+        self.elementsCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
 
         for t in autoCompletion.types.itervalues():
             self.elementsCombo.Append(t.ti.name, t.ti.lt)
 
-        EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
+        wx.EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
 
         hsizer.Add(self.elementsCombo, 0)
 
-        vsizer.Add(hsizer, 0, wxEXPAND)
+        vsizer.Add(hsizer, 0, wx.EXPAND)
 
-        vsizer.Add(wxStaticLine(self, -1), 0, wxEXPAND | wxTOP | wxBOTTOM, 10)
+        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 10)
 
-        self.enabledCb = wxCheckBox(self, -1, "Auto-completion enabled")
-        EVT_CHECKBOX(self, self.enabledCb.GetId(), self.OnMisc)
-        vsizer.Add(self.enabledCb, 0, wxBOTTOM, 10)
+        self.enabledCb = wx.CheckBox(self, -1, "Auto-completion enabled")
+        wx.EVT_CHECKBOX(self, self.enabledCb.GetId(), self.OnMisc)
+        vsizer.Add(self.enabledCb, 0, wx.BOTTOM, 10)
 
-        vsizer.Add(wxStaticText(self, -1, "Default items:"))
+        vsizer.Add(wx.StaticText(self, -1, "Default items:"))
 
-        self.itemsEntry = wxTextCtrl(self, -1, style = wxTE_MULTILINE |
-                                     wxTE_DONTWRAP, size = (400, 200))
-        EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
-        vsizer.Add(self.itemsEntry, 1, wxEXPAND)
+        self.itemsEntry = wx.TextCtrl(self, -1, style = wx.TE_MULTILINE |
+                                      wx.TE_DONTWRAP, size = (400, 200))
+        wx.EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
+        vsizer.Add(self.itemsEntry, 1, wx.EXPAND)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
         
         cancelBtn = gutil.createStockButton(self, "Cancel")
-        hsizer.Add(cancelBtn, 0, wxLEFT, 10)
+        hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 10)
 
         util.finishWindow(self, vsizer)
 
         self.elementsCombo.SetSelection(0)
         self.OnElementCombo()
 
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
     def OnOK(self, event):
         self.autoCompletion.refresh()
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
     def OnElementCombo(self, event = None):
         self.lt = self.elementsCombo.GetClientData(self.elementsCombo.

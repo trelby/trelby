@@ -1,3 +1,5 @@
 -pml->pdf font baseline wrong for non-courier fonts?
 
 -add suffix automatically if missing in save/export
+
+-remove wxIsUnicode, we can now depend on it always being true

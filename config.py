@@ -9,7 +9,7 @@ import screenplay
 import util
 
 import copy
-from wxPython.wx import *
+import wx
 
 # mapping from character to linebreak
 _char2lb = {
@@ -633,7 +633,7 @@ class ConfigGlobal:
         # keyboard commands
         self.commands = [
             Command("Abort", "Abort something, e.g. selection,"
-                    " auto-completion, etc.", [WXK_ESCAPE], isFixed = True),
+                    " auto-completion, etc.", [wx.WXK_ESCAPE], isFixed = True),
 
             Command("About", "Show the about dialog.", isMenu = True),
             
@@ -690,10 +690,10 @@ class ConfigGlobal:
                     isFixed = True, isMenu = True),
 
             Command("Delete", "Delete the character under the cursor,"
-                    " or selected text.", [WXK_DELETE], isFixed = True),
+                    " or selected text.", [wx.WXK_DELETE], isFixed = True),
             
             Command("DeleteBackward", "Delete the character behind the"
-                    " cursor.", [WXK_BACK], isFixed = True),
+                    " cursor.", [wx.WXK_BACK], isFixed = True),
 
             Command("DeleteElements", "Open the 'Delete elements' dialog.",
                     isMenu = True),
@@ -709,8 +709,8 @@ class ConfigGlobal:
                     [util.Key(5, ctrl = True).toInt()], isMenu = True),
             
             Command("ForcedLineBreak", "Insert a forced line break.",
-                    [util.Key(WXK_RETURN, ctrl = True).toInt(),
-                     util.Key(WXK_RETURN, shift = True).toInt(),
+                    [util.Key(wx.WXK_RETURN, ctrl = True).toInt(),
+                     util.Key(wx.WXK_RETURN, shift = True).toInt(),
 
                      # CTRL+Enter under wxMSW
                      util.Key(10, ctrl = True).toInt()],
@@ -741,49 +741,49 @@ class ConfigGlobal:
             Command("LocationsDlg", "Open the locations dialog.",
                     isMenu = True),
 
-            Command("MoveDown", "Move down.", [WXK_DOWN], isMovement = True),
+            Command("MoveDown", "Move down.", [wx.WXK_DOWN], isMovement = True),
             
             Command("MoveEndOfLine", "Move to the end of the line or"
                     " finish auto-completion.",
-                    [WXK_END], isMovement = True),
+                    [wx.WXK_END], isMovement = True),
             
             Command("MoveEndOfScript", "Move to the end of the script.",
-                    [util.Key(WXK_END, ctrl = True).toInt()],
+                    [util.Key(wx.WXK_END, ctrl = True).toInt()],
                     isMovement = True),
             
-            Command("MoveLeft", "Move left.", [WXK_LEFT], isMovement = True),
+            Command("MoveLeft", "Move left.", [wx.WXK_LEFT], isMovement = True),
             
             Command("MovePageDown", "Move one page down.",
-                    [WXK_NEXT, WXK_PAGEDOWN], isMovement = True),
+                    [wx.WXK_PAGEDOWN], isMovement = True),
             
             Command("MovePageUp", "Move one page up.",
-                    [WXK_PRIOR, WXK_PAGEUP], isMovement = True),
+                    [wx.WXK_PAGEUP], isMovement = True),
             
-            Command("MoveRight", "Move right.", [WXK_RIGHT],
+            Command("MoveRight", "Move right.", [wx.WXK_RIGHT],
                     isMovement = True),
             
             Command("MoveSceneDown", "Move one scene down.",
-                    [util.Key(WXK_DOWN, ctrl = True).toInt()],
+                    [util.Key(wx.WXK_DOWN, ctrl = True).toInt()],
                     isMovement = True),
             
             Command("MoveSceneUp", "Move one scene up.",
-                    [util.Key(WXK_UP, ctrl = True).toInt()],
+                    [util.Key(wx.WXK_UP, ctrl = True).toInt()],
                     isMovement = True),
             
             Command("MoveStartOfLine", "Move to the start of the line.",
-                    [WXK_HOME], isMovement = True),
+                    [wx.WXK_HOME], isMovement = True),
             
             Command("MoveStartOfScript", "Move to the start of the"
                     " script.",
-                    [util.Key(WXK_HOME, ctrl = True).toInt()],
+                    [util.Key(wx.WXK_HOME, ctrl = True).toInt()],
                     isMovement = True),
             
-            Command("MoveUp", "Move up.", [WXK_UP], isMovement = True),
+            Command("MoveUp", "Move up.", [wx.WXK_UP], isMovement = True),
 
             Command("NameDatabase", "Open the character name database.",
                     isMenu = True),
             
-            Command("NewElement", "Create a new element.", [WXK_RETURN],
+            Command("NewElement", "Create a new element.", [wx.WXK_RETURN],
                     isFixed = True),
 
             Command("NewScript", "Create a new script.", isMenu = True),
@@ -853,12 +853,12 @@ class ConfigGlobal:
                     [util.Key(1, ctrl = True).toInt()], isMenu = True),
             
             Command("SetMark", "Set mark at current cursor position.",
-                    [util.Key(WXK_SPACE, ctrl = True).toInt()]),
+                    [util.Key(wx.WXK_SPACE, ctrl = True).toInt()]),
             
             Command("Settings", "Change global settings.", isMenu = True),
 
             Command("SpellCheckerDlg","Spell check the script.",
-                    [util.Key(WXK_F8).toInt()], isMenu = True),
+                    [util.Key(wx.WXK_F8).toInt()], isMenu = True),
             
             Command("SpellCheckerDictionaryDlg",
                     "Open the global spell checker dictionary dialog.",
@@ -870,11 +870,11 @@ class ConfigGlobal:
                     isMenu = True),
 
             Command("Tab", "Change current element to the next style or"
-                    " create a new element.", [WXK_TAB], isFixed = True),
+                    " create a new element.", [wx.WXK_TAB], isFixed = True),
 
             Command("TabPrev", "Change current element to the previous"
                     " style.",
-                    [util.Key(WXK_TAB, shift = True).toInt()],
+                    [util.Key(wx.WXK_TAB, shift = True).toInt()],
                     isFixed = True),
 
             Command("TitlesDlg", "Open the titles dialog.", isMenu = True),
@@ -1168,56 +1168,56 @@ class ConfigGui:
     def __init__(self, cfgGl):
 
         if not ConfigGui.constantsInited:
-            ConfigGui.bluePen = wxPen(wxColour(0, 0, 255))
-            ConfigGui.redColor = wxColour(255, 0, 0)
-            ConfigGui.blackColor = wxColour(0, 0, 0)
+            ConfigGui.bluePen = wx.Pen(wx.Colour(0, 0, 255))
+            ConfigGui.redColor = wx.Colour(255, 0, 0)
+            ConfigGui.blackColor = wx.Colour(0, 0, 0)
 
             ConfigGui.constantsInited = True
 
-        # convert cfgGl.MyColor -> cfgGui.wxColour
+        # convert cfgGl.MyColor -> cfgGui.wx.Colour
         for it in cfgGl.cvars.color.itervalues():
             c = getattr(cfgGl, it.name)
-            tmp = wxColour(c.r, c.g, c.b)
+            tmp = wx.Colour(c.r, c.g, c.b)
             setattr(self, it.name, tmp)
 
-        self.textPen = wxPen(self.textColor)
-        self.textHdrPen = wxPen(self.textHdrColor)
+        self.textPen = wx.Pen(self.textColor)
+        self.textHdrPen = wx.Pen(self.textHdrColor)
         
-        self.workspaceBrush = wxBrush(self.workspaceColor)
-        self.workspacePen = wxPen(self.workspaceColor)
+        self.workspaceBrush = wx.Brush(self.workspaceColor)
+        self.workspacePen = wx.Pen(self.workspaceColor)
 
-        self.textBgBrush = wxBrush(self.textBgColor)
-        self.textBgPen = wxPen(self.textBgColor)
+        self.textBgBrush = wx.Brush(self.textBgColor)
+        self.textBgPen = wx.Pen(self.textBgColor)
 
-        self.pageBorderPen = wxPen(self.pageBorderColor)
-        self.pageShadowPen = wxPen(self.pageShadowColor)
+        self.pageBorderPen = wx.Pen(self.pageBorderColor)
+        self.pageShadowPen = wx.Pen(self.pageShadowColor)
 
-        self.selectedBrush = wxBrush(self.selectedColor)
-        self.selectedPen = wxPen(self.selectedColor)
+        self.selectedBrush = wx.Brush(self.selectedColor)
+        self.selectedPen = wx.Pen(self.selectedColor)
 
-        self.searchBrush = wxBrush(self.searchColor)
-        self.searchPen = wxPen(self.searchColor)
+        self.searchBrush = wx.Brush(self.searchColor)
+        self.searchPen = wx.Pen(self.searchColor)
 
-        self.cursorBrush = wxBrush(self.cursorColor)
-        self.cursorPen = wxPen(self.cursorColor)
+        self.cursorBrush = wx.Brush(self.cursorColor)
+        self.cursorPen = wx.Pen(self.cursorColor)
 
-        self.noteBrush = wxBrush(self.noteColor)
-        self.notePen = wxPen(self.noteColor)
+        self.noteBrush = wx.Brush(self.noteColor)
+        self.notePen = wx.Pen(self.noteColor)
 
-        self.autoCompPen = wxPen(self.autoCompFgColor)
-        self.autoCompBrush = wxBrush(self.autoCompBgColor)
-        self.autoCompRevPen = wxPen(self.autoCompBgColor)
-        self.autoCompRevBrush = wxBrush(self.autoCompFgColor)
+        self.autoCompPen = wx.Pen(self.autoCompFgColor)
+        self.autoCompBrush = wx.Brush(self.autoCompBgColor)
+        self.autoCompRevPen = wx.Pen(self.autoCompBgColor)
+        self.autoCompRevBrush = wx.Brush(self.autoCompFgColor)
 
-        self.pagebreakPen = wxPen(self.pagebreakColor)
-        self.pagebreakNoAdjustPen = wxPen(self.pagebreakNoAdjustColor,
-                                          style = wxDOT)
+        self.pagebreakPen = wx.Pen(self.pagebreakColor)
+        self.pagebreakNoAdjustPen = wx.Pen(self.pagebreakNoAdjustColor,
+                                           style = wx.DOT)
 
-        self.tabFgPen = wxPen(self.tabFgColor)
-        self.tabHighlightPen = wxPen(self.tabHighlightColor)
+        self.tabFgPen = wx.Pen(self.tabFgColor)
+        self.tabHighlightPen = wx.Pen(self.tabHighlightColor)
 
-        self.tabSelectedBgBrush = wxBrush(self.tabSelectedBgColor)
-        self.tabSelectedBgPen = wxPen(self.tabSelectedBgColor)
+        self.tabSelectedBgBrush = wx.Brush(self.tabSelectedBgColor)
+        self.tabSelectedBgPen = wx.Pen(self.tabSelectedBgColor)
 
         # a 4-item list of FontInfo objects, indexed by the two lowest
         # bits of pml.TextOp.flags.
@@ -1234,11 +1234,11 @@ class ConfigGui:
             # to create a font from an empty string, so we must guard
             # against that.
             if s:
-                nfi = wxNativeFontInfo()
+                nfi = wx.NativeFontInfo()
                 nfi.FromString(s)
-                nfi.SetEncoding(wxFONTENCODING_ISO8859_1)
+                nfi.SetEncoding(wx.FONTENCODING_ISO8859_1)
 
-                fi.font = wxFontFromNativeInfo(nfi)
+                fi.font = wx.FontFromNativeInfo(nfi)
 
                 # likewise, evil users can set the font name to "z" or
                 # something equally silly, resulting in an
@@ -1254,8 +1254,8 @@ class ConfigGui:
             # font and use it. this sucks but is preferable to crashing or
             # displaying an empty screen.
             if not fi.font:
-                fi.font = wxFont(10, wxMODERN, wxNORMAL, wxNORMAL,
-                                 encoding = wxFONTENCODING_ISO8859_1)
+                fi.font = wx.Font(10, wx.MODERN, wx.NORMAL, wx.NORMAL,
+                                  encoding = wx.FONTENCODING_ISO8859_1)
                 setattr(cfgGl, fname, fi.font.GetNativeFontInfo().ToString())
 
             fx, fy = util.getTextExtent(fi.font, "O")

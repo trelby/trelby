@@ -5,14 +5,14 @@ import pml
 import screenplay
 import util
 
-from wxPython.wx import *
+import wx
 
 def genCharacterReport(mainFrame, sp):
     report = CharacterReport(sp)
 
     if not report.cinfo:
-        wxMessageBox("No characters speaking found.",
-                     "Error", wxOK, mainFrame)
+        wx.MessageBox("No characters speaking found.",
+                      "Error", wx.OK, mainFrame)
 
         return
 
@@ -25,7 +25,7 @@ def genCharacterReport(mainFrame, sp):
         "Characters to include:", True)
 
     ok = False
-    if dlg.ShowModal() == wxID_OK:
+    if dlg.ShowModal() == wx.ID_OK:
         ok = True
 
         for i in range(len(report.cinfo)):

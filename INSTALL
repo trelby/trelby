@@ -6,9 +6,8 @@ You have to copy all the files (excluding INSTALL and Makefile) to
 "/usr/local/blyte/blyte.py".
 
 The supplied makefile copies everything to the right place if you run
-"make install". It requires root access (assuming /usr/local is not
-writable with normal user permissions) and WILL DO "rm -rf
-/usr/local/blyte", so be sure there's nothing important stored there.
+"make -f Makefile.install". It WILL DO "rm -rf /usr/local/blyte/*", so be
+sure there's nothing important stored there.
 
 See the website (http://www.oskusoft.com) for the requirements for running
 Blyte on Linux.

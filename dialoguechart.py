@@ -5,7 +5,7 @@ import pml
 import screenplay
 import util
 
-from wxPython.wx import *
+import wx
 
 def genDialogueChart(mainFrame, sp):
     # TODO: would be nice if this behaved like the other reports, i.e. the
@@ -25,7 +25,7 @@ def genDialogueChart(mainFrame, sp):
     dlg = misc.CheckBoxDlg(mainFrame, "Report type", inf,
                            "Information to include:", False)
 
-    if dlg.ShowModal() != wxID_OK:
+    if dlg.ShowModal() != wx.ID_OK:
         dlg.Destroy()
 
         return
@@ -39,16 +39,16 @@ def genDialogueChart(mainFrame, sp):
     chart = DialogueChart(sp, minLines)
 
     if not chart.cinfo:
-        wxMessageBox("No characters speaking found.", "Error", wxOK,
-                     mainFrame)
+        wx.MessageBox("No characters speaking found.", "Error", wx.OK,
+                      mainFrame)
 
         return
 
     del inf[0]
     
     if len(misc.CheckBoxItem.getClientData(inf)) == 0:
-        wxMessageBox("Can't disable all output.", "Error", wxOK,
-                     mainFrame)
+        wx.MessageBox("Can't disable all output.", "Error", wx.OK,
+                      mainFrame)
 
         return
         

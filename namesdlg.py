@@ -2,24 +2,24 @@ import misc
 import namearray
 import util
 
-from wxPython.wx import *
+import wx
 
-class NamesDlg(wxDialog):
+class NamesDlg(wx.Dialog):
     def __init__(self, parent, ctrl, nameArr):
-        wxDialog.__init__(self, parent, -1, "Character name database",
-                          style = wxDEFAULT_DIALOG_STYLE | wxRESIZE_BORDER)
+        wx.Dialog.__init__(self, parent, -1, "Character name database",
+                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         self.ctrl = ctrl
         self.nameArr = nameArr
         
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer.Add(wxStaticText(self, -1, "Search in:"))
+        vsizer.Add(wx.StaticText(self, -1, "Search in:"))
 
-        self.typeList = wxListCtrl(self, -1,
-            style = wxLC_REPORT | wxLC_HRULES | wxLC_VRULES)
+        self.typeList = wx.ListCtrl(self, -1,
+            style = wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES)
         
         self.typeList.InsertColumn(0, "Count")
         self.typeList.InsertColumn(1, "Type")
@@ -29,8 +29,8 @@ class NamesDlg(wxDialog):
             self.typeList.SetStringItem(i, 1, self.nameArr.typeNames[i])
             self.typeList.SetItemData(i, i)
 
-        self.typeList.SetColumnWidth(0, wxLIST_AUTOSIZE)
-        self.typeList.SetColumnWidth(1, wxLIST_AUTOSIZE)
+        self.typeList.SetColumnWidth(0, wx.LIST_AUTOSIZE)
+        self.typeList.SetColumnWidth(1, wx.LIST_AUTOSIZE)
 
         w = 0
         w += self.typeList.GetColumnWidth(0)
@@ -40,59 +40,59 @@ class NamesDlg(wxDialog):
         
         self.typeList.SortItems(self.CmpFreq)
         self.selectAllTypes()
-        vsizer.Add(self.typeList, 1, wxEXPAND | wxBOTTOM, 5)
+        vsizer.Add(self.typeList, 1, wx.EXPAND | wx.BOTTOM, 5)
 
-        selectAllBtn = wxButton(self, -1, "Select all")
+        selectAllBtn = wx.Button(self, -1, "Select all")
         vsizer.Add(selectAllBtn)
 
-        hsizer.Add(vsizer, 0, wxEXPAND)
+        hsizer.Add(vsizer, 0, wx.EXPAND)
 
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
         
-        hsizer2 = wxBoxSizer(wxHORIZONTAL)
+        hsizer2 = wx.BoxSizer(wx.HORIZONTAL)
         
-        vsizer2 = wxBoxSizer(wxVERTICAL)
+        vsizer2 = wx.BoxSizer(wx.VERTICAL)
         
-        searchBtn = wxButton(self, -1, "Search")
-        EVT_BUTTON(self, searchBtn.GetId(), self.OnSearch)
-        vsizer2.Add(searchBtn, 0, wxBOTTOM | wxTOP, 10)
+        searchBtn = wx.Button(self, -1, "Search")
+        wx.EVT_BUTTON(self, searchBtn.GetId(), self.OnSearch)
+        vsizer2.Add(searchBtn, 0, wx.BOTTOM | wx.TOP, 10)
 
-        self.searchEntry = wxTextCtrl(self, -1, style = wxTE_PROCESS_ENTER)
-        vsizer2.Add(self.searchEntry, 0, wxEXPAND)
+        self.searchEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
+        vsizer2.Add(self.searchEntry, 0, wx.EXPAND)
 
-        tmp = wxButton(self, -1, "Insert")
-        EVT_BUTTON(self, tmp.GetId(), self.OnInsertName)
-        vsizer2.Add(tmp, 0, wxBOTTOM | wxTOP, 10)
+        tmp = wx.Button(self, -1, "Insert")
+        wx.EVT_BUTTON(self, tmp.GetId(), self.OnInsertName)
+        vsizer2.Add(tmp, 0, wx.BOTTOM | wx.TOP, 10)
 
-        hsizer2.Add(vsizer2, 1, wxRIGHT, 10)
+        hsizer2.Add(vsizer2, 1, wx.RIGHT, 10)
 
-        self.nameRb = wxRadioBox(self, -1, "Name",
-            style = wxRA_SPECIFY_COLS, majorDimension = 1,
+        self.nameRb = wx.RadioBox(self, -1, "Name",
+            style = wx.RA_SPECIFY_COLS, majorDimension = 1,
             choices = [ "begins with", "contains", "ends in" ])
         hsizer2.Add(self.nameRb)
 
-        self.sexRb = wxRadioBox(self, -1, "Sex",
-            style = wxRA_SPECIFY_COLS, majorDimension = 1,
+        self.sexRb = wx.RadioBox(self, -1, "Sex",
+            style = wx.RA_SPECIFY_COLS, majorDimension = 1,
             choices = [ "Male", "Female", "Both" ])
         self.sexRb.SetSelection(2)
-        hsizer2.Add(self.sexRb, 0, wxLEFT, 5)
+        hsizer2.Add(self.sexRb, 0, wx.LEFT, 5)
         
-        vsizer.Add(hsizer2, 0, wxEXPAND | wxALIGN_CENTER)
+        vsizer.Add(hsizer2, 0, wx.EXPAND | wx.ALIGN_CENTER)
 
-        vsizer.Add(wxStaticText(self, -1, "Results:"))
+        vsizer.Add(wx.StaticText(self, -1, "Results:"))
         
         self.list = MyListCtrl(self, nameArr)
-        vsizer.Add(self.list, 1, wxEXPAND | wxBOTTOM, 5)
+        vsizer.Add(self.list, 1, wx.EXPAND | wx.BOTTOM, 5)
 
-        self.foundLabel = wxStaticText(self, -1, "",
-            style = wxALIGN_CENTRE | wxST_NO_AUTORESIZE)
-        vsizer.Add(self.foundLabel, 0, wxEXPAND)
+        self.foundLabel = wx.StaticText(self, -1, "",
+            style = wx.ALIGN_CENTRE | wx.ST_NO_AUTORESIZE)
+        vsizer.Add(self.foundLabel, 0, wx.EXPAND)
 
-        hsizer.Add(vsizer, 20, wxEXPAND | wxLEFT, 10)
+        hsizer.Add(vsizer, 20, wx.EXPAND | wx.LEFT, 10)
 
-        EVT_TEXT_ENTER(self, self.searchEntry.GetId(), self.OnSearch)
-        EVT_BUTTON(self, selectAllBtn.GetId(), self.selectAllTypes)
-        EVT_LIST_COL_CLICK(self, self.typeList.GetId(), self.OnHeaderClick)
+        wx.EVT_TEXT_ENTER(self, self.searchEntry.GetId(), self.OnSearch)
+        wx.EVT_BUTTON(self, selectAllBtn.GetId(), self.selectAllTypes)
+        wx.EVT_LIST_COL_CLICK(self, self.typeList.GetId(), self.OnHeaderClick)
 
         util.finishWindow(self, hsizer)
 
@@ -101,8 +101,8 @@ class NamesDlg(wxDialog):
 
     def selectAllTypes(self, event = None):
         for i in xrange(len(self.nameArr.typeNames)):
-            self.typeList.SetItemState(i, wxLIST_STATE_SELECTED,
-                                       wxLIST_STATE_SELECTED)
+            self.typeList.SetItemState(i, wx.LIST_STATE_SELECTED,
+                                       wx.LIST_STATE_SELECTED)
         
     def OnHeaderClick(self, event):
         if event.GetColumn() == 0:
@@ -117,8 +117,8 @@ class NamesDlg(wxDialog):
         return cmp(self.nameArr.typeNames[i1], self.nameArr.typeNames[i2])
 
     def OnInsertName(self, event):
-        item = self.list.GetNextItem(-1, wxLIST_NEXT_ALL,
-                                     wxLIST_STATE_SELECTED)
+        item = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL,
+                                     wx.LIST_STATE_SELECTED)
 
         if item == -1:
             return
@@ -133,7 +133,7 @@ class NamesDlg(wxDialog):
     def OnSearch(self, event = None):
         l = []
 
-        wxBeginBusyCursor()
+        wx.BeginBusyCursor()
         
         s = util.lower(misc.fromGUI(self.searchEntry.GetValue()))
         sex = self.sexRb.GetSelection()
@@ -143,8 +143,8 @@ class NamesDlg(wxDialog):
         item = -1
         
         while 1:
-            item = self.typeList.GetNextItem(item, wxLIST_NEXT_ALL,
-                wxLIST_STATE_SELECTED)
+            item = self.typeList.GetNextItem(item, wx.LIST_NEXT_ALL,
+                wx.LIST_STATE_SELECTED)
 
             if item == -1:
                 break
@@ -182,15 +182,15 @@ class NamesDlg(wxDialog):
         self.list.SetItemCount(len(l))
         self.list.EnsureVisible(0)
 
-        wxEndBusyCursor()
+        wx.EndBusyCursor()
 
         self.foundLabel.SetLabel("%d names found." % len(l))
 
-class MyListCtrl(wxListCtrl):
+class MyListCtrl(wx.ListCtrl):
     def __init__(self, parent, nameArr):
-        wxListCtrl.__init__(self, parent, -1,
-            style = wxLC_REPORT | wxLC_VIRTUAL | wxLC_SINGLE_SEL |
-                    wxLC_HRULES | wxLC_VRULES)
+        wx.ListCtrl.__init__(self, parent, -1,
+            style = wx.LC_REPORT | wx.LC_VIRTUAL | wx.LC_SINGLE_SEL |
+                    wx.LC_HRULES | wx.LC_VRULES)
 
         self.nameArr = nameArr
 
@@ -202,8 +202,8 @@ class MyListCtrl(wxListCtrl):
         self.SetColumnWidth(0, 120)
         self.SetColumnWidth(1, 120)
 
-        # we can't use wxLIST_AUTOSIZE since this is a virtual control, so
-        # calculate the size ourselves since we know the longest string
+        # we can't use wx.LIST_AUTOSIZE since this is a virtual control,
+        # so calculate the size ourselves since we know the longest string
         # possible.
         w = util.getTextExtent(self.GetFont(), "Female")[0] + 15
         self.SetColumnWidth(2, w)

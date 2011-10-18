@@ -2,17 +2,17 @@ import misc
 import util
 
 import xml.sax.saxutils as xss
-from wxPython.wx import *
-from wxPython.html import *
+import wx
+import wx.html
 
-class CommandsDlg(wxFrame):
+class CommandsDlg(wx.Frame):
     def __init__(self, cfgGl):
-        wxFrame.__init__(self, None, -1, "Commands",
-                         size = (650, 600), style = wxDEFAULT_FRAME_STYLE)
+        wx.Frame.__init__(self, None, -1, "Commands",
+                          size = (650, 600), style = wx.DEFAULT_FRAME_STYLE)
 
         self.Center()
         
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(vsizer)
 
         s = '<table border="1"><tr><td><b>Key(s)</b></td>'\
@@ -54,37 +54,37 @@ R                      Replace
 </body></html>
         """ % s
         
-        htmlWin = wxHtmlWindow(self)
+        htmlWin = wx.html.HtmlWindow(self)
         rep = htmlWin.GetInternalRepresentation()
-        rep.SetIndent(0, wxHTML_INDENT_BOTTOM)
+        rep.SetIndent(0, wx.html.HTML_INDENT_BOTTOM)
         htmlWin.SetPage(self.html)
         htmlWin.SetFocus()
         
-        vsizer.Add(htmlWin, 1, wxEXPAND)
+        vsizer.Add(htmlWin, 1, wx.EXPAND)
 
-        id = wxNewId()
-        menu = wxMenu()
+        id = wx.NewId()
+        menu = wx.Menu()
         menu.Append(id, "&Save as...")
 
-        mb = wxMenuBar()
+        mb = wx.MenuBar()
         mb.Append(menu, "&File")
         self.SetMenuBar(mb)
 
-        EVT_MENU(self, id, self.OnSave)
+        wx.EVT_MENU(self, id, self.OnSave)
 
         self.Layout()
 
-        EVT_CLOSE(self, self.OnCloseWindow)
+        wx.EVT_CLOSE(self, self.OnCloseWindow)
 
     def OnCloseWindow(self, event):
         self.Destroy()
 
     def OnSave(self, event):
-        dlg = wxFileDialog(self, "Filename to save as",
+        dlg = wx.FileDialog(self, "Filename to save as",
             wildcard = "HTML files (*.html)|*.html|All files|*",
-            style = wxSAVE | wxOVERWRITE_PROMPT)
+            style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
-        if dlg.ShowModal() == wxID_OK:
+        if dlg.ShowModal() == wx.ID_OK:
             util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()), self.html,
                              self)
             

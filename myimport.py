@@ -5,7 +5,7 @@ import util
 
 import re
 
-from wxPython.wx import *
+import wx
 
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."
@@ -24,7 +24,7 @@ def importTextFile(fileName, frame):
         return None
 
     if len(data) == 0:
-        wxMessageBox("File is empty.", "Error", wxOK, frame)
+        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
 
         return None
 
@@ -67,7 +67,7 @@ def importTextFile(fileName, frame):
         lines[i] = s
 
     if len(indDict) == 0:
-        wxMessageBox("File contains only empty lines.", "Error", wxOK, frame)
+        wx.MessageBox("File contains only empty lines.", "Error", wx.OK, frame)
 
         return None
 
@@ -109,7 +109,7 @@ def importTextFile(fileName, frame):
 
     dlg = ImportDlg(frame, indDict.values())
 
-    if dlg.ShowModal() != wxID_OK:
+    if dlg.ShowModal() != wx.ID_OK:
         dlg.Destroy()
 
         return None
@@ -212,30 +212,30 @@ class Indent:
         self.paren = 0
 
 
-class ImportDlg(wxDialog):
+class ImportDlg(wx.Dialog):
     def __init__(self, parent, indents):
-        wxDialog.__init__(self, parent, -1, "Adjust styles",
-                          style = wxDEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, -1, "Adjust styles",
+                           style = wx.DEFAULT_DIALOG_STYLE)
 
         indents.sort(lambda i1, i2: -cmp(len(i1.lines), len(i2.lines)))
         
-        vsizer = wxBoxSizer(wxVERTICAL)
+        vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        tmp = wxStaticText(self, -1, "Input:")
+        tmp = wx.StaticText(self, -1, "Input:")
         vsizer.Add(tmp)
         
-        self.inputLb = wxListBox(self, -1, size = (400, 200))
+        self.inputLb = wx.ListBox(self, -1, size = (400, 200))
         for it in indents:
             self.inputLb.Append("%d lines (indented %d characters)" %
                                 (len(it.lines), it.indent), it)
             
-        vsizer.Add(self.inputLb, 0, wxEXPAND)
+        vsizer.Add(self.inputLb, 0, wx.EXPAND)
 
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         
-        hsizer.Add(wxStaticText(self, -1, "Style:"), 0,
-                   wxALIGN_CENTER_VERTICAL)
-        self.styleCombo = wxComboBox(self, -1, style = wxCB_READONLY)
+        hsizer.Add(wx.StaticText(self, -1, "Style:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
+        self.styleCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
 
         self.styleCombo.Append("Scene / Action", SCENE_ACTION)
         for t in config.getTIs():
@@ -243,17 +243,17 @@ class ImportDlg(wxDialog):
 
         util.setWH(self.styleCombo, w = 150)
         
-        hsizer.Add(self.styleCombo, 0, wxLEFT, 10)
+        hsizer.Add(self.styleCombo, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxTOP | wxBOTTOM, 10)
+        vsizer.Add(hsizer, 0, wx.TOP | wx.BOTTOM, 10)
 
-        vsizer.Add(wxStaticText(self, -1, "Lines:"))
+        vsizer.Add(wx.StaticText(self, -1, "Lines:"))
 
-        self.linesEntry = wxTextCtrl(self, -1, size = (400, 200),
-            style = wxTE_MULTILINE | wxTE_DONTWRAP)
-        vsizer.Add(self.linesEntry, 0, wxEXPAND)
+        self.linesEntry = wx.TextCtrl(self, -1, size = (400, 200),
+            style = wx.TE_MULTILINE | wx.TE_DONTWRAP)
+        vsizer.Add(self.linesEntry, 0, wx.EXPAND)
         
-        hsizer = wxBoxSizer(wxHORIZONTAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
         
@@ -261,26 +261,26 @@ class ImportDlg(wxDialog):
         hsizer.Add(cancelBtn)
         
         okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wxLEFT, 10)
+        hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
-        vsizer.Add(hsizer, 0, wxEXPAND | wxTOP, 10)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 10)
 
         util.finishWindow(self, vsizer)
 
-        EVT_COMBOBOX(self, self.styleCombo.GetId(), self.OnStyleCombo)
-        EVT_LISTBOX(self, self.inputLb.GetId(), self.OnInputLb)
+        wx.EVT_COMBOBOX(self, self.styleCombo.GetId(), self.OnStyleCombo)
+        wx.EVT_LISTBOX(self, self.inputLb.GetId(), self.OnInputLb)
         
-        EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
+        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
         self.inputLb.SetSelection(0)
         self.OnInputLb()
         
     def OnOK(self, event):
-        self.EndModal(wxID_OK)
+        self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
-        self.EndModal(wxID_CANCEL)
+        self.EndModal(wx.ID_CANCEL)
 
     def OnInputLb(self, event = None):
         self.selected = self.inputLb.GetClientData(self.inputLb.GetSelection())
