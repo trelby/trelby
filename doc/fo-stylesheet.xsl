@@ -5,7 +5,7 @@
   <xsl:param name="section.autolabel" select="1"></xsl:param>
   <xsl:param name="section.label.includes.component.label" select="1"></xsl:param>
 
-  <xsl:param name="fop.extensions" select="1" />
+  <xsl:param name="fop1.extensions" select="1" />
   <xsl:param name="variablelist.as.blocks" select="1" />
 
 </xsl:stylesheet>

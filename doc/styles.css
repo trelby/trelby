@@ -158,7 +158,6 @@ IMG
 .tip
 {
     border: black solid 1px;
-    background: url(./images/info.png) no-repeat;
     margin: 0.12in 0;
     padding: 0 55px;
 }
@@ -166,7 +165,6 @@ IMG
 .warning
 {
     border: black solid 1px;
-    background: url(./images/warning.png) no-repeat;
     margin: 0.12in 0;
     padding: 0 55px;
 }
@@ -174,7 +172,6 @@ IMG
 .note
 {
     border: black solid 1px;
-    background: url(./images/note.png) no-repeat;
     margin: 0.12in 0;
     padding: 0 55px;
 }
