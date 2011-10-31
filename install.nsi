@@ -18,9 +18,9 @@
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Blyte"
-!define PRODUCT_VERSION "1.5.0"
-!define PRODUCT_PUBLISHER "Oskusoft"
-!define PRODUCT_WEB_SITE "http://www.oskusoft.com"
+!define PRODUCT_VERSION "1.6-dev"
+!define PRODUCT_PUBLISHER "Blyte.org"
+!define PRODUCT_WEB_SITE "http://www.blyte.org/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\blyte.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -56,7 +56,7 @@ SetCompressor lzma
 
 Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
 OutFile "Setup-${PRODUCT_NAME}-${PRODUCT_VERSION}.exe"
-InstallDir "C:\Program Files\Oskusoft\Blyte"
+InstallDir "C:\Program Files\Blyte"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
@@ -74,13 +74,21 @@ done:
 
 FunctionEnd
 
+Section MFCRUNTIME
+  SetOutPath "$INSTDIR"
+  File "vcredist_x86.exe"
+  ExecWait `vcredist_x86.exe /q:a /c:"VCREDI~1.EXE /q:a /c:""msiexec /i vcredist.msi /qn"" "`
+  delete "vcredist_x86.exe" #Step 3 Install Microsoft MFC 8 Runtime"
+SectionEnd
+
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite on
-  File "dist\*"
+  File /r "dist\*"
   CreateDirectory "$SMPROGRAMS\Blyte"
   CreateShortCut "$SMPROGRAMS\Blyte\Blyte.lnk" "$INSTDIR\blyte.exe"
   CreateShortCut "$DESKTOP\Blyte.lnk" "$INSTDIR\blyte.exe"
+  Delete "$INSTDIR\vcredist_86.exe"
 SectionEnd
 
 Section -AdditionalIcons
@@ -132,7 +140,7 @@ Section Uninstall
   Delete "$INSTDIR\htmlc.pyd"
   Delete "$INSTDIR\icon16.png"
   Delete "$INSTDIR\icon32.png"
-  Delete "$INSTDIR\logo.jpg"
+  Delete "$INSTDIR\logo.png"
   Delete "$INSTDIR\names.dat"
   Delete "$INSTDIR\dict_en.dat.gz"
   Delete "$INSTDIR\python23.dll"

@@ -1,7 +1,6 @@
-\python23\python -OO setup.py py2exe
-copy icon16.png dist
-copy icon32.png dist
-copy logo.jpg dist
+python -OO setup.py py2exe
+xcopy /i icons dist\icons
+copy vcredist_x86.exe dist
 copy names.dat dist
 copy sample.blyte dist
 copy manual.pdf dist
