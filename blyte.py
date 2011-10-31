@@ -1728,17 +1728,10 @@ class MyFrame(wx.Frame):
         wx.Image_AddHandler(wx.PNGHandler())
 
         ib = wx.IconBundle()
-        
-        img = wx.Image("icon32.png", wx.BITMAP_TYPE_PNG)
-        imgS = wx.Image("icon16.png", wx.BITMAP_TYPE_PNG)
 
-        bitmap = wx.BitmapFromImage(img)
-        icon = wx.IconFromBitmap(bitmap)
-        ib.AddIcon(icon)
-
-        bitmap = wx.BitmapFromImage(imgS)
-        icon = wx.IconFromBitmap(bitmap)
-        ib.AddIcon(icon)
+        ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("icons/icon16.png")))
+        ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("icons/icon32.png")))
+        ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("icons/icon64.png")))
 
         self.SetIcons(ib)
 

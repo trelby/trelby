@@ -89,6 +89,12 @@ def toPath(s):
     else:
         return s.encode("UTF-8")
 
+# return bitmap created from the given file, whose filename is given as
+# relative to the install dir. so passing in "icons/blaa.png" might return
+# "/opt/blyte/icons/blaa.png" for example.
+def getBitmap(filename):
+    return wx.Bitmap("/".join([progPath, filename]))
+
 class MyColorSample(wx.Window):
     def __init__(self, parent, id, size):
         wx.Window.__init__(self, parent, id, size = size)
