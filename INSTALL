@@ -2,12 +2,13 @@ Installation instructions for Blyte on Linux
 --------------------------------------------
 
 You have to copy all the files (excluding INSTALL and Makefile) to
-/usr/local/blyte. Afterwards you can run the program with the command
-"/usr/local/blyte/blyte.py".
+/opt/blyte. Afterwards you can run the program with the command
+"/opt/blyte/blyte.py".
 
 The supplied makefile copies everything to the right place if you run
-"make -f Makefile.install". It WILL DO "rm -rf /usr/local/blyte/*", so be
-sure there's nothing important stored there.
+"make install". It requires root access (assuming /opt is not
+writable with normal user permissions) and WILL DO "rm -rf
+/opt/blyte", so be sure there's nothing important stored there.
 
 See the website (http://www.oskusoft.com) for the requirements for running
 Blyte on Linux.

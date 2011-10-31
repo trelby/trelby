@@ -1,7 +1,8 @@
-DIR := /usr/local/blyte
+DIR := /opt/blyte
 
 install:
 	rm -rf $(DIR)/*
 	cp * $(DIR)
+	cp $(DIR)/blyte.desktop /usr/share/applications/
 	rm -f $(DIR)/INSTALL $(DIR)/Makefile
 	echo Installation finished

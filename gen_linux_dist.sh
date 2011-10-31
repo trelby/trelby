@@ -5,7 +5,7 @@
 
 set -eu
 
-VER=$(grep 'misc.version =' blyte.py | cut -b24- | perl -pe 's/"//g;')
+VER=$(grep 'version =' misc.py | cut -d'"' -f2)
 DIR="linux-dist/blyte-$VER"
 
 rm -rf linux-dist
@@ -16,7 +16,7 @@ if test $1 = "src"; then
  svn export --force . $DIR
 else
  FNAME="blyte-$VER.tar"
- cp *.py icon16.png icon32.png logo.jpg names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL $DIR
+ cp -r *.py blyte.desktop names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL icons/ $DIR
  rm $DIR/setup.py
  cp Makefile.install $DIR/Makefile
 fi

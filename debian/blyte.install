@@ -1,0 +1,2 @@
+debian/blyte/opt/blyte/* opt/blyte/
+debian/blyte/opt/blyte/blyte.desktop usr/share/applications/
