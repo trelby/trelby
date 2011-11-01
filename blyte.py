@@ -328,7 +328,7 @@ class MyCtrl(wx.Control):
             if i == 1:
                 tmp = name
             else:
-                tmp = name + "<%d>" % i
+                tmp = name + "-%d" % i
 
             matched = False
             
