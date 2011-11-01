@@ -54,6 +54,11 @@ class MyListBook(wx.ListBox):
 
         panel = self.GetClientData(self.GetSelection())
 
+        # newer wxWidgets versions sometimes return None from the above
+        # for some reason when the dialog is closed.
+        if panel is None:
+            return
+
         if hasattr(panel, "doForcedUpdate"):
             panel.doForcedUpdate()
 
