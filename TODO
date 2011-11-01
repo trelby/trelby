@@ -3,3 +3,15 @@
 -add suffix automatically if missing in save/export
 
 -remove wxIsUnicode, we can now depend on it always being true
+
+-use staticmethod decorator for static functions
+
+-should probably have menu commands for switching the element's type, once
+ the combobox is deleted. otherwise only way to do it through keyboard
+ commands.
+
+-change default fonts on linux to something that actually makes sense on
+ modern distros
+
+-update locations to look for adobe acrobat; also, there may be better
+ ways of finding a program to launch for PDFs nowadays
