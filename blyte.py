@@ -1618,7 +1618,6 @@ class MyFrame(wx.Frame):
         misc.version = "1.5.0"
         misc.releaseDate = datetime.date(2006, 7, 28)
 
-        hsizer.Add(self.typeCb)
 
         self.tabCtrl = misc.MyTabCtrl(self, -1)
         hsizer.Add(self.tabCtrl, 1, wx.EXPAND)
