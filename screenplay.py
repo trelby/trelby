@@ -86,7 +86,14 @@ class Screenplay:
         self.hasChanged = False
 
     def isModified(self):
-        return self.hasChanged
+        if not self.hasChanged:
+            return False
+
+        # nothing of value is ever lost by not saving a completely empty
+        # script, and it's annoying getting warnings about unsaved changes
+        # on those, so don't do that
+
+        return (len(self.lines) > 1) or bool(self.lines[0].text)
 
     def markChanged(self, state = True):
         self.hasChanged = state
