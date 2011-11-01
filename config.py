@@ -951,24 +951,24 @@ class ConfigGlobal:
         v.addColor("textHdr", 128, 128, 128, "TextHeadersFG",
                    "Text foreground (headers)")
         v.addColor("textBg", 255, 255, 255, "TextBG", "Text background")
-        v.addColor("workspace", 204, 204, 204, "Workspace", "Workspace")
-        v.addColor("pageBorder", 0, 0, 0, "PageBorder", "Page border")
-        v.addColor("pageShadow", 128, 128, 128, "PageShadow", "Page shadow")
-        v.addColor("selected", 128, 192, 192, "Selected", "Selection")
+        v.addColor("workspace", 237, 237, 237, "Workspace", "Workspace")
+        v.addColor("pageBorder", 170, 170, 170, "PageBorder", "Page border")
+        v.addColor("pageShadow", 153, 153, 153, "PageShadow", "Page shadow")
+        v.addColor("selected", 221, 221, 221, "Selected", "Selection")
         v.addColor("search", 255, 127, 0, "SearchResult", "Search result")
-        v.addColor("cursor", 205, 0, 0, "Cursor", "Cursor")
+        v.addColor("cursor", 135, 135, 253, "Cursor", "Cursor")
         v.addColor("autoCompFg", 0, 0, 0, "AutoCompletionFG",
                    "Auto-completion foreground")
-        v.addColor("autoCompBg", 249, 222, 99, "AutoCompletionBG",
+        v.addColor("autoCompBg", 255, 240, 168, "AutoCompletionBG",
                    "Auto-completion background")
-        v.addColor("note", 255, 255, 0, "ScriptNote", "Script note")
-        v.addColor("pagebreak", 128, 128, 128, "PageBreakLine",
+        v.addColor("note", 255, 255, 181, "ScriptNote", "Script note")
+        v.addColor("pagebreak", 221, 221, 221, "PageBreakLine",
                    "Page-break line")
-        v.addColor("pagebreakNoAdjust", 128, 128, 128,
+        v.addColor("pagebreakNoAdjust", 221, 221, 221,
                    "PageBreakNoAdjustLine",
                    "Page-break (original, not adjusted) line")
         v.addColor("tabFg", 0, 0, 0, "TabFG", "Tab foreground")
-        v.addColor("tabHighlight", 255, 255, 255, "TabHighlight",
+        v.addColor("tabHighlight", 163, 163, 163, "TabHighlight",
                    "Tab highlight")
         v.addColor("tabSelectedBg", 238, 238, 238, "TabSelectedBG",
                    "Tab background, selected")
