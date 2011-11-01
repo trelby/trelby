@@ -41,11 +41,13 @@ def init(doWX = True):
         confPath = ".blyte"
     else:
         if isUnix:
-            progPath = "/usr/local/blyte"
+            progPath = "/opt/blyte"
             confPath = os.environ["HOME"] + "/.blyte"
         else:
-            progPath = r"C:\Program Files\Oskusoft\Blyte"
-            confPath = progPath + r"\conf"
+            progPath = r"C:\Program Files\Blyte"
+            confPath = os.environ["USERPROFILE"] + r"\Blyte\conf"
+            if not os.path.exists(confPath):
+                os.makedirs(confPath)
 
     # convert the path settings to Unicode
     progPath = unicode(progPath, "UTF-8")
