@@ -350,10 +350,6 @@ class MyCtrl(wx.Control):
 
     def setTabText(self):
         mainFrame.setTabText(self.panel, self.fileNameDisplay)
-        
-    def updateTypeCb(self):
-        util.reverseComboSelect(mainFrame.typeCb,
-                                self.sp.lines[self.sp.line].lt)
 
     # texts = gd.vm.getScreen(self, False)[0], or None, in which case it's
     # called in this function.
@@ -410,8 +406,6 @@ class MyCtrl(wx.Control):
 
     # update GUI elements shared by all scripts, like statusbar etc
     def updateCommon(self):
-        self.updateTypeCb()
-
         sb = mainFrame.statusBar
         
         sb.SetStatusText("Page: %d / %d" % (self.sp.line2page(self.sp.line),
@@ -537,12 +531,6 @@ class MyCtrl(wx.Control):
             delta = cfgGl.mouseWheelLines
             
         self.sp.setTopLine(self.sp.getTopLine() + delta)
-        self.updateScreen()
-        
-    def OnTypeCombo(self, event):
-        lt = mainFrame.typeCb.GetClientData(mainFrame.typeCb.GetSelection())
-        self.sp.convertCurrentTo(lt)
-        self.SetFocus()
         self.updateScreen()
 
     def OnScroll(self, event):
@@ -1626,11 +1614,6 @@ class MyFrame(wx.Frame):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.typeCb = wx.ComboBox(self, -1, style = wx.CB_READONLY)
-
-        for t in config.getTIs():
-            self.typeCb.Append(t.name, t.lt)
-
         # FIXME: move these to misc.py?
         misc.version = "1.5.0"
         misc.releaseDate = datetime.date(2006, 7, 28)
@@ -1657,8 +1640,6 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU_HIGHLIGHT_ALL(self, self.OnMenuHighlight)
 
         self.tabCtrl.setPageChangedFunc(self.OnPageChange)
-        
-        wx.EVT_COMBOBOX(self, self.typeCb.GetId(), self.OnTypeCombo)
 
         wx.EVT_MENU(self, ID_FILE_NEW, self.OnNewScript)
         wx.EVT_MENU(self, ID_FILE_OPEN, self.OnOpen)
@@ -2207,8 +2188,6 @@ class MyFrame(wx.Frame):
         win = splash.SplashWindow(self, -1)
         win.Show()
 
-    def OnTypeCombo(self, event):
-        self.panel.ctrl.OnTypeCombo(event)
 
     def OnCloseWindow(self, event):
         doExit = True
