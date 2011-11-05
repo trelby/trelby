@@ -15,3 +15,27 @@
 
 -update locations to look for adobe acrobat; also, there may be better
  ways of finding a program to launch for PDFs nowadays
+
+-move some/all of GlobalData/MyPanel/MyCtrl/MyFrame out of blyte.py
+
+-rename: blyte -> trelby
+
+-settings dialog for colors should have a "restore default" button for
+ each item
+
+-try using graphics contexts for tab ctrl drawing to get anti-aliased
+ lines (http://docs.wxwidgets.org/trunk/classwx_graphics_context.html)
+
+-check if it would make sense to store the name database in .zip format.
+ it would be a bit bigger but much faster to decode, plus we're not a
+ commercial program anymore so we don't care at all about obfuscating the
+ storage format.
+
+-check windows uninstall doesn't leave any files behind etc (why does it
+ try to delete python23.dll still?)
+
+-go through README/INSTALL/t.bat etc and make sure nothing references
+ python2.3 anymore
+
+-stop using iso-8859-1 encoding in source files, it's freaking emacs out
+ for some reason
