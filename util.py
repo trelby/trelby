@@ -514,7 +514,7 @@ class FIFO:
 def drawLine(dc, x, y, xd, yd):
     dc.DrawLine(x, y, x + xd, y + yd)
 
-# draws text aligned somehow
+# draws text aligned somehow. returns a (w, h) tuple of the text extent.
 def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
     w, h = dc.GetTextExtent(text)
 
@@ -529,6 +529,8 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
         y -= h
         
     dc.DrawText(text, x, y)
+
+    return (w, h)
 
 # create pad sizer for given window whose controls are in topSizer, with
 # 'pad' pixels of padding on each side, resize window to correct size, and

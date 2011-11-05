@@ -65,6 +65,9 @@ def refreshGuiConfig():
 
     cfgGui = config.ConfigGui(cfgGl)
 
+def getCfgGui():
+    return cfgGui
+
 # keeps (some) global data
 class GlobalData:
     def __init__(self):
@@ -412,21 +415,19 @@ class MyCtrl(wx.Control):
 
     # update GUI elements shared by all scripts, like statusbar etc
     def updateCommon(self):
-        sb = mainFrame.statusBar
-        
-        sb.SetStatusText("Page: %d / %d" % (self.sp.line2page(self.sp.line),
-            self.sp.line2page(len(self.sp.lines) - 1)), 2)
-
         cur = cfgGl.getType(self.sp.lines[self.sp.line].lt)
-        
+
         if self.sp.tabMakesNew():
-            s = "%s" % cfgGl.getType(cur.newTypeTab).ti.name
+            tabNext = "%s" % cfgGl.getType(cur.newTypeTab).ti.name
         else:
-            s = "%s [change]" % cfgGl.getType(cur.nextTypeTab).ti.name
-            
-        sb.SetStatusText("Tab: %s" % s, 0)
-        sb.SetStatusText("Enter: %s" % cfgGl.getType(cur.newTypeEnter).ti.name,
-                         1)
+            tabNext = "%s" % cfgGl.getType(cur.nextTypeTab).ti.name
+
+        enterNext = cfgGl.getType(cur.newTypeEnter).ti.name
+
+        page = self.sp.line2page(self.sp.line)
+        pageCnt = self.sp.line2page(len(self.sp.lines) - 1)
+
+        mainFrame.statusCtrl.SetValues(page, pageCnt, cur.ti.name, tabNext, enterNext)
 
     # apply per-script config
     def applyCfg(self, newCfg):
@@ -463,6 +464,7 @@ class MyCtrl(wx.Control):
 
         # in case tab colors have been changed
         mainFrame.tabCtrl.Refresh(False)
+        mainFrame.statusCtrl.Refresh(False)
         
         if writeCfg:
             util.writeToFile(gd.confFilename, cfgGl.save(), mainFrame)
@@ -1671,8 +1673,11 @@ class MyFrame(wx.Frame):
 
         wx.EVT_BUTTON(self, self.noFSBtn.GetId(), self.ToggleFullscreen)
 
-        self.tabCtrl = misc.MyTabCtrl(self, -1)
+        self.tabCtrl = misc.MyTabCtrl(self, -1, getCfgGui)
         hsizer.Add(self.tabCtrl, 1, wx.EXPAND)
+
+        self.statusCtrl = misc.MyStatus(self, -1, getCfgGui)
+        hsizer.Add(self.statusCtrl)
 
         vsizer.Add(hsizer, 0, wx.EXPAND)
 
@@ -1681,10 +1686,6 @@ class MyFrame(wx.Frame):
 
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND)
 
-        self.statusBar = wx.StatusBar(self)
-        self.statusBar.SetFieldsCount(3)
-        self.statusBar.SetStatusWidths([-2, -2, -1])
-        self.SetStatusBar(self.statusBar)
 
         gd.mru.useMenu(fileMenu, 14)
 

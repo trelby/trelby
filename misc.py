@@ -97,15 +97,96 @@ class MyColorSample(wx.Window):
         dc.SetBrush(br)
         dc.DrawRectangle(0, 0, w, h)
 
+# custom status control
+class MyStatus(wx.Window):
+    WIDTH = 280
+
+    def __init__(self, parent, id, getCfgGui):
+        wx.Window.__init__(self, parent, id, size = (MyStatus.WIDTH, TAB_BAR_HEIGHT))
+
+        self.getCfgGui = getCfgGui
+
+        self.page = 0
+        self.pageCnt = 0
+        self.elemType = ""
+        self.tabNext = ""
+        self.enterNext = ""
+
+        self.font = util.createPixelFont(
+            TAB_BAR_HEIGHT // 2 + 2, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL)
+
+        self.pageFont = util.createPixelFont(
+            TAB_BAR_HEIGHT - 7, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL)
+
+        wx.EVT_PAINT(self, self.OnPaint)
+
+    def OnPaint(self, event):
+        cfgGui = self.getCfgGui()
+
+        cy = (TAB_BAR_HEIGHT - 1) // 2
+        xoff = 5
+
+        dc = wx.PaintDC(self)
+        w, h = self.GetClientSizeTuple()
+
+        dc.SetBrush(cfgGui.tabBarBgBrush)
+        dc.SetPen(cfgGui.tabBarBgPen)
+        dc.DrawRectangle(0, 0, w, h)
+
+        dc.SetPen(cfgGui.tabTextPen)
+        dc.SetTextForeground(cfgGui.tabTextColor)
+
+        pageText = "Page: %d / %d" % (self.page, self.pageCnt)
+        dc.SetFont(self.pageFont)
+
+        x = MyStatus.WIDTH - xoff
+
+        x -= util.drawText(
+            dc, pageText, x, cy,
+            util.ALIGN_RIGHT, util.VALIGN_CENTER)[0]
+
+        dc.SetFont(self.font)
+
+        s1 = "%s [Enter]" % self.enterNext
+        s2 = "%s [Tab]" % self.tabNext
+
+        w1 = dc.GetTextExtent(s1)[0]
+        w2 = dc.GetTextExtent(s2)[0]
+
+        wmax = max(w1, w2)
+
+        x -= wmax + xoff * 2
+        dc.DrawText(s1, x, 0)
+        dc.DrawText(s2, x, cy)
+
+        x -= xoff
+        s = "%s ->" % self.elemType
+        util.drawText(dc, s, x, cy, util.ALIGN_RIGHT, util.VALIGN_CENTER)
+
+        dc.SetPen(cfgGui.tabBorderPen)
+        dc.DrawLine(0, h-1, w, h-1)
+
+    def SetValues(self, page, pageCnt, elemType, tabNext, enterNext):
+        self.page = page
+        self.pageCnt = pageCnt
+        self.elemType = elemType
+        self.tabNext = tabNext
+        self.enterNext = enterNext
+
+        self.Refresh(False)
+
+
 # our own version of a tab control, which exists for two reasons: it does
 # not care where it is physically located, which allows us to combine it
 # with other controls on a horizontal row, and it consumes less vertical
 # space than wx.Notebook. note that this control is divided into two parts,
 # MyTabCtrl and MyTabCtrl2, and both must be created.
 class MyTabCtrl(wx.Window):
-    def __init__(self, parent, id):
+    def __init__(self, parent, id, getCfgGui):
         style = wx.FULL_REPAINT_ON_RESIZE
         wx.Window.__init__(self, parent, id, style = style)
+
+        self.getCfgGui = getCfgGui
 
         # pages, i.e., [wx.Window, name] lists. note that 'name' must be an
         # Unicode string.
@@ -299,8 +380,7 @@ class MyTabCtrl(wx.Window):
     def OnPaint(self, event):
         dc = wx.BufferedPaintDC(self, self.screenBuf)
 
-        # a kludge, but it works for now
-        cfgGui = self.pages[0][0].ctrl.getCfgGui()
+        cfgGui = self.getCfgGui()
 
         w, h = self.GetClientSizeTuple()
 
