@@ -717,6 +717,10 @@ class ConfigGlobal:
                      util.Key(10, ctrl = True).toInt()],
                     isFixed = True),
 
+            Command("Fullscreen", "Toggle fullscreen.",
+                    [util.Key(wx.WXK_F11).toInt()], isFixed = True,
+                    isMenu = True),
+
             Command("GotoScene", "Goto to a given scene.",
                     [util.Key(ord("G"), alt = True).toInt()], isFixed = True,
                     isMenu = True),

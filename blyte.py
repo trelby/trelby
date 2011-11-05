@@ -1567,6 +1567,7 @@ class MyFrame(wx.Frame):
     
         viewMenu.AppendSeparator()
         viewMenu.AppendCheckItem(ID_VIEW_SHOW_FORMATTING, "&Show formatting")
+        viewMenu.Append(ID_VIEW_FULL_SCREEN, "&Fullscreen\tF11")
         
         scriptMenu = wx.Menu()
         scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error")
@@ -1655,6 +1656,13 @@ class MyFrame(wx.Frame):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
+        self.noFSBtn = wx.BitmapButton(self, bitmap=misc.getBitmap("icons/close.png"))
+        self.noFSBtn.SetToolTipString("Stop fullscreen")
+        self.noFSBtn.Show(False)
+        hsizer.Add(self.noFSBtn)
+
+        wx.EVT_BUTTON(self, self.noFSBtn.GetId(), self.ToggleFullscreen)
+
         self.tabCtrl = misc.MyTabCtrl(self, -1)
         hsizer.Add(self.tabCtrl, 1, wx.EXPAND)
 
@@ -1706,6 +1714,7 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_VIEW_STYLE_OVERVIEW_SMALL, self.OnViewModeChange)
         wx.EVT_MENU(self, ID_VIEW_STYLE_OVERVIEW_LARGE, self.OnViewModeChange)
         wx.EVT_MENU(self, ID_VIEW_SHOW_FORMATTING, self.OnShowFormatting)
+        wx.EVT_MENU(self, ID_VIEW_FULL_SCREEN, self.ToggleFullscreen)
         wx.EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindNextError)
         wx.EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
         wx.EVT_MENU(self, ID_SCRIPT_AUTO_COMPLETION, self.OnAutoCompletionDlg)
@@ -1821,6 +1830,7 @@ class MyFrame(wx.Frame):
             "ID_TOOLBAR_REPORTS",
             "ID_TOOLBAR_VIEWS",
             "ID_TOOLBAR_TOOLS",
+            "ID_VIEW_FULL_SCREEN",
             ]
 
         g = globals()
@@ -2115,6 +2125,11 @@ class MyFrame(wx.Frame):
         c = self.panel.ctrl
         c.makeLineVisible(c.sp.line)
         c.updateScreen()
+
+    def ToggleFullscreen(self, event = None):
+        self.ShowFullScreen(not self.IsFullScreen(), wx.FULLSCREEN_ALL)
+        self.noFSBtn.Show(self.IsFullScreen())
+        self.panel.ctrl.SetFocus()
 
     def OnPaginate(self, event = None):
         self.panel.ctrl.OnPaginate()
