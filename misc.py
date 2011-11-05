@@ -8,6 +8,8 @@ import sys
 
 import wx
 
+TAB_BAR_HEIGHT = 24
+
 def init(doWX = True):
     global isWindows, isUnix, unicodeFS, wxIsUnicode, doDblBuf, \
            progPath, confPath, tmpPrefix, version
@@ -135,7 +137,7 @@ class MyTabCtrl(wx.Window):
 
         # how much padding to leave horizontally at the ends of the
         # control, and within each tab
-        self.paddingX = 5
+        self.paddingX = 10
 
         # starting Y-pos of text in labels
         self.textY = 5
@@ -152,8 +154,10 @@ class MyTabCtrl(wx.Window):
         # initialized in OnPaint since we don't know our height yet
         self.font = None
 
-        self.SetMinSize(wx.Size(self.paddingX * 2 + self.arrowWidth * 2 + \
-                                    self.arrowSpacing + self.tabWidth, 20))
+        self.SetMinSize(wx.Size(
+                self.paddingX * 2 + self.arrowWidth * 2 + self.arrowSpacing +\
+                    self.tabWidth + 5,
+                TAB_BAR_HEIGHT))
 
         wx.EVT_LEFT_DOWN(self, self.OnLeftDown)
         wx.EVT_LEFT_DCLICK(self, self.OnLeftDown)
@@ -315,15 +319,15 @@ class MyTabCtrl(wx.Window):
 
         # a kludge, but it works for now
         cfgGui = self.pages[0][0].ctrl.getCfgGui()
-        
+
         w, h = self.GetClientSizeTuple()
 
-        dc.SetBrush(cfgGui.workspaceBrush)
-        dc.SetPen(cfgGui.workspacePen)
+        dc.SetBrush(cfgGui.tabBarBgBrush)
+        dc.SetPen(cfgGui.tabBarBgPen)
         dc.DrawRectangle(0, 0, w, h)
 
-        dc.SetBrush(cfgGui.tabSelectedBgBrush)
-        dc.SetTextForeground(cfgGui.tabFgColor)
+        dc.SetPen(cfgGui.tabBorderPen)
+        dc.DrawLine(0,h-1,w,h-1)
 
         xpos = self.paddingX
 
@@ -339,26 +343,25 @@ class MyTabCtrl(wx.Window):
         dc.SetFont(self.font)
 
         maxTab = self.getLastVisibleTab()
-        
+
         for i in range(self.firstTab, maxTab + 1):
             p = self.pages[i]
 
             dc.DestroyClippingRegion()
             dc.SetClippingRegion(xpos, tabY, tabW, tabH)
+            dc.SetPen(cfgGui.tabBorderPen)
 
             if i == self.selected:
-                dc.SetPen(cfgGui.tabSelectedBgPen)
-                dc.DrawRectangle(xpos + 1, tabY + 1, tabW - 2, tabH - 1)
+                points=((5,2),(tabW-8,2),(tabW-6,3),(tabW-2,tabH),(0,tabH),(3,3))
+                dc.SetBrush(cfgGui.workspaceBrush)
+            else:
+                points=((5,2),(tabW-8,2),(tabW-6,3),(tabW-2,tabH-1),(0,tabH-1),(3,3))
+                dc.SetBrush(cfgGui.tabNonActiveBgBrush)
 
-            dc.SetPen(cfgGui.tabHighlightPen)
-            util.drawLine(dc, xpos, tabY + 2, 0, tabH - 2)
-            util.drawLine(dc, xpos + 2, tabY, tabW - 4, 0)
-            dc.DrawPoint(xpos + 1, tabY + 1)
+            dc.DrawPolygon(points,xpos,tabY)
 
-            dc.SetPen(cfgGui.tabFgPen)
-            util.drawLine(dc, xpos + tabW - 1, tabY + 2, 0, tabH - 2)
-            dc.DrawPoint(xpos + tabW - 2, tabY + 1)
-
+            dc.SetPen(cfgGui.tabTextPen)
+            dc.SetTextForeground(cfgGui.tabTextPen.GetColour())
             dc.DrawText(toGUIUnicode(p[1]), xpos + self.paddingX, self.textY)
 
             xpos += tabW
@@ -368,7 +371,7 @@ class MyTabCtrl(wx.Window):
 
         if self.firstTab != 0:
             dc.DestroyClippingRegion()
-            dc.SetPen(cfgGui.tabFgPen)
+            dc.SetPen(cfgGui.tabTextPen)
 
             util.drawLine(dc, rx - self.arrowSpacing - 1, self.arrowY,
                           0, self.arrowHeight)
@@ -380,7 +383,7 @@ class MyTabCtrl(wx.Window):
 
         if maxTab < (len(self.pages) - 1):
             dc.DestroyClippingRegion()
-            dc.SetPen(cfgGui.tabFgPen)
+            dc.SetPen(cfgGui.tabTextPen)
 
             util.drawLine(dc, rx, self.arrowY, 0, self.arrowHeight)
             util.drawLine(dc, rx + 1, self.arrowY, self.arrowWidth - 1,

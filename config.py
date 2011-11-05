@@ -967,11 +967,13 @@ class ConfigGlobal:
         v.addColor("pagebreakNoAdjust", 221, 221, 221,
                    "PageBreakNoAdjustLine",
                    "Page-break (original, not adjusted) line")
-        v.addColor("tabFg", 0, 0, 0, "TabFG", "Tab foreground")
-        v.addColor("tabHighlight", 163, 163, 163, "TabHighlight",
-                   "Tab highlight")
-        v.addColor("tabSelectedBg", 238, 238, 238, "TabSelectedBG",
-                   "Tab background, selected")
+
+        v.addColor("tabText", 0, 0, 0, "TabText", "Tab text")
+        v.addColor("tabBorder", 163, 163, 163, "TabBorder",
+                   "Tab border")
+        v.addColor("tabBarBg", 240, 240, 240, "TabBarBG",
+                   "Tab bar background")
+        v.addColor("tabNonActiveBg", 194, 194, 194, "TabNonActiveBg", "Tab, non-active")
 
         v.makeDicts()
         
@@ -1213,11 +1215,14 @@ class ConfigGui:
         self.pagebreakNoAdjustPen = wx.Pen(self.pagebreakNoAdjustColor,
                                            style = wx.DOT)
 
-        self.tabFgPen = wx.Pen(self.tabFgColor)
-        self.tabHighlightPen = wx.Pen(self.tabHighlightColor)
+        self.tabTextPen = wx.Pen(self.tabTextColor)
+        self.tabBorderPen = wx.Pen(self.tabBorderColor)
 
-        self.tabSelectedBgBrush = wx.Brush(self.tabSelectedBgColor)
-        self.tabSelectedBgPen = wx.Pen(self.tabSelectedBgColor)
+        self.tabBarBgBrush = wx.Brush(self.tabBarBgColor)
+        self.tabBarBgPen = wx.Pen(self.tabBarBgColor)
+
+        self.tabNonActiveBgBrush = wx.Brush(self.tabNonActiveBgColor)
+        self.tabNonActiveBgPen = wx.Pen(self.tabNonActiveBgColor)
 
         # a 4-item list of FontInfo objects, indexed by the two lowest
         # bits of pml.TextOp.flags.
