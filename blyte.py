@@ -42,6 +42,8 @@ import sys
 import time
 import wx
 
+from functools import partial
+
 #keycodes
 KC_CTRL_A = 1
 KC_CTRL_B = 2
@@ -1518,6 +1520,8 @@ class MyFrame(wx.Frame):
         tmp.Append(ID_SETTINGS_SAVE_AS, "Save as...")
         tmp.AppendSeparator()
         tmp.Append(ID_SETTINGS_SC_DICT, "&Spell checker dictionary...")
+        settingsMenu = tmp
+
         fileMenu.AppendMenu(ID_FILE_SETTINGS, "Se&ttings", tmp)
 
         fileMenu.AppendSeparator()
@@ -1582,6 +1586,7 @@ class MyFrame(wx.Frame):
         tmp.Append(ID_SCRIPT_SETTINGS_LOAD, "&Load...")
         tmp.Append(ID_SCRIPT_SETTINGS_SAVE_AS, "&Save as...")
         scriptMenu.AppendMenu(ID_SCRIPT_SETTINGS, "&Settings", tmp)
+        scriptSettingsMenu = tmp
 
         reportsMenu = wx.Menu()
         reportsMenu.Append(ID_REPORTS_SCRIPT_REP, "Sc&ript report")
@@ -1611,6 +1616,36 @@ class MyFrame(wx.Frame):
         self.menuBar.Append(toolsMenu, "Too&ls")
         self.menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(self.menuBar)
+
+        self.toolBar = self.CreateToolBar(wx.TB_VERTICAL)
+
+        def addTB(id, iconFilename, toolTip):
+            self.toolBar.AddLabelTool(
+                id, "", misc.getBitmap("icons/%s" % iconFilename),
+                shortHelp=toolTip)
+
+        addTB(ID_FILE_NEW, "new.png", "New script")
+        addTB(ID_FILE_OPEN, "open.png", "Open Script..")
+        addTB(ID_FILE_SAVE, "save.png", "Save..")
+        addTB(ID_FILE_SAVE_AS, "saveas.png", "Save as..")
+        addTB(ID_FILE_CLOSE, "close.png", "Close Script")
+        addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.png", "Script settings")
+        addTB(ID_FILE_PRINT, "pdf.png", "Print")
+
+        self.toolBar.AddSeparator()
+
+        addTB(ID_FILE_IMPORT, "import.png", "Import a text script")
+        addTB(ID_FILE_EXPORT, "export.png", "Export script")
+
+        self.toolBar.AddSeparator()
+
+        addTB(ID_EDIT_FIND, "find.png", "Find / Replace")
+        addTB(ID_TOOLBAR_VIEWS, "layout.png", "View mode")
+        addTB(ID_TOOLBAR_REPORTS, "report.png", "Script reports")
+        addTB(ID_TOOLBAR_TOOLS, "tools.png", "Tools")
+        addTB(ID_TOOLBAR_SETTINGS, "settings.png", "Global settings")
+
+        self.toolBar.Realize()
 
         wx.EVT_MOVE(self, self.OnMove)
         wx.EVT_SIZE(self, self.OnSize)
@@ -1697,6 +1732,15 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU_RANGE(self, gd.mru.getIds()[0], gd.mru.getIds()[1],
                           self.OnMRUFile)
 
+        def addTBMenu(id, menu):
+            wx.EVT_MENU(self, id, partial(self.OnToolBarMenu, menu=menu))
+
+        addTBMenu(ID_TOOLBAR_SETTINGS, settingsMenu)
+        addTBMenu(ID_TOOLBAR_SCRIPTSETTINGS, scriptSettingsMenu)
+        addTBMenu(ID_TOOLBAR_REPORTS, reportsMenu)
+        addTBMenu(ID_TOOLBAR_VIEWS, viewMenu)
+        addTBMenu(ID_TOOLBAR_TOOLS, toolsMenu)
+
         wx.EVT_CLOSE(self, self.OnCloseWindow)
 
         self.Layout()
@@ -1772,6 +1816,11 @@ class MyFrame(wx.Frame):
             "ID_VIEW_STYLE_OVERVIEW_LARGE",
             "ID_VIEW_STYLE_OVERVIEW_SMALL",
             "ID_VIEW_STYLE_SIDE_BY_SIDE",
+            "ID_TOOLBAR_SETTINGS",
+            "ID_TOOLBAR_SCRIPTSETTINGS",
+            "ID_TOOLBAR_REPORTS",
+            "ID_TOOLBAR_VIEWS",
+            "ID_TOOLBAR_TOOLS",
             ]
 
         g = globals()
@@ -2188,6 +2237,8 @@ class MyFrame(wx.Frame):
         win = splash.SplashWindow(self, -1)
         win.Show()
 
+    def OnToolBarMenu(self, event, menu):
+        self.PopupMenu(menu)
 
     def OnCloseWindow(self, event):
         doExit = True
