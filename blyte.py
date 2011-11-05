@@ -1242,18 +1242,24 @@ class MyCtrl(wx.Control):
         
         strings, dpages = gd.vm.getScreen(self, True, True)
 
+        dc.SetBrush(cfgGui.workspaceBrush)
+        dc.SetPen(cfgGui.workspacePen)
+        dc.DrawRectangle(0, 0, size.width, size.height)
+
         if not dpages:
+            # draft mode; draw an infinite page
+            lx = util.clamp((size.width - self.pageW) // 2, 0)
+            rx = lx + self.pageW
+
             dc.SetBrush(cfgGui.textBgBrush)
             dc.SetPen(cfgGui.textBgPen)
+            dc.DrawRectangle(lx, 5, self.pageW, size.height - 5)
 
-            dc.DrawRectangle(0, 0, size.width, size.height)
+            dc.SetPen(cfgGui.pageBorderPen)
+            dc.DrawLine(lx, 5, lx, size.height)
+            dc.DrawLine(rx, 5, rx, size.height)
 
         else:
-            dc.SetBrush(cfgGui.workspaceBrush)
-            dc.SetPen(cfgGui.workspacePen)
-
-            dc.DrawRectangle(0, 0, size.width, size.height)
-            
             dc.SetBrush(cfgGui.textBgBrush)
             dc.SetPen(cfgGui.pageBorderPen)
             for dp in dpages:

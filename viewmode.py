@@ -168,23 +168,25 @@ class ViewMode:
 
             cs.needsVisifying = False
 
-# Draft view mode. No pages, just text lines on a plain background.
+# Draft view mode. No fancy page break layouts, just text lines on a plain
+# background.
 class ViewModeDraft(ViewMode):
 
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
         cfg = ctrl.sp.cfg
         cfgGui = ctrl.getCfgGui()
-        
-        texts = []
 
         width, height = ctrl.GetClientSizeTuple()
-
         ls = ctrl.sp.lines
-        y = 10
+        y = 15
         i = ctrl.sp.getTopLine()
-        cox = 10
+
+        marginLeft = int(ctrl.mm2p * cfg.marginLeft)
+        cox = util.clamp((width - ctrl.pageW) // 2, 0)
         fyd = ctrl.sp.cfgGl.fontYdelta
         length = len(ls)
+
+        texts = []
 
         while (y < height) and (i < length):
             y += int((ctrl.sp.getSpacingBefore(i) / 10.0) * fyd)
@@ -205,7 +207,7 @@ class ViewModeDraft(ViewMode):
 
             fi = cfgGui.tt2fi(tcfg.screen)
             texts.append(TextString(i, text,
-                cox + tcfg.indent * fi.fx, y, fi,
+                cox + marginLeft + tcfg.indent * fi.fx, y, fi,
                 tcfg.screen.isUnderlined))
 
             y += fyd
@@ -252,7 +254,7 @@ class ViewModeLayout(ViewMode):
         mm2p = ctrl.mm2p
         fontY = cfgGui.fonts[pml.NORMAL].fy
 
-        cox = util.clamp((width - ctrl.pageW) / 2, 0)
+        cox = util.clamp((width - ctrl.pageW) // 2, 0)
 
         y = 0
         topLine = ctrl.sp.getTopLine()
