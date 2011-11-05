@@ -10,10 +10,12 @@ import wx
 
 def init(doWX = True):
     global isWindows, isUnix, unicodeFS, wxIsUnicode, doDblBuf, \
-           progPath, confPath, tmpPrefix
+           progPath, confPath, tmpPrefix, version
 
     # prefix used for temp files
-    tmpPrefix = "oskusoft-blyte-tmp-"
+    tmpPrefix = "blyte-tmp-"
+
+    version = "1.6-dev"
 
     isWindows = False
     isUnix = False

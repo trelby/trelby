@@ -1614,11 +1614,6 @@ class MyFrame(wx.Frame):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # FIXME: move these to misc.py?
-        misc.version = "1.5.0"
-        misc.releaseDate = datetime.date(2006, 7, 28)
-
-
         self.tabCtrl = misc.MyTabCtrl(self, -1)
         hsizer.Add(self.tabCtrl, 1, wx.EXPAND)
 

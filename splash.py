@@ -66,8 +66,8 @@ class SplashWindow(wx.Frame):
 
         dc.DrawBitmap(self.pic, 0, 0, False)
 
-        util.drawText(dc, "Version %s, released %s." % (misc.version,
-            misc.releaseDate), 630, 346, util.ALIGN_RIGHT)
+        util.drawText(dc, "Version %s" % misc.version,
+                      630, 346, util.ALIGN_RIGHT)
         
     def OnTimer(self, event):
         self.timer.Stop()
