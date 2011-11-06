@@ -34,3 +34,5 @@
 
 -go through README/INSTALL/t.bat etc and make sure nothing references
  python2.3 anymore
+
+-move *.py into src/
