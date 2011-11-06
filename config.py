@@ -1083,16 +1083,10 @@ class ConfigGlobal:
         fn = ["", "", "", ""]
 
         if misc.isUnix:
-            if misc.wxIsUnicode:
-                fn[0] = "Monospace 10"
-                fn[1] = "Monospace Bold 10"
-                fn[2] = "Monospace Italic 10"
-                fn[3] = "Monospace Bold Italic 10"
-            else:
-                fn[0] = "0;-adobe-courier-medium-r-normal-*-*-140-*-*-m-*-iso8859-1"
-                fn[1] = "0;-adobe-courier-bold-r-normal-*-*-140-*-*-m-*-iso8859-1"
-                fn[2] = "0;-adobe-courier-medium-o-normal-*-*-140-*-*-m-*-iso8859-1"
-                fn[3] = "0;-adobe-courier-bold-o-normal-*-*-140-*-*-m-*-iso8859-1"
+            fn[0] = "Monospace 12"
+            fn[1] = "Monospace Bold 12"
+            fn[2] = "Monospace Italic 12"
+            fn[3] = "Monospace Bold Italic 12"
             
         elif misc.isWindows:
                 fn[0] = "0;-13;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"

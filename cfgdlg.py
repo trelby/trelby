@@ -262,9 +262,6 @@ class DisplayPanel(wx.Panel):
             nfi.FromString(getattr(self.cfg, self.fontsLb.GetClientData(i)))
 
             ps = nfi.GetPointSize()
-            if misc.isUnix:
-                ps //= 10
-
             s = nfi.GetFaceName()
 
             self.fontsLb.SetString(i, "%s: %s, %d" % (names[i], s, ps))
