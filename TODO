@@ -36,6 +36,3 @@
 
 -go through README/INSTALL/t.bat etc and make sure nothing references
  python2.3 anymore
-
--stop using iso-8859-1 encoding in source files, it's freaking emacs out
- for some reason

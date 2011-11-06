@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: ISO-8859-1 -*-
+# -*- coding: iso-8859-1 -*-
 
 from error import *
 import autocompletiondlg
