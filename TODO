@@ -2,7 +2,8 @@
 
 -add suffix automatically if missing in save/export
 
--remove wxIsUnicode, we can now depend on it always being true
+-remove fromGUIUnicode and toGUIUnicode and all calls to them, they are
+ now no-ops
 
 -use staticmethod decorator for static functions
 

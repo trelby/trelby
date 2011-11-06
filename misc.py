@@ -57,33 +57,20 @@ def init(doWX = True):
     progPath = unicode(progPath, "UTF-8")
     confPath = unicode(confPath, "UTF-8")
 
-# convert s, which is returned from the wxWidgets GUI and is either an
-# Unicode string or a normal string, to a normal string.
+# convert s, which is returned from the wxWidgets GUI and is an Unicode
+# string, to a normal string.
 def fromGUI(s):
-    if not wxIsUnicode:
-        return s
-    else:
-        return s.encode("ISO-8859-1", "ignore")
+    return s.encode("ISO-8859-1", "ignore")
 
-# convert s, which is returned from the wxWidgets GUI and is either an
-# Unicode string or a normal string, to a Unicode string. since the only
-# thing we use full Unicode for is file/directory names, and those are
-# UTF-8 on UNIXes, we use that instead of ISO-8859-1 here.
+# FIXME: since the removal of wxIsUnicode, this is now a no-op, and should
+# be removed.
 def fromGUIUnicode(s):
-    if wxIsUnicode:
-        return s
-    else:
-        return unicode(s, "UTF-8", "ignore")
+    return s
 
-# convert s, which is an Unicode string, to a form suitable for passing to
-# wxWidgets for display. since the only thing we use full Unicode for is
-# file/directory names, and those are UTF-8 on UNIXes, we use that instead
-# of ISO-8859-1 here.
+# FIXME: since the removal of wxIsUnicode, this is now a no-op, and should
+# be removed.
 def toGUIUnicode(s):
-    if wxIsUnicode:
-        return s
-    else:
-        return s.encode("UTF-8")
+    return s
 
 # convert s, which is an Unicode string, to an object suitable for passing
 # to Python's file APIs. this is either the Unicode string itself, if the
