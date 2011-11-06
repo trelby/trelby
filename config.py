@@ -674,7 +674,8 @@ class ConfigGlobal:
                     isMenu = True),
 
             Command("CloseScript", "Close the current script.",
-                    isMenu = True),
+                    [util.Key(23, ctrl = True).toInt()],
+                    isFixed = True, isMenu = True),
             
             Command("CompareScripts", "Compare two scripts.", isMenu = True),
 
@@ -786,7 +787,9 @@ class ConfigGlobal:
             Command("NewElement", "Create a new element.", [wx.WXK_RETURN],
                     isFixed = True),
 
-            Command("NewScript", "Create a new script.", isMenu = True),
+            Command("NewScript", "Create a new script.",
+                    [util.Key(14, ctrl = True).toInt()],
+                    isFixed = True, isMenu = True),
             
             Command("OpenScript", "Open a script.",
                     [util.Key(15, ctrl = True).toInt()],

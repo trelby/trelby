@@ -1497,11 +1497,11 @@ class MyFrame(wx.Frame):
         self.allocIds()
         
         fileMenu = wx.Menu()
-        fileMenu.Append(ID_FILE_NEW, "&New")
+        fileMenu.Append(ID_FILE_NEW, "&New\tCTRL-N")
         fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
         fileMenu.Append(ID_FILE_SAVE, "&Save\tCTRL-S")
         fileMenu.Append(ID_FILE_SAVE_AS, "Save &As...")
-        fileMenu.Append(ID_FILE_CLOSE, "&Close")
+        fileMenu.Append(ID_FILE_CLOSE, "&Close\tCTRL-W")
         fileMenu.Append(ID_FILE_REVERT, "&Revert")
         fileMenu.AppendSeparator()
         fileMenu.Append(ID_FILE_IMPORT, "&Import...")
