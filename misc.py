@@ -83,8 +83,8 @@ def toPath(s):
         return s.encode("UTF-8")
 
 # return bitmap created from the given file, whose filename is given as
-# relative to the install dir. so passing in "icons/blaa.png" might return
-# "/opt/blyte/icons/blaa.png" for example.
+# relative to the install dir. so passing in "resources/blaa.png" might
+# return "/opt/blyte/resources/blaa.png" for example.
 def getBitmap(filename):
     return wx.Bitmap("/".join([progPath, filename]))
 

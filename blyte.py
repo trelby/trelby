@@ -1622,7 +1622,7 @@ class MyFrame(wx.Frame):
 
         def addTB(id, iconFilename, toolTip):
             self.toolBar.AddLabelTool(
-                id, "", misc.getBitmap("icons/%s" % iconFilename),
+                id, "", misc.getBitmap("resources/%s" % iconFilename),
                 shortHelp=toolTip)
 
         addTB(ID_FILE_NEW, "new.png", "New script")
@@ -1763,9 +1763,8 @@ class MyFrame(wx.Frame):
 
         ib = wx.IconBundle()
 
-        ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("icons/icon16.png")))
-        ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("icons/icon32.png")))
-        ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("icons/icon64.png")))
+        for sz in ("16", "32", "64"):
+            ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("resources/icon%s.png" % sz)))
 
         self.SetIcons(ib)
 

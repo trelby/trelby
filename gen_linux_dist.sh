@@ -16,7 +16,7 @@ if test $1 = "src"; then
  svn export --force . $DIR
 else
  FNAME="blyte-$VER.tar"
- cp -r *.py blyte.desktop names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL icons/ $DIR
+ cp -r *.py blyte.desktop names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL resources/ $DIR
  rm $DIR/setup.py
  cp Makefile.install $DIR/Makefile
 fi

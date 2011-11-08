@@ -4,7 +4,7 @@ Encoding=UTF-8
 Name=Blyte
 Comment=Screenwriting Application
 Exec=/opt/blyte/blyte.py
-Icon=/opt/blyte/icons/icon64.png
+Icon=/opt/blyte/resources/icon64.png
 Type=Application
 Categories=Utility;Publishing;
 
