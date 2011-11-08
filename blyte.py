@@ -1656,8 +1656,8 @@ class MyFrame(wx.Frame):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.noFSBtn = wx.BitmapButton(self, bitmap=misc.getBitmap("icons/close.png"))
-        self.noFSBtn.SetToolTipString("Stop fullscreen")
+        self.noFSBtn = wx.BitmapButton(self, bitmap=misc.getBitmap("resources/fullscreen.png"))
+        self.noFSBtn.SetToolTipString("Exit fullscreen")
         self.noFSBtn.Show(False)
         hsizer.Add(self.noFSBtn)
 
