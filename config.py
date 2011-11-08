@@ -909,6 +909,9 @@ class ConfigGlobal:
 
     def setupVars(self):
         v = self.__class__.cvars = mypickle.Vars()
+
+        # how many seconds to show splash screen for on startup (0 = disabled)
+        v.addInt("splashTime", 2, "SplashTime", 0, 10)
         
         # confirm non-undoable delete operations that would delete at
         # least this many lines. (0 = disabled)

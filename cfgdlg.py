@@ -1008,6 +1008,9 @@ class MiscPanel(wx.Panel):
         wx.EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
         vsizer.Add(self.checkErrorsCb, 0, wx.BOTTOM, 10)
 
+        self.addSpin("splashTime", "Show splash screen for X seconds:\n"
+                     " (0 = disable)", self, vsizer, "splashTime")
+
         self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
                      " (0 = disable)", self, vsizer, "paginateInterval")
 
@@ -1060,6 +1063,7 @@ class MiscPanel(wx.Panel):
         self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
         self.cfg.confirmDeletes = util.getSpinValue(self.confDelEntry)
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
+        self.cfg.splashTime = util.getSpinValue(self.splashTimeEntry)
 
     def OnBrowse(self, event):
         dlg = wx.DirDialog(
@@ -1099,6 +1103,7 @@ class MiscPanel(wx.Panel):
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
         self.confDelEntry.SetValue(self.cfg.confirmDeletes)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
+        self.splashTimeEntry.SetValue(self.cfg.splashTime)
 
 class ElementsGlobalPanel(wx.Panel):
     def __init__(self, parent, id, cfg):

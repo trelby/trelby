@@ -2367,11 +2367,11 @@ class MyApp(wx.App):
         
         self.SetTopWindow(mainFrame)
 
-        if not opts.isTest:
-            win = splash.SplashWindow(mainFrame, 2500)
+        if cfgGl.splashTime > 0:
+            win = splash.SplashWindow(mainFrame, cfgGl.splashTime * 1000)
             win.Show()
             win.Raise()
-        
+
         return True
 
 def main():
