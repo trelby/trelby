@@ -32,7 +32,7 @@ SetCompressor lzma
 
 ; MUI Settings
 !define MUI_ABORTWARNING
-!define MUI_ICON "${NSISDIR}\Contrib\Graphics\Icons\modern-install.ico"
+!define MUI_ICON "icon32.ico"
 !define MUI_UNICON "${NSISDIR}\Contrib\Graphics\Icons\modern-uninstall.ico"
 
 ; Welcome page
@@ -143,12 +143,28 @@ Section Uninstall
   Delete "$INSTDIR\logo.png"
   Delete "$INSTDIR\names.dat"
   Delete "$INSTDIR\dict_en.dat.gz"
-  Delete "$INSTDIR\python23.dll"
+  Delete "$INSTDIR\bz2.pyd"
+  Delete "$INSTDIR\_hashlib.pyd"
+  Delete "$INSTDIR\icons"
+  Delete "$INSTDIR\python27.dll"
+  Delete "$INSTDIR\resources"
+  Delete "$INSTDIR\select.pyd"
+  Delete "$INSTDIR\vcredist_x86.exe"
+  Delete "$INSTDIR\wxbase28uh_net_vc.dll"
+  Delete "$INSTDIR\wxbase28uh_vc.dll"
+  Delete "$INSTDIR\wx._controls_.pyd"
+  Delete "$INSTDIR\wx._core_.pyd"
+  Delete "$INSTDIR\wx._gdi_.pyd"
+  Delete "$INSTDIR\wx._html.pyd"
+  Delete "$INSTDIR\wx._misc_.pyd"
+  Delete "$INSTDIR\wxmsw28uh_adv_vc.dll"
+  Delete "$INSTDIR\wxmsw28uh_core_vc.dll"
+  Delete "$INSTDIR\wxmsw28uh_html_vc.dll"
+  Delete "$INSTDIR\wx._windows_.pyd"
   Delete "$INSTDIR\unicodedata.pyd"
   Delete "$INSTDIR\w9xpopen.exe"
   Delete "$INSTDIR\wxc2.pyd"
   Delete "$INSTDIR\wxc.pyd"
-  Delete "$INSTDIR\wxmsw24h.dll"
   Delete "$INSTDIR\sample.blyte"
   Delete "$INSTDIR\_socket.pyd"
   Delete "$INSTDIR\_ssl.pyd"
@@ -163,6 +179,7 @@ Section Uninstall
   Delete "$SMPROGRAMS\Blyte\Blyte.lnk"
   Delete "$SMPROGRAMS\Blyte\Manual.lnk"
 
+  RMDir /r "$INSTDIR\resources"
   RMDir "$SMPROGRAMS\Blyte"
   RMDir "$INSTDIR"
 
