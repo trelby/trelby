@@ -749,7 +749,7 @@ class MyCtrl(wx.Control):
         s = str(s).replace("\n", os.linesep)
         
         if wx.TheClipboard.Open():
-            wx.TheClipboard.UsePrimarySelection(True)
+            wx.TheClipboard.UsePrimarySelection(False)
             
             wx.TheClipboard.Clear()
             wx.TheClipboard.AddData(wx.TextDataObject(s))
@@ -775,7 +775,7 @@ class MyCtrl(wx.Control):
         s = ""
         
         if wx.TheClipboard.Open():
-            wx.TheClipboard.UsePrimarySelection(True)
+            wx.TheClipboard.UsePrimarySelection(False)
             
             df = wx.DataFormat(wx.DF_TEXT)
             
