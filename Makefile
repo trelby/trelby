@@ -25,7 +25,7 @@ clean:
 
 install:
 	mkdir -p $(BINDIR)
-	cp -r *.py blyte.desktop names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL icons $(BINDIR)
+	cp -r *.py blyte.desktop names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL resources $(BINDIR)
 	cp blyte.desktop $(DESKTOPDIR)
 	rm $(BINDIR)/setup.py
 
