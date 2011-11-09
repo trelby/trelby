@@ -204,8 +204,8 @@ class MyCtrl(wx.Control):
         wx.EVT_PAINT(self, self.OnPaint)
         wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
         wx.EVT_LEFT_DOWN(self, self.OnLeftDown)
+        wx.EVT_LEFT_UP(self, self.OnLeftUp)
         wx.EVT_LEFT_DCLICK(self, self.OnLeftDown)
-        wx.EVT_RIGHT_DOWN(self, self.OnRightDown)
         wx.EVT_MOTION(self, self.OnMotion)
         wx.EVT_MOUSEWHEEL(self, self.OnMouseWheel)
         wx.EVT_CHAR(self, self.OnKeyChar)
@@ -214,6 +214,8 @@ class MyCtrl(wx.Control):
         self.updateScreen(redraw = False)
 
     def clearVars(self):
+        self.mouseSelectActive = False
+
         self.searchLine = -1
         self.searchColumn = -1
         self.searchWidth = -1
@@ -511,17 +513,22 @@ class MyCtrl(wx.Control):
         self.makeLineVisible(self.sp.line)
     
     def OnLeftDown(self, event, mark = False):
+        if not self.mouseSelectActive:
+            self.sp.clearMark()
+            self.updateScreen()
+
         pos = event.GetPosition()
         line, col = gd.vm.pos2linecol(self, pos.x, pos.y)
+
+        self.mouseSelectActive = True
 
         if line != None:
             self.sp.gotoPos(line, col, mark)
             self.updateScreen()
 
-    def OnRightDown(self, event):
-        self.sp.clearMark()
-        self.updateScreen()
-        
+    def OnLeftUp(self, event):
+        self.mouseSelectActive = False
+
     def OnMotion(self, event):
         if event.LeftIsDown():
             self.OnLeftDown(event, mark = True)
