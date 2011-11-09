@@ -2,7 +2,7 @@ Source: blyte
 Section: python
 Priority: extra
 Maintainer: Anil Gulecha <anil.verve@gmail.com>
-Build-Depends: debhelper (>= 7), python-support, fop, xsltproc
+Build-Depends: debhelper (>= 7), python-support, xsltproc, docbook-xsl
 Standards-Version: 3.8.0
 
 Package: blyte
