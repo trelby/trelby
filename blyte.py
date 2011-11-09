@@ -195,7 +195,7 @@ class MyPanel(wx.Panel):
 class MyCtrl(wx.Control):
 
     def __init__(self, parent, id):
-        style = wx.WANTS_CHARS | wx.FULL_REPAINT_ON_RESIZE
+        style = wx.WANTS_CHARS | wx.FULL_REPAINT_ON_RESIZE | wx.NO_BORDER
         wx.Control.__init__(self, parent, id, style = style)
 
         self.panel = parent
@@ -2126,8 +2126,8 @@ class MyFrame(wx.Frame):
         c.updateScreen()
 
     def ToggleFullscreen(self, event = None):
+        self.noFSBtn.Show(not self.IsFullScreen())
         self.ShowFullScreen(not self.IsFullScreen(), wx.FULLSCREEN_ALL)
-        self.noFSBtn.Show(self.IsFullScreen())
         self.panel.ctrl.SetFocus()
 
     def OnPaginate(self, event = None):
