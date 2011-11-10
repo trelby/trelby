@@ -17,7 +17,7 @@ dict_en.dat.gz: dict_en.dat
 	gzip -c dict_en.dat > dict_en.dat.gz
 
 manual.pdf: doc/*
-	make -C doc pdf && mv doc/manual.pdf .
+	make -C doc && mv doc/book.html manual.html
 
 clean:
 	rm -f *.pyc
@@ -25,7 +25,7 @@ clean:
 
 install:
 	mkdir -p $(BINDIR)
-	cp -r *.py blyte.desktop names.dat dict_en.dat.gz sample.blyte manual.pdf fileformat.txt LICENSE INSTALL resources $(BINDIR)
+	cp -r *.py blyte.desktop names.dat dict_en.dat.gz sample.blyte manual.html fileformat.txt LICENSE INSTALL resources $(BINDIR)
 	cp blyte.desktop $(DESKTOPDIR)
 	rm $(BINDIR)/setup.py
 

@@ -82,11 +82,16 @@ def toPath(s):
     else:
         return s.encode("UTF-8")
 
-# return bitmap created from the given file, whose filename is given as
-# relative to the install dir. so passing in "resources/blaa.png" might
-# return "/opt/blyte/resources/blaa.png" for example.
+# return bitmap created from the given file. argument is as for
+# getFullPath.
 def getBitmap(filename):
-    return wx.Bitmap("/".join([progPath, filename]))
+    return wx.Bitmap(getFullPath(filename))
+
+# return the absolute path of a file under the install dir. so passing in
+# "resources/blaa.png" might return "/opt/blyte/resources/blaa.png" for
+# example.
+def getFullPath(relative):
+    return progPath + "/" + relative
 
 class MyColorSample(wx.Window):
     def __init__(self, parent, id, size):
