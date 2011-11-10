@@ -1129,6 +1129,12 @@ class ConfigGlobal:
                 ]
         elif misc.isWindows:
             progs = [
+                (ur"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe",
+                 ""),
+                (ur"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe",
+                 ""),
+                (ur"C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe",
+                 "")
                 (ur"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe",
                  ""),
                 (ur"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe",
@@ -1136,6 +1142,8 @@ class ConfigGlobal:
                 (ur"C:\Program Files\Adobe\Acrobat 5.0\Reader\AcroRd32.exe",
                  ""),
                 (ur"C:\Program Files\Adobe\Acrobat 4.0\Reader\AcroRd32.exe",
+                 ""),
+                (ur"C:\Program Files\Foxit Software\Foxit Reader\Foxit Reader.exe",
                  ""),
                 ]
         else:
