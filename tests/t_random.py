@@ -49,6 +49,7 @@ class Ops:
         return s
 
     # construct a new Ops from the given string.
+    @staticmethod
     def load(s):
         self = Ops()
 
@@ -57,9 +58,7 @@ class Ops:
                 self.ops.append(Op.load(line))
 
         return self
-                    
-    load = staticmethod(load)
-        
+
 # a single operation
 class Op:
     funcs = [
@@ -122,6 +121,7 @@ class Op:
     # get a random operation.
     # FIXME: this should have different probabilities for different
     # operations.
+    @staticmethod
     def getRandom():
         self = Op()
 
@@ -133,8 +133,6 @@ class Op:
 
         return self
 
-    getRandom = staticmethod(getRandom)
-
     # return self as a text string
     def save(self):
         s = self.name
@@ -145,6 +143,7 @@ class Op:
         return s
 
     # construct a new Ops from the given string.
+    @staticmethod
     def load(s):
         vals = s.split(",")
         
@@ -154,8 +153,6 @@ class Op:
             self.args.append(int(vals[i]))
 
         return self
-                    
-    load = staticmethod(load)
 
 # run random operations forever
 def runRandomOps():

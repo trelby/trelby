@@ -547,6 +547,7 @@ class MyColor:
     def toWx(self):
         return wx.Colour(self.r, self.g, self.b)
 
+    @staticmethod
     def fromWx(c):
         o = MyColor(0, 0, 0)
 
@@ -556,8 +557,6 @@ class MyColor:
 
         return o
     
-    fromWx = staticmethod(fromWx)
-
 # fake key event, supports same operations as the real one
 class MyKeyEvent:
     def __init__(self, kc = 0):
@@ -691,18 +690,16 @@ class Key:
         return (self.kc & 0xFFFFFFFFL) | (self.ctrl << 32L) | \
                (self.alt << 33L) | (self.shift << 34L)
 
+    @staticmethod
     def fromInt(val):
         return Key(val & 0xFFFFFFFFL, (val >> 32) & 1, (val >> 33) & 1,
                    (val >> 34) & 1)
 
-    fromInt = staticmethod(fromInt)
-
     # construct from wx.KeyEvent
+    @staticmethod
     def fromKE(ev):
         return Key(ev.GetKeyCode(), ev.ControlDown(), ev.AltDown(),
                    ev.ShiftDown())
-
-    fromKE = staticmethod(fromKE)
 
     def toStr(self):
         s = ""

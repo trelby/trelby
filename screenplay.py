@@ -187,6 +187,7 @@ class Screenplay:
     # where msgs is string (possibly empty) of warnings about the loading
     # process. fatal errors are indicated by raising a MiscError. note
     # that this is a static function.
+    @staticmethod
     def load(s, cfgGl):
         if s[0:3] != codecs.BOM_UTF8:
             raise error.MiscError("File is not a Blyte screenplay.")
@@ -358,8 +359,6 @@ class Screenplay:
 
         return (sp, "\n\n".join(msgs))
 
-    load = staticmethod(load)
-
     # lines is an array of strings. if lines[startIndex] == "Begin-$name
     # ", this searches for a string of "End-$name ", takes all the strings
     # between those two, joins the lines into a single string (lines
@@ -367,6 +366,7 @@ class Screenplay:
     # line-index-after-the-end-line). returns ("", startIndex) if
     # startIndex does not contain the start line or startIndex is too big
     # for 'lines'. raises error.MiscError on errors.
+    @staticmethod
     def getConfigPart(lines, name, startIndex):
         if (startIndex >= len(lines)) or\
                (lines[startIndex] != ("#Begin-%s " % name)):
@@ -379,12 +379,11 @@ class Screenplay:
 
         return ("\n".join(lines[startIndex + 1:endIndex]), endIndex + 1)
 
-    getConfigPart = staticmethod(getConfigPart)
-
     # parse a line containing a config-value in the format detailed in
     # fileformat.txt. line must have newline stripped from the end
     # already. returns a (key, value) tuple. if line doesn't match the
     # format, (None, None) is returned.
+    @staticmethod
     def parseConfigLine(s):
         m = re.match("#([a-zA-Z0-9\-]+) (.*)", s)
 
@@ -392,8 +391,6 @@ class Screenplay:
             return (m.group(1), m.group(2))
         else:
             return (None, None)
-
-    parseConfigLine = staticmethod(parseConfigLine)
 
     # apply new config.
     def applyCfg(self, cfg):

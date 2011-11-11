@@ -5,8 +5,6 @@
 -remove fromGUIUnicode and toGUIUnicode and all calls to them, they are
  now no-ops
 
--use staticmethod decorator for static functions
-
 -should probably have menu commands for switching the element's type, once
  the combobox is deleted. otherwise only way to do it through keyboard
  commands.
@@ -17,8 +15,6 @@
 
 -settings dialog for colors should have a "restore default" button for
  each item
-
--character map dialog: fonts are too big and text overflows boundaries
 
 -try using graphics contexts for tab ctrl drawing to get anti-aliased
  lines (http://docs.wxwidgets.org/trunk/classwx_graphics_context.html)

@@ -53,6 +53,7 @@ class Vars:
 
     # transform string 's' (loaded from file) into a form suitable for
     # load() to take.
+    @staticmethod
     def makeVals(s):
         tmp = util.fixNL(s).split("\n")
 
@@ -63,8 +64,6 @@ class Vars:
                 vals[name] = v
 
         return vals
-
-    makeVals = staticmethod(makeVals)
 
     def save(self, prefix, obj):
         s = ""

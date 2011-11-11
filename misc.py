@@ -488,6 +488,7 @@ class CheckBoxItem:
     # return dict which has keys for all selected items' client data.
     # takes a list of CheckBoxItem's as its parameter. note: this is a
     # static function.
+    @staticmethod
     def getClientData(cbil):
         tmp = {}
         
@@ -499,8 +500,6 @@ class CheckBoxItem:
 
         return tmp
     
-    getClientData = staticmethod(getClientData)
-
 # shows one or two (one if cbil2 = None) checklistbox widgets with
 # contents from cbil1 and possibly cbil2, which are lists of
 # CheckBoxItems. btns[12] are bools for whether or not to include helper
