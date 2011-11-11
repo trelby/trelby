@@ -53,7 +53,7 @@ class MyCharMap(wx.Window):
         # size of the zoomed-in character boxes
         self.boxSize = 60
         
-        self.smallFont = util.createPixelFont(20,
+        self.smallFont = util.createPixelFont(18,
             wx.FONTFAMILY_SWISS, wx.NORMAL, wx.NORMAL)
         self.normalFont = util.createPixelFont(self.cellSize - 2,
             wx.FONTFAMILY_MODERN, wx.NORMAL, wx.BOLD)
@@ -122,7 +122,6 @@ class MyCharMap(wx.Window):
             
         y = self.offset + self.rows * self.cellSize
         pad = 5
-        dc.SetFont(self.smallFont)
             
         if self.selected:
             self.drawCharBox(dc, "Selected:", self.selected, self.offset,
@@ -142,12 +141,12 @@ class MyCharMap(wx.Window):
             dc.DrawText("Character code: %d" % ord(self.selected),
                         360, y + pad)
         else:
+            dc.SetFont(self.smallFont)
             dc.DrawText("Click on a character to select it.", self.offset,
                         y + pad)
                 
     def drawCharBox(self, dc, text, char, x, y, xinc):
         dc.SetFont(self.smallFont)
-
         dc.DrawText(text, x, y)
 
         boxX = x + xinc
