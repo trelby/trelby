@@ -9,7 +9,6 @@ import characterreport
 import charmapdlg
 import commandsdlg
 import config
-import decode
 import dialoguechart
 import finddlg
 import gutil
@@ -2220,22 +2219,13 @@ class MyFrame(wx.Frame):
         self.panel.ctrl.OnSpellCheckerDlg()
 
     def OnNameDatabase(self, event = None):
-        if not hasattr(self, "names"):
-            self.statusBar.SetStatusText("Opening name database...", 1)
-            wx.SafeYield()
-            wx.BeginBusyCursor()
-            self.names = decode.readNames(u"names.dat")
-            wx.EndBusyCursor()
-            self.panel.ctrl.updateCommon()
+        if not namesdlg.readNames(self):
+            wx.MessageBox("Error opening name database.", "Error",
+                          wx.OK, self)
 
-            if self.names.count == 0:
-                wx.MessageBox("Error opening name database.", "Error",
-                              wx.OK, self)
-                del self.names
+            return
 
-                return
-
-        dlg = namesdlg.NamesDlg(self, self.panel.ctrl, self.names)
+        dlg = namesdlg.NamesDlg(self, self.panel.ctrl)
         dlg.ShowModal()
         dlg.Destroy()
 

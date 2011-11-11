@@ -1,9 +1,6 @@
 import mypickle
 import util
 
-import gzip
-import StringIO
-
 import wx
 
 # PY2.4: use a Set object
@@ -21,33 +18,10 @@ def loadDict(frame):
     if gdict:
         return True
 
-    # use dict_en.dat if if exists, dict_en.dat.gz otherwise
-    fname = u"dict_en.dat"
-    doGz = False
-    
-    if not util.fileExists(fname):
-        fname += ".gz"
-        doGz = True
-
-    s = util.loadFile(fname, frame)
-    if s == None:
+    s = util.loadMaybeCompressedFile(u"dict_en.dat", frame)
+    if not s:
         return False
 
-    if doGz:
-        buf = StringIO.StringIO(s)
-
-        # python's gzip module throws almost arbitrary exceptions in
-        # various error conditions, so the only safe thing to do is to
-        # catch everything.
-        try:
-            f = gzip.GzipFile(mode = "r", fileobj = buf)
-            s = f.read()
-        except:
-            wx.MessageBox("Error loading file '%s': Decompression failed" % \
-                              misc.toGUIUnicode(fname), "Error", wx.OK, frame)
-
-            return False
-    
     lines = s.splitlines()
 
     chars = "abcdefghijklmnopqrstuvwxyz"

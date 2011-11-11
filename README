@@ -22,7 +22,7 @@ this, that aspect of the program will not work.
 
  * Name list
 
-  $ make names.dat
+  $ make names.txt.gz
 
  * Dictionary
 

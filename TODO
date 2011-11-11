@@ -18,13 +18,10 @@
 -settings dialog for colors should have a "restore default" button for
  each item
 
+-character map dialog: fonts are too big and text overflows boundaries
+
 -try using graphics contexts for tab ctrl drawing to get anti-aliased
  lines (http://docs.wxwidgets.org/trunk/classwx_graphics_context.html)
-
--check if it would make sense to store the name database in .zip format.
- it would be a bit bigger but much faster to decode, plus we're not a
- commercial program anymore so we don't care at all about obfuscating the
- storage format.
 
 -check windows uninstall doesn't leave any files behind etc (why does it
  try to delete python23.dll still?)

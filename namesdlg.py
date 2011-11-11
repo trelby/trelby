@@ -4,13 +4,56 @@ import util
 
 import wx
 
+# NameArray, or None if not loaded
+nameArr = None
+
+# if not already loaded, read the name database from disk and store it.
+# returns False on errors.
+def readNames(frame):
+    global nameArr
+
+    if nameArr:
+        # already loaded
+        return True
+
+    try:
+        data = util.loadMaybeCompressedFile(u"names.txt", frame)
+        if not data:
+            return False
+
+        res = namearray.NameArray()
+        nameType = None
+
+        for line in data.splitlines():
+            ch = line[0]
+            if ch == "#":
+                continue
+            elif ch == "N":
+                nameType = line[1:]
+            elif ch in ("M", "F"):
+                if not nameType:
+                    raise Exception("No name type set before line: '%s'" % line)
+                res.append(line[1:], nameType, ch)
+            else:
+                raise Exception("Unknown linetype for line: '%s'" % line)
+
+        nameArr = res
+
+        return True
+
+    except Exception, e:
+        wx.MessageBox("Error loading name database: %s" % str(e),
+                      "Error", wx.OK, frame)
+
+
+        return False
+
 class NamesDlg(wx.Dialog):
-    def __init__(self, parent, ctrl, nameArr):
+    def __init__(self, parent, ctrl):
         wx.Dialog.__init__(self, parent, -1, "Character name database",
                            style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         self.ctrl = ctrl
-        self.nameArr = nameArr
         
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -24,9 +67,11 @@ class NamesDlg(wx.Dialog):
         self.typeList.InsertColumn(0, "Count")
         self.typeList.InsertColumn(1, "Type")
 
-        for i in xrange(len(self.nameArr.typeNames)):
-            self.typeList.InsertStringItem(i, str(self.nameArr.typeFreqs[i]))
-            self.typeList.SetStringItem(i, 1, self.nameArr.typeNames[i])
+        for i in range(len(nameArr.typeNamesById)):
+            typeName = nameArr.typeNamesById[i]
+
+            self.typeList.InsertStringItem(i, str(nameArr.typeNamesCnt[typeName]))
+            self.typeList.SetStringItem(i, 1, typeName)
             self.typeList.SetItemData(i, i)
 
         self.typeList.SetColumnWidth(0, wx.LIST_AUTOSIZE)
@@ -81,7 +126,7 @@ class NamesDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticText(self, -1, "Results:"))
         
-        self.list = MyListCtrl(self, nameArr)
+        self.list = MyListCtrl(self)
         vsizer.Add(self.list, 1, wx.EXPAND | wx.BOTTOM, 5)
 
         self.foundLabel = wx.StaticText(self, -1, "",
@@ -100,7 +145,7 @@ class NamesDlg(wx.Dialog):
         self.searchEntry.SetFocus()
 
     def selectAllTypes(self, event = None):
-        for i in xrange(len(self.nameArr.typeNames)):
+        for i in range(len(nameArr.typeNamesById)):
             self.typeList.SetItemState(i, wx.LIST_STATE_SELECTED,
                                        wx.LIST_STATE_SELECTED)
         
@@ -111,10 +156,10 @@ class NamesDlg(wx.Dialog):
             self.typeList.SortItems(self.CmpType)
 
     def CmpFreq(self, i1, i2):
-        return self.nameArr.typeFreqs[i2] - self.nameArr.typeFreqs[i1]
+        return nameArr.typeNamesCnt[nameArr.typeNamesById[i2]] - nameArr.typeNamesCnt[nameArr.typeNamesById[i1]]
     
     def CmpType(self, i1, i2):
-        return cmp(self.nameArr.typeNames[i1], self.nameArr.typeNames[i2])
+        return cmp(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
 
     def OnInsertName(self, event):
         item = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL,
@@ -151,20 +196,20 @@ class NamesDlg(wx.Dialog):
 
             selTypes[self.typeList.GetItemData(item)] = True
 
-        if len(selTypes) == len(self.nameArr.typeNames):
+        if len(selTypes) == len(nameArr.typeNamesCnt):
             doTypes = False
         else:
             doTypes = True
 
-        for i in xrange(self.nameArr.count):
-            if (sex != 2) and (sex == self.nameArr.sex[i]):
+        for i in xrange(nameArr.count):
+            if (sex != 2) and (sex == nameArr.sex[i]):
                 continue
 
-            if doTypes and self.nameArr.type[i] not in selTypes:
+            if doTypes and nameArr.type[i] not in selTypes:
                 continue
             
             if s:
-                name = util.lower(self.nameArr.name[i])
+                name = util.lower(nameArr.name[i])
                 
                 if nt == 0:
                     if not name.startswith(s):
@@ -187,12 +232,10 @@ class NamesDlg(wx.Dialog):
         self.foundLabel.SetLabel("%d names found." % len(l))
 
 class MyListCtrl(wx.ListCtrl):
-    def __init__(self, parent, nameArr):
+    def __init__(self, parent):
         wx.ListCtrl.__init__(self, parent, -1,
             style = wx.LC_REPORT | wx.LC_VIRTUAL | wx.LC_SINGLE_SEL |
                     wx.LC_HRULES | wx.LC_VRULES)
-
-        self.nameArr = nameArr
 
         self.sex = ["Female", "Male"]
         
@@ -214,11 +257,11 @@ class MyListCtrl(wx.ListCtrl):
         n = self.items[item]
         
         if col == 0:
-            return self.nameArr.name[n]
+            return nameArr.name[n]
         elif col == 1:
-            return self.nameArr.typeNames[self.nameArr.type[n]]
+            return nameArr.typeNamesById[nameArr.type[n]]
         elif col == 2:
-            return self.sex[self.nameArr.sex[n]]
+            return self.sex[nameArr.sex[n]]
 
         # shouldn't happen
         return ""

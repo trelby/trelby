@@ -2,11 +2,15 @@ from error import *
 
 import datetime
 import glob
+import gzip
 import misc
 import os
 import re
 import tempfile
 import time
+
+import StringIO
+
 
 import wx
 
@@ -776,6 +780,37 @@ def loadFile(filename, frame, maxSize = -1):
         ret = None
 
     return ret
+
+# like loadFile, but if file doesn't exist, tries to load a .gz compressed
+# version of it.
+def loadMaybeCompressedFile(filename, frame):
+    fname = u"dict_en.dat"
+    doGz = False
+
+    if not fileExists(filename):
+        filename += ".gz"
+        doGz = True
+
+    s = loadFile(filename, frame)
+    if s is None:
+        return None
+
+    if not doGz:
+        return s
+
+    buf = StringIO.StringIO(s)
+
+    # python's gzip module throws almost arbitrary exceptions in various
+    # error conditions, so the only safe thing to do is to catch
+    # everything.
+    try:
+        f = gzip.GzipFile(mode = "r", fileobj = buf)
+        return f.read()
+    except:
+        wx.MessageBox("Error loading file '%s': Decompression failed" % \
+                          misc.toGUIUnicode(filename), "Error", wx.OK, frame)
+
+        return None
 
 # write 'data' to 'filename', popping up a messagebox using 'frame' as
 # parent on errors. returns True on success.

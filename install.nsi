@@ -141,7 +141,7 @@ Section Uninstall
   Delete "$INSTDIR\icon16.png"
   Delete "$INSTDIR\icon32.png"
   Delete "$INSTDIR\logo.png"
-  Delete "$INSTDIR\names.dat"
+  Delete "$INSTDIR\names.txt.gz"
   Delete "$INSTDIR\dict_en.dat.gz"
   Delete "$INSTDIR\bz2.pyd"
   Delete "$INSTDIR\_hashlib.pyd"

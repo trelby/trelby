@@ -1,7 +1,7 @@
 python -OO setup.py py2exe
 xcopy /i resources dist\resources
 copy vcredist_x86.exe dist
-copy names.dat dist
+copy names.txt.gz dist
 copy sample.blyte dist
 copy manual.pdf dist
 copy fileformat.txt dist
