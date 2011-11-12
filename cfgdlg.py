@@ -1052,9 +1052,8 @@ class MiscPanel(wx.Panel):
         event.Skip()
 
     def OnMisc(self, event = None):
-        self.cfg.scriptDir = misc.fromGUIUnicode(
-            self.scriptDirEntry.GetValue()).rstrip("/\\")
-        self.cfg.pdfViewerPath = misc.fromGUIUnicode(self.progEntry.GetValue())
+        self.cfg.scriptDir = self.scriptDirEntry.GetValue().rstrip("/\\")
+        self.cfg.pdfViewerPath = self.progEntry.GetValue()
         self.cfg.pdfViewerArgs = misc.fromGUI(self.argsEntry.GetValue())
         self.cfg.capitalize = self.autoCapSentences.GetValue()
         self.cfg.capitalizeI = self.autoCapI.GetValue()
@@ -1067,8 +1066,7 @@ class MiscPanel(wx.Panel):
 
     def OnBrowse(self, event):
         dlg = wx.DirDialog(
-            cfgFrame,
-            defaultPath = misc.toGUIUnicode(self.cfg.scriptDir),
+            cfgFrame, defaultPath = self.cfg.scriptDir,
             style = wx.DD_NEW_DIR_BUTTON)
 
         if dlg.ShowModal() == wx.ID_OK:
@@ -1079,8 +1077,8 @@ class MiscPanel(wx.Panel):
     def OnBrowsePDF(self, event):
         dlg = wx.FileDialog(
             cfgFrame, "Choose program",
-            misc.toGUIUnicode(os.path.dirname(self.cfg.pdfViewerPath)),
-            misc.toGUIUnicode(self.cfg.pdfViewerPath), style = wx.OPEN)
+            os.path.dirname(self.cfg.pdfViewerPath),
+            self.cfg.pdfViewerPath, style = wx.OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             self.progEntry.SetValue(dlg.GetPath())
@@ -1093,8 +1091,8 @@ class MiscPanel(wx.Panel):
         self.paginateEntry.SetValue(5)
         self.confDelEntry.SetValue(5)
 
-        self.scriptDirEntry.SetValue(misc.toGUIUnicode(self.cfg.scriptDir))
-        self.progEntry.SetValue(misc.toGUIUnicode(self.cfg.pdfViewerPath))
+        self.scriptDirEntry.SetValue(self.cfg.scriptDir)
+        self.progEntry.SetValue(self.cfg.pdfViewerPath)
         self.argsEntry.SetValue(self.cfg.pdfViewerArgs)
         self.autoCapSentences.SetValue(self.cfg.capitalize)
         self.autoCapI.SetValue(self.cfg.capitalizeI)
@@ -1375,7 +1373,7 @@ class PDFFontsPanel(wx.Panel):
             return
 
         self.pf.pdfName = misc.fromGUI(self.nameEntry.GetValue())
-        self.pf.filename = misc.fromGUIUnicode(self.fileEntry.GetValue())
+        self.pf.filename = self.fileEntry.GetValue()
 
     def OnBrowse(self, event):
         if self.pf.filename:
@@ -1386,8 +1384,7 @@ class PDFFontsPanel(wx.Panel):
             dFile = u""
                            
         dlg = wx.FileDialog(cfgFrame, "Choose font file",
-            defaultDir = misc.toGUIUnicode(dDir),
-            defaultFile = misc.toGUIUnicode(dFile),
+            defaultDir = dDir, defaultFile = dFile,
             wildcard = "TrueType fonts (*.ttf;*.TTF)|*.ttf;*.TTF|All files|*",
             style = wx.OPEN)
 
@@ -1395,7 +1392,7 @@ class PDFFontsPanel(wx.Panel):
             self.fileEntry.SetValue(dlg.GetPath())
             self.fileEntry.SetInsertionPointEnd()
 
-            fname = misc.fromGUIUnicode(dlg.GetPath())
+            fname = dlg.GetPath()
 
             self.nameEntry.SetValue(self.getFontPostscriptName(fname))
             self.lastDir = os.path.dirname(fname)
@@ -1412,7 +1409,7 @@ class PDFFontsPanel(wx.Panel):
 
     def cfg2gui(self):
         self.nameEntry.SetValue(self.pf.pdfName)
-        self.fileEntry.SetValue(misc.toGUIUnicode(self.pf.filename))
+        self.fileEntry.SetValue(self.pf.filename)
         self.fileEntry.SetInsertionPointEnd()
 
     # read TrueType font from given file and return its Postscript name,
@@ -1432,7 +1429,7 @@ class PDFFontsPanel(wx.Panel):
         if not f.isOK():
             wx.MessageBox("File '%s'\n"
                           "does not appear to be a valid TrueType font."
-                          % misc.toGUIUnicode(filename),
+                          % filename,
                           "Error", wx.OK, cfgFrame)
 
             return ""
@@ -1441,7 +1438,7 @@ class PDFFontsPanel(wx.Panel):
             wx.MessageBox("Font '%s'\n"
                           "does not allow embedding in its license terms.\n"
                           "You may encounter problems using this font"
-                          " embedded." % misc.toGUIUnicode(filename),
+                          " embedded." % filename,
                           "Error", wx.OK, cfgFrame)
 
         return f.getPostscriptName()

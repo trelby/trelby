@@ -62,16 +62,6 @@ def init(doWX = True):
 def fromGUI(s):
     return s.encode("ISO-8859-1", "ignore")
 
-# FIXME: since the removal of wxIsUnicode, this is now a no-op, and should
-# be removed.
-def fromGUIUnicode(s):
-    return s
-
-# FIXME: since the removal of wxIsUnicode, this is now a no-op, and should
-# be removed.
-def toGUIUnicode(s):
-    return s
-
 # convert s, which is an Unicode string, to an object suitable for passing
 # to Python's file APIs. this is either the Unicode string itself, if the
 # platform supports Unicode-based APIs (and Python has implemented support
@@ -354,7 +344,7 @@ class MyTabCtrl(wx.Window):
 
             dc.SetPen(cfgGui.tabTextPen)
             dc.SetTextForeground(cfgGui.tabTextPen.GetColour())
-            dc.DrawText(toGUIUnicode(p[1]), xpos + self.paddingX, self.textY)
+            dc.DrawText(p[1], xpos + self.paddingX, self.textY)
 
             xpos += tabW
 
@@ -849,7 +839,7 @@ class MRUFiles:
         for i in range(self.getCount()):
             self.menu.Insert(self.menuPos + i, self.firstId + i,
                              "&%d %s" % (
-                i + 1, toGUIUnicode(os.path.basename(self.get(i)))))
+                i + 1, os.path.basename(self.get(i))))
 
     # return number of items.
     def getCount(self):

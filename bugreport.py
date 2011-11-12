@@ -85,4 +85,4 @@ class BugReportDlg(wx.Dialog):
             self.brh.copyPos = len(self.brh.data)
             s = str(self.brh.data)
 
-            util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()), s, self)
+            util.writeToFile(dlg.GetPath(), s, self)

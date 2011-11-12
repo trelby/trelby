@@ -2,9 +2,6 @@
 
 -add suffix automatically if missing in save/export
 
--remove fromGUIUnicode and toGUIUnicode and all calls to them, they are
- now no-ops
-
 -should probably have menu commands for switching the element's type, once
  the combobox is deleted. otherwise only way to do it through keyboard
  commands.
@@ -18,9 +15,6 @@
 
 -try using graphics contexts for tab ctrl drawing to get anti-aliased
  lines (http://docs.wxwidgets.org/trunk/classwx_graphics_context.html)
-
--check windows uninstall doesn't leave any files behind etc (why does it
- try to delete python23.dll still?)
 
 -go through README/INSTALL/t.bat etc and make sure nothing references
  python2.3 anymore

@@ -128,8 +128,8 @@ class GlobalData:
                 os.mkdir(misc.toPath(misc.confPath), 0755)
             except OSError, (errno, strerror):
                 wx.MessageBox("Error creating configuration directory\n"
-                              "'%s': %s" % (misc.toGUIUnicode(misc.confPath),
-                                            strerror), "Error", wx.OK, None)
+                              "'%s': %s" % (misc.confPath, strerror),
+                              "Error", wx.OK, None)
 
     # set viewmode, the parameter is one of the VIEWMODE_ defines.
     def setViewMode(self, viewMode):
@@ -1004,13 +1004,13 @@ class MyCtrl(wx.Control):
             dFile = u""
 
         dlg = wx.FileDialog(mainFrame, "Filename to save as",
-            defaultDir = misc.toGUIUnicode(dDir),
-            defaultFile = misc.toGUIUnicode(dFile),
+            defaultDir = dDir,
+            defaultFile = dFile,
             wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
         if dlg.ShowModal() == wx.ID_OK:
-            if self.saveFile(misc.fromGUIUnicode(dlg.GetPath())):
-                gd.mru.add(misc.fromGUIUnicode(dlg.GetPath()))
+            if self.saveFile(dlg.GetPath()):
+                gd.mru.add(dlg.GetPath())
 
         dlg.Destroy()
 
@@ -1020,12 +1020,12 @@ class MyCtrl(wx.Control):
             return
         
         dlg = wx.FileDialog(mainFrame, "Filename to export as",
-            misc.toGUIUnicode(misc.scriptDir),
+            misc.scriptDir,
             wildcard = "PDF|*.pdf|RTF|*.rtf|Formatted text|*.txt",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
-            misc.scriptDir = misc.fromGUIUnicode(dlg.GetDirectory())
+            misc.scriptDir = dlg.GetDirectory()
 
             choice = dlg.GetFilterIndex()
             if choice == 0:
@@ -1036,8 +1036,7 @@ class MyCtrl(wx.Control):
                 data = self.getExportText(sp)
 
             if data:
-                util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()), data,
-                                 mainFrame)
+                util.writeToFile(dlg.GetPath(), data, mainFrame)
 
         dlg.Destroy()
 
@@ -1852,7 +1851,7 @@ class MyFrame(wx.Frame):
         return newPanel
 
     def setTitle(self, text):
-        self.SetTitle("Blyte - %s" % misc.toGUIUnicode(text))
+        self.SetTitle("Blyte - %s" % text)
 
     def setTabText(self, panel, text):
         i = self.findPage(panel)
@@ -1958,13 +1957,13 @@ class MyFrame(wx.Frame):
 
     def OnOpen(self, event = None):
         dlg = wx.FileDialog(self, "File to open",
-            misc.toGUIUnicode(misc.scriptDir),
+            misc.scriptDir,
             wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
             style = wx.OPEN)
         
         if dlg.ShowModal() == wx.ID_OK:
-            misc.scriptDir = misc.fromGUIUnicode(dlg.GetDirectory())
-            self.openScript(misc.fromGUIUnicode(dlg.GetPath()))
+            misc.scriptDir = dlg.GetDirectory()
+            self.openScript(dlg.GetPath())
 
         dlg.Destroy()
 
@@ -1976,18 +1975,18 @@ class MyFrame(wx.Frame):
 
     def OnImportScript(self, event = None):
         dlg = wx.FileDialog(self, "File to import",
-            misc.toGUIUnicode(misc.scriptDir),
+            misc.scriptDir,
             wildcard = "Text files (*.txt)|*.txt|All files|*",
             style = wx.OPEN)
         
         if dlg.ShowModal() == wx.ID_OK:
-            misc.scriptDir = misc.fromGUIUnicode(dlg.GetDirectory())
+            misc.scriptDir = dlg.GetDirectory()
 
             if not self.tabCtrl.getPage(self.findPage(self.panel))\
                    .ctrl.isUntouched():
                 self.panel = self.createNewPanel()
 
-            self.panel.ctrl.importFile(misc.fromGUIUnicode(dlg.GetPath()))
+            self.panel.ctrl.importFile(dlg.GetPath())
             self.panel.ctrl.updateScreen()
 
         dlg.Destroy()
@@ -2016,18 +2015,18 @@ class MyFrame(wx.Frame):
 
     def OnLoadSettings(self, event = None):
         dlg = wx.FileDialog(self, "File to open",
-            defaultDir = misc.toGUIUnicode(os.path.dirname(gd.confFilename)),
-            defaultFile = misc.toGUIUnicode(os.path.basename(gd.confFilename)),
+            defaultDir = os.path.dirname(gd.confFilename),
+            defaultFile = os.path.basename(gd.confFilename),
             wildcard = "Setting files (*.conf)|*.conf|All files|*",
             style = wx.OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
-            s = util.loadFile(misc.fromGUIUnicode(dlg.GetPath()), self)
+            s = util.loadFile(dlg.GetPath(), self)
 
             if s:
                 c = config.ConfigGlobal()
                 c.load(s)
-                gd.confFilename = misc.fromGUIUnicode(dlg.GetPath())
+                gd.confFilename = dlg.GetPath()
                 
                 self.panel.ctrl.applyGlobalCfg(c, False)
 
@@ -2035,15 +2034,14 @@ class MyFrame(wx.Frame):
 
     def OnSaveSettingsAs(self, event = None):
         dlg = wx.FileDialog(self, "Filename to save as",
-            defaultDir = misc.toGUIUnicode(os.path.dirname(gd.confFilename)),
-            defaultFile = misc.toGUIUnicode(os.path.basename(gd.confFilename)),
+            defaultDir = os.path.dirname(gd.confFilename),
+            defaultFile = os.path.basename(gd.confFilename),
             wildcard = "Setting files (*.conf)|*.conf|All files|*",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
-            if util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()),
-                                cfgGl.save(), self):
-                gd.confFilename = misc.fromGUIUnicode(dlg.GetPath())
+            if util.writeToFile(dlg.GetPath(), cfgGl.save(), self):
+                gd.confFilename = dlg.GetPath()
             
         dlg.Destroy()
 
@@ -2169,34 +2167,31 @@ class MyFrame(wx.Frame):
 
     def OnLoadScriptSettings(self, event = None):
         dlg = wx.FileDialog(self, "File to open",
-            defaultDir = misc.toGUIUnicode(gd.scriptSettingsPath),
+            defaultDir = gd.scriptSettingsPath,
             wildcard = "Script setting files (*.sconf)|*.sconf|All files|*",
             style = wx.OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
-            s = util.loadFile(misc.fromGUIUnicode(dlg.GetPath()), self)
+            s = util.loadFile(dlg.GetPath(), self)
 
             if s:
                 cfg = config.Config()
                 cfg.load(s)
                 self.panel.ctrl.applyCfg(cfg)
                 
-                gd.scriptSettingsPath = os.path.dirname(
-                    misc.fromGUIUnicode(dlg.GetPath()))
+                gd.scriptSettingsPath = os.path.dirname(dlg.GetPath())
 
         dlg.Destroy()
 
     def OnSaveScriptSettingsAs(self, event = None):
         dlg = wx.FileDialog(self, "Filename to save as",
-            defaultDir = misc.toGUIUnicode(gd.scriptSettingsPath),
+            defaultDir = gd.scriptSettingsPath,
             wildcard = "Script setting files (*.sconf)|*.sconf|All files|*",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
-            if util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()),
-                                self.panel.ctrl.sp.saveCfg(), self):
-                gd.scriptSettingsPath = os.path.dirname(
-                    misc.fromGUIUnicode(dlg.GetPath()))
+            if util.writeToFile(dlg.GetPath(), self.panel.ctrl.sp.saveCfg(), self):
+                gd.scriptSettingsPath = os.path.dirname(dlg.GetPath())
             
         dlg.Destroy()
 

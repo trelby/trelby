@@ -773,7 +773,7 @@ def loadFile(filename, frame, maxSize = -1):
 
     except IOError, (errno, strerror):
         wx.MessageBox("Error loading file '%s': %s" % (
-                misc.toGUIUnicode(filename), strerror), "Error", wx.OK, frame)
+                filename, strerror), "Error", wx.OK, frame)
         ret = None
 
     return ret
@@ -805,7 +805,7 @@ def loadMaybeCompressedFile(filename, frame):
         return f.read()
     except:
         wx.MessageBox("Error loading file '%s': Decompression failed" % \
-                          misc.toGUIUnicode(filename), "Error", wx.OK, frame)
+                          filename, "Error", wx.OK, frame)
 
         return None
 
@@ -824,7 +824,7 @@ def writeToFile(filename, data, frame):
     
     except IOError, (errno, strerror):
         wx.MessageBox("Error writing file '%s': %s" % (
-                misc.toGUIUnicode(filename), strerror), "Error", wx.OK, frame)
+                filename, strerror), "Error", wx.OK, frame)
 
         return False
 

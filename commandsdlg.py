@@ -85,7 +85,6 @@ R                      Replace
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
-            util.writeToFile(misc.fromGUIUnicode(dlg.GetPath()), self.html,
-                             self)
+            util.writeToFile(dlg.GetPath(), self.html, self)
             
         dlg.Destroy()
