@@ -7,10 +7,58 @@ import re
 
 import wx
 
+from xml.etree.ElementTree import ElementTree
+
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."
 SCENE_ACTION = -2
+
+# behaves like importTextFile, but for fdx files. Returns a list of
+# lines for the screenplay, or None on error.
+def importFDX(filename, frame):
+    try:
+        fdx = ElementTree().parse(filename)
+    except:
+        wx.MessageBox("Could not parse this file", "Parse Error", wx.OK, frame)
+        return None
+
+    paras = list(fdx.iter("Paragraph"))
     
+    lines = []
+    elemMap = {
+            "Scene Heading" : screenplay.SCENE,
+            "Character"     : screenplay.CHARACTER,
+            "Dialogue"      : screenplay.DIALOGUE,
+            "Parenthetical" : screenplay.PAREN,
+            "Transition"    : screenplay.TRANSITION,
+            "Shot"          : screenplay.SHOT,
+            "Action"        : screenplay.ACTION,
+    }
+
+    for para in paras:
+        elementtype = para.get("Type")
+        # General is used for Dual Dialog.. skip it.
+        if elementtype == None or elementtype == "General" :
+            continue
+        if elementtype in elemMap.keys():
+            lt = elemMap[elementtype]
+        else:
+            # all unknown linetypes are converted to Action
+            lt = screenplay.ACTION
+        textitems = list(para.iter("Text"))
+        txt = ""
+        for item in textitems:
+            txt = txt + item.text
+
+        lines.append(screenplay.Line(screenplay.LB_LAST, lt, txt))
+
+    if len(lines) == 0:
+        wx.MessageBox("This file contains no importable lines", "Error", wx.OK, frame)
+        return None
+    else:
+        return lines
+
+
 # import text file from fileName, return list of Line objects for the
 # screenplay or None if something went wrong. returned list always
 # contains at least one line.

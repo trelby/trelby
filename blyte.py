@@ -289,8 +289,10 @@ class MyCtrl(wx.Control):
             return False
 
     def importFile(self, fileName):
-        lines = myimport.importTextFile(fileName, mainFrame)
-
+        if fileName[-3:] == "fdx":
+            lines = myimport.importFDX(fileName, mainFrame)
+        else:
+            lines = myimport.importTextFile(fileName, mainFrame)
         if not lines:
             return
 
@@ -299,6 +301,7 @@ class MyCtrl(wx.Control):
         self.sp.lines = lines
         self.sp.reformatAll()
         self.sp.paginate()
+        self.sp.markChanged(True)
 
     # generate exportable text from given screenplay, or None.
     def getExportText(self, sp):
@@ -1976,7 +1979,7 @@ class MyFrame(wx.Frame):
     def OnImportScript(self, event = None):
         dlg = wx.FileDialog(self, "File to import",
             misc.scriptDir,
-            wildcard = "Text files (*.txt)|*.txt|All files|*",
+            wildcard = "Importable files (*.txt;*.fdx)|*.fdx;*.txt|Formatted text files (*.txt)|*.txt|Final Draft XML(*.fdx)|*.fdx|All files|*",
             style = wx.OPEN)
         
         if dlg.ShowModal() == wx.ID_OK:
