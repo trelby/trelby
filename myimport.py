@@ -27,9 +27,9 @@ def importFDX(fileName, frame):
         "Transition" : screenplay.TRANSITION,
     }
 
-    # the 1 MB limit is arbitrary, we just want to avoid getting a
+    # the 5 MB limit is arbitrary, we just want to avoid getting a
     # MemoryError exception for /dev/zero etc.
-    data = util.loadFile(fileName, frame, 1000000)
+    data = util.loadFile(fileName, frame, 5000000)
 
     if data == None:
         return None
