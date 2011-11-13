@@ -343,7 +343,7 @@ class MyTabCtrl(wx.Window):
             dc.DrawPolygon(points,xpos,tabY)
 
             dc.SetPen(cfgGui.tabTextPen)
-            dc.SetTextForeground(cfgGui.tabTextPen.GetColour())
+            dc.SetTextForeground(cfgGui.tabTextColor)
             dc.DrawText(p[1], xpos + self.paddingX, self.textY)
 
             xpos += tabW
