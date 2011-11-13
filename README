@@ -5,14 +5,11 @@ to inspect/modify the code.
 1. Requirements
 ===============
 
-You will need Python (at least 2.6) and wxWidgets (2.8) and its Python
-bindings to run Blyte.
+You will need Python (2.6 or 2.7) and wxWidgets (2.8) and its Python
+bindings to run Blyte. You also need the lxml Python library
+(http://lxml.de/).
 
-To build the manual, you will need:
-
- -HTML: xsltproc
-
- -PDF: FOP
+To build the manual, you will also need xsltproc.
 
 2. Preparing data files
 =======================

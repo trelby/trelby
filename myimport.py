@@ -5,6 +5,8 @@ import util
 
 import re
 
+from lxml import etree
+
 import wx
 
 from xml.etree.ElementTree import ElementTree
@@ -13,50 +15,66 @@ from xml.etree.ElementTree import ElementTree
 # and scene lines are the ones that begin with "EXT." or "INT."
 SCENE_ACTION = -2
 
-# behaves like importTextFile, but for fdx files. Returns a list of
-# lines for the screenplay, or None on error.
-def importFDX(filename, frame):
-    try:
-        fdx = ElementTree().parse(filename)
-    except:
-        wx.MessageBox("Could not parse this file", "Parse Error", wx.OK, frame)
-        return None
-
-    paras = list(fdx.iter("Paragraph"))
-    
-    lines = []
+# like importTextFile, but for Final Draft files.
+def importFDX(fileName, frame):
     elemMap = {
-            "Scene Heading" : screenplay.SCENE,
-            "Character"     : screenplay.CHARACTER,
-            "Dialogue"      : screenplay.DIALOGUE,
-            "Parenthetical" : screenplay.PAREN,
-            "Transition"    : screenplay.TRANSITION,
-            "Shot"          : screenplay.SHOT,
-            "Action"        : screenplay.ACTION,
+        "Action" : screenplay.ACTION,
+        "Character" : screenplay.CHARACTER,
+        "Dialogue" : screenplay.DIALOGUE,
+        "Parenthetical" : screenplay.PAREN,
+        "Scene Heading" : screenplay.SCENE,
+        "Shot" : screenplay.SHOT,
+        "Transition" : screenplay.TRANSITION,
     }
 
-    for para in paras:
-        elementtype = para.get("Type")
-        # General is used for Dual Dialog.. skip it.
-        if elementtype == None or elementtype == "General" :
-            continue
-        if elementtype in elemMap.keys():
-            lt = elemMap[elementtype]
-        else:
-            # all unknown linetypes are converted to Action
-            lt = screenplay.ACTION
-        textitems = list(para.iter("Text"))
-        txt = ""
-        for item in textitems:
-            txt = txt + item.text
+    # the 1 MB limit is arbitrary, we just want to avoid getting a
+    # MemoryError exception for /dev/zero etc.
+    data = util.loadFile(fileName, frame, 1000000)
 
-        lines.append(screenplay.Line(screenplay.LB_LAST, lt, txt))
-
-    if len(lines) == 0:
-        wx.MessageBox("This file contains no importable lines", "Error", wx.OK, frame)
+    if data == None:
         return None
-    else:
+
+    if len(data) == 0:
+        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+
+        return None
+
+    try:
+        root = etree.XML(data)
+        lines = []
+
+        for para in root.xpath("Content/Paragraph"):
+            et = para.get("Type")
+
+            # FD uses "General" for Dual Dialogue. skip it for now.
+            # enhancement would be to convert it to normal dialogue.
+            if et == "General":
+                continue
+
+            # all unknown linetypes are converted to Action
+            lt = elemMap.get(et, screenplay.ACTION)
+
+            s = u""
+            for text in para.xpath("Text"):
+                s += text.text
+
+            # FD uses some fancy unicode apostrophe, replace it with a
+            # normal one
+            s = s.replace(u"\u2019", "'")
+
+            s = util.toLatin1(s)
+
+            lines.append(screenplay.Line(screenplay.LB_LAST, lt, s))
+
+        if len(lines) == 0:
+            wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
+            return None
+
         return lines
+
+    except etree.XMLSyntaxError, e:
+        wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
+        return None
 
 
 # import text file from fileName, return list of Line objects for the

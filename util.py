@@ -119,6 +119,11 @@ def lower(s):
 def capitalize(s):
     return upper(s[:1]) + s[1:]
 
+# return 's', which must be a unicode string, converted to a ISO-8859-1
+# 8-bit string. characters not representable in ISO-8859-1 are discarded.
+def toLatin1(s):
+    return s.encode("ISO-8859-1", "ignore")
+
 # return 's', which must be a string of ISO-8859-1 characters, converted
 # to UTF-8.
 def toUTF8(s):

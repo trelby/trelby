@@ -7,5 +7,5 @@ Standards-Version: 3.8.0
 
 Package: blyte
 Architecture: all
-Depends: python (>= 2.6), python-wxgtk2.8, python-crypto
+Depends: python (>= 2.6), python-wxgtk2.8, python-crypto, python-lxml
 Description: A simple, powerful, full-featured, multi-platform, free screenwriting software. Use as a free alternative to Final Draft / Movie Magic Screenwriter.
