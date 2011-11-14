@@ -1134,7 +1134,7 @@ class ConfigGlobal:
                 (ur"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe",
                  ""),
                 (ur"C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe",
-                 "")
+                 ""),
                 (ur"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe",
                  ""),
                 (ur"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe",
