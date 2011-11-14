@@ -971,19 +971,19 @@ class ConfigGlobal:
                    "Auto-completion foreground")
         v.addColor("autoCompBg", 255, 240, 168, "AutoCompletionBG",
                    "Auto-completion background")
-        v.addColor("note", 255, 255, 181, "ScriptNote", "Script note")
+        v.addColor("note", 221, 217, 215, "ScriptNote", "Script note")
         v.addColor("pagebreak", 221, 221, 221, "PageBreakLine",
                    "Page-break line")
         v.addColor("pagebreakNoAdjust", 221, 221, 221,
                    "PageBreakNoAdjustLine",
                    "Page-break (original, not adjusted) line")
 
-        v.addColor("tabText", 0, 0, 0, "TabText", "Tab text")
-        v.addColor("tabBorder", 163, 163, 163, "TabBorder",
+        v.addColor("tabText", 50, 50, 50, "TabText", "Tab text")
+        v.addColor("tabBorder", 202, 202, 202, "TabBorder",
                    "Tab border")
-        v.addColor("tabBarBg", 240, 240, 240, "TabBarBG",
+        v.addColor("tabBarBg", 221, 217, 215, "TabBarBG",
                    "Tab bar background")
-        v.addColor("tabNonActiveBg", 194, 194, 194, "TabNonActiveBg", "Tab, non-active")
+        v.addColor("tabNonActiveBg", 234, 232, 233, "TabNonActiveBg", "Tab, non-active")
 
         v.makeDicts()
         
