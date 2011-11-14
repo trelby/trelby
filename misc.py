@@ -414,7 +414,7 @@ class MyTabCtrl(wx.Window):
             dc.SetPen(cfgGui.tabBorderPen)
 
             if i == self.selected:
-                points=((5,2),(tabW-8,2),(tabW-6,3),(tabW-2,tabH),(0,tabH),(3,3))
+                points=((6,1),(tabW-8,1),(tabW-6,2),(tabW-2,tabH),(0,tabH),(4,2))
                 dc.SetBrush(cfgGui.workspaceBrush)
             else:
                 points=((5,2),(tabW-8,2),(tabW-6,3),(tabW-2,tabH-1),(0,tabH-1),(3,3))
