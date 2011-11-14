@@ -43,11 +43,11 @@ def importFDX(fileName, frame):
         root = etree.XML(data)
         lines = []
 
-        for para in root.xpath("Content/Paragraph"):
+        for para in root.xpath("Content//Paragraph"):
             et = para.get("Type")
 
-            # FD uses "General" for Dual Dialogue. skip it for now.
-            # enhancement would be to convert it to normal dialogue.
+            # "General" has embedded Dual Dialogue paragraphs inside it;
+            # nothing to do for the General element itself.
             if et == "General":
                 continue
 
