@@ -130,9 +130,11 @@ class MyFSButton(wx.Window):
 # custom status control
 class MyStatus(wx.Window):
     WIDTH = 280
+    X_ELEDIVIDER = 100
 
     def __init__(self, parent, id, getCfgGui):
-        wx.Window.__init__(self, parent, id, size = (MyStatus.WIDTH, TAB_BAR_HEIGHT))
+        wx.Window.__init__(self, parent, id, size = (MyStatus.WIDTH, TAB_BAR_HEIGHT),
+                           style = wx.FULL_REPAINT_ON_RESIZE)
 
         self.getCfgGui = getCfgGui
 
@@ -142,11 +144,11 @@ class MyStatus(wx.Window):
         self.tabNext = ""
         self.enterNext = ""
 
+        self.elementFont = util.createPixelFont(
+            TAB_BAR_HEIGHT // 2 + 6, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL)
+
         self.font = util.createPixelFont(
             TAB_BAR_HEIGHT // 2 + 2, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL)
-
-        self.pageFont = util.createPixelFont(
-            TAB_BAR_HEIGHT - 7, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL)
 
         wx.EVT_PAINT(self, self.OnPaint)
 
@@ -166,35 +168,29 @@ class MyStatus(wx.Window):
         dc.SetPen(cfgGui.tabTextPen)
         dc.SetTextForeground(cfgGui.tabTextColor)
 
-        pageText = "Page: %d / %d" % (self.page, self.pageCnt)
-        dc.SetFont(self.pageFont)
-
-        x = MyStatus.WIDTH - xoff
-
-        x -= util.drawText(
-            dc, pageText, x, cy,
-            util.ALIGN_RIGHT, util.VALIGN_CENTER)[0]
-
+        pageText = "Page %d / %d" % (self.page, self.pageCnt)
         dc.SetFont(self.font)
+
+        util.drawText(dc, pageText, MyStatus.WIDTH - xoff, cy,
+            util.ALIGN_RIGHT, util.VALIGN_CENTER)
 
         s1 = "%s [Enter]" % self.enterNext
         s2 = "%s [Tab]" % self.tabNext
 
-        w1 = dc.GetTextExtent(s1)[0]
-        w2 = dc.GetTextExtent(s2)[0]
-
-        wmax = max(w1, w2)
-
-        x -= wmax + xoff * 2
+        x = MyStatus.X_ELEDIVIDER + xoff
         dc.DrawText(s1, x, 0)
         dc.DrawText(s2, x, cy)
 
-        x -= xoff
-        s = "%s ->" % self.elemType
-        util.drawText(dc, s, x, cy, util.ALIGN_RIGHT, util.VALIGN_CENTER)
+        x = xoff
+        s = "%s" % self.elemType
+        dc.SetFont(self.elementFont)
+        util.drawText(dc, s, x, cy, valign = util.VALIGN_CENTER)
 
         dc.SetPen(cfgGui.tabBorderPen)
         dc.DrawLine(0, h-1, w, h-1)
+
+        for x in (MyStatus.X_ELEDIVIDER, 0):
+            dc.DrawLine(x, 0, x, h-1)
 
     def SetValues(self, page, pageCnt, elemType, tabNext, enterNext):
         self.page = page
