@@ -465,6 +465,7 @@ class MyCtrl(wx.Control):
         # in case tab colors have been changed
         mainFrame.tabCtrl.Refresh(False)
         mainFrame.statusCtrl.Refresh(False)
+        mainFrame.noFSBtn.Refresh(False)
         
         if writeCfg:
             util.writeToFile(gd.confFilename, cfgGl.save(), mainFrame)
@@ -1666,7 +1667,7 @@ class MyFrame(wx.Frame):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.noFSBtn = wx.BitmapButton(self, bitmap=misc.getBitmap("resources/fullscreen.png"))
+        self.noFSBtn = misc.MyFSButton(self, -1, getCfgGui)
         self.noFSBtn.SetToolTipString("Exit fullscreen")
         self.noFSBtn.Show(False)
         hsizer.Add(self.noFSBtn)

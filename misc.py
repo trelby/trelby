@@ -97,6 +97,36 @@ class MyColorSample(wx.Window):
         dc.SetBrush(br)
         dc.DrawRectangle(0, 0, w, h)
 
+# Custom "exit fullscreen" button for our tab bar. Used so that we have
+# full control over the button's size.
+class MyFSButton(wx.Window):
+    def __init__(self, parent, id, getCfgGui):
+        wx.Window.__init__(self, parent, id, size = (TAB_BAR_HEIGHT, TAB_BAR_HEIGHT))
+
+        self.getCfgGui = getCfgGui
+        self.fsImage = getBitmap("resources/fullscreen.png")
+
+        wx.EVT_PAINT(self, self.OnPaint)
+        wx.EVT_LEFT_DOWN(self, self.OnMouseDown)
+
+    def OnPaint(self, event):
+        cfgGui = self.getCfgGui()
+        dc = wx.PaintDC(self)
+
+        w, h = self.GetClientSizeTuple()
+
+        dc.SetBrush(cfgGui.tabNonActiveBgBrush)
+        dc.SetPen(cfgGui.tabBorderPen)
+        dc.DrawRectangle(0, 0, w, h)
+
+        off = (h - self.fsImage.GetHeight()) // 2
+        dc.DrawBitmap(self.fsImage, off, off)
+
+    def OnMouseDown(self, event):
+        clickEvent = wx.CommandEvent(wx.wxEVT_COMMAND_BUTTON_CLICKED, self.GetId())
+        clickEvent.SetEventObject(self)
+        self.GetEventHandler().ProcessEvent(clickEvent)
+
 # custom status control
 class MyStatus(wx.Window):
     WIDTH = 280
