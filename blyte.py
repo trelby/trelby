@@ -466,6 +466,7 @@ class MyCtrl(wx.Control):
         mainFrame.tabCtrl.Refresh(False)
         mainFrame.statusCtrl.Refresh(False)
         mainFrame.noFSBtn.Refresh(False)
+        mainFrame.toolBar.SetBackgroundColour(cfgGui.tabBarBgColor)
         
         if writeCfg:
             util.writeToFile(gd.confFilename, cfgGl.save(), mainFrame)
@@ -1259,6 +1260,9 @@ class MyCtrl(wx.Control):
         dc.SetPen(cfgGui.workspacePen)
         dc.DrawRectangle(0, 0, size.width, size.height)
 
+        dc.SetPen(cfgGui.tabBorderPen)
+        dc.DrawLine(0,0,0,size.height)
+
         if not dpages:
             # draft mode; draw an infinite page
             lx = util.clamp((size.width - self.pageW) // 2, 0)
@@ -1657,6 +1661,7 @@ class MyFrame(wx.Frame):
         addTB(ID_TOOLBAR_TOOLS, "tools.png", "Tools")
         addTB(ID_TOOLBAR_SETTINGS, "settings.png", "Global settings")
 
+        self.toolBar.SetBackgroundColour(cfgGui.tabBarBgColor)
         self.toolBar.Realize()
 
         wx.EVT_MOVE(self, self.OnMove)
