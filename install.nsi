@@ -9,6 +9,8 @@
 !undef SHCNF_FLUSH
 !endif
 !define SHCNF_FLUSH        0x1000
+
+RequestExecutionLevel admin
  
 !macro UPDATEFILEASSOC
 ; Using the system.dll plugin to call the SHChangeNotify Win32 API function
@@ -17,13 +19,22 @@
 !macroend
 
 ; HM NIS Edit Wizard helper defines
-!define PRODUCT_NAME "Blyte"
-!define PRODUCT_VERSION "1.6-dev"
-!define PRODUCT_PUBLISHER "Blyte.org"
-!define PRODUCT_WEB_SITE "http://www.blyte.org/"
-!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\blyte.exe"
+!define PRODUCT_NAME "Trelby"
+!define PRODUCT_VERSION "2.0-dev"
+!define PRODUCT_PUBLISHER "Trelby.org"
+!define PRODUCT_WEB_SITE "http://www.trelby.org/"
+!define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\trelby.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
+
+Caption "${PRODUCT_NAME} installer"
+VIProductVersion ${PRODUCT_VERSION}
+VIAddVersionKey ProductName "${PRODUCT_NAME}"
+VIAddVersionKey Comments "Installer for Trelby."
+VIAddVersionKey CompanyName Trelby.org
+VIAddVersionKey LegalCopyright Trelby.org
+VIAddVersionKey FileDescription "${PRODUCT_NAME} ${PRODUCT_VERSION} installer"
+VIAddVersionKey ProductVersion "${PRODUCT_VERSION}"
 
 SetCompressor lzma
 
@@ -40,7 +51,7 @@ SetCompressor lzma
 ; Instfiles page
 !insertmacro MUI_PAGE_INSTFILES
 ; Finish page
-!define MUI_FINISHPAGE_RUN "$INSTDIR\blyte.exe"
+!define MUI_FINISHPAGE_RUN "$INSTDIR\trelby.exe"
 !insertmacro MUI_PAGE_FINISH
 
 ; Uninstaller pages
@@ -54,9 +65,9 @@ SetCompressor lzma
 
 ; MUI end ------
 
-Name "${PRODUCT_NAME} ${PRODUCT_VERSION}"
+Name "${PRODUCT_NAME}"
 OutFile "Setup-${PRODUCT_NAME}-${PRODUCT_VERSION}.exe"
-InstallDir "C:\Program Files\Blyte"
+InstallDir "C:\Program Files\Trelby"
 InstallDirRegKey HKLM "${PRODUCT_DIR_REGKEY}" ""
 ShowInstDetails show
 ShowUnInstDetails show
@@ -78,42 +89,41 @@ Section MFCRUNTIME
   SetOutPath "$INSTDIR"
   File "vcredist_x86.exe"
   ExecWait `vcredist_x86.exe /q:a /c:"VCREDI~1.EXE /q:a /c:""msiexec /i vcredist.msi /qn"" "`
-  delete "vcredist_x86.exe" #Step 3 Install Microsoft MFC 8 Runtime"
 SectionEnd
 
 Section "MainSection" SEC01
   SetOutPath "$INSTDIR"
   SetOverwrite on
   File /r "dist\*"
-  CreateDirectory "$SMPROGRAMS\Blyte"
-  CreateShortCut "$SMPROGRAMS\Blyte\Blyte.lnk" "$INSTDIR\blyte.exe"
-  CreateShortCut "$DESKTOP\Blyte.lnk" "$INSTDIR\blyte.exe"
+  CreateDirectory "$SMPROGRAMS\Trelby"
+  CreateShortCut "$SMPROGRAMS\Trelby\Trelby.lnk" "$INSTDIR\trelby.exe"
+  CreateShortCut "$DESKTOP\Trelby.lnk" "$INSTDIR\trelby.exe"
   Delete "$INSTDIR\vcredist_86.exe"
 SectionEnd
 
 Section -AdditionalIcons
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
-  CreateShortCut "$SMPROGRAMS\Blyte\Manual.lnk" "$INSTDIR\manual.pdf"
-  CreateShortCut "$SMPROGRAMS\Blyte\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
-  CreateShortCut "$SMPROGRAMS\Blyte\Uninstall.lnk" "$INSTDIR\uninst.exe"
+  CreateShortCut "$SMPROGRAMS\Trelby\Manual.lnk" "$INSTDIR\manual.html"
+  CreateShortCut "$SMPROGRAMS\Trelby\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
+  CreateShortCut "$SMPROGRAMS\Trelby\Uninstall.lnk" "$INSTDIR\uninst.exe"
 SectionEnd
 
 Section -Post
   WriteUninstaller "$INSTDIR\uninst.exe"
-  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\blyte.exe"
+  WriteRegStr HKLM "${PRODUCT_DIR_REGKEY}" "" "$INSTDIR\trelby.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayName" "$(^Name)"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "UninstallString" "$INSTDIR\uninst.exe"
-  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\blyte.exe"
+  WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayIcon" "$INSTDIR\trelby.exe"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "DisplayVersion" "${PRODUCT_VERSION}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "URLInfoAbout" "${PRODUCT_WEB_SITE}"
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 
   ; file associations
-  WriteRegStr HKCR ".blyte" "" "Blyte.Screenplay"
-  WriteRegStr HKCR "Blyte.Screenplay" "" "Blyte Screenplay"
-  WriteRegStr HKCR "Blyte.Screenplay\DefaultIcon" "" "$INSTDIR\blyte.exe,0"
-  WriteRegStr HKCR "Blyte.Screenplay\shell" "" "open"
-  WriteRegStr HKCR "Blyte.Screenplay\shell\open\command" "" '"$INSTDIR\blyte.exe" "%1"'
+  WriteRegStr HKCR ".trel" "" "Trelby.Screenplay"
+  WriteRegStr HKCR "Trelby.Screenplay" "" "Trelby Screenplay"
+  WriteRegStr HKCR "Trelby.Screenplay\DefaultIcon" "" "$INSTDIR\trelby.exe,0"
+  WriteRegStr HKCR "Trelby.Screenplay\shell" "" "open"
+  WriteRegStr HKCR "Trelby.Screenplay\shell\open\command" "" '"$INSTDIR\trelby.exe" "%1"'
 
  !insertmacro UPDATEFILEASSOC
 SectionEnd
@@ -134,7 +144,7 @@ Section Uninstall
   Delete "$INSTDIR\uninst.exe"
   Delete "$INSTDIR\zlib.pyd"
   Delete "$INSTDIR\_sre.pyd"
-  Delete "$INSTDIR\blyte.exe"
+  Delete "$INSTDIR\trelby.exe"
   Delete "$INSTDIR\datetime.pyd"
   Delete "$INSTDIR\pyexpat.pyd"
   Delete "$INSTDIR\htmlc.pyd"
@@ -150,6 +160,7 @@ Section Uninstall
   Delete "$INSTDIR\resources"
   Delete "$INSTDIR\select.pyd"
   Delete "$INSTDIR\vcredist_x86.exe"
+  Delete "$INSTDIR\lxml.etree.pyd"
   Delete "$INSTDIR\wxbase28uh_net_vc.dll"
   Delete "$INSTDIR\wxbase28uh_vc.dll"
   Delete "$INSTDIR\wx._controls_.pyd"
@@ -165,31 +176,31 @@ Section Uninstall
   Delete "$INSTDIR\w9xpopen.exe"
   Delete "$INSTDIR\wxc2.pyd"
   Delete "$INSTDIR\wxc.pyd"
-  Delete "$INSTDIR\sample.blyte"
+  Delete "$INSTDIR\sample.trel"
   Delete "$INSTDIR\_socket.pyd"
   Delete "$INSTDIR\_ssl.pyd"
   Delete "$INSTDIR\_winreg.pyd"
-  Delete "$INSTDIR\manual.pdf"
+  Delete "$INSTDIR\manual.html"
   Delete "$INSTDIR\fileformat.txt"
   Delete "$INSTDIR\LICENSE"
 
-  Delete "$SMPROGRAMS\Blyte\Uninstall.lnk"
-  Delete "$SMPROGRAMS\Blyte\Website.lnk"
-  Delete "$DESKTOP\Blyte.lnk"
-  Delete "$SMPROGRAMS\Blyte\Blyte.lnk"
-  Delete "$SMPROGRAMS\Blyte\Manual.lnk"
+  Delete "$SMPROGRAMS\Trelby\Uninstall.lnk"
+  Delete "$SMPROGRAMS\Trelby\Website.lnk"
+  Delete "$DESKTOP\Trelby.lnk"
+  Delete "$SMPROGRAMS\Trelby\Trelby.lnk"
+  Delete "$SMPROGRAMS\Trelby\Manual.lnk"
 
   RMDir /r "$INSTDIR\resources"
-  RMDir "$SMPROGRAMS\Blyte"
+  RMDir "$SMPROGRAMS\Trelby"
   RMDir "$INSTDIR"
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-  DeleteRegKey HKCR ".blyte"
-  DeleteRegKey HKCR "Blyte.Screenplay\DefaultIcon"
-  DeleteRegKey HKCR "Blyte.Screenplay\shell"
-  DeleteRegKey HKCR "Blyte.Screenplay\shell\open\command"
-  DeleteRegKey HKCR "Blyte.Screenplay"
+  DeleteRegKey HKCR ".trel"
+  DeleteRegKey HKCR "Trelby.Screenplay\DefaultIcon"
+  DeleteRegKey HKCR "Trelby.Screenplay\shell"
+  DeleteRegKey HKCR "Trelby.Screenplay\shell\open\command"
+  DeleteRegKey HKCR "Trelby.Screenplay"
 
  !insertmacro UPDATEFILEASSOC
 

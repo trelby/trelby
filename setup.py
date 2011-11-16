@@ -4,7 +4,8 @@ import py2exe
 
 includes = [
     "encodings",
-    "encodings.*"
+    "encodings.*",
+    "lxml._elementpath"
     ]
 
 options = {
