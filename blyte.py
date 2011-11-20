@@ -208,12 +208,68 @@ class MyCtrl(wx.Control):
         wx.EVT_LEFT_DOWN(self, self.OnLeftDown)
         wx.EVT_LEFT_UP(self, self.OnLeftUp)
         wx.EVT_LEFT_DCLICK(self, self.OnLeftDown)
+        wx.EVT_RIGHT_DOWN(self, self.OnRightDown)
         wx.EVT_MOTION(self, self.OnMotion)
         wx.EVT_MOUSEWHEEL(self, self.OnMouseWheel)
         wx.EVT_CHAR(self, self.OnKeyChar)
 
+        self.typeMenu = wx.Menu()
+        
+        self.TYPE_SC = wx.NewId()
+        self.TYPE_AC = wx.NewId()
+        self.TYPE_CH = wx.NewId()
+        self.TYPE_PA = wx.NewId()
+        self.TYPE_DI = wx.NewId()
+        self.TYPE_TR = wx.NewId()
+        self.TYPE_NO = wx.NewId()
+        self.TYPE_SH = wx.NewId()
+
+        self.typeMenu.Append(self.TYPE_SC, "&Scene")
+        self.typeMenu.Append(self.TYPE_AC, "&Action")
+        self.typeMenu.Append(self.TYPE_CH, "&Character")
+        self.typeMenu.Append(self.TYPE_PA, "&Paranthetical")
+        self.typeMenu.Append(self.TYPE_DI, "&Dialogue")
+        self.typeMenu.Append(self.TYPE_TR, "&Transition")
+        self.typeMenu.Append(self.TYPE_SH, "Sh&ot")
+        self.typeMenu.Append(self.TYPE_NO, "&Note")
+
+        for item in (self.TYPE_SC, self.TYPE_AC, self.TYPE_CH, self.TYPE_PA,
+                     self.TYPE_DI, self.TYPE_TR, self.TYPE_NO, self.TYPE_SH):
+            wx.EVT_MENU(self, item, self.OnChangeType)
+
         self.createEmptySp()
         self.updateScreen(redraw = False)
+
+    def OnChangeType(self, event):
+        print event.GetId()
+        cs = screenplay.CommandState()
+        newtype = event.GetId()
+
+        if newtype == self.TYPE_SC:
+            self.cmdChangeToScene(cs)
+
+        elif newtype == self.TYPE_AC:
+            self.cmdChangeToAction(cs)
+            
+        elif newtype == self.TYPE_PA:
+            self.cmdChangeToParenthetical(cs)
+
+        elif newtype == self.TYPE_CH:
+            self.cmdChangeToCharacter(cs)
+
+        elif newtype == self.TYPE_DI:
+            self.cmdChangeToDialogue(cs)
+
+        elif newtype == self.TYPE_TR:
+            self.cmdChangeToTransition(cs)
+            
+        elif newtype == self.TYPE_NO:
+            self.cmdChangeToNote(cs)
+
+        elif newtype == self.TYPE_SH:
+            self.cmdChangeToShot(cs)
+
+        self.updateScreen()
 
     def clearVars(self):
         self.mouseSelectActive = False
@@ -538,6 +594,22 @@ class MyCtrl(wx.Control):
     def OnMotion(self, event):
         if event.LeftIsDown():
             self.OnLeftDown(event, mark = True)
+
+    def OnRightDown(self, event):
+        #No popup in the overview modes.
+        if gd.viewMode == VIEWMODE_OVERVIEW_SMALL or \
+            gd.viewMode == VIEWMODE_OVERVIEW_LARGE:
+            return
+
+        #Put cursor where clicked, and popup the line type menu.
+        pos = event.GetPosition()
+        line, col = gd.vm.pos2linecol(self, pos.x, pos.y)
+
+        if line != None and line != self.sp.line:
+            self.sp.gotoPos(line, 0, False)
+            self.updateScreen()
+
+        self.PopupMenu(self.typeMenu)
 
     def OnMouseWheel(self, event):
         if event.GetWheelRotation() > 0:
