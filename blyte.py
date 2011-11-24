@@ -213,61 +213,19 @@ class MyCtrl(wx.Control):
         wx.EVT_MOUSEWHEEL(self, self.OnMouseWheel)
         wx.EVT_CHAR(self, self.OnKeyChar)
 
-        self.typeMenu = wx.Menu()
-        
-        self.TYPE_SC = wx.NewId()
-        self.TYPE_AC = wx.NewId()
-        self.TYPE_CH = wx.NewId()
-        self.TYPE_PA = wx.NewId()
-        self.TYPE_DI = wx.NewId()
-        self.TYPE_TR = wx.NewId()
-        self.TYPE_NO = wx.NewId()
-        self.TYPE_SH = wx.NewId()
-
-        self.typeMenu.Append(self.TYPE_SC, "&Scene")
-        self.typeMenu.Append(self.TYPE_AC, "&Action")
-        self.typeMenu.Append(self.TYPE_CH, "&Character")
-        self.typeMenu.Append(self.TYPE_PA, "&Paranthetical")
-        self.typeMenu.Append(self.TYPE_DI, "&Dialogue")
-        self.typeMenu.Append(self.TYPE_TR, "&Transition")
-        self.typeMenu.Append(self.TYPE_SH, "Sh&ot")
-        self.typeMenu.Append(self.TYPE_NO, "&Note")
-
-        for item in (self.TYPE_SC, self.TYPE_AC, self.TYPE_CH, self.TYPE_PA,
-                     self.TYPE_DI, self.TYPE_TR, self.TYPE_NO, self.TYPE_SH):
-            wx.EVT_MENU(self, item, self.OnChangeType)
-
         self.createEmptySp()
         self.updateScreen(redraw = False)
 
     def OnChangeType(self, event):
-        print event.GetId()
         cs = screenplay.CommandState()
-        newtype = event.GetId()
 
-        if newtype == self.TYPE_SC:
-            self.cmdChangeToScene(cs)
+        lt = idToLTMap[event.GetId()]
 
-        elif newtype == self.TYPE_AC:
-            self.cmdChangeToAction(cs)
-            
-        elif newtype == self.TYPE_PA:
-            self.cmdChangeToParenthetical(cs)
+        self.sp.convertCurrentTo(lt)
+        self.sp.cmdPost(cs)
 
-        elif newtype == self.TYPE_CH:
-            self.cmdChangeToCharacter(cs)
-
-        elif newtype == self.TYPE_DI:
-            self.cmdChangeToDialogue(cs)
-
-        elif newtype == self.TYPE_TR:
-            self.cmdChangeToTransition(cs)
-            
-        elif newtype == self.TYPE_NO:
-            self.cmdChangeToNote(cs)
-
-        elif newtype == self.TYPE_SH:
-            self.cmdChangeToShot(cs)
+        if cs.needsVisifying:
+            self.makeLineVisible(self.sp.line)
 
         self.updateScreen()
 
@@ -584,7 +542,7 @@ class MyCtrl(wx.Control):
 
         self.mouseSelectActive = True
 
-        if line != None:
+        if line is not None:
             self.sp.gotoPos(line, col, mark)
             self.updateScreen()
 
@@ -596,20 +554,18 @@ class MyCtrl(wx.Control):
             self.OnLeftDown(event, mark = True)
 
     def OnRightDown(self, event):
-        #No popup in the overview modes.
-        if gd.viewMode == VIEWMODE_OVERVIEW_SMALL or \
-            gd.viewMode == VIEWMODE_OVERVIEW_LARGE:
+        # No popup in the overview modes.
+        if gd.viewMode in (VIEWMODE_OVERVIEW_SMALL, VIEWMODE_OVERVIEW_LARGE):
             return
 
-        #Put cursor where clicked, and popup the line type menu.
         pos = event.GetPosition()
         line, col = gd.vm.pos2linecol(self, pos.x, pos.y)
 
-        if line != None and line != self.sp.line:
+        if line is not None and line != self.sp.line:
             self.sp.gotoPos(line, 0, False)
             self.updateScreen()
 
-        self.PopupMenu(self.typeMenu)
+        self.PopupMenu(mainFrame.typeMenu)
 
     def OnMouseWheel(self, event):
         if event.GetWheelRotation() > 0:
@@ -1771,6 +1727,18 @@ class MyFrame(wx.Frame):
 
         self.tabCtrl.setPageChangedFunc(self.OnPageChange)
 
+        # see OnRightDown
+        self.typeMenu = wx.Menu()
+
+        self.typeMenu.Append(ID_ELEM_TO_SCENE, "&Scene")
+        self.typeMenu.Append(ID_ELEM_TO_ACTION, "&Action")
+        self.typeMenu.Append(ID_ELEM_TO_CHARACTER, "&Character")
+        self.typeMenu.Append(ID_ELEM_TO_PAREN, "&Parenthetical")
+        self.typeMenu.Append(ID_ELEM_TO_DIALOGUE, "&Dialogue")
+        self.typeMenu.Append(ID_ELEM_TO_TRANSITION, "&Transition")
+        self.typeMenu.Append(ID_ELEM_TO_SHOT, "Sh&ot")
+        self.typeMenu.Append(ID_ELEM_TO_NOTE, "&Note")
+
         wx.EVT_MENU(self, ID_FILE_NEW, self.OnNewScript)
         wx.EVT_MENU(self, ID_FILE_OPEN, self.OnOpen)
         wx.EVT_MENU(self, ID_FILE_SAVE, self.OnSave)
@@ -1825,8 +1793,12 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         wx.EVT_MENU(self, ID_HELP_MANUAL, self.OnHelpManual)
         wx.EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
+
         wx.EVT_MENU_RANGE(self, gd.mru.getIds()[0], gd.mru.getIds()[1],
                           self.OnMRUFile)
+
+        wx.EVT_MENU_RANGE(self, ID_ELEM_TO_ACTION, ID_ELEM_TO_TRANSITION,
+                          self.OnChangeType)
 
         def addTBMenu(id, menu):
             wx.EVT_MENU(self, id, partial(self.OnToolBarMenu, menu=menu))
@@ -1917,12 +1889,32 @@ class MyFrame(wx.Frame):
             "ID_TOOLBAR_VIEWS",
             "ID_TOOLBAR_TOOLS",
             "ID_VIEW_FULL_SCREEN",
+            "ID_ELEM_TO_ACTION",
+            "ID_ELEM_TO_CHARACTER",
+            "ID_ELEM_TO_DIALOGUE",
+            "ID_ELEM_TO_NOTE",
+            "ID_ELEM_TO_PAREN",
+            "ID_ELEM_TO_SCENE",
+            "ID_ELEM_TO_SHOT",
+            "ID_ELEM_TO_TRANSITION",
             ]
 
         g = globals()
         
         for n in names:
             g[n] = wx.NewId()
+
+        # see OnChangeType
+        g["idToLTMap"] = {
+            ID_ELEM_TO_SCENE : screenplay.SCENE,
+            ID_ELEM_TO_ACTION : screenplay.ACTION,
+            ID_ELEM_TO_CHARACTER : screenplay.CHARACTER,
+            ID_ELEM_TO_DIALOGUE : screenplay.DIALOGUE,
+            ID_ELEM_TO_PAREN : screenplay.PAREN,
+            ID_ELEM_TO_TRANSITION : screenplay.TRANSITION,
+            ID_ELEM_TO_SHOT : screenplay.SHOT,
+            ID_ELEM_TO_NOTE : screenplay.NOTE,
+            }
 
     def createNewPanel(self):
         newPanel = MyPanel(self.tabCtrl.getTabParent(), -1)
@@ -2313,6 +2305,9 @@ class MyFrame(wx.Frame):
 
     def OnCompareScripts(self, event = None):
         self.panel.ctrl.OnCompareScripts()
+
+    def OnChangeType(self, event):
+        self.panel.ctrl.OnChangeType(event)
 
     def OnHelpCommands(self, event = None):
         dlg = commandsdlg.CommandsDlg(cfgGl)
