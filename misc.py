@@ -45,7 +45,7 @@ def init(doWX = True):
         confPath = ".trelby"
     else:
         if isUnix:
-            progPath = "/opt/blyte"
+            progPath = "/opt/trelby"
             confPath = os.environ["HOME"] + "/.trelby"
         else:
             progPath = r"C:\Program Files\Trelby"
@@ -78,7 +78,7 @@ def getBitmap(filename):
     return wx.Bitmap(getFullPath(filename))
 
 # return the absolute path of a file under the install dir. so passing in
-# "resources/blaa.png" might return "/opt/blyte/resources/blaa.png" for
+# "resources/blaa.png" might return "/opt/trelby/resources/blaa.png" for
 # example.
 def getFullPath(relative):
     return progPath + "/" + relative

@@ -68,7 +68,7 @@ Your freshly created Setup-Trelby-<version>.exe should be ready.
 
 On Linux:
 
- $ cd ~/blyte/src
+ $ cd ~/trelby/src
  $ ./trelby.py --test
 
 On Windows:

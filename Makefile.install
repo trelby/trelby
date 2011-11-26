@@ -1,4 +1,4 @@
-DIR := /opt/blyte
+DIR := /opt/trelby
 
 install:
 	rm -rf $(DIR)/*

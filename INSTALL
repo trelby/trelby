@@ -3,12 +3,12 @@ Installation instructions for Trelby on Linux
 
 You have to copy all the files (excluding INSTALL and Makefile) to
 /opt/trelby. Afterwards you can run the program with the command
-"/opt/blyte/trelby.py".
+"/opt/trelby/trelby.py".
 
 The supplied makefile copies everything to the right place if you run
 "make install". It requires root access (assuming /opt is not
 writable with normal user permissions) and WILL DO "rm -rf
-/opt/blyte", so be sure there's nothing important stored there.
+/opt/trelby", so be sure there's nothing important stored there.
 
 See the website (http://www.trelby.org/) for the requirements for running
 Trelby on Linux.

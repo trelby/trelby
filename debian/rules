@@ -18,7 +18,7 @@ install: build
 		dh_testroot
 		dh_prep
 		dh_installdirs
-		$(MAKE) DESTDIR=$(CURDIR)/debian/blyte install
+		$(MAKE) DESTDIR=$(CURDIR)/debian/trelby install
 binary-arch: build install
 		# emptiness
 binary-indep: build install

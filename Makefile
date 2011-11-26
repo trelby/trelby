@@ -1,6 +1,6 @@
 .PHONY = dist
 
-BINDIR = $(DESTDIR)/opt/blyte
+BINDIR = $(DESTDIR)/opt/trelby
 DESKTOPDIR = $(DESTDIR)/usr/share/applications
 
 dist: names.txt.gz dict_en.dat.gz manual.pdf

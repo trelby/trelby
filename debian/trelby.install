@@ -1,2 +1,2 @@
-debian/blyte/opt/blyte/* opt/blyte/
-debian/blyte/opt/blyte/trelby.desktop usr/share/applications/
+debian/trelby/opt/trelby/* opt/trelby/
+debian/trelby/opt/trelby/trelby.desktop usr/share/applications/
