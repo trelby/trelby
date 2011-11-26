@@ -1,1 +1,1 @@
-\python23\python blyte.py --test sample.trelby
+\python23\python trelby.py --test sample.trelby

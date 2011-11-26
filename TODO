@@ -2,7 +2,7 @@
 
 -add suffix automatically if missing in save/export
 
--move some/all of GlobalData/MyPanel/MyCtrl/MyFrame out of blyte.py
+-move some/all of GlobalData/MyPanel/MyCtrl/MyFrame out of trelby.py
 
 -rename: blyte -> trelby
 
