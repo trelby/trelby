@@ -58,7 +58,7 @@ class Dict:
                       mypickle.StrLatin1Var("", "", ""))
 
             v.makeDicts()
-            
+
         self.__class__.cvars.setDefaults(self)
 
         # we have wordsList that we use for saving/loading, and words,
@@ -67,7 +67,7 @@ class Dict:
 
         # key = word, lowercased, value = None
         self.words = {}
-        
+
     # load from string 's'. does not throw any exceptions and silently
     # ignores any errors.
     def load(self, s):
@@ -95,7 +95,7 @@ class Dict:
 
             if w:
                 ww[w] = None
-        
+
         self.words = ww
 
     # returns True if word is known
@@ -122,7 +122,7 @@ class Dict:
         keys.sort()
 
         return keys
-        
+
     # clean up word in all possible ways and return it, or an empty string
     # if nothing remains.
     def cleanWord(self, word):
@@ -143,7 +143,7 @@ class SpellChecker:
 
         # key = word found in character names, value = None
         self.cnames = {}
-        
+
         for it in sp.getCharacterNames():
             for w in util.splitToWords(it):
                 self.cnames[w] = None
@@ -170,7 +170,7 @@ class SpellChecker:
 
         while 1:
             word, line, col = self.sp.getWord(line, col)
-            
+
             if not word:
                 return False
 
@@ -180,7 +180,7 @@ class SpellChecker:
                 self.col = col
 
                 return True
-            
+
             col += len(word)
 
     # return True if word is a known word.
@@ -196,22 +196,22 @@ class SpellChecker:
 # Calculates the Levenshtein distance between a and b.
 def lev(a, b):
     n, m = len(a), len(b)
-    
+
     if n > m:
         # Make sure n <= m, to use O(min(n, m)) space
         a, b = b, a
         n, m = m, n
 
     current = range(n + 1)
-    
+
     for i in range(1, m + 1):
         previous, current = current, [i] + [0] * m
-        
+
         for j in range(1, n + 1):
             add, delete = previous[j] + 1, current[j - 1] + 1
-            
+
             change = previous[j - 1]
-            
+
             if a[j - 1] != b[i - 1]:
                 change += 1
 

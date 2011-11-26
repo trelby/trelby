@@ -47,7 +47,7 @@ class MyListBook(wx.ListBox):
     def SetPageSizes(self, w, h):
         for page in self.GetPages():
             page.SetClientSizeWH(w, h)
-        
+
     def OnPageChange(self, event = None):
         for page in self.GetPages():
             page.Hide()
@@ -73,24 +73,24 @@ class CfgDlg(wx.Dialog):
 
         global cfgFrame
         cfgFrame = self
-        
+
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         self.listbook = MyListBook(self)
         w = util.getTextExtent(self.listbook.GetFont(), "Formatting")[0]
         util.setWH(self.listbook, w + 20, 200)
-        
+
         hsizer.Add(self.listbook, 0, wx.EXPAND)
 
         self.panel = wx.Panel(self, -1)
-        
+
         hsizer.Add(self.panel, 1, wx.EXPAND)
 
         if isGlobal:
             self.SetTitle("Settings dialog")
-            
+
             self.AddPage(ColorsPanel, "Colors")
             self.AddPage(DisplayPanel, "Display")
             self.AddPage(ElementsGlobalPanel, "Elements")
@@ -98,7 +98,7 @@ class CfgDlg(wx.Dialog):
             self.AddPage(MiscPanel, "Misc")
         else:
             self.SetTitle("Script settings dialog")
-            
+
             self.AddPage(ElementsPanel, "Elements")
             self.AddPage(FormattingPanel, "Formatting")
             self.AddPage(PaperPanel, "Paper")
@@ -116,26 +116,26 @@ class CfgDlg(wx.Dialog):
         # it's unclear whether SetSelection sends an event on all
         # platforms or not, so force correct action.
         self.listbook.OnPageChange()
-        
+
         vsizer.Add(hsizer, 1, wx.EXPAND)
 
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
-        
+
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
-        
+
         applyBtn = gutil.createStockButton(self, "Apply")
         hsizer.Add(applyBtn, 0, wx.ALL, 5)
 
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn, 0, wx.ALL, 5)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.ALL, 5)
 
         vsizer.Add(hsizer, 0, wx.EXPAND)
-        
+
         self.SetSizerAndFit(vsizer)
         self.Layout()
         self.Center()
@@ -173,25 +173,25 @@ class DisplayPanel(wx.Panel):
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         vsizer.Add(wx.StaticText(self, -1, "Screen fonts:"))
-        
+
         self.fontsLb = wx.ListBox(self, -1, size = (300, 100))
 
         for it in ["fontNormal", "fontBold", "fontItalic", "fontBoldItalic"]:
             self.fontsLb.Append("", it)
         self.fontsLb.SetSelection(0)
         self.updateFontLb()
-        
+
         vsizer.Add(self.fontsLb, 0, wx.BOTTOM, 10)
-        
+
         btn = wx.Button(self, -1, "Change")
         wx.EVT_BUTTON(self, btn.GetId(), self.OnChangeFont)
         vsizer.Add(btn, 0, wx.BOTTOM, 20)
 
         vsizer.Add(wx.StaticText(self, -1, "The settings below apply only"
                                 " to 'Draft' view mode."), 0, wx.BOTTOM, 15)
-        
+
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         hsizer.Add(wx.StaticText(self, -1, "Row spacing:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
 
@@ -214,7 +214,7 @@ class DisplayPanel(wx.Panel):
         self.cfg2gui()
 
         util.finishWindow(self, vsizer, center = False)
-        
+
         wx.EVT_RADIOBOX(self, self.pbRb.GetId(), self.OnMisc)
 
     def OnKillFocus(self, event):
@@ -227,7 +227,7 @@ class DisplayPanel(wx.Panel):
     def OnChangeFont(self, event):
         fname = self.fontsLb.GetClientData(self.fontsLb.GetSelection())
         nfont = getattr(self.cfg, fname)
-        
+
         fd = wx.FontData()
         nfi = wx.NativeFontInfo()
         nfi.FromString(nfont)
@@ -241,7 +241,7 @@ class DisplayPanel(wx.Panel):
                 setattr(self.cfg, fname, font.GetNativeFontInfo().ToString())
 
                 self.cfg.fontYdelta = util.getFontHeight(font)
-                
+
                 self.cfg2gui()
                 self.updateFontLb()
             else:
@@ -265,11 +265,11 @@ class DisplayPanel(wx.Panel):
             s = nfi.GetFaceName()
 
             self.fontsLb.SetString(i, "%s: %s, %d" % (names[i], s, ps))
-        
+
     def cfg2gui(self):
         self.spacingEntry.SetValue(self.cfg.fontYdelta)
         self.pbRb.SetSelection(self.cfg.pbi)
-        
+
 class ElementsPanel(wx.Panel):
     def __init__(self, parent, id, cfg):
         wx.Panel.__init__(self, parent, id)
@@ -294,14 +294,14 @@ class ElementsPanel(wx.Panel):
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 10)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         hsizer.Add(self.addTextStyles("Screen", "screen", self))
         hsizer.Add(self.addTextStyles("Print", "export", self), 0, wx.LEFT, 10)
-        
+
         vsizer.Add(hsizer, 0, wx.BOTTOM, 10)
 
         gsizer = wx.FlexGridSizer(2, 2, 5, 0)
-        
+
         gsizer.Add(wx.StaticText(self, -1, "Empty lines / 10 before:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
 
@@ -312,7 +312,7 @@ class ElementsPanel(wx.Panel):
         wx.EVT_KILL_FOCUS(tmp, self.OnKillFocus)
         gsizer.Add(tmp)
         self.beforeSpacingEntry = tmp
-        
+
         gsizer.Add(wx.StaticText(self, -1, "Empty lines / 10 between:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
 
@@ -323,14 +323,14 @@ class ElementsPanel(wx.Panel):
         wx.EVT_KILL_FOCUS(tmp, self.OnKillFocus)
         gsizer.Add(tmp)
         self.intraSpacingEntry = tmp
-        
+
         vsizer.Add(gsizer, 0, wx.BOTTOM, 20)
-        
+
         gsizer = wx.FlexGridSizer(2, 3, 5, 0)
 
         gsizer.Add(wx.StaticText(self, -1, "Indent:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        
+
         self.indentEntry = wx.SpinCtrl(self, -1)
         self.indentEntry.SetRange(
             *self.cfg.getType(screenplay.ACTION).cvars.getMinMax("indent"))
@@ -343,7 +343,7 @@ class ElementsPanel(wx.Panel):
 
         gsizer.Add(wx.StaticText(self, -1, "Width:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        
+
         self.widthEntry = wx.SpinCtrl(self, -1)
         self.widthEntry.SetRange(
             *self.cfg.getType(screenplay.ACTION).cvars.getMinMax("width"))
@@ -374,12 +374,12 @@ class ElementsPanel(wx.Panel):
         pad = 0
         if misc.isWindows:
             pad = 5
-        
+
         self.addCheckBox("Caps", prefix, parent, gsizer, pad)
         self.addCheckBox("Italic", prefix, parent, gsizer, pad)
         self.addCheckBox("Bold", prefix, parent, gsizer, pad)
         self.addCheckBox("Underlined", prefix, parent, gsizer, pad)
-            
+
         hsizer.Add(gsizer, 0, wx.EXPAND)
 
         return hsizer
@@ -389,7 +389,7 @@ class ElementsPanel(wx.Panel):
         wx.EVT_CHECKBOX(self, cb.GetId(), self.OnStyleCb)
         sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, prefix + name + "Cb", cb)
-        
+
     def OnKillFocus(self, event):
         self.OnMisc()
 
@@ -401,10 +401,10 @@ class ElementsPanel(wx.Panel):
         self.lt = self.elementsCombo.GetClientData(self.elementsCombo.
                                                      GetSelection())
         self.cfg2gui()
-                         
+
     def OnStyleCb(self, event):
         tcfg = self.cfg.types[self.lt]
-        
+
         tcfg.screen.isCaps = self.screenCapsCb.GetValue()
         tcfg.screen.isItalic = self.screenItalicCb.GetValue()
         tcfg.screen.isBold = self.screenBoldCb.GetValue()
@@ -422,10 +422,10 @@ class ElementsPanel(wx.Panel):
         tcfg.intraSpacing = util.getSpinValue(self.intraSpacingEntry)
         tcfg.indent = util.getSpinValue(self.indentEntry)
         tcfg.width = util.getSpinValue(self.widthEntry)
-            
+
     def cfg2gui(self):
         tcfg = self.cfg.types[self.lt]
-        
+
         self.screenCapsCb.SetValue(tcfg.screen.isCaps)
         self.screenItalicCb.SetValue(tcfg.screen.isItalic)
         self.screenBoldCb.SetValue(tcfg.screen.isBold)
@@ -441,7 +441,7 @@ class ElementsPanel(wx.Panel):
         self.beforeSpacingEntry.SetValue(5)
         self.intraSpacingEntry.SetValue(5)
         self.indentEntry.SetValue(5)
-        
+
         self.beforeSpacingEntry.SetValue(tcfg.beforeSpacing)
         self.intraSpacingEntry.SetValue(tcfg.intraSpacing)
         self.indentEntry.SetValue(tcfg.indent)
@@ -460,7 +460,7 @@ class ColorsPanel(wx.Panel):
 
         tmp = self.cfg.cvars.color.values()
         tmp.sort(lambda c1, c2: cmp(c1.descr, c2.descr))
-        
+
         for it in tmp:
             self.colorsLb.Append(it.descr, it.name)
 
@@ -477,7 +477,7 @@ class ColorsPanel(wx.Panel):
         self.colorSample = misc.MyColorSample(self, -1,
             size = wx.Size(200, 50))
         hsizer.Add(self.colorSample)
-        
+
         vsizer.Add(hsizer, 0, wx.EXPAND)
 
         util.finishWindow(self, vsizer, center = False)
@@ -490,7 +490,7 @@ class ColorsPanel(wx.Panel):
         self.color = self.colorsLb.GetClientData(self.colorsLb.
                                                     GetSelection())
         self.cfg2gui()
-                         
+
     def OnChangeColor(self, event):
         cd = wx.ColourData()
         cd.SetColour(getattr(self.cfg, self.color).toWx())
@@ -502,25 +502,25 @@ class ColorsPanel(wx.Panel):
         dlg.Destroy()
 
         self.cfg2gui()
-            
+
     def cfg2gui(self):
         self.colorSample.SetBackgroundColour(
             getattr(self.cfg, self.color).toWx())
         self.colorSample.Refresh()
-        
+
 class PaperPanel(wx.Panel):
     def __init__(self, parent, id, cfg):
         wx.Panel.__init__(self, parent, id)
         self.cfg = cfg
 
         self.blockEvents = 1
-        
+
         self.paperSizes = {
             "A4" : (210.0, 297.0),
             "Letter" : (215.9, 279.4),
             "Custom" : (1.0, 1.0)
             }
-        
+
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         gsizer = wx.FlexGridSizer(3, 2, 5, 5)
@@ -554,7 +554,7 @@ class PaperPanel(wx.Panel):
         gsizer.Add(hsizer)
 
         vsizer.Add(gsizer, 0, wx.BOTTOM, 10)
-        
+
         bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, "Margins"),
                                   wx.HORIZONTAL)
 
@@ -564,9 +564,9 @@ class PaperPanel(wx.Panel):
         self.addMarginCtrl("Bottom", self, gsizer)
         self.addMarginCtrl("Left", self, gsizer)
         self.addMarginCtrl("Right", self, gsizer)
-            
+
         bsizer.Add(gsizer, 0, wx.EXPAND | wx.ALL, 10)
-        
+
         vsizer.Add(bsizer, 0, wx.BOTTOM, 10)
 
         vsizer.Add(wx.StaticText(self, -1, "(1 inch = 25.4 mm)"), 0,
@@ -577,9 +577,9 @@ class PaperPanel(wx.Panel):
         # wxwindows doesn't recalculate sizer size correctly at startup so
         # set initial text
         self.setLines()
-        
+
         vsizer.Add(self.linesLabel, 0, wx.TOP, 20)
-        
+
         util.finishWindow(self, vsizer, center = False)
 
         ptype = "Custom"
@@ -587,29 +587,29 @@ class PaperPanel(wx.Panel):
             if self.eqFloat(self.cfg.paperWidth, v[0]) and \
                self.eqFloat(self.cfg.paperHeight, v[1]):
                 ptype = k
-            
+
         idx = self.paperCombo.FindString(ptype)
         if idx != -1:
             self.paperCombo.SetSelection(idx)
-        
+
         wx.EVT_COMBOBOX(self, self.paperCombo.GetId(), self.OnPaperCombo)
         self.OnPaperCombo(None)
 
         wx.EVT_TEXT(self, self.widthEntry.GetId(), self.OnMisc)
         wx.EVT_TEXT(self, self.heightEntry.GetId(), self.OnMisc)
-        
+
         self.cfg2mm()
         self.cfg2inch()
-        
+
         self.blockEvents -= 1
 
     def eqFloat(self, f1, f2):
         return round(f1, 2) == round(f2, 2)
-        
+
     def addMarginCtrl(self, name, parent, sizer):
         sizer.Add(wx.StaticText(parent, -1, name + ":"), 0,
                   wx.ALIGN_CENTER_VERTICAL)
-        
+
         entry = wx.TextCtrl(parent, -1)
         sizer.Add(entry, 0)
         label = wx.StaticText(parent, -1, "mm")
@@ -632,12 +632,12 @@ class PaperPanel(wx.Panel):
     def setLines(self):
         self.cfg.recalc(False)
         self.linesLabel.SetLabel("Lines per page: %d" % self.cfg.linesOnPage)
-        
+
     def OnPaperCombo(self, event):
         w, h = self.paperCombo.GetClientData(self.paperCombo.GetSelection())
 
         ptype = self.paperCombo.GetStringSelection()
-        
+
         if ptype == "Custom":
             self.widthEntry.Enable(True)
             self.heightEntry.Enable(True)
@@ -646,27 +646,27 @@ class PaperPanel(wx.Panel):
         else:
             self.widthEntry.Disable()
             self.heightEntry.Disable()
-        
+
         self.widthEntry.SetValue(str(w))
         self.heightEntry.SetValue(str(h))
 
         self.setLines()
-                         
+
     def OnMisc(self, event):
         if self.blockEvents > 0:
             return
 
         self.entry2float(self.widthEntry, "paperWidth")
         self.entry2float(self.heightEntry, "paperHeight")
-    
+
         self.setLines()
-        
+
     def OnMarginMm(self, event):
         if self.blockEvents > 0:
             return
 
         self.blockEvents += 1
-        
+
         self.entry2float(self.topEntryMm, "marginTop")
         self.entry2float(self.bottomEntryMm, "marginBottom")
         self.entry2float(self.leftEntryMm, "marginLeft")
@@ -677,7 +677,7 @@ class PaperPanel(wx.Panel):
         self.cfg2inch()
 
         self.blockEvents -= 1
-        
+
     def OnMarginInch(self, event):
         if self.blockEvents > 0:
             return
@@ -690,7 +690,7 @@ class PaperPanel(wx.Panel):
         self.entry2float(self.rightEntryInch, "marginRight", 25.4)
 
         self.setLines()
-        
+
         self.cfg2mm()
 
         self.blockEvents -= 1
@@ -721,7 +721,7 @@ class FormattingPanel(wx.Panel):
         vsizer.Add(wx.StaticText(self, -1,
             "Leave at least this many lines at the end of a page when\n"
             "breaking in the middle of an element:"), 0, wx.BOTTOM, 5)
-        
+
         gsizer = wx.FlexGridSizer(2, 2, 5, 0)
 
         self.addSpin("action", "Action:", self, gsizer, "pbActionLines")
@@ -741,7 +741,7 @@ class FormattingPanel(wx.Panel):
         wx.EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
         hsizer.Add(self.sceneContinuedsCb, 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
-        
+
         self.addSpin("sceneContinuedIndent", "indent:", self, hsizer,
                      "sceneContinuedIndent")
         hsizer.Add(wx.StaticText(self, -1, "characters"), 0,
@@ -763,13 +763,13 @@ class FormattingPanel(wx.Panel):
         vsizer.Add(self.lineNumbersCb, 0, wx.TOP, pad)
 
         self.cfg2gui()
-        
+
         util.finishWindow(self, vsizer, center = False)
 
     def addSpin(self, name, descr, parent, sizer, cfgName):
         sizer.Add(wx.StaticText(parent, -1, descr), 0,
                   wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        
+
         entry = wx.SpinCtrl(parent, -1)
         entry.SetRange(*self.cfg.cvars.getMinMax(cfgName))
         wx.EVT_SPINCTRL(self, entry.GetId(), self.OnMisc)
@@ -794,14 +794,14 @@ class FormattingPanel(wx.Panel):
         self.cfg.fontSize = util.getSpinValue(self.fontSizeEntry)
         self.cfg.pdfShowSceneNumbers = self.scenesCb.GetValue()
         self.cfg.pdfShowLineNumbers = self.lineNumbersCb.GetValue()
-        
+
     def cfg2gui(self):
         # stupid wxwindows/wxpython displays empty box if the initial
         # value is zero if we don't do this...
         self.actionEntry.SetValue(5)
         self.dialogueEntry.SetValue(5)
         self.sceneContinuedIndentEntry.SetValue(5)
-        
+
         self.actionEntry.SetValue(self.cfg.pbActionLines)
         self.dialogueEntry.SetValue(self.cfg.pbDialogueLines)
         self.sceneContinuedsCb.SetValue(self.cfg.sceneContinueds)
@@ -816,7 +816,7 @@ class KeyboardPanel(wx.Panel):
         self.cfg = cfg
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
-        
+
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
@@ -838,12 +838,12 @@ class KeyboardPanel(wx.Panel):
 
         self.keysLb = wx.ListBox(self, -1, size = (150, 60))
         vsizer2.Add(self.keysLb, 1, wx.BOTTOM, 10)
-        
+
         btn = wx.Button(self, -1, "Add")
         wx.EVT_BUTTON(self, btn.GetId(), self.OnAdd)
         vsizer2.Add(btn, 0, wx.ALIGN_CENTER | wx.BOTTOM, 10)
         self.addBtn = btn
-        
+
         btn = wx.Button(self, -1, "Delete")
         wx.EVT_BUTTON(self, btn.GetId(), self.OnDelete)
         vsizer2.Add(btn, 0, wx.ALIGN_CENTER | wx.BOTTOM, 10)
@@ -854,7 +854,7 @@ class KeyboardPanel(wx.Panel):
         self.descEntry = wx.TextCtrl(self, -1,
             style = wx.TE_MULTILINE | wx.TE_READONLY, size = (150, 75))
         vsizer2.Add(self.descEntry, 1, wx.EXPAND)
-        
+
         hsizer.Add(vsizer2, 0, wx.EXPAND | wx.BOTTOM, 10)
 
         vsizer.Add(hsizer)
@@ -864,7 +864,7 @@ class KeyboardPanel(wx.Panel):
         self.conflictsEntry = wx.TextCtrl(self, -1,
             style = wx.TE_MULTILINE | wx.TE_READONLY, size = (50, 75))
         vsizer.Add(self.conflictsEntry, 1, wx.EXPAND)
-        
+
         util.finishWindow(self, vsizer, center = False)
 
         wx.EVT_LISTBOX(self, self.commandsLb.GetId(), self.OnCommandLb)
@@ -897,7 +897,7 @@ class KeyboardPanel(wx.Panel):
                               "Error", wx.OK, cfgFrame)
 
                 return
-                
+
             self.cmd.keys.append(kint)
             self.cfg2gui()
 
@@ -907,18 +907,18 @@ class KeyboardPanel(wx.Panel):
             key = self.keysLb.GetClientData(sel)
             self.cfg.removeKey(self.cmd, key)
             self.cfg2gui()
-        
+
     def cfg2gui(self):
         self.cfg.addShiftKeys()
         self.keysLb.Clear()
-        
+
         for key in self.cmd.keys:
             k = util.Key.fromInt(key)
             self.keysLb.Append(k.toStr(), key)
 
         self.addBtn.Enable(not self.cmd.isFixed)
         self.deleteBtn.Enable(not self.cmd.isFixed)
-        
+
         s = self.cmd.desc
         self.descEntry.SetValue(s)
         self.updateConflicts()
@@ -929,7 +929,7 @@ class KeyboardPanel(wx.Panel):
             s = "None"
 
         self.conflictsEntry.SetValue(s)
-        
+
 class MiscPanel(wx.Panel):
     def __init__(self, parent, id, cfg):
         wx.Panel.__init__(self, parent, id)
@@ -939,9 +939,9 @@ class MiscPanel(wx.Panel):
 
         bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1,
             "Default script directory"), wx.VERTICAL)
-        
+
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         self.scriptDirEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.scriptDirEntry, 1,
                    wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
@@ -961,7 +961,7 @@ class MiscPanel(wx.Panel):
 
         hsizer.Add(wx.StaticText(self, -1, "Path:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        
+
         self.progEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.progEntry, 1, wx.ALIGN_CENTER_VERTICAL)
 
@@ -970,12 +970,12 @@ class MiscPanel(wx.Panel):
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
         bsizer.Add(hsizer, 1, wx.EXPAND)
-        
+
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         hsizer.Add(wx.StaticText(self, -1, "Arguments:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        
+
         self.argsEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.argsEntry, 1, wx.ALIGN_CENTER_VERTICAL)
 
@@ -1016,10 +1016,10 @@ class MiscPanel(wx.Panel):
 
         self.addSpin("confDel", "Confirm deletes >= this many lines\n"
                      " (0 = disable):", self, vsizer, "confirmDeletes")
-        
+
         self.addSpin("wheelScroll", "Lines to scroll per mouse wheel event:",
                      self, vsizer, "mouseWheelLines")
-            
+
         self.cfg2gui()
 
         util.finishWindow(self, vsizer, center = False)
@@ -1030,18 +1030,18 @@ class MiscPanel(wx.Panel):
 
     def addSpin(self, name, descr, parent, sizer, cfgName):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         hsizer.Add(wx.StaticText(parent, -1, descr), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        
+
         tmp = wx.SpinCtrl(parent, -1)
         tmp.SetRange(*self.cfg.cvars.getMinMax(cfgName))
         wx.EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
         wx.EVT_KILL_FOCUS(tmp, self.OnKillFocus)
         hsizer.Add(tmp)
-        
+
         sizer.Add(hsizer, 0, wx.BOTTOM, 10)
-        
+
         setattr(self, name + "Entry", tmp)
 
     def OnKillFocus(self, event):
@@ -1073,7 +1073,7 @@ class MiscPanel(wx.Panel):
             self.scriptDirEntry.SetValue(dlg.GetPath())
 
         dlg.Destroy()
-            
+
     def OnBrowsePDF(self, event):
         dlg = wx.FileDialog(
             cfgFrame, "Choose program",
@@ -1145,7 +1145,7 @@ class ElementsGlobalPanel(wx.Panel):
     def addTypeCombo(self, name, descr, parent, sizer):
         sizer.Add(wx.StaticText(parent, -1, descr + ":"), 0,
                   wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        
+
         combo = wx.ComboBox(parent, -1, style = wx.CB_READONLY)
 
         for t in config.getTIs():
@@ -1154,14 +1154,14 @@ class ElementsGlobalPanel(wx.Panel):
         sizer.Add(combo)
 
         wx.EVT_COMBOBOX(self, combo.GetId(), self.OnMisc)
-        
+
         setattr(self, name + "Combo", combo)
 
     def OnElementCombo(self, event = None):
         self.lt = self.elementsCombo.GetClientData(self.elementsCombo.
                                                    GetSelection())
         self.cfg2gui()
-                         
+
     def OnMisc(self, event = None):
         tcfg = self.cfg.types[self.lt]
 
@@ -1173,10 +1173,10 @@ class ElementsGlobalPanel(wx.Panel):
             self.nextTabCombo.GetSelection())
         tcfg.prevTypeTab = self.prevTabCombo.GetClientData(
             self.prevTabCombo.GetSelection())
-            
+
     def cfg2gui(self):
         tcfg = self.cfg.types[self.lt]
-        
+
         util.reverseComboSelect(self.newEnterCombo, tcfg.newTypeEnter)
         util.reverseComboSelect(self.newTabCombo, tcfg.newTypeTab)
         util.reverseComboSelect(self.nextTabCombo, tcfg.nextTypeTab)
@@ -1191,7 +1191,7 @@ class StringsPanel(wx.Panel):
         # this class and the name of a string configuration variable in
         # cfg.
         self.items = []
-        
+
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         gsizer = wx.FlexGridSizer(4, 2, 5, 0)
@@ -1217,7 +1217,7 @@ class StringsPanel(wx.Panel):
 
         tmp = wx.TextCtrl(parent, -1)
         sizer.Add(tmp, 0, wx.EXPAND | wx.ALIGN_CENTER_VERTICAL)
-        
+
         setattr(self, name, tmp)
         self.items.append(name)
 
@@ -1249,7 +1249,7 @@ class PDFPanel(wx.Panel):
 
         self.openOnCurrentPageCb = self.addCb("Open PDF on current page",
                                               vsizer, pad)
-        
+
         self.removeNotesCb = self.addCb(
             "Omit Note elements", vsizer, pad)
 
@@ -1259,7 +1259,7 @@ class PDFPanel(wx.Panel):
         self.marginsCb = self.addCb("Show margins (debug)", vsizer, pad)
 
         self.cfg2gui()
-        
+
         util.finishWindow(self, vsizer, center = False)
 
     def addCb(self, descr, sizer, pad):
@@ -1278,7 +1278,7 @@ class PDFPanel(wx.Panel):
         self.cfg.pdfShowMargins = self.marginsCb.GetValue()
 
         self.outlineNotesCb.Enable(not self.cfg.pdfRemoveNotes)
-        
+
     def cfg2gui(self):
         self.includeTOCCb.SetValue(self.cfg.pdfIncludeTOC)
         self.showTOCCb.SetValue(self.cfg.pdfShowTOC)
@@ -1296,7 +1296,7 @@ class PDFFontsPanel(wx.Panel):
 
         # last directory we chose a font from
         self.lastDir = u""
-        
+
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         vsizer.Add(wx.StaticText(self, -1,
@@ -1310,7 +1310,7 @@ class PDFFontsPanel(wx.Panel):
             "See the manual for the full details.\n"))
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         hsizer.Add(wx.StaticText(self, -1, "Type:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
 
@@ -1356,11 +1356,11 @@ class PDFFontsPanel(wx.Panel):
 
             if pf.filename:
                 self.getFontPostscriptName(pf.filename)
-        
+
     def addEntry(self, name, descr, parent, sizer):
         sizer.Add(wx.StaticText(parent, -1, descr), 0,
                   wx.ALIGN_CENTER_VERTICAL)
-        
+
         entry = wx.TextCtrl(parent, -1)
         sizer.Add(entry, 1, wx.EXPAND)
 
@@ -1382,7 +1382,7 @@ class PDFFontsPanel(wx.Panel):
         else:
             dDir = self.lastDir
             dFile = u""
-                           
+
         dlg = wx.FileDialog(cfgFrame, "Choose font file",
             defaultDir = dDir, defaultFile = dFile,
             wildcard = "TrueType fonts (*.ttf;*.TTF)|*.ttf;*.TTF|All files|*",

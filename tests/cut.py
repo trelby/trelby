@@ -40,10 +40,10 @@ def testEndPrevPara():
 
     # test that when deleting the last lines of an element we correctly
     # flag the preceding line as the new last line.
-    
+
     assert sp.lines[2].lb == scr.LB_LAST
     assert sp.lines[3].lt == scr.CHARACTER
-    
+
 # we used to have a bug where joining two elements when the latter one
 # contained a forced linebreak didn't convert it properly to the preceding
 # element's type.

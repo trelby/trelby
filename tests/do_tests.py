@@ -35,10 +35,10 @@ def getTestFuncs(filename):
     funcs = {}
 
     f = open(filename, "r")
-    
+
     for line in f:
         mo = re.match("def (test[a-zA-Z0-9_]*)\(", line)
-        
+
         if mo:
             name = mo.group(1)
 
@@ -64,7 +64,7 @@ def getFlags(filename):
 
         # FIXME: very lame, make this actually work as the documentation
         # says.
-        
+
         if s.find("ut:ignore") != -1:
             ret["ignore"] = None
 
@@ -81,7 +81,7 @@ def doTest(opts):
     name = opts.file[0:-3]
 
     exec("import %s" % name)
-    
+
     mod = eval("%s" % name)
     attr = dir(mod)
 
@@ -113,19 +113,19 @@ def doTests(opts):
     cntFailed = 0
 
     t = time.time()
-    
+
     # FIXME: allow specifying which files to test
 
     # PY2.4: use "for fname in sorted(glob...)"
     fnames = glob.glob("*.py")
     fnames.sort()
-    
+
     for fname in fnames:
         flags = getFlags(fname)
 
         if flags.has_key("ignore"):
             continue
-        
+
         # strip .py suffix
         name = fname[0:-3]
 

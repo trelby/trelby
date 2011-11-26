@@ -41,7 +41,7 @@ class DisplayPage:
 class PageCache:
     def __init__(self, ctrl):
         self.ctrl = ctrl
-        
+
         # cached pages. key = pageNr, value = pml.Page
         self.pages = {}
 
@@ -51,7 +51,7 @@ class PageCache:
         if not pg:
             pg = self.ctrl.sp.generatePMLPage(pager, pageNr, False, False)
             self.pages[pageNr] = pg
-            
+
         return pg
 
 # View Mode, i.e. a way of displaying the script on screen. this is an
@@ -73,7 +73,7 @@ class ViewMode:
     # this has to always return at least one line.
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
         raise "getScreen not implemented"
-    
+
     # return height for one line on screen
     def getLineHeight(self, ctrl):
         raise "getLineHeight not implemented"
@@ -115,7 +115,7 @@ class ViewMode:
                 continue
 
             sel = t
-            
+
             if (t.y + lineh) > y:
                 break
 
@@ -212,7 +212,7 @@ class ViewModeDraft(ViewMode):
 
             y += fyd
             i += 1
-    
+
         return (texts, [])
 
     def getLineHeight(self, ctrl):
@@ -233,7 +233,7 @@ class ViewModeDraft(ViewMode):
 
     def pageCmd(self, ctrl, cs, dir, texts, dpages):
         self.pageCmdGeneric(ctrl, cs, dir, texts, dpages)
-        
+
 # Layout view mode. Pages are shown with the actual layout they would
 # have.
 class ViewModeLayout(ViewMode):
@@ -241,7 +241,7 @@ class ViewModeLayout(ViewMode):
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
         cfgGui = ctrl.getCfgGui()
         textOp = pml.TextOp
-        
+
         texts = []
         dpages = []
 
@@ -352,7 +352,7 @@ class ViewModeLayout(ViewMode):
                 dpages[-1].y2 = lastY + 10
 
         return (texts, dpages)
-    
+
     def getLineHeight(self, ctrl):
         # the + 1.0 avoids occasional non-consecutive backgrounds for
         # lines.
@@ -379,7 +379,7 @@ class ViewModeSideBySide(ViewMode):
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
         cfgGui = ctrl.getCfgGui()
         textOp = pml.TextOp
-        
+
         texts = []
         dpages = []
 
@@ -397,13 +397,13 @@ class ViewModeSideBySide(ViewMode):
 
         topLine = ctrl.sp.getTopLine()
         pageNr = ctrl.sp.line2page(topLine)
-        
+
         if doExtra and ctrl.sp.cfg.pdfShowSceneNumbers:
             pager.scene = ctrl.sp.getSceneNumber(
                 ctrl.sp.page2lines(pageNr)[0] - 1)
 
         pagesDone = 0
-        
+
         while 1:
             if (pagesDone >= pageCnt) or (pageNr >= len(ctrl.sp.pages)):
                 break
@@ -412,7 +412,7 @@ class ViewModeSideBySide(ViewMode):
             # accurate number for this in the worst case, so disable it
             # altogether.
             pager.sceneContNr = 0
-                
+
             if pageCache:
                 pg = pageCache.getPage(pager, pageNr)
             else:
@@ -440,7 +440,7 @@ class ViewModeSideBySide(ViewMode):
             pagesDone += 1
 
         return (texts, dpages)
-    
+
     def getLineHeight(self, ctrl):
         # the + 1.0 avoids occasional non-consecutive backgrounds for
         # lines.
@@ -455,7 +455,7 @@ class ViewModeSideBySide(ViewMode):
         ls = ctrl.sp.lines
 
         sel = None
-        
+
         for t in self.getScreen(ctrl, False)[0]:
             if t.line == -1:
                 continue
@@ -508,7 +508,7 @@ class ViewModeOverview(ViewMode):
 
         # each character is size x size pixels.
         self.size = size
-        
+
     def getScreen(self, ctrl, doExtra, partials = False, pageCache = None):
         cfgGui = ctrl.getCfgGui()
         textOp = pml.TextOp
@@ -526,17 +526,17 @@ class ViewModeOverview(ViewMode):
         cols = max(1, (width - pageGap) // (ctrl.pageW + pageGap))
         rows = max(1, (height - pageGap) // (ctrl.pageH + pageGap))
         pageCnt = cols * rows
-        
+
         pager = mypager.Pager(ctrl.sp.cfg)
         fi = config.FontInfo()
         fi.font = cfgGui.fonts[pml.NORMAL].font
         fi.fx = fi.fy = self.size
-        
+
         mm2p = ctrl.mm2p
 
         pageNr = ctrl.sp.line2page(ctrl.sp.getTopLine())
         pagesDone = 0
-        
+
         while 1:
             if (pagesDone >= pageCnt) or (pageNr >= len(ctrl.sp.pages)):
                 break
@@ -571,7 +571,7 @@ class ViewModeOverview(ViewMode):
             pagesDone += 1
 
         return (texts, dpages)
-    
+
     def getLineHeight(self, ctrl):
         return self.size
 
@@ -581,10 +581,10 @@ class ViewModeOverview(ViewMode):
     def drawTexts(self, ctrl, dc, tl):
         for i in xrange(len(tl[1][0])):
             dc.SetPen(wx.Pen(tl[1][2][i]))
-            
+
             s = tl[1][0][i]
             sx, sy = tl[1][1][i]
-            
+
             for j in xrange(len(s)):
                 if s[j] != " ":
                     off = sx + j * self.size
@@ -601,7 +601,7 @@ class ViewModeOverview(ViewMode):
                 continue
 
             return (ctrl.sp.page2lines(dp.pageNr)[0], 0)
-            
+
         return (None, None)
 
     def makeLineVisible(self, ctrl, line, texts):

@@ -27,10 +27,10 @@ class HeadersDlg(wx.Dialog):
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         hsizer.Add(wx.StaticText(self, -1, "Empty lines after headers:"), 0,
                    wx.ALIGN_CENTER_VERTICAL)
-        
+
         self.elinesEntry = wx.SpinCtrl(self, -1)
         self.elinesEntry.SetRange(0, 5)
         wx.EVT_SPINCTRL(self, self.elinesEntry.GetId(), self.OnMisc)
@@ -38,18 +38,18 @@ class HeadersDlg(wx.Dialog):
         hsizer.Add(self.elinesEntry, 0, wx.LEFT, 10)
 
         vsizer.Add(hsizer)
-        
+
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM,
                    10)
-        
+
         tmp = wx.StaticText(self, -1, "Strings:")
         vsizer.Add(tmp)
-        
+
         self.stringsLb = wx.ListBox(self, -1, size = (200, 100))
         vsizer.Add(self.stringsLb, 0, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer.Add(self.addBtn)
         wx.EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
@@ -111,7 +111,7 @@ class HeadersDlg(wx.Dialog):
         wx.EVT_COMBOBOX(self, self.alignCombo.GetId(), self.OnMisc)
 
         hsizerTop.Add(gsizer)
-        
+
         bsizer = wx.StaticBoxSizer(
             wx.StaticBox(self, -1, "Style"), wx.HORIZONTAL)
 
@@ -122,11 +122,11 @@ class HeadersDlg(wx.Dialog):
         pad = 0
         if misc.isWindows:
             pad = 5
-        
+
         self.addCheckBox("Bold", self, vsizer2, pad)
         self.addCheckBox("Italic", self, vsizer2, pad)
         self.addCheckBox("Underlined", self, vsizer2, pad)
-            
+
         bsizer.Add(vsizer2)
 
         hsizerTop.Add(bsizer, 0, wx.LEFT, 40)
@@ -136,7 +136,7 @@ class HeadersDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
-        
+
         previewBtn = gutil.createStockButton(self, "Preview")
         hsizer.Add(previewBtn)
 
@@ -145,7 +145,7 @@ class HeadersDlg(wx.Dialog):
 
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
@@ -164,7 +164,7 @@ class HeadersDlg(wx.Dialog):
         self.widList = [ self.textEntry, self.xoffEntry, self.alignCombo,
                          self.lineEntry, self.boldCb, self.italicCb,
                          self.underlinedCb ]
-        
+
         self.updateGui()
 
         self.textEntry.SetFocus()
@@ -174,7 +174,7 @@ class HeadersDlg(wx.Dialog):
         wx.EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
         sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, name.lower() + "Cb", cb)
-        
+
     def OnOK(self, event):
         self.EndModal(wx.ID_OK)
 
@@ -192,9 +192,9 @@ class HeadersDlg(wx.Dialog):
 
         fs = self.cfg.fontSize
         chY = util.getTextHeight(fs)
-        
+
         y = self.cfg.marginTop + self.headers.getNrOfLines() * chY
-        
+
         pg.add(pml.TextOp("Mindy runs away from the dinosaur, but trips on"
             " the power", self.cfg.marginLeft, y, fs))
 
@@ -202,7 +202,7 @@ class HeadersDlg(wx.Dialog):
             self.cfg.marginLeft, y + chY, fs))
 
         doc.add(pg)
-        
+
         tmp = pdf.generate(doc)
         gutil.showTempPDF(tmp, self.cfgGl, self)
 
@@ -220,12 +220,12 @@ class HeadersDlg(wx.Dialog):
     def OnAddString(self, event):
         h = headers.HeaderString()
         h.text = "new string"
-        
+
         self.headers.hdrs.append(h)
         self.hdrIndex = len(self.headers.hdrs) - 1
 
         self.updateGui()
-        
+
     def OnDeleteString(self, event):
         if self.hdrIndex == -1:
             return
@@ -234,13 +234,13 @@ class HeadersDlg(wx.Dialog):
         self.hdrIndex = min(self.hdrIndex, len(self.headers.hdrs) - 1)
 
         self.updateGui()
-        
+
     # update listbox
     def updateGui(self):
         self.stringsLb.Clear()
 
         self.elinesEntry.SetValue(self.headers.emptyLinesAfter)
-        
+
         self.delBtn.Enable(self.hdrIndex != -1)
 
         for h in self.headers.hdrs:
@@ -248,7 +248,7 @@ class HeadersDlg(wx.Dialog):
 
         if self.hdrIndex != -1:
             self.stringsLb.SetSelection(self.hdrIndex)
-            
+
         self.updateHeaderGui()
 
     # update selected header stuff
@@ -263,13 +263,13 @@ class HeadersDlg(wx.Dialog):
             self.boldCb.SetValue(False)
             self.italicCb.SetValue(False)
             self.underlinedCb.SetValue(False)
-            
+
             return
 
         self.block = True
 
         h = self.headers.hdrs[self.hdrIndex]
-        
+
         for w in self.widList:
             w.Enable(True)
 
@@ -284,22 +284,22 @@ class HeadersDlg(wx.Dialog):
         self.underlinedCb.SetValue(h.isUnderlined)
 
         self.block = False
-        
+
     def OnMisc(self, event = None):
         self.headers.emptyLinesAfter = util.getSpinValue(self.elinesEntry)
-        
+
         if (self.hdrIndex == -1) or self.block:
             return
 
         h = self.headers.hdrs[self.hdrIndex]
-        
+
         h.text = util.toInputStr(misc.fromGUI(self.textEntry.GetValue()))
         self.stringsLb.SetString(self.hdrIndex, h.text)
-        
+
         h.xoff = util.getSpinValue(self.xoffEntry)
         h.line = util.getSpinValue(self.lineEntry)
         h.align = self.alignCombo.GetClientData(self.alignCombo.GetSelection())
-        
+
         h.isBold = self.boldCb.GetValue()
         h.isItalic = self.italicCb.GetValue()
         h.isUnderlined = self.underlinedCb.GetValue()

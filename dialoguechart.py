@@ -45,22 +45,22 @@ def genDialogueChart(mainFrame, sp):
         return
 
     del inf[0]
-    
+
     if len(misc.CheckBoxItem.getClientData(inf)) == 0:
         wx.MessageBox("Can't disable all output.", "Error", wx.OK,
                       mainFrame)
 
         return
-        
+
     data = chart.generate(inf)
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
-    
+
 class DialogueChart:
     def __init__(self, sp, minLines):
 
         self.sp = sp
-        
+
         ls = sp.lines
 
         # PageInfo's for each page, 0-indexed.
@@ -73,7 +73,7 @@ class DialogueChart:
         tmpCinfo = {}
 
         name = "UNKNOWN"
-        
+
         for i in xrange(len(ls)):
             pgNr = sp.line2page(i) -1
             pi = self.pages[pgNr]
@@ -84,7 +84,7 @@ class DialogueChart:
             if (line.lt == screenplay.CHARACTER) and\
                    (line.lb == screenplay.LB_LAST):
                 name = util.upper(line.text)
-                
+
             elif line.lt == screenplay.DIALOGUE:
                 pi.addLineToSpeaker(name)
 
@@ -106,14 +106,14 @@ class DialogueChart:
 
         # start Y of page markers
         self.pageY = 20.0
-        
+
         # where dialogue density bars start and how tall they are
         self.barY = 30.0
         self.barHeight = 15.0
 
         # chart Y pos
         self.chartY = 50.0
-        
+
         # how much to leave empty on each side (mm)
         self.margin = 10.0
 
@@ -123,7 +123,7 @@ class DialogueChart:
         while 1:
             # character font size in points
             self.charFs = size
-        
+
             # how many mm in Y direction for each character
             self.charY = util.getTextHeight(self.charFs)
 
@@ -132,7 +132,7 @@ class DialogueChart:
 
             if size <= 6:
                 break
-            
+
             if (self.chartY + self.chartHeight) <= \
                    (sp.cfg.paperWidth - self.margin):
                 break
@@ -146,7 +146,7 @@ class DialogueChart:
         for ci in self.cinfo:
             maxLen = max(maxLen, len(ci.name))
         maxLen = max(10, maxLen)
-        
+
         charX = util.getTextWidth(" ", pml.COURIER, self.charFs)
 
         # chart X pos
@@ -165,10 +165,10 @@ class DialogueChart:
         self.legendMargin = 2.0
 
         # spacing from one legend item to next
-        self.legendSpacing = 5.0 
+        self.legendSpacing = 5.0
 
         # spacing from one legend item to next
-        self.legendSize = 4.0 
+        self.legendSize = 4.0
 
     def generate(self, cbil):
         doc = pml.Document(self.sp.cfg.paperHeight,
@@ -178,7 +178,7 @@ class DialogueChart:
             if it.selected:
                 self.cinfo.sort(it.cdata)
                 doc.add(self.generatePage(it.text, doc))
-        
+
         return pdf.generate(doc)
 
     def generatePage(self, title, doc):
@@ -196,9 +196,9 @@ class DialogueChart:
         # drawing the grid.
         for i in range(len(self.cinfo)):
             y = self.chartY + i * self.charY
-            
+
             if (i % 2) == 1:
-                pg.add(pml.PDFOp("0.93 g")) 
+                pg.add(pml.PDFOp("0.93 g"))
                 pg.add(pml.RectOp(self.chartX, y, self.chartWidth,
                                   self.charY))
                 pg.add(pml.PDFOp("0.0 g"))
@@ -210,7 +210,7 @@ class DialogueChart:
 
         # dashed pattern
         pg.add(pml.PDFOp("[2 2] 0 d"))
-        
+
         # draw grid and page markers
         for i in xrange(pageCnt):
             if (i == 0) or ((i + 1) % 10) == 0:
@@ -245,20 +245,20 @@ class DialogueChart:
             y = self.barY + self.barHeight
             pi = self.pages[i]
             tlc = pi.getTotalLineCount()
-            
-            pg.add(pml.PDFOp("0.3 g")) 
+
+            pg.add(pml.PDFOp("0.3 g"))
             pct = util.safeDivInt(pi.getLineCount(screenplay.ACTION), tlc)
             barH = self.barHeight * pct
             pg.add(pml.RectOp(x, y - barH, mmPerPage, barH))
             y -= barH
 
-            pg.add(pml.PDFOp("0.5 g")) 
+            pg.add(pml.PDFOp("0.5 g"))
             pct = util.safeDivInt(pi.getLineCount(screenplay.DIALOGUE), tlc)
             barH = self.barHeight * pct
             pg.add(pml.RectOp(x, y - barH, mmPerPage, barH))
             y -= barH
 
-            pg.add(pml.PDFOp("0.7 g")) 
+            pg.add(pml.PDFOp("0.7 g"))
             pct = util.safeDivInt(pi.getLineCount(screenplay.CHARACTER), tlc)
             barH = self.barHeight * pct
             pg.add(pml.RectOp(x, y - barH, mmPerPage, barH))
@@ -274,20 +274,20 @@ class DialogueChart:
         for i in range(len(self.cinfo)):
             y = self.chartY + i * self.charY
             ci = self.cinfo[i]
-            
+
             pg.add(pml.TextOp(ci.name, self.margin, y + self.charY / 2.0,
                 self.charFs, valign = util.VALIGN_CENTER))
-            
+
             for i in xrange(pageCnt):
                 pi = self.pages[i]
                 cnt = pi.getSpeakerLineCount(ci.name)
 
                 if cnt > 0:
                     h = self.charY * (float(cnt) / self.sp.cfg.linesOnPage)
-                    
+
                     pg.add(pml.RectOp(self.chartX + i * mmPerPage,
                         y + (self.charY - h) / 2.0, mmPerPage, h))
-                
+
         return pg
 
     # draw a single legend for page content bars
@@ -296,14 +296,14 @@ class DialogueChart:
         y = self.legendY + self.legendMargin + pos * self.legendSpacing
 
         pg.add(pml.PDFOp("%f g" % color))
-        
+
         pg.add(pml.RectOp(x, y, self.legendSize, self.legendSize,
                           pml.STROKE_FILL, lw))
-        
-        pg.add(pml.PDFOp("0.0 g")) 
+
+        pg.add(pml.PDFOp("0.0 g"))
 
         pg.add(pml.TextOp(name, x + self.legendSize + 2.0, y, 6))
-        
+
 
 # keeps track of information for one page
 class PageInfo:
@@ -320,7 +320,7 @@ class PageInfo:
         # character name, value = int. note that if someone doesn't speak
         # they have no entry.
         self.speakers = {}
-        
+
     # add one line of given type.
     def addLine(self, lt):
         self.lineCounts[lt] = self.getLineCount(lt) + 1
@@ -368,7 +368,7 @@ def cmpCount(c1, c2):
         return ret
     else:
         return cmpFirst(c1, c2)
-    
+
 def cmpCountThenName(c1, c2):
     ret = cmp(c2.lineCnt, c1.lineCnt)
 
@@ -376,7 +376,7 @@ def cmpCountThenName(c1, c2):
         return ret
     else:
         return cmpName(c1, c2)
-    
+
 def cmpFirst(c1, c2):
     ret = cmp(c1.firstPage, c2.firstPage)
 
@@ -384,7 +384,7 @@ def cmpFirst(c1, c2):
         return ret
     else:
         return cmpLastRev(c1, c2)
-    
+
 def cmpLast(c1, c2):
     ret = cmp(c1.lastPage, c2.lastPage)
 
@@ -392,7 +392,7 @@ def cmpLast(c1, c2):
         return ret
     else:
         return cmpName(c1, c2)
-    
+
 def cmpLastRev(c1, c2):
     ret = cmp(c2.lastPage, c1.lastPage)
 
@@ -400,6 +400,6 @@ def cmpLastRev(c1, c2):
         return ret
     else:
         return cmpCountThenName(c1, c2)
-    
+
 def cmpName(c1, c2):
     return cmp(c1.name, c2.name)

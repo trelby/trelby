@@ -9,7 +9,7 @@ import u
 # where it is on the third line.
 def testForcedLb():
     sp = u.new()
-    
+
     sp.cmd("addChar", char = "a")
     sp.cmd("splitElement")
     sp.cmd("toDialogue")
@@ -31,7 +31,7 @@ def testForcedLb():
 
 def testForcedLb2():
     sp = u.new()
-    
+
     sp.cmd("addChar", char = "a")
     sp.cmd("splitElement")
     sp.cmd("toTransition")

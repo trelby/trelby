@@ -18,7 +18,7 @@ class Locations:
                                        mypickle.StrLatin1Var("", "", "")))
 
             v.makeDicts()
-            
+
         self.__class__.cvars.setDefaults(self)
 
         # self.locations is a list of lists of strings, where the inner
@@ -34,7 +34,7 @@ class Locations:
     # ignores any errors.
     def load(self, s):
         self.cvars.load(self.cvars.makeVals(s), "", self)
-        
+
     # save to a string and return that.
     def save(self):
         return self.cvars.save("", self)
@@ -50,7 +50,7 @@ class Locations:
         locs = []
 
         added = {}
-        
+
         for sceneList in self.locations:
             scenes = []
 
@@ -66,5 +66,5 @@ class Locations:
                 locs.append(scenes)
 
         locs.sort()
-        
+
         self.locations = locs

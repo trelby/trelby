@@ -23,7 +23,7 @@ class Vars:
     # if typeObj is None.
     def getDict(self, typeObj = None):
         tmp = {}
-        
+
         for it in self.cvars:
             if not typeObj or isinstance(it, typeObj):
                 tmp[it.name] = it
@@ -33,15 +33,15 @@ class Vars:
     # get default value of a setting
     def getDefault(self, name):
         return self.all[name].defVal
-        
+
     # get minimum value of a numeric setting
     def getMin(self, name):
         return self.numeric[name].minVal
-        
+
     # get maximum value of a numeric setting
     def getMax(self, name):
         return self.numeric[name].maxVal
-        
+
     # get minimum and maximum value of a numeric setting as a (min,max)
     # tuple.
     def getMinMax(self, name):
@@ -67,13 +67,13 @@ class Vars:
 
     def save(self, prefix, obj):
         s = ""
-        
+
         for it in self.cvars:
             if it.name2:
                 s += it.toStr(getattr(obj, it.name), prefix + it.name2)
 
         return s
-    
+
     def load(self, vals, prefix, obj):
         for it in self.cvars:
             if it.name2:
@@ -92,10 +92,10 @@ class Vars:
     def addColor(self, name, r, g, b, name2, descr):
         self.addVar(ColorVar(name + "Color", util.MyColor(r, g, b),
                              "Color/" + name2, descr))
-        
+
     def addFloat(self, *params):
         self.addVar(FloatVar(*params))
-        
+
     def addInt(self, *params):
         self.addVar(IntVar(*params))
 
@@ -149,7 +149,7 @@ class ColorVar(ConfVar):
         r = util.str2int(v[0], 0, 0, 255)
         g = util.str2int(v[1], 0, 0, 255)
         b = util.str2int(v[2], 0, 0, 255)
-        
+
         return util.MyColor(r, g, b)
 
 class NumericVar(ConfVar):
@@ -165,7 +165,7 @@ class FloatVar(NumericVar):
 
     def toStr(self, val, prefix):
         return "%s:%.*f\n" % (prefix, self.precision, val)
-        
+
     def fromStr(self, vals, val, prefix):
         return util.str2float(val, self.defVal, self.minVal, self.maxVal)
 
@@ -183,7 +183,7 @@ class IntVar(NumericVar):
 class StrLatin1Var(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
-        
+
     def toStr(self, val, prefix):
         return "%s:%s\n" % (prefix, util.toUTF8(val))
 
@@ -194,7 +194,7 @@ class StrLatin1Var(ConfVar):
 class StrUnicodeVar(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
-        
+
     def toStr(self, val, prefix):
         return "%s:%s\n" % (prefix, val.encode("UTF-8"))
 
@@ -207,7 +207,7 @@ class StrUnicodeVar(ConfVar):
 class StrBinaryVar(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
-        
+
     def toStr(self, val, prefix):
         return "%s:%s\n" % (prefix, util.encodeStr(val))
 
@@ -218,7 +218,7 @@ class StrBinaryVar(ConfVar):
 class ElementNameVar(ConfVar):
     def __init__(self, name, defVal, name2):
         ConfVar.__init__(self, name, defVal, name2)
-        
+
     def toStr(self, val, prefix):
         return "%s:%s\n" % (prefix, config.lt2ti(val).name)
 
@@ -229,7 +229,7 @@ class ElementNameVar(ConfVar):
             return ti.lt
         else:
             return self.defVal
-        
+
 class ListVar(ConfVar):
     def __init__(self, name, defVal, name2, itemType):
         ConfVar.__init__(self, name, defVal, name2)
@@ -237,7 +237,7 @@ class ListVar(ConfVar):
         # itemType is an instance of one of the *Var classes, and is the
         # type of item contained in the list.
         self.itemType = itemType
-        
+
     def toStr(self, val, prefix):
         s = ""
 

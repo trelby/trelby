@@ -29,15 +29,15 @@ def genSceneReport(mainFrame, sp):
 class SceneReport:
     def __init__(self, sp):
         self.sp = sp
-        
+
         # list of SceneInfos
         self.scenes = []
-        
+
         line = 0
         while 1:
             if line >= len(sp.lines):
                 break
-            
+
             startLine, endLine = sp.getSceneIndexesFromLine(line)
 
             si = SceneInfo(sp)
@@ -64,7 +64,7 @@ class SceneReport:
 
         for si in self.scenes:
             tf.addSpace(5.0)
-            
+
             tf.addText("%-4s %s" % (si.number, si.name), style = pml.BOLD)
 
             tf.addSpace(1.0)
@@ -75,10 +75,10 @@ class SceneReport:
 
             if self.inf[self.INF_SPEAKERS].selected:
                 tf.addSpace(2.5)
-            
+
                 for it in util.sortDict(si.chars):
                     tf.addText("     %3d  %s" % (it[1], it[0]))
-            
+
         return pdf.generate(tf.doc)
 
 # information about one scene
@@ -86,7 +86,7 @@ class SceneInfo:
     def __init__(self, sp):
         # scene number, e.g. "42A"
         self.number = None
-        
+
         # scene name, e.g. "INT. MOTEL ROOM - NIGHT"
         self.name = None
 
@@ -108,7 +108,7 @@ class SceneInfo:
         self.number = sp.getSceneNumber(startLine)
 
         ls = sp.lines
-        
+
         # TODO: handle multi-line scene names
         if ls[startLine].lt == screenplay.SCENE:
             s = util.upper(ls[startLine].text)
@@ -140,7 +140,7 @@ class SceneInfo:
         # get number of action lines and store page information
         for i in range(startLine, endLine + 1):
             self.pages.addPage(sp.line2page(i))
-            
+
             if ls[i].lt == screenplay.ACTION:
                 self.actionLines += 1
 
@@ -159,7 +159,7 @@ class SceneInfo:
         # find start of speech
         while (line < endLine) and (ls[line].lt != screenplay.CHARACTER):
             line += 1
-        
+
         if line >= endLine:
             # no speech found, or CHARACTER was on last line, leaving no
             # space for dialogue.
@@ -177,7 +177,7 @@ class SceneInfo:
 
         # dialogue lines
         dlines = 0
-        
+
         while 1:
             if line > endLine:
                 break
@@ -193,5 +193,5 @@ class SceneInfo:
 
         if dlines > 0:
             self.chars[name] = self.chars.get(name, 0) + dlines
-            
+
         return line

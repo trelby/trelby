@@ -11,7 +11,7 @@ def v(sp):
         return
 
     assert 0
-    
+
 def testEmpty():
     sp = u.new()
     sp._validate()
@@ -33,7 +33,7 @@ def testCursorPos():
 
     sp.column = -1
     v(sp)
-    
+
     sp.column = 5
     v(sp)
 

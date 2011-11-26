@@ -15,12 +15,12 @@ class LocationsDlg(wx.Dialog):
 
         tmp = wx.StaticText(self, -1, "Locations:")
         vsizer.Add(tmp)
-        
+
         self.locationsLb = wx.ListBox(self, -1, size = (450, 200))
         vsizer.Add(self.locationsLb, 1, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer.Add(self.addBtn)
         wx.EVT_BUTTON(self, self.addBtn.GetId(), self.OnAdd)
@@ -33,7 +33,7 @@ class LocationsDlg(wx.Dialog):
 
         tmp = wx.StaticText(self, -1, "Scenes:")
         vsizer.Add(tmp)
-        
+
         self.scenesLb = wx.ListBox(self, -1, size = (450, 200),
                                    style = wx.LB_EXTENDED)
         vsizer.Add(self.scenesLb, 1, wx.EXPAND)
@@ -41,10 +41,10 @@ class LocationsDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
-        
+
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
@@ -63,7 +63,7 @@ class LocationsDlg(wx.Dialog):
 
         # sub-list
         sl = []
-        
+
         for i in range(self.locationsLb.GetCount()):
             scene = self.locationsLb.GetClientData(i)
 
@@ -75,7 +75,7 @@ class LocationsDlg(wx.Dialog):
 
         self.sp.locations.locations = ml
         self.sp.locations.refresh(self.sp.getSceneNames())
-        
+
         self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
@@ -98,7 +98,7 @@ class LocationsDlg(wx.Dialog):
             locIdx = -1
 
         addSep = False
-        
+
         for idx in selected:
             scene = self.scenesLb.GetClientData(idx)
 
@@ -167,7 +167,7 @@ class LocationsDlg(wx.Dialog):
 
         separator = "-" * 40
         added = {}
-        
+
         for locList in self.sp.locations.locations:
             for scene in locList:
                 self.locationsLb.Append(scene, scene)
@@ -178,7 +178,7 @@ class LocationsDlg(wx.Dialog):
         # PY2.4: use sorted
         sceneNames = self.sp.getSceneNames().keys()
         sceneNames.sort()
-        
+
         for scene in sceneNames:
             if scene not in added:
                 self.scenesLb.Append(scene, scene)

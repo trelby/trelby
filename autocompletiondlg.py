@@ -45,10 +45,10 @@ class AutoCompletionDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
-        
+
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
@@ -71,14 +71,14 @@ class AutoCompletionDlg(wx.Dialog):
 
     def OnElementCombo(self, event = None):
         self.lt = self.elementsCombo.GetClientData(self.elementsCombo.
-                                                     GetSelection()) 
+                                                     GetSelection())
         t = self.autoCompletion.getType(self.lt)
-       
+
         self.enabledCb.SetValue(t.enabled)
 
         self.itemsEntry.Enable(t.enabled)
         self.itemsEntry.SetValue("\n".join(t.items))
-                         
+
     def OnMisc(self, event = None):
         t = self.autoCompletion.getType(self.lt)
 

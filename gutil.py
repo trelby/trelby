@@ -49,7 +49,7 @@ def createStockButton(parent, label):
             "Delete" : wx.ID_DELETE,
             "Preview" : wx.ID_PREVIEW
             }
-        
+
         return wx.Button(parent, ids[label])
     else:
         return wx.Button(parent, -1, label)
@@ -63,7 +63,7 @@ def createStockButton(parent, label):
 def btnDblClick(btn, func):
     if misc.isUnix:
         wx.EVT_LEFT_DCLICK(btn, func)
-    
+
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF
 # viewer application. 'mainFrame' is used as a parent for message boxes in

@@ -10,16 +10,16 @@ class Headers:
 
         # how many empty lines after the headers
         self.emptyLinesAfter = 1
-        
+
     # create standard headers
     def addDefaults(self):
         h = HeaderString()
         h.text = "${PAGE}."
         h.align = util.ALIGN_RIGHT
         h.line = 1
-        
+
         self.hdrs.append(h)
-        
+
     # return how many header lines there are. includes number of empty
     # lines after possible headers.
     def getNrOfLines(self):
@@ -47,7 +47,7 @@ class HeaderString:
 
         # x offset, in characters
         self.xoff = 0
-        
+
         # contents of string
         self.text = ""
 
@@ -79,14 +79,14 @@ class HeaderString:
             x = cfg.paperWidth - cfg.marginRight
 
         fs = cfg.fontSize
-        
+
         if self.xoff != 0:
             x += util.getTextWidth(" ", pml.COURIER, fs) * self.xoff
 
         y = cfg.marginTop + (self.line - 1) * util.getTextHeight(fs)
 
         text = self.text.replace("${PAGE}", pageNr)
-        
+
         page.add(pml.TextOp(text, x, y, fs, fl, self.align))
 
     # parse information from s, which must be a string created by __str__,
@@ -99,7 +99,7 @@ class HeaderString:
 
         if len(a) != 5:
             return
-        
+
         self.line = util.str2int(a[0], 1, 1, 5)
         self.xoff = util.str2int(a[1], 0, -100, 100)
 
@@ -112,19 +112,19 @@ class HeaderString:
             self.align = util.ALIGN_CENTER
         else:
             self.align = util.ALIGN_RIGHT
-            
+
         self.text = a[4]
-                       
+
     def __str__(self):
         s = "%d,%d," % (self.line, self.xoff)
-        
+
         if self.align == util.ALIGN_LEFT:
             s += "l"
         elif self.align == util.ALIGN_CENTER:
             s += "c"
         else:
             s += "r"
-            
+
         s += util.bools2flags("biu", self.isBold, self.isItalic,
                               self.isUnderlined)
 

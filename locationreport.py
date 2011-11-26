@@ -22,7 +22,7 @@ def genLocationReport(mainFrame, sp):
 
     if not ok:
         return
-    
+
     data = report.generate()
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
@@ -31,7 +31,7 @@ class LocationReport:
     # sr = SceneReport
     def __init__(self, sr):
         # TODO: have this construct SceneReport internally
-        
+
         self.sp = sr.sp
 
         # key = scene name, value = LocationInfo. note that multiple keys
@@ -40,11 +40,11 @@ class LocationReport:
 
         # like locations, but this one stores per-scene information
         self.scenes = {}
-        
+
         # make grouped scenes point to the same LocationInfos.
         for sceneList in self.sp.locations.locations:
             li = LocationInfo(self.sp)
-            
+
             for scene in sceneList:
                 locations[scene] = li
 
@@ -101,7 +101,7 @@ class LocationReport:
             tmp.reverse()
             tmp.sort(lambda x, y: cmp(x[1], y[1]))
             tmp.reverse()
-            
+
             for scene, lines in tmp:
                 if len(tmp) > 1:
                     pct = " (%d%%)" % util.pct(lines, li.lines)
@@ -117,14 +117,14 @@ class LocationReport:
                 util.pct(li.actionLines, li.lines),
                 util.pct(li.lines, scriptLines), li.sceneCount,
                 len(li.pages), li.pages), "  ")
-            
+
 
             if self.inf[self.INF_SPEAKERS].selected:
                 tf.addSpace(2.5)
-                
+
                 for it in util.sortDict(li.chars):
                     tf.addText("     %3d  %s" % (it[1], it[0]))
-            
+
         return pdf.generate(tf.doc)
 
 # information about one location
@@ -132,7 +132,7 @@ class LocationInfo:
     def __init__(self, sp):
         # number of scenes
         self.sceneCount = 0
-        
+
         # scene names, e.g. ["INT. MOTEL ROOM - NIGHT", "EXT. MOTEL -
         # NIGHT"]
         self.scenes = []
@@ -154,7 +154,7 @@ class LocationInfo:
     def addScene(self, si):
         if si.name not in self.scenes:
             self.scenes.append(si.name)
-        
+
         self.sceneCount += 1
         self.lines += si.lines
         self.actionLines += si.actionLines

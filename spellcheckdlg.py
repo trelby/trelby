@@ -17,27 +17,27 @@ class SpellCheckDlg(wx.Dialog):
 
         # user's global spell checker dictionary
         self.gScDict = gScDict
-        
+
         # have we replaced any text in the script
         self.didReplaces = False
 
         # have we added any words to global dictionary
         self.changedGlobalDict = False
-        
+
         vsizer = wx.BoxSizer(wx.VERTICAL)
-        
+
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         hsizer.Add(wx.StaticText(self, -1, "Word:"), 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
         self.replaceEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
         hsizer.Add(self.replaceEntry, 1, wx.EXPAND)
-        
+
         vsizer.Add(hsizer, 1, wx.EXPAND | wx.BOTTOM, 15)
 
         gsizer = wx.FlexGridSizer(2, 2, 10, 10)
         gsizer.AddGrowableCol(1)
-        
+
         replaceBtn = wx.Button(self, -1, "&Replace")
         gsizer.Add(replaceBtn)
 
@@ -100,13 +100,13 @@ class SpellCheckDlg(wx.Dialog):
             return
 
         self.showWord()
-        
+
     def OnChar(self, event):
         kc = event.GetKeyCode()
 
         if kc == wx.WXK_ESCAPE:
             self.EndModal(wx.ID_OK)
-            
+
             return
 
         event.Skip()
@@ -114,7 +114,7 @@ class SpellCheckDlg(wx.Dialog):
     def OnReplace(self, event):
         if not self.sc.word:
             return
-        
+
         word = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue()))
         ls = self.ctrl.sp.lines
 
@@ -130,7 +130,7 @@ class SpellCheckDlg(wx.Dialog):
         self.didReplaces = True
         self.ctrl.sp.markChanged()
         self.gotoNext(False)
-        
+
     def OnSkip(self, event = None, autoFind = False):
         if not self.sc.word:
             return
@@ -140,18 +140,18 @@ class SpellCheckDlg(wx.Dialog):
     def OnAddScript(self, event):
         if not self.sc.word:
             return
-        
+
         self.ctrl.sp.scDict.add(self.sc.word)
         self.ctrl.sp.markChanged()
         self.gotoNext()
-        
+
     def OnAddGlobal(self, event):
         if not self.sc.word:
             return
-        
+
         self.gScDict.add(self.sc.word)
         self.changedGlobalDict = True
-        
+
         self.gotoNext()
 
     def OnSuggest(self, event):
@@ -160,9 +160,9 @@ class SpellCheckDlg(wx.Dialog):
 
         isAllCaps = self.sc.word == util.upper(self.sc.word)
         isCapitalized = self.sc.word[:1] == util.upper(self.sc.word[:1])
-        
+
         word = util.lower(self.sc.word)
-        
+
         wl = len(word)
         wstart = word[:2]
         d = 500
@@ -176,7 +176,7 @@ class SpellCheckDlg(wx.Dialog):
         for w in self.gScDict.words.iterkeys():
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
-            
+
         for w in self.ctrl.sp.scDict.words.iterkeys():
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
@@ -193,7 +193,7 @@ class SpellCheckDlg(wx.Dialog):
 
         dlg = wx.SingleChoiceDialog(
             self, "Most similar words:", "Suggestions", items)
-        
+
         if dlg.ShowModal() == wx.ID_OK:
             sel = dlg.GetSelection()
 
@@ -203,7 +203,7 @@ class SpellCheckDlg(wx.Dialog):
                 newWord = util.upper(newWord)
             elif isCapitalized:
                 newWord = util.capitalize(newWord)
-                
+
             self.replaceEntry.SetValue(newWord)
 
         dlg.Destroy()

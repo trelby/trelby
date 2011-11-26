@@ -80,7 +80,7 @@ def testBackLbForcedTypeConvert():
     sp.cmd("deleteBackward")
 
     sp._validate()
-    
+
 # FIXME: more tests for forward deletion
 
 # test that when joining two elements of different type, the latter of

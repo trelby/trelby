@@ -12,12 +12,12 @@ class SCDictDlg(wx.Dialog):
         self.scDict = scDict
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
-        
+
         if isGlobal:
             s = "Global words:"
         else:
             s = "Script-specific words:"
-            
+
         vsizer.Add(wx.StaticText(self, -1, s))
 
         self.itemsEntry = wx.TextCtrl(self, -1, style = wx.TE_MULTILINE |
@@ -27,10 +27,10 @@ class SCDictDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
-        
+
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.LEFT, 10)
 

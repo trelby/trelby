@@ -9,7 +9,7 @@ initDone = False
 
 def init():
     global initDone
-    
+
     if not initDone:
         misc.init(False)
         util.init(False)
@@ -21,7 +21,7 @@ def new():
     init()
 
     return screenplay.Screenplay(config.ConfigGlobal())
-    
+
 # load script from the given file
 def load(filename = "test.trelby"):
     init()

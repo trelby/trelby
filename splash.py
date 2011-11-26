@@ -21,7 +21,7 @@ class SplashWindow(wx.Frame):
 
     # Quote objects
     quotes = []
-    
+
     def __init__(self, parent, delay):
         wx.Frame.__init__(
             self, parent, -1, "Splash",
@@ -65,7 +65,7 @@ class SplashWindow(wx.Frame):
 
         wx.EVT_PAINT(self, self.OnPaint)
         wx.EVT_CLOSE(self, self.OnCloseWindow)
-        
+
     def OnClick(self, event):
         self.Close()
 
@@ -101,11 +101,11 @@ class SplashWindow(wx.Frame):
 
                 dc.DrawText(line, x, y)
 
-        
+
     def OnTimer(self, event):
         self.timer.Stop()
         self.Close()
-        
+
     def OnCloseWindow(self, event):
         self.Destroy()
         self.Refresh()

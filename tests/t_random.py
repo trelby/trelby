@@ -42,7 +42,7 @@ class Ops:
     # return self.ops as a text string
     def save(self):
         s = ""
-        
+
         for op in self.ops:
             s += op.save() + "\n"
 
@@ -93,7 +93,7 @@ class Op:
         ]
 
     # FIXME: support other commands like getSelectedAsCD etc.
-    
+
     def __init__(self, name = None):
         # name of operation
         self.name = name
@@ -139,14 +139,14 @@ class Op:
 
         for arg in self.args:
             s += ",%s" % str(arg)
-        
+
         return s
 
     # construct a new Ops from the given string.
     @staticmethod
     def load(s):
         vals = s.split(",")
-        
+
         self = Op()
         self.name = vals[0]
         for i in range(1, len(vals)):
@@ -160,10 +160,10 @@ def runRandomOps():
     while True:
         rounds = max(1, int(random.gauss(15000, 4000)))
         print "Count %d (%d rounds)" % (cnt, rounds)
-        
+
         ops = Ops()
         failed = False
-        
+
         # every 10th time, test operations on an empty script
         if (cnt % 10) == 0:
             ops.add(Op("NEW"))
@@ -184,7 +184,7 @@ def runRandomOps():
                 print " Failed, saving..."
                 save(ops, cnt)
                 failed = True
-                
+
                 break
 
         if not failed:
@@ -216,7 +216,7 @@ def runOpsFromFile(filename):
 
         if not more:
             break
-    
+
 # save information about failed ops.
 def save(ops, cnt):
     f = open("%d.ops" % cnt, "w")

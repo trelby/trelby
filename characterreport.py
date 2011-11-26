@@ -19,7 +19,7 @@ def genCharacterReport(mainFrame, sp):
     charNames = []
     for s in util.listify(report.cinfo, "name"):
         charNames.append(misc.CheckBoxItem(s))
-    
+
     dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
         "Information to include:", False, charNames,
         "Characters to include:", True)
@@ -35,16 +35,16 @@ def genCharacterReport(mainFrame, sp):
 
     if not ok:
         return
-    
+
     data = report.generate()
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
-    
+
 class CharacterReport:
     def __init__(self, sp):
 
         self.sp = sp
-        
+
         ls = sp.lines
 
         # key = character name, value = CharInfo
@@ -52,22 +52,22 @@ class CharacterReport:
 
         name = None
         scene = "(NO SCENE NAME)"
-        
+
         # how many lines processed for current speech
         curSpeechLines = 0
-        
+
         for i in xrange(len(ls)):
             line = ls[i]
 
             if (line.lt == screenplay.SCENE) and\
                    (line.lb == screenplay.LB_LAST):
                 scene = util.upper(line.text)
-                
+
             elif (line.lt == screenplay.CHARACTER) and\
                    (line.lb == screenplay.LB_LAST):
                 name = util.upper(line.text)
                 curSpeechLines = 0
-                
+
             elif line.lt in (screenplay.DIALOGUE, screenplay.PAREN) and name:
                 ci = chars.get(name)
                 if not ci:
@@ -91,7 +91,7 @@ class CharacterReport:
                     ci.wordCnt += len(words)
                     ci.wordCharCnt += reduce(lambda x, y: x + len(y), words,
                                              0)
-                
+
                 ci.pages.addPage(sp.line2page(i))
 
             else:
@@ -119,7 +119,7 @@ class CharacterReport:
     # calculate total sum of self.cinfo.{name} and return it.
     def sum(self, name):
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
-        
+
     def generate(self):
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 20.0, 12)
@@ -127,7 +127,7 @@ class CharacterReport:
         for ci in self.cinfo:
             if not ci.include:
                 continue
-            
+
             tf.addText(ci.name, fs = 14,
                        style = pml.BOLD | pml.UNDERLINED)
 
@@ -141,7 +141,7 @@ class CharacterReport:
                     " characters per: %.2f" % (ci.wordCnt,
                     util.safeDiv(ci.wordCnt, ci.speechCnt),
                     util.safeDiv(ci.wordCharCnt, ci.wordCnt)))
-                
+
             if self.inf[self.INF_PAGES].selected:
                 tf.addWrappedText("Pages: %d, list: %s" % (len(ci.pages),
                     ci.pages), "       ")
@@ -152,9 +152,9 @@ class CharacterReport:
                 for it in util.sortDict(ci.scenes):
                     tf.addText("%3d %s" % (it[1], it[0]),
                                x = tf.margin * 2.0, fs = 10)
-            
+
             tf.addSpace(5.0)
-            
+
         return pdf.generate(tf.doc)
 
 # information about one character

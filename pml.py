@@ -39,7 +39,7 @@ class Document:
     def __init__(self, w, h):
         self.w = w
         self.h = h
-        
+
         # a collection of Page objects
         self.pages = []
 
@@ -74,7 +74,7 @@ class Page:
 
         # link to containing document
         self.doc = doc
-        
+
         # a collection of Operation objects
         self.ops = []
 
@@ -115,7 +115,7 @@ class DrawOp:
 # underlined.
 class TextOp(DrawOp):
     pdfOp = pdf.PDFTextOp()
-    
+
     def __init__(self, text, x, y, size, flags = NORMAL | COURIER,
                  align = util.ALIGN_LEFT, valign = util.VALIGN_TOP,
                  line = -1):
@@ -127,11 +127,11 @@ class TextOp(DrawOp):
 
         # TOCItem, by default we have none
         self.toc = None
-        
+
         # index of line in Screenplay.lines, or -1 if some other text.
         # only used when drawing display, pdf output doesn't use this.
         self.line = line
-        
+
         if align != util.ALIGN_LEFT:
             w = util.getTextWidth(text, flags, size)
 
@@ -142,7 +142,7 @@ class TextOp(DrawOp):
 
         if valign != util.VALIGN_TOP:
             h = util.getTextHeight(size)
-            
+
             if valign == util.VALIGN_CENTER:
                 self.y -= h / 2.0
             elif valign == util.VALIGN_BOTTOM:
@@ -190,7 +190,7 @@ class QuarterCircleOp(DrawOp):
         self.width = width
         self.flipX = flipX
         self.flipY = flipY
-        
+
 # Arbitrary PDF commands. Should not have whitespace in the beginning or
 # the end. Should be used only for non-critical things like tweaking line
 # join styles etc, because non-PDF renderers will ignore these.
@@ -215,9 +215,9 @@ class TextFormatter:
         # number of chararacters that fit on a single line
         self.charsToLine = int((width - margin * 2.0) /
                                util.getTextWidth(" ", COURIER, fontSize))
-        
+
         self.createPage()
-        
+
     # add new empty page, select it as current, reset y pos
     def createPage(self):
         self.pg = Page(self.doc)
@@ -242,7 +242,7 @@ class TextFormatter:
 
         if (self.y + yd) > (self.doc.h - self.margin):
             self.createPage()
-            
+
         self.pg.add(TextOp(text, x, self.y, fs, style))
 
         self.y += yd
@@ -253,6 +253,6 @@ class TextFormatter:
     def addWrappedText(self, text, indent):
         tmp = textwrap.wrap(text, self.charsToLine,
                 subsequent_indent = indent)
-        
+
         for s in tmp:
             self.addText(s)

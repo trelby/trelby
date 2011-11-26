@@ -82,7 +82,7 @@ class TypeInfo:
 # text type
 class TextType:
     cvars = None
-    
+
     def __init__(self):
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
@@ -124,14 +124,14 @@ class Type:
             # 10.
             v.addInt("beforeSpacing", 0, "BeforeSpacing", 0, 50)
             v.addInt("intraSpacing", 0, "IntraSpacing", 0, 20)
-            
+
             v.addInt("indent", 0, "Indent", 0, 80)
             v.addInt("width", 5, "Width", 5, 80)
 
             v.makeDicts()
-            
+
         self.__class__.cvars.setDefaults(self)
-            
+
     def save(self, prefix):
         prefix += "%s/" % self.ti.name
 
@@ -143,7 +143,7 @@ class Type:
 
     def load(self, vals, prefix):
         prefix += "%s/" % self.ti.name
-        
+
         self.cvars.load(vals, prefix, self)
         self.screen.load(vals, prefix + "Screen/")
         self.export.load(vals, prefix + "Export/")
@@ -153,13 +153,13 @@ class TypeGlobal:
     cvars = None
 
     def __init__(self, lt):
-        
+
         # line type
         self.lt = lt
 
         # pointer to TypeInfo
         self.ti = lt2ti(lt)
-        
+
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
 
@@ -170,11 +170,11 @@ class TypeGlobal:
             # what element to switch to when user hits tab / shift-tab.
             v.addElemName("nextTypeTab", screenplay.ACTION, "NextTypeTab")
             v.addElemName("prevTypeTab", screenplay.ACTION, "PrevTypeTab")
-            
+
             v.makeDicts()
-            
+
         self.__class__.cvars.setDefaults(self)
-            
+
     def save(self, prefix):
         prefix += "%s/" % self.ti.name
 
@@ -182,7 +182,7 @@ class TypeGlobal:
 
     def load(self, vals, prefix):
         prefix += "%s/" % self.ti.name
-        
+
         self.cvars.load(vals, prefix, self)
 
 # command (an action in the main program)
@@ -206,16 +206,16 @@ class Command:
         # some commands & their keys (Tab, Enter, Quit, etc) are fixed and
         # can't be changed
         self.isFixed = isFixed
-        
+
         # is this a menu item
         self.isMenu = isMenu
-        
+
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
 
             v.addList("keys", [], "Keys",
                       mypickle.IntVar("", 0, "", 0, 9223372036854775808L))
-            
+
             v.makeDicts()
 
         # this is not actually needed but let's keep it for consistency
@@ -226,7 +226,7 @@ class Command:
     def save(self, prefix):
         if self.isFixed:
             return ""
-        
+
         prefix += "%s/" % self.name
 
         if len(self.keys) > 0:
@@ -257,7 +257,7 @@ class Command:
         # weed out invalid bindings
         tmp2 = self.keys
         self.keys = []
-        
+
         for k in tmp2:
             k2 = util.Key.fromInt(k)
             if not k2.isValidInputChar():
@@ -278,7 +278,7 @@ class PDFFontInfo:
 
     # list of characters not allowed in pdfNames
     invalidChars = None
-    
+
     def __init__(self, name, style):
         # our name for the font (one of the PDF_FONT_* constants)
         self.name = name
@@ -296,7 +296,7 @@ class PDFFontInfo:
             # filename for the font to embed, or empty meaning don't
             # embed.
             v.addStrUnicode("filename", u"", "Filename")
-            
+
             v.makeDicts()
 
             tmp = ""
@@ -311,9 +311,9 @@ class PDFFontInfo:
                     tmp += chr(i)
 
             self.__class__.invalidChars = tmp
-            
+
         self.__class__.cvars.setDefaults(self)
-            
+
     def save(self, prefix):
         prefix += "%s/" % self.name
 
@@ -321,7 +321,7 @@ class PDFFontInfo:
 
     def load(self, vals, prefix):
         prefix += "%s/" % self.name
-        
+
         self.cvars.load(vals, prefix, self)
 
     # fix up invalid values.
@@ -336,7 +336,7 @@ class PDFFontInfo:
 # per-script config, each script has its own one of these.
 class Config:
     cvars = None
-    
+
     def __init__(self):
 
         if not self.__class__.cvars:
@@ -350,7 +350,7 @@ class Config:
         # element types
         t = Type(screenplay.SCENE)
         t.beforeSpacing = 10
-        t.indent = 0 
+        t.indent = 0
         t.width = 60
         t.screen.isCaps = True
         t.screen.isBold = True
@@ -396,7 +396,7 @@ class Config:
         t.screen.isCaps = True
         t.export.isCaps = True
         self.types[t.lt] = t
-        
+
         t = Type(screenplay.NOTE)
         t.beforeSpacing = 10
         t.indent = 5
@@ -419,7 +419,7 @@ class Config:
 
     def setupVars(self):
         v = self.__class__.cvars = mypickle.Vars()
-        
+
         # font size used for PDF generation, in points
         v.addInt("fontSize", 12, "FontSize", 4, 72)
 
@@ -441,7 +441,7 @@ class Config:
 
         # whether scene continueds are enabled
         v.addBool("sceneContinueds", True, "SceneContinueds")
-        
+
         # scene continued text indent width
         v.addInt("sceneContinuedIndent", 45, "SceneContinuedIndent", -20, 80)
 
@@ -453,10 +453,10 @@ class Config:
 
         # whether to show PDF TOC by default
         v.addBool("pdfShowTOC", True, "ShowTOC")
-        
+
         # whether to open PDF document on current page
         v.addBool("pdfOpenOnCurrentPage", True, "OpenOnCurrentPage")
-        
+
         # whether to remove Note elements in PDF output
         v.addBool("pdfRemoveNotes", False, "RemoveNotes")
 
@@ -485,7 +485,7 @@ class Config:
                        "String/DialogueContinued")
 
         v.makeDicts()
-        
+
     # load config from string 's'. does not throw any exceptions, silently
     # ignores any errors, and always leaves config in an ok state.
     def load(self, s):
@@ -500,19 +500,19 @@ class Config:
             pf.load(vals, "Font/")
 
         self.recalc()
-        
+
     # save config into a string and return that.
     def save(self):
         s = self.cvars.save("", self)
 
         for t in self.types.itervalues():
             s += t.save("Element/")
-            
+
         for pf in self.pdfFonts.itervalues():
             s += pf.save("Font/")
 
         return s
-            
+
     # fix up all invalid config values and recalculate all variables
     # dependent on other variables.
     #
@@ -532,7 +532,7 @@ class Config:
 
         for it in self.cvars.stringLatin1.itervalues():
             setattr(self, it.name, util.toInputStr(getattr(self, it.name)))
-            
+
         for pf in self.pdfFonts.itervalues():
             pf.refresh()
 
@@ -541,7 +541,7 @@ class Config:
                (self.paperHeight - 100.0):
             self.marginTop = 0.0
             self.marginBottom = 0.0
-            
+
         h = self.paperHeight - self.marginTop - self.marginBottom
 
         # how many lines on a page
@@ -562,7 +562,7 @@ class Config:
 # global config. there is only ever one of these active.
 class ConfigGlobal:
     cvars = None
-    
+
     def __init__(self):
 
         if not self.__class__.cvars:
@@ -622,7 +622,7 @@ class ConfigGlobal:
         t.nextTypeTab = screenplay.ACTION
         t.prevTypeTab = screenplay.SCENE
         self.types[t.lt] = t
-        
+
         t = TypeGlobal(screenplay.NOTE)
         t.newTypeEnter = screenplay.ACTION
         t.newTypeTab = screenplay.CHARACTER
@@ -636,10 +636,10 @@ class ConfigGlobal:
                     " auto-completion, etc.", [wx.WXK_ESCAPE], isFixed = True),
 
             Command("About", "Show the about dialog.", isMenu = True),
-            
+
             Command("AutoCompletionDlg", "Open the auto-completion dialog.",
                     isMenu = True),
-            
+
             Command("ChangeToAction", "Change current element's style to"
                     " action.",
                     [util.Key(ord("A"), alt = True).toInt()]),
@@ -676,7 +676,7 @@ class ConfigGlobal:
             Command("CloseScript", "Close the current script.",
                     [util.Key(23, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
-            
+
             Command("CompareScripts", "Compare two scripts.", isMenu = True),
 
             Command("Copy", "Copy selected text to the internal clipboard.",
@@ -685,30 +685,30 @@ class ConfigGlobal:
 
             Command("CopySystemCb", "Copy selected text to the system's"
                     " clipboard.", isMenu = True),
-            
+
             Command("Cut", "Cut selected text to internal clipboard.",
                     [util.Key(24, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
 
             Command("Delete", "Delete the character under the cursor,"
                     " or selected text.", [wx.WXK_DELETE], isFixed = True),
-            
+
             Command("DeleteBackward", "Delete the character behind the"
                     " cursor.", [wx.WXK_BACK], isFixed = True),
 
             Command("DeleteElements", "Open the 'Delete elements' dialog.",
                     isMenu = True),
-            
+
             Command("ExportScript", "Export the current script.",
                     isMenu = True),
-            
+
             Command("FindAndReplaceDlg", "Open the 'Find & Replace' dialog.",
                     [util.Key(6, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
 
             Command("FindNextError", "Find next error in the current script.",
                     [util.Key(5, ctrl = True).toInt()], isMenu = True),
-            
+
             Command("ForcedLineBreak", "Insert a forced line break.",
                     [util.Key(wx.WXK_RETURN, ctrl = True).toInt(),
                      util.Key(wx.WXK_RETURN, shift = True).toInt(),
@@ -728,86 +728,86 @@ class ConfigGlobal:
             Command("GotoPage", "Goto to a given page.",
                     [util.Key(7, ctrl = True).toInt()], isFixed = True,
                     isMenu = True),
-            
+
             Command("HeadersDlg", "Open the headers dialog.", isMenu = True),
-            
+
             Command("HelpCommands", "Show list of commands and their key"
                     " bindings.", isMenu = True),
-            
+
             Command("HelpManual", "Open the manual.", isMenu = True),
-            
+
             Command("ImportScript", "Import a script.", isMenu = True),
-            
+
             Command("LoadSettings", "Load global settings.", isMenu = True),
-            
+
             Command("LoadScriptSettings", "Load script-specific settings.",
                     isMenu = True),
-            
+
             Command("LocationsDlg", "Open the locations dialog.",
                     isMenu = True),
 
             Command("MoveDown", "Move down.", [wx.WXK_DOWN], isMovement = True),
-            
+
             Command("MoveEndOfLine", "Move to the end of the line or"
                     " finish auto-completion.",
                     [wx.WXK_END], isMovement = True),
-            
+
             Command("MoveEndOfScript", "Move to the end of the script.",
                     [util.Key(wx.WXK_END, ctrl = True).toInt()],
                     isMovement = True),
-            
+
             Command("MoveLeft", "Move left.", [wx.WXK_LEFT], isMovement = True),
-            
+
             Command("MovePageDown", "Move one page down.",
                     [wx.WXK_PAGEDOWN], isMovement = True),
-            
+
             Command("MovePageUp", "Move one page up.",
                     [wx.WXK_PAGEUP], isMovement = True),
-            
+
             Command("MoveRight", "Move right.", [wx.WXK_RIGHT],
                     isMovement = True),
-            
+
             Command("MoveSceneDown", "Move one scene down.",
                     [util.Key(wx.WXK_DOWN, ctrl = True).toInt()],
                     isMovement = True),
-            
+
             Command("MoveSceneUp", "Move one scene up.",
                     [util.Key(wx.WXK_UP, ctrl = True).toInt()],
                     isMovement = True),
-            
+
             Command("MoveStartOfLine", "Move to the start of the line.",
                     [wx.WXK_HOME], isMovement = True),
-            
+
             Command("MoveStartOfScript", "Move to the start of the"
                     " script.",
                     [util.Key(wx.WXK_HOME, ctrl = True).toInt()],
                     isMovement = True),
-            
+
             Command("MoveUp", "Move up.", [wx.WXK_UP], isMovement = True),
 
             Command("NameDatabase", "Open the character name database.",
                     isMenu = True),
-            
+
             Command("NewElement", "Create a new element.", [wx.WXK_RETURN],
                     isFixed = True),
 
             Command("NewScript", "Create a new script.",
                     [util.Key(14, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
-            
+
             Command("OpenScript", "Open a script.",
                     [util.Key(15, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
 
             Command("Paginate", "Paginate current script.", isMenu = True),
-            
+
             Command("Paste", "Paste text from the internal clipboard.",
                     [util.Key(22, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
 
             Command("PasteSystemCb", "Paste text from the system's"
                     " clipboard.", isMenu = True),
-            
+
             Command("PrintScript", "Print current script.",
                     [util.Key(16, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
@@ -818,35 +818,35 @@ class ConfigGlobal:
 
             Command("ReportCharacter", "Generate character report.",
                     isMenu = True),
-            
+
             Command("ReportDialogueChart", "Generate dialogue chart report.",
                     isMenu = True),
 
             Command("ReportLocation", "Generate location report.",
                     isMenu = True),
-            
+
             Command("ReportScene", "Generate scene report.",
                     isMenu = True),
-            
+
             Command("ReportScript", "Generate script report.",
                     isMenu = True),
 
             Command("RevertScript", "Revert current script to the"
                     " version on disk.", isMenu = True),
-            
+
             Command("SaveScriptSettingsAs", "Save script-specific settings"
                     " to a new file.", isMenu = True),
-            
+
             Command("SaveSettingsAs", "Save global settings to a new file.",
                     isMenu = True),
-            
+
             Command("SaveScript", "Save the current script.",
                     [util.Key(19, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
 
             Command("SaveScriptAs", "Save the current script to a new file.",
                     isMenu = True),
-            
+
             Command("ScriptNext", "Change to next open script.",
                     isMenu = True),
 
@@ -855,18 +855,18 @@ class ConfigGlobal:
 
             Command("ScriptSettings", "Change script-specific settings.",
                     isMenu = True),
-            
+
             Command("SelectScene", "Select the current scene.",
                     [util.Key(1, ctrl = True).toInt()], isMenu = True),
-            
+
             Command("SetMark", "Set mark at current cursor position.",
                     [util.Key(wx.WXK_SPACE, ctrl = True).toInt()]),
-            
+
             Command("Settings", "Change global settings.", isMenu = True),
 
             Command("SpellCheckerDlg","Spell check the script.",
                     [util.Key(wx.WXK_F8).toInt()], isMenu = True),
-            
+
             Command("SpellCheckerDictionaryDlg",
                     "Open the global spell checker dictionary dialog.",
                     isMenu = True),
@@ -885,7 +885,7 @@ class ConfigGlobal:
                     isFixed = True),
 
             Command("TitlesDlg", "Open the titles dialog.", isMenu = True),
-            
+
             Command("ToggleShowFormatting", "Toggle 'Show formatting'"
                     " display.", isMenu = True),
 
@@ -897,7 +897,7 @@ class ConfigGlobal:
 
             Command("ViewModeOverviewLarge", "Change view mode to large"
                     " overview.", isMenu = True),
-            
+
             Command("ViewModeOverviewSmall", "Change view mode to small"
                     " overview.", isMenu = True),
 
@@ -912,7 +912,7 @@ class ConfigGlobal:
 
         # how many seconds to show splash screen for on startup (0 = disabled)
         v.addInt("splashTime", 2, "SplashTime", 0, 10)
-        
+
         # confirm non-undoable delete operations that would delete at
         # least this many lines. (0 = disabled)
         v.addInt("confirmDeletes", 2, "ConfirmDeletes", 0, 500)
@@ -928,7 +928,7 @@ class ConfigGlobal:
 
         # whether to check script for errors before export / print
         v.addBool("checkOnExport", True, "CheckScriptForErrors")
-        
+
         # whether to auto-capitalize start of sentences
         v.addBool("capitalize", True, "CapitalizeSentences")
 
@@ -937,11 +937,11 @@ class ConfigGlobal:
 
         # whether to open scripts on their last saved position
         v.addBool("honorSavedPos", True, "OpenScriptOnSavedPos")
-        
+
         # page break indicators to show
         v.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,
                     PBI_LAST)
-        
+
         # PDF viewer program and args. defaults are empty since generating
         # them is a complex process handled by findPDFViewer.
         v.addStrUnicode("pdfViewerPath", u"", "PDF/ViewerPath")
@@ -952,10 +952,10 @@ class ConfigGlobal:
         v.addStrBinary("fontBold", "", "FontBold")
         v.addStrBinary("fontItalic", "", "FontItalic")
         v.addStrBinary("fontBoldItalic", "", "FontBoldItalic")
-        
+
         # default script directory
         v.addStrUnicode("scriptDir", misc.progPath, "DefaultScriptDirectory")
-        
+
         # colors
         v.addColor("text", 0, 0, 0, "TextFG", "Text foreground")
         v.addColor("textHdr", 128, 128, 128, "TextHeadersFG",
@@ -986,7 +986,7 @@ class ConfigGlobal:
         v.addColor("tabNonActiveBg", 234, 232, 233, "TabNonActiveBg", "Tab, non-active")
 
         v.makeDicts()
-        
+
     # load config from string 's'. does not throw any exceptions, silently
     # ignores any errors, and always leaves config in an ok state.
     def load(self, s):
@@ -1001,19 +1001,19 @@ class ConfigGlobal:
             cmd.load(vals, "Command/")
 
         self.recalc()
-        
+
     # save config into a string and return that.
     def save(self):
         s = self.cvars.save("", self)
 
         for t in self.types.itervalues():
             s += t.save("Element/")
-            
+
         for cmd in self.commands:
             s += cmd.save("Command/")
 
         return s
-            
+
     # fix up all invalid config values.
     def recalc(self):
         for it in self.cvars.numeric.itervalues():
@@ -1028,12 +1028,12 @@ class ConfigGlobal:
         for cmd in self.commands:
             if cmd.isMovement:
                 nk = []
-                
+
                 for key in cmd.keys:
                     k = util.Key.fromInt(key)
                     k.shift = True
                     ki = k.toInt()
-                    
+
                     if ki not in cmd.keys:
                         nk.append(ki)
 
@@ -1055,7 +1055,7 @@ class ConfigGlobal:
     # conflicts.
     def getConflictingKeys(self):
         keys = {}
-        
+
         for cmd in self.commands:
             for key in cmd.keys:
                 if key in keys:
@@ -1094,13 +1094,13 @@ class ConfigGlobal:
             fn[1] = "Monospace Bold 12"
             fn[2] = "Monospace Italic 12"
             fn[3] = "Monospace Bold Italic 12"
-            
+
         elif misc.isWindows:
                 fn[0] = "0;-13;0;0;0;400;0;0;0;0;3;2;1;49;Courier New"
                 fn[1] = "0;-13;0;0;0;700;0;0;0;0;3;2;1;49;Courier New"
                 fn[2] = "0;-13;0;0;0;400;255;0;0;0;3;2;1;49;Courier New"
                 fn[3] = "0;-13;0;0;0;700;255;0;0;0;3;2;1;49;Courier New"
-                
+
         else:
             raise ConfigError("Unknown platform")
 
@@ -1108,7 +1108,7 @@ class ConfigGlobal:
         self.fontBold = fn[1]
         self.fontItalic = fn[2]
         self.fontBoldItalic = fn[3]
-        
+
     # set PDF viewer program to the best one found on the machine.
     def findPDFViewer(self):
         # list of programs to look for. each item is of the form (name,
@@ -1150,7 +1150,7 @@ class ConfigGlobal:
             pass
 
         success = False
-        
+
         for name, args in progs:
             if misc.isWindows or (name[0] == u"/"):
                 if util.fileExists(name):
@@ -1178,7 +1178,7 @@ class ConfigGui:
     bluePen = None
     redColor = None
     blackColor = None
-    
+
     def __init__(self, cfgGl):
 
         if not ConfigGui.constantsInited:
@@ -1196,7 +1196,7 @@ class ConfigGui:
 
         self.textPen = wx.Pen(self.textColor)
         self.textHdrPen = wx.Pen(self.textHdrColor)
-        
+
         self.workspaceBrush = wx.Brush(self.workspaceColor)
         self.workspacePen = wx.Pen(self.workspaceColor)
 
@@ -1239,7 +1239,7 @@ class ConfigGui:
         # a 4-item list of FontInfo objects, indexed by the two lowest
         # bits of pml.TextOp.flags.
         self.fonts = []
-        
+
         for fname in ["fontNormal", "fontBold", "fontItalic",
                       "fontBoldItalic"]:
             fi = FontInfo()
@@ -1281,7 +1281,7 @@ class ConfigGui:
             fi.fy = max(1, fy)
 
             self.fonts.append(fi)
-            
+
     # TextType -> FontInfo
     def tt2fi(self, tt):
         return self.fonts[tt.isBold | (tt.isItalic << 1)]
@@ -1290,7 +1290,7 @@ def _conv(dict, key, raiseException = True):
     val = dict.get(key)
     if (val == None) and raiseException:
         raise ConfigError("key '%s' not found from '%s'" % (key, dict))
-    
+
     return val
 
 # get TypeInfos
@@ -1335,7 +1335,7 @@ def _init():
         (screenplay.SHOT,       "=",  "Shot"),
         (screenplay.NOTE,       "%",  "Note")
         ):
-        
+
         ti = TypeInfo(lt, char, name)
 
         _ti.append(ti)

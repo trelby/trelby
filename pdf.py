@@ -174,13 +174,13 @@ class PDFExporter:
             pml.COURIER | pml.ITALIC: FontInfo("Courier-Oblique"),
             pml.COURIER | pml.BOLD | pml.ITALIC:
               FontInfo("Courier-BoldOblique"),
-            
+
             pml.HELVETICA : FontInfo("Helvetica"),
             pml.HELVETICA | pml.BOLD: FontInfo("Helvetica-Bold"),
             pml.HELVETICA | pml.ITALIC: FontInfo("Helvetica-Oblique"),
             pml.HELVETICA | pml.BOLD | pml.ITALIC:
               FontInfo("Helvetica-BoldOblique"),
-            
+
             pml.TIMES_ROMAN : FontInfo("Times-Roman"),
             pml.TIMES_ROMAN | pml.BOLD: FontInfo("Times-Bold"),
             pml.TIMES_ROMAN | pml.ITALIC: FontInfo("Times-Italic"),
@@ -212,7 +212,7 @@ class PDFExporter:
 
             # each outline is a single PDF object
             self.outLineObjs = []
-            
+
             for i in xrange(len(doc.tocs)):
                 self.outLineObjs.append(self.addObj())
 
@@ -223,7 +223,7 @@ class PDFExporter:
                                      ">>" % (len(doc.tocs),
                                              self.outLineObjs[0].nr,
                                              self.outLineObjs[-1].nr))
-            
+
             outlinesStr = "/Outlines %d 0 R\n" % self.outlinesObj.nr
 
             if doc.showTOC:
@@ -236,7 +236,7 @@ class PDFExporter:
         # 2) a stream object that has the actual page contents.
         self.pageObjs = []
         self.pageContentObjs = []
-        
+
         for i in xrange(pages):
             self.pageObjs.append(self.addObj("<< /Type /Page\n"
                                              "/Parent %d 0 R\n"
@@ -300,7 +300,7 @@ class PDFExporter:
             self.__class__._widthsStr = "[%s]" % ("600 " * 256).rstrip()
 
         self.widthsObj = self.addObj(self.__class__._widthsStr)
-                                         
+
     # generate a single page
     def genPage(self, pageNr):
         pg = self.doc.pages[pageNr]
@@ -314,7 +314,7 @@ class PDFExporter:
             op.pdfOp.draw(op, pageNr, cont, self)
 
         self.pageContentObjs[pageNr].data = self.genStream(str(cont))
-        
+
     # generate outline number 'i'
     def genOutline(self, i):
         toc = self.doc.tocs[i]
@@ -356,7 +356,7 @@ class PDFExporter:
         if compress:
             s = s.encode("zlib")
             filterStr = "/Filter /FlateDecode\n"
-        
+
         return ("<< /Length %d\n%s%s>>\n"
                 "stream\n"
                 "%s\n"
@@ -384,7 +384,7 @@ class PDFExporter:
     # generate PDF file and return it as a string
     def genPDF(self):
         data = util.String()
-        
+
         data += "%PDF-1.5\n"
 
         for obj in self.objects:
@@ -405,11 +405,11 @@ class PDFExporter:
                  "/Root %d 0 R\n"
                  "/Info %d 0 R\n>>\n" % (
             self.objectCnt, self.catalogObj.nr, self.infoObj.nr))
-            
+
         data += "startxref\n%d\n%%%%EOF\n" % xrefStartPos
 
         return str(data)
-        
+
     # get font number to use for given flags. also creates the PDF object
     # for the font if it does not yet exist.
     def getFontNr(self, flags):
@@ -447,7 +447,7 @@ class PDFExporter:
                                         "/FontDescriptor %d 0 R\n"
                                         ">>" % (pfi.name, self.widthsObj.nr,
                                                 self.objectCnt + 1))
-            
+
                 fm = fontinfo.getMetrics(flags)
 
                 if pfi.fontProgram:
@@ -493,7 +493,7 @@ class PDFExporter:
     # escape string
     def escapeStr(self, s):
         return s.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
-        
+
     # convert mm to points (1/72 inch).
     def mm2points(self, mm):
         # 2.834 = 72 / 25.4

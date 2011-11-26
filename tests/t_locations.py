@@ -11,7 +11,7 @@ def ch(locsOld, scenes, locsNew):
     loc.refresh(scenes)
 
     assert loc.locations == locsNew
-    
+
 def test():
     u.init()
 
@@ -31,13 +31,13 @@ def test():
 
     ch([["int. motel Room - day", "nosuchthingie"]], scenes,
        [["INT. MOTEL ROOM - DAY"]])
-    
+
     ch([["int. motel Room - day", "int. motel Room - day"]], scenes,
        [["INT. MOTEL ROOM - DAY"]])
-    
+
     ch([["INT. MOTEL ROOM - DAY", "EXT. SHOPFRONT - DAY"]], scenes,
        [["EXT. SHOPFRONT - DAY", "INT. MOTEL ROOM - DAY"]])
-    
+
     ch([["INT. MOTEL ROOM - DAY"],
         ["INT. MOTEL ROOM - NIGHT", "EXT. PALACE - DAY"]], scenes,
        [["EXT. PALACE - DAY", "INT. MOTEL ROOM - NIGHT"],

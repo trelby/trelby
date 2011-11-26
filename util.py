@@ -107,7 +107,7 @@ def init(doWX = True):
         # we're measuring...
         permDc = wx.MemoryDC()
         permDc.SelectObject(wx.EmptyBitmap(512, 32))
-    
+
 # like string.upper/lower/capitalize, but we do our own charset-handling
 # that doesn't need locales etc
 def upper(s):
@@ -164,7 +164,7 @@ def fixNL(s):
 # clamps the given value to a specific range. both limits are optional.
 def clamp(val, minVal = None, maxVal = None):
     ret = val
-    
+
     if minVal != None:
         ret = max(ret, minVal)
 
@@ -182,7 +182,7 @@ def clampObj(obj, name, minVal = None, maxVal = None):
 # as well) on any errors.
 def str2float(s, defVal, minVal = None, maxVal = None):
     val = defVal
-    
+
     try:
         val = float(s)
     except (ValueError, OverflowError):
@@ -193,7 +193,7 @@ def str2float(s, defVal, minVal = None, maxVal = None):
 # like str2float, but for ints.
 def str2int(s, defVal, minVal = None, maxVal = None, radix = 10):
     val = defVal
-    
+
     try:
         val = int(s, radix)
     except ValueError:
@@ -239,7 +239,7 @@ def safeDivInt(val1, val2):
         return float(val1) / val2
     else:
         return 0.0
-    
+
 # for each character in 'flags', starting at beginning, checks if that
 # character is found in 's'. if so, appends True to a tuple, False
 # otherwise. returns that tuple, whose length is of course is len(flags).
@@ -273,7 +273,7 @@ def bools2flags(chars, *bools):
 # "\\") are escaped.
 def encodeStr(s):
     ret = ""
-    
+
     for ch in s:
         c = ord(ch)
 
@@ -366,7 +366,7 @@ def createPixelFont(height, family, style, weight):
 
     return wx.Font(selected, family, style, weight,
                    encoding = wx.FONTENCODING_ISO8859_1)
-    
+
 def reverseComboSelect(combo, clientData):
     for i in range(combo.GetCount()):
         if combo.GetClientData(i) == clientData:
@@ -395,7 +395,7 @@ def setWH(ctrl, w = -1, h = -1):
 def getSpinValue(spinCtrl):
     tmp = clamp(spinCtrl.GetValue(), spinCtrl.GetMin(), spinCtrl.GetMax())
     spinCtrl.SetValue(tmp)
-    
+
     return tmp
 
 # return True if c is not a word character, i.e. is either empty, not an
@@ -412,11 +412,11 @@ def isWordBoundary(c):
 # return True if c is an alphanumeric character
 def isAlnum(c):
     return unicode(c, "ISO-8859-1").isalnum()
-    
+
 # return string 's' split into words (as a list), using isWordBoundary.
 def splitToWords(s):
     tmp = ""
-    
+
     for c in s:
         if isWordBoundary(c):
             tmp += " "
@@ -465,13 +465,13 @@ def sortDict(d, sortFunc = None):
 
     if sortFunc == None:
         sortFunc = tmpSortFunc
-        
+
     tmp = []
     for k, v in d.iteritems():
         tmp.append((k, v))
 
     tmp.sort(sortFunc)
-    
+
     return tmp
 
 # an efficient FIFO container of fixed size. can't contain None objects.
@@ -489,19 +489,19 @@ class FIFO:
 
         if self.next >= len(self.arr):
             self.next = 0
-        
+
     # get contents as a list, in LIFO order.
     def get(self):
         tmp = []
 
         j = self.next - 1
-        
+
         for i in range(len(self.arr)):
             if j < 0:
                 j = len(self.arr) - 1
 
             obj = self.arr[j]
-            
+
             if  obj != None:
                 tmp.append(obj)
 
@@ -522,12 +522,12 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
         x -= w // 2
     elif align == ALIGN_RIGHT:
         x -= w
-        
+
     if valign == VALIGN_CENTER:
         y -= h // 2
     elif valign == VALIGN_BOTTOM:
         y -= h
-        
+
     dc.DrawText(text, x, y)
 
     return (w, h)
@@ -540,7 +540,7 @@ def finishWindow(window, topSizer, pad = 10, center = True):
     padSizer.Add(topSizer, 1, wx.EXPAND | wx.ALL, pad)
     window.SetSizerAndFit(padSizer)
     window.Layout()
-    
+
     if center:
         window.Center()
 
@@ -563,7 +563,7 @@ class MyColor:
         o.b = c.Blue()
 
         return o
-    
+
 # fake key event, supports same operations as the real one
 class MyKeyEvent:
     def __init__(self, kc = 0):
@@ -576,7 +576,7 @@ class MyKeyEvent:
 
     def GetKeyCode(self):
         return self.kc
-    
+
     def ControlDown(self):
         return self.controlDown
 
@@ -602,7 +602,7 @@ class Key:
 
         # CTRL+Enter = 10 in Windows
         10 : "Enter (Windows)",
-        
+
         11 : "K",
         12 : "L",
         14 : "N",
@@ -692,7 +692,7 @@ class Key:
     #        32:  Control
     #        33:  Alt
     #        34:  Shift
-    
+
     def toInt(self):
         return (self.kc & 0xFFFFFFFFL) | (self.ctrl << 32L) | \
                (self.alt << 33L) | (self.shift << 34L)
@@ -749,16 +749,16 @@ class String:
 
         if s:
             self += s
-            
+
     def __len__(self):
         return self.pos
 
     def __str__(self):
         return "".join(self.data)
-    
+
     def __iadd__(self, s):
         s2 = str(s)
-        
+
         self.data.append(s2)
         self.pos += len(s2)
 
@@ -828,7 +828,7 @@ def writeToFile(filename, data, frame):
             f.close()
 
         return True
-    
+
     except IOError, (errno, strerror):
         wx.MessageBox("Error writing file '%s': %s" % (
                 filename, strerror), "Error", wx.OK, frame)
@@ -890,9 +890,9 @@ class TimerDev:
 
     # how many TimerDev instances are currently in existence
     nestingLevel = 0
-    
+
     def __init__(self, msg = ""):
-        self.msg = msg 
+        self.msg = msg
         self.__class__.nestingLevel += 1
         self.t = time.time()
 
@@ -912,9 +912,9 @@ def showPDF(filename, cfgGl, frame):
 
     if not fileExists(cfgGl.pdfViewerPath):
         complain()
-        
+
         return
-    
+
     # on Windows, Acrobat complains about "invalid path" if we
     # give the full path of the program as first arg, so give a
     # dummy arg.
@@ -923,7 +923,7 @@ def showPDF(filename, cfgGl, frame):
     # there's a race condition in checking if the path exists, above, and
     # using it, below. if the file disappears between those two we get an
     # OSError exception from spawnv, so we need to catch it and handle it.
-    
+
     # TODO: spawnv does not support Unicode paths as of this moment
     # (Python 2.4). for now, convert it to UTF-8 and hope for the best.
     try:

@@ -18,7 +18,7 @@ class FontMetrics:
         # character widths in an array of 256 integers, or None for the
         # Courier fonts.
         self.widths = widths
-        
+
         # see the PDF spec for the details on what these are.
         self.fontWeight = fontWeight
         self.flags = flags
@@ -52,17 +52,17 @@ _fontMetrics = {
     fontWeight = 400, flags = 35, bbox = (-23, -250, 715, 805),
     italicAngle = 0, ascent = 629, descent = -157, capHeight = 562,
     stemV = 51, stemH = 51, xHeight = 426, widths = None),
-                              
+
     pml.COURIER | pml.BOLD : FontMetrics(
     fontWeight = 700, flags = 35, bbox = (-113, -250, 749, 801),
     italicAngle = 0, ascent = 629, descent = -157, capHeight = 562,
     stemV = 106, stemH = 84, xHeight = 439, widths = None),
-    
+
     pml.COURIER | pml.ITALIC : FontMetrics(
     fontWeight = 400, flags = 99, bbox = (-27, -250, 849, 805),
     italicAngle = -12, ascent = 629, descent = -157, capHeight = 562,
     stemV = 51, stemH = 51, xHeight = 426, widths = None),
-    
+
     pml.COURIER | pml.BOLD | pml.ITALIC : FontMetrics(
     fontWeight = 700, flags = 99, bbox = (-57, -250, 869, 801),
     italicAngle = -12, ascent = 629, descent = -157, capHeight = 562,
@@ -106,7 +106,7 @@ _fontMetrics = {
     556, 556, 556, 556, 556, 556, 556, 584,
     611, 556, 556, 556, 556, 500, 556, 500
     ]),
-    
+
     pml.HELVETICA | pml.BOLD : FontMetrics(
     fontWeight = 700, flags = 32, bbox = (-170, -228, 1003, 962),
     italicAngle = 0, ascent = 718, descent = -207, capHeight = 718,
@@ -144,7 +144,7 @@ _fontMetrics = {
     611, 611, 611, 611, 611, 611, 611, 584,
     611, 611, 611, 611, 611, 556, 611, 556,
     ]),
-    
+
     pml.HELVETICA | pml.ITALIC : FontMetrics(
     fontWeight = 400, flags = 96, bbox = (-170, -225, 1116, 931),
     italicAngle = -12, ascent = 718, descent = -207, capHeight = 718,
@@ -182,7 +182,7 @@ _fontMetrics = {
     556, 556, 556, 556, 556, 556, 556, 584,
     611, 556, 556, 556, 556, 500, 556, 500,
     ]),
-    
+
     pml.HELVETICA | pml.BOLD | pml.ITALIC : FontMetrics(
     fontWeight = 700, flags = 96, bbox = (-174, -228, 1114, 962),
     italicAngle = -12, ascent = 718, descent = -207, capHeight = 718,

@@ -98,14 +98,14 @@ class GlobalData:
             defaultW = 800
 
         v.addInt("width", defaultW, "Width", 500, 9999)
-        
+
         v.addInt("height", 830, "Height", 300, 9999)
         v.addInt("viewMode", VIEWMODE_LAYOUT, "ViewMode", VIEWMODE_DRAFT,
                  VIEWMODE_OVERVIEW_LARGE)
 
         v.addList("files", [], "Files",
                   mypickle.StrUnicodeVar("", u"", ""))
-        
+
         v.makeDicts()
         v.setDefaults(self)
 
@@ -174,25 +174,25 @@ class MyPanel(wx.Panel):
             style = wx.WANTS_CHARS | wx.NO_BORDER)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         self.scrollBar = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
         self.ctrl = MyCtrl(self, -1)
 
         hsizer.Add(self.ctrl, 1, wx.EXPAND)
         hsizer.Add(self.scrollBar, 0, wx.EXPAND)
-        
+
         wx.EVT_COMMAND_SCROLL(self, self.scrollBar.GetId(),
                               self.ctrl.OnScroll)
 
         wx.EVT_SET_FOCUS(self.scrollBar, self.OnScrollbarFocus)
-        
+
         self.SetSizer(hsizer)
 
     # we never want the scrollbar to get the keyboard focus, pass it on to
     # the main widget
     def OnScrollbarFocus(self, event):
         self.ctrl.SetFocus()
-    
+
 class MyCtrl(wx.Control):
 
     def __init__(self, parent, id):
@@ -200,7 +200,7 @@ class MyCtrl(wx.Control):
         wx.Control.__init__(self, parent, id, style = style)
 
         self.panel = parent
-        
+
         wx.EVT_SIZE(self, self.OnSize)
         wx.EVT_PAINT(self, self.OnPaint)
         wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
@@ -243,7 +243,7 @@ class MyCtrl(wx.Control):
         self.findDlgDirUp = False
         self.findDlgUseExtra = False
         self.findDlgElements = None
-        
+
     def createEmptySp(self):
         self.clearVars()
         self.sp = screenplay.Screenplay(cfgGl)
@@ -251,7 +251,7 @@ class MyCtrl(wx.Control):
         self.sp.headers.addDefaults()
         self.setFile(None)
         self.refreshCache()
-        
+
     # update stuff that depends on configuration / view mode etc.
     def refreshCache(self):
         self.chX = util.getTextWidth(" ", pml.COURIER, self.sp.cfg.fontSize)
@@ -284,7 +284,7 @@ class MyCtrl(wx.Control):
 
         if msg:
             misc.showText(mainFrame, msg, "Warning")
-            
+
         self.clearVars()
         self.sp = sp
         self.setFile(fileName)
@@ -313,7 +313,7 @@ class MyCtrl(wx.Control):
             return
 
         self.createEmptySp()
-        
+
         self.sp.lines = lines
         self.sp.reformatAll()
         self.sp.paginate()
@@ -333,7 +333,7 @@ class MyCtrl(wx.Control):
             return None
 
         return sp.generateText(inf[0].selected)
-        
+
     def setFile(self, fileName):
         self.fileName = fileName
         if fileName:
@@ -353,7 +353,7 @@ class MyCtrl(wx.Control):
                 tmp = name + "-%d" % i
 
             matched = False
-            
+
             for c in mainFrame.getCtrls():
                 if c == self:
                     continue
@@ -367,7 +367,7 @@ class MyCtrl(wx.Control):
                 break
 
             i += 1
-            
+
         self.fileNameDisplay = tmp
 
     def setTabText(self):
@@ -400,7 +400,7 @@ class MyCtrl(wx.Control):
         # accuracy is not that important for this, so we don't even care
         # about draft / layout mode differences.
         approx = int(((height / self.mm2p) / self.chY) / 1.3)
-        
+
         self.panel.scrollBar.SetScrollbar(self.sp.getTopLine(), approx,
             len(self.sp.lines) + approx - 1, approx)
 
@@ -419,10 +419,10 @@ class MyCtrl(wx.Control):
 
     def updateScreen(self, redraw = True, setCommon = True):
         self.adjustScrollBar()
-        
+
         if setCommon:
             self.updateCommon()
-            
+
         if redraw:
             self.Refresh(False)
 
@@ -453,7 +453,7 @@ class MyCtrl(wx.Control):
     # apply global config
     def applyGlobalCfg(self, newCfgGl, writeCfg = True):
         global cfgGl
-        
+
         oldCfgGl = cfgGl
 
         cfgGl = copy.deepcopy(newCfgGl)
@@ -462,11 +462,11 @@ class MyCtrl(wx.Control):
         # the current one, otherwise set the new default as current.
         if misc.scriptDir == oldCfgGl.scriptDir:
             misc.scriptDir = cfgGl.scriptDir
-        
+
         cfgGl.recalc()
         refreshGuiConfig()
         mainFrame.updateKbdCommands()
-        
+
         for c in mainFrame.getCtrls():
             c.sp.cfgGl = cfgGl
             c.refreshCache()
@@ -480,7 +480,7 @@ class MyCtrl(wx.Control):
         mainFrame.statusCtrl.Refresh(False)
         mainFrame.noFSBtn.Refresh(False)
         mainFrame.toolBar.SetBackgroundColour(cfgGui.tabBarBgColor)
-        
+
         if writeCfg:
             util.writeToFile(gd.confFilename, cfgGl.save(), mainFrame)
 
@@ -509,14 +509,14 @@ class MyCtrl(wx.Control):
         if sp.cfg.pdfRemoveNotes:
             sp = copy.deepcopy(self.sp)
             sp.removeElementTypes({screenplay.NOTE : None})
-                
+
         sp.paginate()
-        
+
         return sp
 
     def OnEraseBackground(self, event):
         pass
-        
+
     def OnSize(self, event):
         if misc.doDblBuf:
             size = self.GetClientSize()
@@ -528,9 +528,9 @@ class MyCtrl(wx.Control):
                (old.GetHeight() != sb.GetHeight()) or \
                (old.GetWidth() != sb.GetWidth()):
                 self.__class__.screenBuf = sb
-        
+
         self.makeLineVisible(self.sp.line)
-    
+
     def OnLeftDown(self, event, mark = False):
         if not self.mouseSelectActive:
             self.sp.clearMark()
@@ -571,7 +571,7 @@ class MyCtrl(wx.Control):
             delta = -cfgGl.mouseWheelLines
         else:
             delta = cfgGl.mouseWheelLines
-            
+
         self.sp.setTopLine(self.sp.getTopLine() + delta)
         self.updateScreen()
 
@@ -624,7 +624,7 @@ class MyCtrl(wx.Control):
             self.sp.markChanged()
 
         dlg.Destroy()
-        
+
     def OnSpellCheckerScriptDictionaryDlg(self):
         dlg = spellcheckcfgdlg.SCDictDlg(mainFrame,
             copy.deepcopy(self.sp.scDict), False)
@@ -685,10 +685,10 @@ class MyCtrl(wx.Control):
                           wx.OK, mainFrame)
 
             return
-        
+
         c1 = mainFrame.tabCtrl.getPage(sel1).ctrl
         c2 = mainFrame.tabCtrl.getPage(sel2).ctrl
-        
+
         sp1 = c1.getExportable("compare")
         sp2 = c2.getExportable("compare")
 
@@ -700,7 +700,7 @@ class MyCtrl(wx.Control):
             sp2.cfg = copy.deepcopy(sp1.cfg)
             sp2.reformatAll()
             sp2.paginate()
-            
+
         s = sp1.compareScripts(sp2)
 
         if s:
@@ -744,7 +744,7 @@ class MyCtrl(wx.Control):
         if self.fileName:
             if not self.canBeClosed():
                 return
-        
+
             self.loadFile(self.fileName)
             self.updateScreen()
 
@@ -762,7 +762,7 @@ class MyCtrl(wx.Control):
                 return
 
         cd = self.sp.getSelectedAsCD(doDelete)
-        
+
         if copyToClip:
             mainFrame.clipboard = cd
 
@@ -787,14 +787,14 @@ class MyCtrl(wx.Control):
             s += ln.text + config.lb2str(ln.lb)
 
         s = str(s).replace("\n", os.linesep)
-        
+
         if wx.TheClipboard.Open():
             wx.TheClipboard.UsePrimarySelection(False)
-            
+
             wx.TheClipboard.Clear()
             wx.TheClipboard.AddData(wx.TextDataObject(s))
             wx.TheClipboard.Flush()
-                
+
             wx.TheClipboard.Close()
 
     def OnPaste(self, clines = None):
@@ -807,18 +807,18 @@ class MyCtrl(wx.Control):
             clines = cd.lines
 
         self.sp.paste(clines)
-        
+
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
-    
+
     def OnPasteSystemCb(self):
         s = ""
-        
+
         if wx.TheClipboard.Open():
             wx.TheClipboard.UsePrimarySelection(False)
-            
+
             df = wx.DataFormat(wx.DF_TEXT)
-            
+
             if wx.TheClipboard.IsSupported(df):
                 data = wx.TextDataObject()
                 wx.TheClipboard.GetData(data)
@@ -827,7 +827,7 @@ class MyCtrl(wx.Control):
             wx.TheClipboard.Close()
 
         s = util.fixNL(s)
-        
+
         if len(s) == 0:
             return
 
@@ -850,7 +850,7 @@ class MyCtrl(wx.Control):
 
     def OnSelectScene(self):
         self.sp.cmd("selectScene")
-        
+
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
@@ -915,26 +915,26 @@ class MyCtrl(wx.Control):
         if line != -1:
             self.sp.line = line
             self.sp.column = 0
-            
+
             self.makeLineVisible(self.sp.line)
             self.updateScreen()
-            
+
         else:
             msg = "No errors found."
-            
+
         wx.MessageBox(msg, "Results", wx.OK, mainFrame)
-        
+
     def OnFind(self):
         self.clearAutoComp()
-        
+
         dlg = finddlg.FindDlg(mainFrame, self)
         dlg.ShowModal()
         dlg.saveState()
-        
+
         if dlg.didReplaces:
             self.sp.reformatAll()
             self.makeLineVisible(self.sp.line)
-        
+
         dlg.Destroy()
 
         self.searchLine = -1
@@ -945,24 +945,24 @@ class MyCtrl(wx.Control):
 
     def OnSpellCheckerDlg(self):
         self.clearAutoComp()
-        
+
         wasAtStart = self.sp.line == 0
 
         wx.BeginBusyCursor()
-        
+
         if not spellcheck.loadDict(mainFrame):
             wx.EndBusyCursor()
-            
+
             return
 
         sc = spellcheck.SpellChecker(self.sp, gd.scDict)
         found = sc.findNext()
-        
+
         wx.EndBusyCursor()
 
         if not found:
             s = ""
-            
+
             if not wasAtStart:
                 s = "\n\n(Starting position was not at\n"\
                     "the beginning of the script.)"
@@ -973,14 +973,14 @@ class MyCtrl(wx.Control):
 
         dlg = spellcheckdlg.SpellCheckDlg(mainFrame, self, sc, gd.scDict)
         dlg.ShowModal()
-        
+
         if dlg.didReplaces:
             self.sp.reformatAll()
             self.makeLineVisible(self.sp.line)
 
         if dlg.changedGlobalDict:
             gd.saveScDict()
-            
+
         dlg.Destroy()
 
         self.searchLine = -1
@@ -1007,7 +1007,7 @@ class MyCtrl(wx.Control):
             ok = True
 
             tdict = misc.CheckBoxItem.getClientData(types)
-            
+
         dlg.Destroy()
 
         if not ok or (len(tdict) == 0):
@@ -1052,7 +1052,7 @@ class MyCtrl(wx.Control):
         sp = self.getExportable("export")
         if not sp:
             return
-        
+
         dlg = wx.FileDialog(mainFrame, "Filename to export as",
             misc.scriptDir,
             wildcard = "PDF|*.pdf|RTF|*.rtf|Formatted text|*.txt",
@@ -1078,7 +1078,7 @@ class MyCtrl(wx.Control):
         sp = self.getExportable("print")
         if not sp:
             return
-        
+
         s = sp.generatePDF(False)
         gutil.showTempPDF(s, cfgGl, mainFrame)
 
@@ -1153,7 +1153,7 @@ class MyCtrl(wx.Control):
 
     def cmdMovePageDown(self, cs):
         self.pageCmd(cs, 1)
-        
+
     def cmdMovePageUp(self, cs):
         self.pageCmd(cs, -1)
 
@@ -1189,7 +1189,7 @@ class MyCtrl(wx.Control):
 
     def cmdSpeedTest(self, cs):
         zz = util.TimerDev("50 paints")
-        
+
         for i in xrange(50):
             self.OnKeyChar(util.MyKeyEvent(ord("a")))
             self.Update()
@@ -1198,13 +1198,13 @@ class MyCtrl(wx.Control):
 
     def cmdTest(self, cs):
         pass
-    
+
     def OnKeyChar(self, ev):
         kc = ev.GetKeyCode()
 
         #print "kc: %d, ctrl/alt/shift: %d, %d, %d" %\
         #      (kc, ev.ControlDown(), ev.AltDown(), ev.ShiftDown())
-        
+
         cs = screenplay.CommandState()
         cs.mark = bool(ev.ShiftDown())
 
@@ -1224,7 +1224,7 @@ class MyCtrl(wx.Control):
                 self.cmdSpeedTest(cs)
             else:
                 self.sp.addCharCmd(cs)
-                
+
         else:
             cmd = mainFrame.kbdCommands.get(util.Key(kc,
                 ev.ControlDown(), ev.AltDown(), ev.ShiftDown()).toInt())
@@ -1240,7 +1240,7 @@ class MyCtrl(wx.Control):
                 return
 
         self.sp.cmdPost(cs)
-        
+
         if cfgGl.paginateInterval > 0:
             now = time.time()
 
@@ -1256,7 +1256,7 @@ class MyCtrl(wx.Control):
 
     def OnPaint(self, event):
         #ldkjfldsj = util.TimerDev("paint")
-        
+
         ls = self.sp.lines
 
         if misc.doDblBuf:
@@ -1280,7 +1280,7 @@ class MyCtrl(wx.Control):
         # for header texts. list objects are (x, y, width) tuples.
         ulines = []
         ulinesHdr = []
-        
+
         strings, dpages = gd.vm.getScreen(self, True, True)
 
         dc.SetBrush(cfgGui.workspaceBrush)
@@ -1402,14 +1402,14 @@ class MyCtrl(wx.Control):
                 if tl == None:
                     tl = ([], [], [])
                     texts[fi.font] = tl
-                    
+
                 tl[0].append(t.text)
                 tl[1].append((t.x, y))
                 if t.line != -1:
                     tl[2].append(cfgGui.textColor)
                 else:
                     tl[2].append(cfgGui.textHdrColor)
-                
+
                 if t.isUnderlined:
                     if t.line != -1:
                         uli = ulines
@@ -1421,13 +1421,13 @@ class MyCtrl(wx.Control):
 
         if ulines:
             dc.SetPen(cfgGui.textPen)
-            
+
             for ul in ulines:
                 util.drawLine(dc, ul[0], ul[1], ul[2], 0)
 
         if ulinesHdr:
             dc.SetPen(cfgGui.textHdrPen)
-            
+
             for ul in ulinesHdr:
                 util.drawLine(dc, ul[0], ul[1], ul[2], 0)
 
@@ -1435,14 +1435,14 @@ class MyCtrl(wx.Control):
 
         for tl in texts.iteritems():
             gd.vm.drawTexts(self, dc, tl)
-        
+
         if self.sp.acItems and (cursorY > 0):
             self.drawAutoComp(dc, posX, cursorY, acFi)
 
     def drawAutoComp(self, dc, posX, cursorY, fi):
         ac = self.sp.acItems
         asel = self.sp.acSel
-        
+
         offset = 5
         selBleed = 2
 
@@ -1450,12 +1450,12 @@ class MyCtrl(wx.Control):
         sbw = 10
 
         size = self.GetClientSize()
-        
+
         dc.SetFont(fi.font)
 
         show = min(self.sp.acMax, len(ac))
         doSbw = show < len(ac)
-        
+
         startPos = (asel // show) * show
         endPos = min(startPos + show, len(ac))
         if endPos == len(ac):
@@ -1481,7 +1481,7 @@ class MyCtrl(wx.Control):
         # that's just too bad, we don't support window sizes that small.
         if (posY + h) > size.height:
             posY = cursorY - h - 1
-        
+
         dc.SetPen(cfgGui.autoCompPen)
         dc.SetBrush(cfgGui.autoCompBrush)
         dc.DrawRectangle(posX, posY, w, h)
@@ -1500,7 +1500,7 @@ class MyCtrl(wx.Control):
                 dc.SetTextForeground(cfgGui.autoCompBgColor)
                 dc.SetPen(cfgGui.autoCompPen)
                 dc.SetBrush(cfgGui.autoCompBrush)
-                
+
             dc.DrawText(ac[i], posX + offset, posY + offset +
                         (i - startPos) * fi.fy)
 
@@ -1525,7 +1525,7 @@ class MyFrame(wx.Frame):
         if misc.isUnix:
             # automatically reaps zombies
             signal.signal(signal.SIGCHLD, signal.SIG_IGN)
-        
+
         self.clipboard = None
         self.showFormatting = False
 
@@ -1534,12 +1534,12 @@ class MyFrame(wx.Frame):
 
         self.MoveXY(gd.posX, gd.posY)
         self.SetSize(wx.Size(gd.width, gd.height))
-        
+
         util.removeTempFiles(misc.tmpPrefix)
 
         self.mySetIcons()
         self.allocIds()
-        
+
         fileMenu = wx.Menu()
         fileMenu.Append(ID_FILE_NEW, "&New\tCTRL-N")
         fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
@@ -1606,11 +1606,11 @@ class MyFrame(wx.Frame):
             viewMenu.Check(ID_VIEW_STYLE_OVERVIEW_SMALL, True)
         else:
             viewMenu.Check(ID_VIEW_STYLE_OVERVIEW_LARGE, True)
-    
+
         viewMenu.AppendSeparator()
         viewMenu.AppendCheckItem(ID_VIEW_SHOW_FORMATTING, "&Show formatting")
         viewMenu.Append(ID_VIEW_FULL_SCREEN, "&Fullscreen\tF11")
-        
+
         scriptMenu = wx.Menu()
         scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error")
         scriptMenu.Append(ID_SCRIPT_PAGINATE, "&Paginate")
@@ -1637,7 +1637,7 @@ class MyFrame(wx.Frame):
         reportsMenu.Append(ID_REPORTS_SCENE_REP, "&Scene report...")
         reportsMenu.Append(ID_REPORTS_CHARACTER_REP, "&Character report...")
         reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart...")
-        
+
         toolsMenu = wx.Menu()
         toolsMenu.Append(ID_TOOLS_SPELL_CHECK, "&Spell checker...")
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
@@ -1649,7 +1649,7 @@ class MyFrame(wx.Frame):
         helpMenu.Append(ID_HELP_MANUAL, "&Manual")
         helpMenu.AppendSeparator()
         helpMenu.Append(ID_HELP_ABOUT, "&About...")
-        
+
         self.menuBar = wx.MenuBar()
         self.menuBar.Append(fileMenu, "&File")
         self.menuBar.Append(editMenu, "&Edit")
@@ -1811,7 +1811,7 @@ class MyFrame(wx.Frame):
         wx.EVT_CLOSE(self, self.OnCloseWindow)
 
         self.Layout()
-        
+
     def init(self):
         self.updateKbdCommands()
         self.panel = self.createNewPanel()
@@ -1899,7 +1899,7 @@ class MyFrame(wx.Frame):
             ]
 
         g = globals()
-        
+
         for n in names:
             g[n] = wx.NewId()
 
@@ -1938,7 +1938,7 @@ class MyFrame(wx.Frame):
 
             s = text.replace(".trelby", "")
             self.tabCtrl.setTabText(i, s)
-    
+
     # iterates over all tabs and finds out the corresponding page number
     # for the given panel.
     def findPage(self, panel):
@@ -1968,7 +1968,7 @@ class MyFrame(wx.Frame):
 
     def updateKbdCommands(self):
         cfgGl.addShiftKeys()
-        
+
         if cfgGl.getConflictingKeys() != None:
             wx.MessageBox("You have at least one key bound to more than one\n"
                           "command. The program will not work correctly until\n"
@@ -1992,7 +1992,7 @@ class MyFrame(wx.Frame):
         self.panel.ctrl.loadFile(filename)
         self.panel.ctrl.updateScreen()
         gd.mru.add(filename)
-        
+
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
         # override it and do nothing
@@ -2028,7 +2028,7 @@ class MyFrame(wx.Frame):
             misc.scriptDir,
             wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
             style = wx.OPEN)
-        
+
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
             self.openScript(dlg.GetPath())
@@ -2046,7 +2046,7 @@ class MyFrame(wx.Frame):
             misc.scriptDir,
             wildcard = "Importable files (*.txt;*.fdx)|*.fdx;*.txt|Formatted text files (*.txt)|*.txt|Final Draft XML(*.fdx)|*.fdx|All files|*",
             style = wx.OPEN)
-        
+
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
 
@@ -2065,7 +2065,7 @@ class MyFrame(wx.Frame):
     def OnCloseScript(self, event = None):
         if not self.panel.ctrl.canBeClosed():
             return
-        
+
         if self.tabCtrl.getPageCount() > 1:
             self.tabCtrl.deletePage()
         else:
@@ -2095,7 +2095,7 @@ class MyFrame(wx.Frame):
                 c = config.ConfigGlobal()
                 c.load(s)
                 gd.confFilename = dlg.GetPath()
-                
+
                 self.panel.ctrl.applyGlobalCfg(c, False)
 
         dlg.Destroy()
@@ -2110,7 +2110,7 @@ class MyFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             if util.writeToFile(dlg.GetPath(), cfgGl.save(), self):
                 gd.confFilename = dlg.GetPath()
-            
+
         dlg.Destroy()
 
     def OnCut(self, event = None):
@@ -2151,7 +2151,7 @@ class MyFrame(wx.Frame):
             not self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING))
         self.showFormatting = not self.showFormatting
         self.panel.ctrl.Refresh(False)
-        
+
     def OnShowFormatting(self, event = None):
         self.showFormatting = self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING)
         self.panel.ctrl.Refresh(False)
@@ -2192,7 +2192,7 @@ class MyFrame(wx.Frame):
 
         for c in self.getCtrls():
             c.refreshCache()
-        
+
         c = self.panel.ctrl
         c.makeLineVisible(c.sp.line)
         c.updateScreen()
@@ -2246,7 +2246,7 @@ class MyFrame(wx.Frame):
                 cfg = config.Config()
                 cfg.load(s)
                 self.panel.ctrl.applyCfg(cfg)
-                
+
                 gd.scriptSettingsPath = os.path.dirname(dlg.GetPath())
 
         dlg.Destroy()
@@ -2260,7 +2260,7 @@ class MyFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             if util.writeToFile(dlg.GetPath(), self.panel.ctrl.sp.saveCfg(), self):
                 gd.scriptSettingsPath = os.path.dirname(dlg.GetPath())
-            
+
         dlg.Destroy()
 
     def OnReportCharacter(self, event = None):
@@ -2309,7 +2309,7 @@ class MyFrame(wx.Frame):
 
     def OnHelpManual(self, event = None):
         wx.LaunchDefaultBrowser("file://" + misc.getFullPath("manual.html"))
-        
+
     def OnAbout(self, event = None):
         win = splash.SplashWindow(self, -1)
         win.Show()
@@ -2335,7 +2335,7 @@ class MyFrame(wx.Frame):
 
     def OnExit(self, event):
         self.Close(False)
-        
+
     def OnMove(self, event):
         gd.posX, gd.posY = self.GetPositionTuple()
         event.Skip()
@@ -2380,7 +2380,7 @@ class MyApp(wx.App):
         wx.SetDefaultPyEncoding("ISO-8859-1")
 
         os.chdir(misc.progPath)
-        
+
         cfgGl = config.ConfigGlobal()
         cfgGl.setDefaults()
 
@@ -2406,7 +2406,7 @@ class MyApp(wx.App):
 
             if s:
                 gd.load(s)
-                
+
         gd.setViewMode(gd.viewMode)
 
         if util.fileExists(gd.scDictFilename):
@@ -2414,10 +2414,10 @@ class MyApp(wx.App):
 
             if s:
                 gd.scDict.load(s)
-        
+
         mainFrame = MyFrame(None, -1, "Trelby")
         mainFrame.init()
-        
+
         for arg in opts.filenames:
             mainFrame.openScript(arg)
 
@@ -2425,7 +2425,7 @@ class MyApp(wx.App):
 
         # windows needs this for some reason
         mainFrame.panel.ctrl.SetFocus()
-        
+
         self.SetTopWindow(mainFrame)
 
         if cfgGl.splashTime > 0:

@@ -38,7 +38,7 @@ class AutoCompletion:
             t.load(vals, "AutoCompletion/")
 
         self.refresh()
-        
+
     # save config into a string and return that.
     def save(self):
         s = ""
@@ -47,7 +47,7 @@ class AutoCompletion:
             s += t.save("AutoCompletion/")
 
         return s
-            
+
     # fix up invalid values and uppercase everything.
     def refresh(self):
         for t in self.types.itervalues():
@@ -82,7 +82,7 @@ class Type:
                       mypickle.StrLatin1Var("", "", ""))
 
             v.makeDicts()
-            
+
         self.__class__.cvars.setDefaults(self)
 
     def save(self, prefix):
@@ -92,5 +92,5 @@ class Type:
 
     def load(self, vals, prefix):
         prefix += "%s/" % self.ti.name
-        
+
         self.cvars.load(vals, prefix, self)

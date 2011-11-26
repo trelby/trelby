@@ -40,7 +40,7 @@ class Font:
             self.parse(s)
         except (struct.error, ParseError), e:
             self.error = e
-            
+
             return
 
         self.ok = True
@@ -65,7 +65,7 @@ class Font:
         check(version == 0x00010000)
 
         offset = OFFSET_TABLE_SIZE
-        
+
         for i in range(self.tableCnt):
             self.parseTag(offset, s)
             offset += TABLE_DIR_SIZE
@@ -98,7 +98,7 @@ class Font:
         fmt, nameCnt, storageOffset = unpack(">3H", s[:NAME_TABLE_SIZE])
 
         check(fmt == 0)
-        
+
         storage = s[storageOffset:]
         offset = NAME_TABLE_SIZE
 

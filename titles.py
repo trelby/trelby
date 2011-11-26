@@ -24,7 +24,7 @@ class Titles:
         a.append(TitleString("Nowhere, CA 90210", x, y + 4.23, False))
         a.append(TitleString("123/456-7890", x, y + 8.46, False))
         a.append(TitleString("no.such@thing.com", x, y + 12.7, False))
-        
+
         self.pages.append(a)
 
     # add title pages to doc.
@@ -97,7 +97,7 @@ class TitleString:
             fl |= pml.UNDERLINED
 
         return fl
-    
+
     def generatePML(self, page):
         x = self.x
 
@@ -127,7 +127,7 @@ class TitleString:
             tmp += r" \ul"
 
         return r"{\pard\plain%s %s}{\par}" % (tmp, util.escapeRTF(self.text))
-        
+
     # parse information from s, which must be a string created by __str__,
     # and set object state accordingly. keeps default settings on any
     # errors, does not throw any exceptions.
@@ -138,7 +138,7 @@ class TitleString:
 
         if len(a) != 7:
             return
-        
+
         self.x = util.str2float(a[0], 0.0)
         self.y = util.str2float(a[1], 0.0)
         self.size = util.str2int(a[2], 12, 4, 288)
@@ -153,14 +153,14 @@ class TitleString:
         self.font = tmp.get(a[4], pml.COURIER)
 
         self.text = a[6]
-                       
+
     def __str__(self):
         s = "%f,%f,%d," % (self.x, self.y, self.size)
 
         s += util.bools2flags("cbiu", self.isCentered, self.isBold,
                                self.isItalic, self.isUnderlined)
         s += ","
-        
+
         if self.font == pml.COURIER:
             s += "Courier"
         elif self.font == pml.HELVETICA:

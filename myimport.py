@@ -148,7 +148,7 @@ def importTextFile(fileName, frame):
 
     # transitions
     setType(screenplay.TRANSITION, indDict, lambda v: v.trans)
-    
+
     # parentheticals
     setType(screenplay.PAREN, indDict, lambda v: v.paren)
 
@@ -167,7 +167,7 @@ def importTextFile(fileName, frame):
 
         if paren2Indent != -1:
             indDict[paren2Indent].lt = screenplay.PAREN
-    
+
     # set line type to ACTION for any indents not recognized
     for v in indDict.itervalues():
         if v.lt == -1:
@@ -181,7 +181,7 @@ def importTextFile(fileName, frame):
         return None
 
     dlg.Destroy()
-        
+
     ret = []
 
     for i in range(len(lines)):
@@ -189,7 +189,7 @@ def importTextFile(fileName, frame):
         cnt = util.countInitial(s, " ")
         s = s.lstrip()
         sUp = s.upper()
-        
+
         if s:
             lt = indDict[cnt].lt
 
@@ -222,7 +222,7 @@ def importTextFile(fileName, frame):
 
     # make sure the last line ends an element
     ret[-1].lb = screenplay.LB_LAST
-    
+
     return ret
 
 # go through indents, find the one with maximum value in something, and
@@ -230,12 +230,12 @@ def importTextFile(fileName, frame):
 def setType(lt, indDict, func):
     maxCount = 0
     found = -1
-    
+
     for v in indDict.itervalues():
         # don't touch indents already set
         if v.lt != -1:
             continue
-        
+
         val = func(v)
 
         if val > maxCount:
@@ -284,21 +284,21 @@ class ImportDlg(wx.Dialog):
                            style = wx.DEFAULT_DIALOG_STYLE)
 
         indents.sort(lambda i1, i2: -cmp(len(i1.lines), len(i2.lines)))
-        
+
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         tmp = wx.StaticText(self, -1, "Input:")
         vsizer.Add(tmp)
-        
+
         self.inputLb = wx.ListBox(self, -1, size = (400, 200))
         for it in indents:
             self.inputLb.Append("%d lines (indented %d characters)" %
                                 (len(it.lines), it.indent), it)
-            
+
         vsizer.Add(self.inputLb, 0, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         hsizer.Add(wx.StaticText(self, -1, "Style:"), 0,
                    wx.ALIGN_CENTER_VERTICAL)
         self.styleCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
@@ -308,7 +308,7 @@ class ImportDlg(wx.Dialog):
             self.styleCombo.Append(t.name, t.lt)
 
         util.setWH(self.styleCombo, w = 150)
-        
+
         hsizer.Add(self.styleCombo, 0, wx.LEFT, 10)
 
         vsizer.Add(hsizer, 0, wx.TOP | wx.BOTTOM, 10)
@@ -318,14 +318,14 @@ class ImportDlg(wx.Dialog):
         self.linesEntry = wx.TextCtrl(self, -1, size = (400, 200),
             style = wx.TE_MULTILINE | wx.TE_DONTWRAP)
         vsizer.Add(self.linesEntry, 0, wx.EXPAND)
-        
+
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
-        
+
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
@@ -335,13 +335,13 @@ class ImportDlg(wx.Dialog):
 
         wx.EVT_COMBOBOX(self, self.styleCombo.GetId(), self.OnStyleCombo)
         wx.EVT_LISTBOX(self, self.inputLb.GetId(), self.OnInputLb)
-        
+
         wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
         wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
         self.inputLb.SetSelection(0)
         self.OnInputLb()
-        
+
     def OnOK(self, event):
         self.EndModal(wx.ID_OK)
 

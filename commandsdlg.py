@@ -11,7 +11,7 @@ class CommandsDlg(wx.Frame):
                           size = (650, 600), style = wx.DEFAULT_FRAME_STYLE)
 
         self.Center()
-        
+
         vsizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(vsizer)
 
@@ -33,7 +33,7 @@ class CommandsDlg(wx.Frame):
             s += "</td></tr>"
 
         s += "</table>"
-        
+
         self.html = """
 <html><head></head><body>
 
@@ -53,13 +53,13 @@ R                      Replace
 </pre>
 </body></html>
         """ % s
-        
+
         htmlWin = wx.html.HtmlWindow(self)
         rep = htmlWin.GetInternalRepresentation()
         rep.SetIndent(0, wx.html.HTML_INDENT_BOTTOM)
         htmlWin.SetPage(self.html)
         htmlWin.SetFocus()
-        
+
         vsizer.Add(htmlWin, 1, wx.EXPAND)
 
         id = wx.NewId()
@@ -86,5 +86,5 @@ R                      Replace
 
         if dlg.ShowModal() == wx.ID_OK:
             util.writeToFile(dlg.GetPath(), self.html, self)
-            
+
         dlg.Destroy()

@@ -9,7 +9,7 @@ def testReplace():
     u.init()
 
     ur = util.replace
-    
+
     assert ur("", "", 0, 0) == ""
     assert ur("", "jep", 0, 0) == "jep"
     assert ur("yo", "bar", 0, 0) == "baryo"
@@ -42,7 +42,7 @@ def testToUTF8():
     assert t("") == ""
     assert t("yo") == "yo"
     assert t("yö") == "yÃ¶"
-    
+
 def testFromUTF8():
     u.init()
 

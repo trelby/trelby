@@ -52,7 +52,7 @@ class Screenplay:
 
         self.cfgGl = cfgGl
         self.cfg = config.Config()
-        
+
         # cursor position: line and column
         self.line = 0
         self.column = 0
@@ -60,7 +60,7 @@ class Screenplay:
         # first line shown on screen. use getTopLine/setTopLine to access
         # this.
         self._topLine = 0
-        
+
         # Mark object if selection active, or None.
         self.mark = None
 
@@ -97,13 +97,13 @@ class Screenplay:
 
     def markChanged(self, state = True):
         self.hasChanged = state
-    
+
     def getSpacingBefore(self, i):
         if i == 0:
             return 0
 
         tcfg = self.cfg.types[self.lines[i].lt]
-        
+
         if self.lines[i - 1].lb == LB_LAST:
             return tcfg.beforeSpacing
         else:
@@ -125,7 +125,7 @@ class Screenplay:
         # remove the dummy empty line
         sp.lines = []
         l = sp.lines
-        
+
         for i in xrange(len(self.lines)):
             ln = self.lines[i]
             l.append(Line(ln.lb, ln.lt, ln.text))
@@ -141,7 +141,7 @@ class Screenplay:
     def save(self):
         self.cfg.cursorLine = self.line
         self.cfg.cursorColumn = self.column
-        
+
         output = util.String()
 
         output += codecs.BOM_UTF8
@@ -162,7 +162,7 @@ class Screenplay:
         output += "#Begin-Spell-Checker-Dict \n"
         output += self.scDict.save()
         output += "#End-Spell-Checker-Dict \n"
-        
+
         pgs = self.titles.pages
         for pg in xrange(len(pgs)):
             if pg != 0:
@@ -177,7 +177,7 @@ class Screenplay:
         output += "#Header-Empty-Lines %d\n" % self.headers.emptyLinesAfter
 
         output += "#Start-Script \n"
-        
+
         for i in xrange(len(self.lines)):
             output += util.toUTF8(str(self.lines[i]) + "\n")
 
@@ -193,7 +193,7 @@ class Screenplay:
             raise error.MiscError("File is not a Trelby screenplay.")
 
         lines = s[3:].splitlines()
-            
+
         sp = Screenplay(cfgGl)
 
         # remove default empty line
@@ -292,7 +292,7 @@ class Screenplay:
             else:
                 if not startSeen:
                     unknownConfigs = True
-                    
+
                     continue
 
                 lb = config.char2lb(s[0], False)
@@ -335,14 +335,14 @@ class Screenplay:
             sp.line = sp.cfg.cursorLine
             sp.column = sp.cfg.cursorColumn
             sp.validatePos()
-        
+
         sp.reformatAll()
         sp.paginate()
         sp.titles.sort()
         sp.locations.refresh(sp.getSceneNames())
 
         msgs = []
-        
+
         if unknownLb:
             msgs.append("Screenplay contained unknown linebreak types.")
 
@@ -371,7 +371,7 @@ class Screenplay:
         if (startIndex >= len(lines)) or\
                (lines[startIndex] != ("#Begin-%s " % name)):
             return ("", startIndex)
-            
+
         try:
             endIndex = lines.index("#End-%s " % name, startIndex)
         except ValueError:
@@ -399,16 +399,16 @@ class Screenplay:
         self.reformatAll()
         self.paginate()
         self.markChanged()
-        
+
     # return script config as a string.
     def saveCfg(self):
         return self.cfg.save()
-        
+
     # generate formatted text and return it as a string. if 'dopages' is
     # True, marks pagination in the output.
     def generateText(self, doPages):
         ls = self.lines
-        
+
         output = util.String()
 
         for p in xrange(1, len(self.pages)):
@@ -451,7 +451,7 @@ class Screenplay:
         # easier to handle if we assume normal font size, this is a scale
         # factor from actual font size to normal font size
         sf = fs / 12.0
-        
+
         for ti in config.getTIs():
             t = self.cfg.getType(ti.lt)
             tt = t.export
@@ -478,7 +478,7 @@ class Screenplay:
                       (t.indent + t.width) * 144 * sf))
 
             tmp += r" \sb%d" % (sf * t.beforeSpacing * 24)
-            
+
             s += "{\\s%d%s %s}\n" % (ti.lt, tmp, ti.name)
 
         s += "}\n"
@@ -490,12 +490,12 @@ class Screenplay:
         s += "\n"
 
         s += self.titles.generateRTF()
-        
+
         length = len(ls)
         i = 0
 
         magicslash = "TRELBY-MAGIC-SLASH"
-        
+
         while i < length:
             lt = ls[i].lt
             text = ""
@@ -506,7 +506,7 @@ class Screenplay:
 
                 lb = ln.lb
                 text += ln.text
-                
+
                 if lb in (LB_SPACE, LB_NONE):
                     text += config.lb2str(lb)
                 elif lb == LB_FORCED:
@@ -516,7 +516,7 @@ class Screenplay:
                 else:
                     raise error.MiscError("Unknown line break style %d"
                                           " in generateRTF" % lb)
-            
+
             s += (r"{\pard \s%d " % lt) + util.escapeRTF(text).replace(
                 magicslash, "\\") + "}{\\par}\n"
 
@@ -537,7 +537,7 @@ class Screenplay:
         if not isExport and self.cfg.pdfOpenOnCurrentPage:
             pager.doc.defPage = len(self.titles.pages) + \
                                 self.line2page(self.line) - 1
-            
+
         for i in xrange(1, len(self.pages)):
             pg = self.generatePMLPage(pager, i, True, True)
 
@@ -596,19 +596,19 @@ class Screenplay:
 
         cfg = self.cfg
         ls = self.lines
-        
+
         fs = cfg.fontSize
         chX = util.getTextWidth(" ", pml.COURIER, fs)
         chY = util.getTextHeight(fs)
         length = len(ls)
-        
+
         start = self.pages[pageNr - 1] + 1
 
         if start >= length:
             # text has been deleted at end of script and pagination has
             # not been updated.
             return None
-        
+
         # pagination may not be up-to-date, so any overflow text gets
         # dumped onto the last page which may thus be arbitrarily long.
         if pageNr == (len(self.pages) - 1):
@@ -698,7 +698,7 @@ class Screenplay:
                 ny = cfg.marginTop + (y / 10.0) * chY
                 nw = tcfg.width * chX
                 lw = 0.25
-                
+
                 pg.add(pml.genLine(nx - offset, ny, 0.0, chY, lw))
                 pg.add(pml.genLine(nx + nw + offset, ny, 0.0, chY, lw))
 
@@ -771,7 +771,7 @@ class Screenplay:
 
     def addSceneNumbers(self, pg, s, width, y, chX, chY):
         cfg = self.cfg
-        
+
         pg.add(pml.TextOp(s, cfg.marginLeft - 6 * chX,
              cfg.marginTop + (y / 10.0) * chY, cfg.fontSize))
         pg.add(pml.TextOp(s, cfg.marginLeft + (width + 1) * chX,
@@ -789,9 +789,9 @@ class Screenplay:
 
     def reformatAll(self):
         #sfdlksjf = util.TimerDev("reformatAll")
-        
+
         line = 0
-        
+
         while 1:
             line += self.rewrapPara(line)
             if line >= len(self.lines):
@@ -811,7 +811,7 @@ class Screenplay:
             if hasattr(ls[line], "reformatMarker"):
                 del ls[line].reformatMarker
                 end = True
-                
+
             line += self.rewrapPara(line)
             if end:
                 break
@@ -822,10 +822,10 @@ class Screenplay:
     def wrapLine(self, line):
         ret = []
         w = self.cfg.getType(line.lt).width
-        
+
         # text remaining to be wrapped
         text = line.text
-        
+
         while 1:
             if len(text) <= w:
                 ret.append(Line(line.lb, line.lt, text))
@@ -865,11 +865,11 @@ class Screenplay:
                 elif i >= 0:
                     ret.append(Line(LB_SPACE, line.lt, text[0:i]))
                     text = text[i + 1:]
-                    
+
                 else:
                     ret.append(Line(LB_NONE, line.lt, text[0:w]))
                     text = text[w:]
-                    
+
         return ret
 
     # rewrap paragraph starting at given line. returns the number of lines
@@ -916,19 +916,19 @@ class Screenplay:
             for i in range(line1, line1 + len(wrappedLines)):
                 ln = ls[i]
                 llen = len(ln.text) + len(config.lb2str(ln.lb))
-                
+
                 if cursorOffset < llen:
                     self.line = i
                     self.column = min(cursorOffset, len(ln.text))
                     break
                 else:
                     cursorOffset -= llen
-            
+
         elif self.line >= line1:
             # cursor position is below current paragraph, modify its
             # linenumber appropriately
             self.line += len(wrappedLines) - (line2 - line1 + 1)
-            
+
         return len(wrappedLines)
 
     # rewraps paragraph previous to current one.
@@ -937,7 +937,7 @@ class Screenplay:
 
         if line == 0:
             return
-        
+
         line = self.getParaFirstIndexFromLine(line - 1)
         self.rewrapPara(line)
 
@@ -948,13 +948,13 @@ class Screenplay:
 
         if line == -1:
             line = self.getElemFirstIndex()
-        
+
         while 1:
             line += self.rewrapPara(line)
-            
+
             if ls[line - 1].lb == LB_LAST:
                 break
-        
+
     def isFirstLineOfElem(self, line):
         return (line == 0) or (self.lines[line - 1].lb == LB_LAST)
 
@@ -970,7 +970,7 @@ class Screenplay:
     # get first index of paragraph
     def getParaFirstIndexFromLine(self, line):
         ls = self.lines
-        
+
         while 1:
             tmp = line - 1
 
@@ -979,7 +979,7 @@ class Screenplay:
 
             if ls[tmp].lb in (LB_LAST, LB_FORCED):
                 break
-            
+
             line -= 1
 
         return line
@@ -1004,7 +1004,7 @@ class Screenplay:
 
     def getElemFirstIndexFromLine(self, line):
         ls = self.lines
-        
+
         while 1:
             tmp = line - 1
 
@@ -1017,10 +1017,10 @@ class Screenplay:
             line -= 1
 
         return line
-    
+
     def getElemLastIndex(self):
         return self.getElemLastIndexFromLine(self.line)
-    
+
     def getElemLastIndexFromLine(self, line):
         ls = self.lines
 
@@ -1052,7 +1052,7 @@ class Screenplay:
             return False
 
         l = ls[line - 1]
-        
+
         return (l.lt != SCENE) or (l.lb == LB_LAST)
 
     def isLastLineOfScene(self, line):
@@ -1060,7 +1060,7 @@ class Screenplay:
 
         if ls[line].lb != LB_LAST:
             return False
-        
+
         if line == (len(ls) - 1):
             return True
 
@@ -1069,7 +1069,7 @@ class Screenplay:
     def getTypeOfPrevElem(self, line):
         line = self.getElemFirstIndexFromLine(line)
         line -= 1
-        
+
         if line < 0:
             return None
 
@@ -1083,32 +1083,32 @@ class Screenplay:
             return None
 
         return self.lines[line].lt
-    
+
     def getSceneIndexes(self):
         return self.getSceneIndexesFromLine(self.line)
 
     def getSceneIndexesFromLine(self, line):
         top, bottom = self.getElemIndexesFromLine(line)
         ls = self.lines
-        
+
         while 1:
             if ls[top].lt == SCENE:
                 break
-            
+
             tmp = top - 1
             if tmp < 0:
                 break
-            
+
             top = self.getElemIndexesFromLine(tmp)[0]
 
         while 1:
             tmp = bottom + 1
             if tmp >= len(ls):
                 break
-            
+
             if ls[tmp].lt == SCENE:
                 break
-            
+
             bottom = self.getElemIndexesFromLine(tmp)[1]
 
         return (top, bottom)
@@ -1129,7 +1129,7 @@ class Screenplay:
     # (MORE) after it and the next page needs a "SOMEBODY (cont'd)".
     def needsMore(self, line):
         ls = self.lines
-        
+
         return ls[line].lt in (DIALOGUE, PAREN)\
            and (line != (len(ls) - 1)) and\
            ls[line + 1].lt in (DIALOGUE, PAREN)
@@ -1145,13 +1145,13 @@ class Screenplay:
                 return "UNKNOWN"
 
             ln = ls[line]
-            
+
             if (ln.lt == CHARACTER) and (ln.lb == LB_LAST):
                 s = ln.text
-                
+
                 if self.cfg.getType(CHARACTER).export.isCaps:
                     s = util.upper(s)
-                
+
                 return s
 
             line -= 1
@@ -1159,16 +1159,16 @@ class Screenplay:
     # return total number of characters in script
     def getCharCount(self):
         return sum([len(ln.text) for ln in self.lines])
-        
+
     def paginate(self):
         #sfdlksjf = util.TimerDev("paginate")
-        
+
         self.pages = [-1]
         self.pagesNoAdjust = [-1]
 
         ls = self.lines
         cfg = self.cfg
-        
+
         length = len(ls)
         lastBreak = -1
 
@@ -1176,7 +1176,7 @@ class Screenplay:
         lbl = LB_LAST
         ct = cfg.types
         hdrLines = self.headers.getNrOfLines()
-        
+
         i = 0
         while 1:
             lp = cfg.linesOnPage * 10
@@ -1200,10 +1200,10 @@ class Screenplay:
             pageLines = 0
             if i < length:
                 pageLines = 10
-                
+
                 # advance i until it points to the last line to put on
                 # this page (before adjustments)
-                
+
                 while i < (length - 1):
 
                     pageLines += 10
@@ -1216,12 +1216,12 @@ class Screenplay:
                         break
 
                     i += 1
-                
+
             if i >= (length - 1):
                 if pageLines != 0:
                     self.pages.append(length - 1)
                     self.pagesNoAdjust.append(length - 1)
-                    
+
                 break
 
             self.pagesNoAdjust.append(i)
@@ -1248,7 +1248,7 @@ class Screenplay:
                 i = self.removeDanglingElement(i, SCENE, lastBreak)
 
             elif line.lt in (DIALOGUE, PAREN):
-                
+
                 if line.lb != LB_LAST or\
                        self.getTypeOfNextElem(i) in (DIALOGUE, PAREN):
 
@@ -1257,7 +1257,7 @@ class Screenplay:
                     while 1:
                         oldI = i
                         line = ls[i]
-                        
+
                         if line.lt == PAREN:
                             i = self.removeDanglingElement(i, PAREN,
                               lastBreak)
@@ -1266,7 +1266,7 @@ class Screenplay:
                         elif line.lt == DIALOGUE:
                             if cutParen:
                                 break
-                            
+
                             first = self.getElemFirstIndexFromLine(i)
 
                             if first > (lastBreak + 1):
@@ -1278,7 +1278,7 @@ class Screenplay:
                                 val = cfg.pbDialogueLines
                                 if reserveLine:
                                     val += 1
-                                
+
                                 if linesOnThisPage < val:
                                     i = first - 1
                                     cutDialogue = True
@@ -1308,24 +1308,24 @@ class Screenplay:
             # make sure no matter how buggy the code above is, we always
             # advance at least one line per page
             i = max(i, lastBreak + 1)
-            
+
             self.pages.append(i)
             lastBreak = i
 
             i += 1
 
         self.lastPaginated = time.time()
-        
+
     def removeDanglingElement(self, line, lt, lastBreak):
         ls = self.lines
         startLine = line
-        
+
         while 1:
             if line < (lastBreak + 2):
                 break
 
             ln = ls[line]
-            
+
             if ln.lt != lt:
                 break
 
@@ -1335,7 +1335,7 @@ class Screenplay:
             # that.
             if (line != startLine) and (ln.lb == LB_LAST):
                 break
-            
+
             line -= 1
 
         return line
@@ -1350,7 +1350,7 @@ class Screenplay:
                (ls[first].text == "()"):
             ls[first].text = ""
             self.column = 0
-            
+
         for i in range(first, last + 1):
             ls[i].lt = lt
 
@@ -1368,7 +1368,7 @@ class Screenplay:
     def joinLines(self, line):
         ls = self.lines
         ln = ls[line]
-        
+
         pos = len(ln.text)
         ln.text += ls[line + 1].text
         ln.lb = ls[line + 1].lb
@@ -1382,7 +1382,7 @@ class Screenplay:
     # split current line at current column position.
     def splitLine(self):
         ln = self.lines[self.line]
-        
+
         s = ln.text
         preStr = s[:self.column]
         postStr = s[self.column:]
@@ -1399,7 +1399,7 @@ class Screenplay:
     # new element.
     def splitElement(self, newType):
         ls = self.lines
-        
+
         if not self.acItems:
             if self.isAtEndOfParen():
                 self.column += 1
@@ -1411,7 +1411,7 @@ class Screenplay:
         ls[self.line - 1].lb = LB_LAST
 
         self.convertCurrentTo(newType)
-        
+
         self.rewrapPara()
         self.rewrapPrevPara()
         self.markChanged()
@@ -1421,7 +1421,7 @@ class Screenplay:
     def deleteChar(self, line, column, posCursor = True):
         s = self.lines[line].text
         self.lines[line].text = s[:column] + s[column + 1:]
-        
+
         if posCursor:
             self.column = column
             self.line = line
@@ -1429,7 +1429,7 @@ class Screenplay:
     # set line types from 'line' to the end of the element to 'lt'.
     def setLineTypes(self, line, lt):
         ls = self.lines
-        
+
         while 1:
             ln = ls[line]
 
@@ -1438,7 +1438,7 @@ class Screenplay:
                 break
 
             line += 1
-        
+
     def line2page(self, line):
         return self.line2pageReal(line, self.pages)
 
@@ -1466,7 +1466,7 @@ class Screenplay:
     def page2lines(self, pageNr):
         pageNr = util.clamp(pageNr, 1, len(self.pages) - 1)
         last = len(self.lines) - 1
-        
+
         return (util.clamp(self.pages[pageNr - 1] + 1, 0, last),
                 util.clamp(self.pages[pageNr], 0, last))
 
@@ -1488,14 +1488,14 @@ class Screenplay:
         sc = SCENE
         scene = 0
         ret = []
-        
+
         for i in xrange(len(ls)):
             if (ls[i].lt == sc) and self.isFirstLineOfElem(i):
                 scene += 1
                 ret.append((str(scene), i))
 
         return ret
-        
+
     # return a dictionary of all scene names (single-line text elements
     # only, upper-cased, values = None).
     def getSceneNames(self):
@@ -1513,7 +1513,7 @@ class Screenplay:
         names = {}
 
         ul = util.lower
-        
+
         for ln in self.lines:
             if (ln.lt == CHARACTER) and (ln.lb == LB_LAST):
                 names[ul(ln.text)] = None
@@ -1527,13 +1527,13 @@ class Screenplay:
     # note that this only handles words that are on a single line.
     def getWord(self, line, col):
         ls = self.lines
-        
+
         while 1:
             if ((line < 0) or (line >= len(ls))):
                 return (None, 0, 0)
 
             s = ls[line].text
-            
+
             if col >= len(s):
                 line += 1
                 col = 0
@@ -1541,7 +1541,7 @@ class Screenplay:
                 continue
 
             ch = s[col : col + 1]
-            
+
             if not util.isWordBoundary(ch):
                 word = ch
                 startCol = col
@@ -1549,7 +1549,7 @@ class Screenplay:
 
                 while col < len(s):
                     ch = s[col : col + 1]
-                    
+
                     if util.isWordBoundary(ch):
                         break
 
@@ -1565,7 +1565,7 @@ class Screenplay:
     # and last character is ")"
     def isAtEndOfParen(self):
         ls = self.lines
-        
+
         return self.isLastLineOfElem(self.line) and\
            (ls[self.line].lt == PAREN) and\
            (ls[self.line].text[self.column:] == ")")
@@ -1577,7 +1577,7 @@ class Screenplay:
 
         if self.isAtEndOfParen():
             return True
-        
+
         if (l.lb != LB_LAST) or (self.column != len(l.text)):
             return False
 
@@ -1619,7 +1619,7 @@ class Screenplay:
 
             else:
                 self.acSel = (self.acSel + self.acMax) % len(self.acItems)
-        
+
     # get a list of strings (single-line text elements for now) that start
     # with 'text' (not case sensitive) and are of of type 'type'. also
     # mixes in the type's default items from config. ignores current line.
@@ -1633,7 +1633,7 @@ class Screenplay:
         for i in range(len(ls)):
             if (ls[i].lt == lt) and (ls[i].lb == LB_LAST):
                 upstr = util.upper(ls[i].text)
-                
+
                 if upstr.startswith(text) and i != self.line:
                     matches[upstr] = None
                     if i < self.line:
@@ -1641,19 +1641,19 @@ class Screenplay:
 
         for s in t.items:
             upstr = util.upper(s)
-            
+
             if upstr.startswith(text):
                 matches[upstr] = None
 
         if last:
             del matches[last]
-            
+
         mlist = matches.keys()
         mlist.sort()
 
         if last:
             mlist.insert(0, last)
-        
+
         return mlist
 
     # returns pair (start, end) of marked lines, inclusive. if mark is
@@ -1663,7 +1663,7 @@ class Screenplay:
     def getMarkedLines(self):
         if not self.mark:
             return None
-        
+
         mark = min(len(self.lines) - 1, self.mark.line)
 
         if self.line < mark:
@@ -1688,7 +1688,7 @@ class Screenplay:
 
         # last valid offset for given line's text
         lvo = max(0, len(ls[line].text) - 1)
-        
+
         # only one line marked
         if (line == marked[0]) and (marked[0] == marked[1]):
             c1 = min(self.mark.column, self.column)
@@ -1729,7 +1729,7 @@ class Screenplay:
         c2 = util.clamp(c2, 0, lvo)
 
         return (c1, c2)
-        
+
     # checks if a line is marked. 'marked' is the value returned from
     # getMarkedLines.
     def isLineMarked(self, line, marked):
@@ -1746,12 +1746,12 @@ class Screenplay:
         ls = self.lines
 
         cd = ClipData()
-        
+
         for i in xrange(marked[0], marked[1] + 1):
             c1, c2 = self.getMarkedColumns(i, marked)
 
             ln = ls[i]
-            
+
             cd.lines.append(Line(ln.lb, ln.lt, ln.text[c1:c2 + 1]))
 
         cd.lines[-1].lb = LB_LAST
@@ -1792,7 +1792,7 @@ class Screenplay:
 
                     if not ln.text and self.isLastLineOfElem(marked[0]):
                         ls[marked[0] - 1].lb = LB_LAST
-                        
+
             else:
 
                 # now find the line whose linebreak we need to adjust. if
@@ -1819,13 +1819,13 @@ class Screenplay:
                         ln.lb = LB_LAST
                     else:
                         ln.lb = LB_NONE
-                    
+
             # if we're joining two elements we have to change the line
             # types for the latter element (starting from the last marked
             # line, because everything before that will get deleted
             # anyway) to that of the first element.
             self.setLineTypes(marked[1], ls[marked[0]].lt)
-            
+
             del ls[del1:del2 + 1]
 
             self.clearMark()
@@ -1853,46 +1853,46 @@ class Screenplay:
         while 1:
             if i >= len(clines):
                 break
-            
+
             ln = clines[i]
-            
+
             newLine = Line(LB_LAST, ln.lt)
 
             while 1:
                 ln = clines[i]
                 i += 1
-                
+
                 newLine.text += ln.text
-                
+
                 if ln.lb in (LB_LAST, LB_FORCED):
                     break
-            
+
                 newLine.text += config.lb2str(ln.lb)
-                
+
             newLine.lb = ln.lb
             inLines.append(newLine)
 
         # shouldn't happen, but...
         if len(inLines) == 0:
             return
-        
+
         ls = self.lines
-        
+
         # where we need to start wrapping
         wrap1 = self.getParaFirstIndexFromLine(self.line)
-        
+
         ln = ls[self.line]
-        
+
         wasEmpty = len(ln.text) == 0
         atEnd = self.column == len(ln.text)
-        
+
         ln.text = ln.text[:self.column] + inLines[0].text + \
                   ln.text[self.column:]
         self.column += len(inLines[0].text)
 
         if wasEmpty:
             ln.lt = inLines[0].lt
-        
+
         if len(inLines) != 1:
 
             if not atEnd:
@@ -1917,7 +1917,7 @@ class Screenplay:
     def capitalizeNeeded(self):
         if not self.cfgGl.capitalize:
             return False
-        
+
         ls = self.lines
         line = self.line
         column = self.column
@@ -1925,16 +1925,16 @@ class Screenplay:
         text = ls[line].text
         if (column < len(text)) and (text[column] != " "):
             return False
-            
+
         # go backwards at most 4 characters, looking for "!?.", and
         # breaking on anything other than space or ".
-        
+
         cnt = 1
         while 1:
             column -= 1
 
             char = None
-            
+
             if column < 0:
                 line -= 1
 
@@ -1961,7 +1961,7 @@ class Screenplay:
 
             if not char:
                 char = text[column]
-            
+
             if cnt == 1:
                 # must be preceded by a space
                 if char != " ":
@@ -1976,9 +1976,9 @@ class Screenplay:
 
             if cnt > 4:
                 break
-        
+
         return False
-        
+
     # find next error in screenplay, starting at given line. returns
     # (line, msg) tuple, where line is -1 if no error was found and the
     # line number otherwise where the error is, and msg is a description
@@ -1997,14 +1997,14 @@ class Screenplay:
 
             ln = ls[line]
             tcfg = cfg.getType(ln.lt)
-            
+
             isFirst = self.isFirstLineOfElem(line)
             isLast = self.isLastLineOfElem(line)
             isOnly = isFirst and isLast
 
             prev = self.getTypeOfPrevElem(line)
             next = self.getTypeOfNextElem(line)
-            
+
             if len(ln.text) == 0:
                 msg = "Empty line."
                 break
@@ -2055,7 +2055,7 @@ class Screenplay:
                 prevType = ln.lt
 
             line += 1
-            
+
         if not msg:
             line = -1
 
@@ -2080,26 +2080,26 @@ class Screenplay:
                     dlt.extend(["1", "2", "3"])
                 else:
                     dlt.append(s)
-                    
+
             i += 1
 
         if len(dlt) == 0:
             return None
-        
+
         dltTmp = dlt
 
         # now, generate changed-lines for single-line diffs
         dlt = []
         for i in xrange(len(dltTmp)):
             s = dltTmp[i]
-            
+
             dlt.append(s)
 
             # this checks that we've just added a sequence of lines whose
             # first characters are " -+", where " " means '"not -" or
             # missing line', and that we're either at end of list or next
             # line does not start with "+".
-            
+
             if (s[0] == "+") and \
                (i != 0) and (dltTmp[i - 1][0] == "-") and (
                 (i == 1) or (dltTmp[i - 2][0] != "-")) and (
@@ -2107,15 +2107,15 @@ class Screenplay:
 
                 # generate line with "^" character at every position that
                 # the lines differ
-                
+
                 s1 = dltTmp[i - 1]
                 s2 = dltTmp[i]
-                
+
                 minCnt = min(len(s1), len(s2))
                 maxCnt = max(len(s1), len(s2))
 
                 res = "^"
-                
+
                 for i in range(1, minCnt):
                     if s1[i] != s2[i]:
                         res += "^"
@@ -2123,7 +2123,7 @@ class Screenplay:
                         res += " "
 
                 res += "^" * (maxCnt - minCnt)
-                
+
                 dlt.append(res)
 
         tmp = ["  Color information:", "1", "-  Deleted lines",
@@ -2135,7 +2135,7 @@ class Screenplay:
 
         cfg = self.cfg
         chY = util.getTextHeight(cfg.fontSize)
-        
+
         doc = pml.Document(cfg.paperWidth, cfg.paperHeight)
 
         # how many lines put on current page
@@ -2148,7 +2148,7 @@ class Screenplay:
         # added, otherwise the colored bars will be drawn partially over
         # some characters.
         textOps = []
-        
+
         for s in dlt:
 
             if y >= cfg.linesOnPage:
@@ -2202,7 +2202,7 @@ class Screenplay:
     # move to line,col, and if mark is True, set mark there
     def gotoPos(self, line, col, mark = False):
         self.clearAutoComp()
-        
+
         self.line = line
         self.column = col
 
@@ -2216,11 +2216,11 @@ class Screenplay:
         lsNew = []
         lsOld = self.lines
         sl = self.line
-        
+
         # how many lines were removed from above the current line
         # (inclusive)
         cnt = 0
-        
+
         for i in xrange(len(lsOld)):
             l = lsOld[i]
 
@@ -2314,7 +2314,7 @@ class Screenplay:
 
         else:
             self.acSel -= 1
-            
+
             if self.acSel < 0:
                 self.acSel = len(self.acItems) - 1
 
@@ -2329,9 +2329,9 @@ class Screenplay:
 
         else:
             self.acSel = (self.acSel + 1) % len(self.acItems)
-            
+
             cs.doAutoComp = cs.AC_KEEP
-                
+
     def moveLineEndCmd(self, cs):
         if self.acItems:
             self.lines[self.line].text = self.acItems[self.acSel]
@@ -2347,7 +2347,7 @@ class Screenplay:
 
     def moveStartCmd(self, cs):
         self.maybeMark(cs.mark)
-                
+
         self.line = 0
         self.setTopLine(0)
         self.column = 0
@@ -2423,7 +2423,7 @@ class Screenplay:
     # select all text of current scene
     def selectSceneCmd(self, cs):
         l1, l2 = self.getSceneIndexes()
-        
+
         self.mark = Mark(l1, 0)
 
         self.line = l2
@@ -2446,7 +2446,7 @@ class Screenplay:
     # nextTypeTab, depending on circumstances.
     def tabCmd(self, cs):
         tcfg = self.cfgGl.getType(self.lines[self.line].lt)
-        
+
         if self.tabMakesNew():
             self.splitElement(tcfg.newTypeTab)
         else:
@@ -2465,7 +2465,7 @@ class Screenplay:
         kc = ord(cs.char)
         if not util.isValidInputChar(kc):
             return
-        
+
         char = cs.char
         if self.capitalizeNeeded():
             char = util.upper(char)
@@ -2487,10 +2487,10 @@ class Screenplay:
                         if (self.line == 0) or \
                                (ls[self.line - 1].lb != LB_NONE):
                             doIt = True
-                        
+
                     if doIt:
                         s = util.replace(s, "I", self.column - 1, 1)
-        
+
         s = s[:self.column] + char + s[self.column:]
         ls[self.line].text = s
         self.column += 1
@@ -2507,7 +2507,7 @@ class Screenplay:
 
         self.rewrapPara()
         self.markChanged()
-        
+
         cs.doAutoComp = cs.AC_REDO
 
     def toSceneCmd(self, cs):
@@ -2548,7 +2548,7 @@ class Screenplay:
         assert self.line < len(self.lines)
         assert self.column >= 0
         assert self.column <= len(self.lines[self.line].text)
-        
+
         for ln in self.lines:
             tcfg = self.cfg.getType(ln.lt)
 
@@ -2608,7 +2608,7 @@ class CommandState:
 
     # what to do about auto-completion
     AC_DEL, AC_REDO, AC_KEEP = range(3)
-    
+
     def __init__(self):
 
         self.doAutoComp = self.AC_DEL
@@ -2616,12 +2616,12 @@ class CommandState:
         # only used for inserting characters, in which case this is the
         # character to insert in a string form.
         self.char = None
-        
+
         # True if this is a movement command and we should set mark at the
         # current position before moving (note that currently this is just
         # set if shift is down)
         self.mark = False
-        
+
         # True if we need to make current line visible
         self.needsVisifying = True
 
@@ -2665,7 +2665,7 @@ class PageList:
 
         # start index of current range, or -1 if no range in progress
         rangeStart = -1
-        
+
         for i in xrange(len(self.allPages)):
             if rangeStart != -1:
                 if not hasPage[i]:

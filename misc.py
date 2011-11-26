@@ -269,7 +269,7 @@ class MyTabCtrl(wx.Window):
     # get given page
     def getPage(self, i):
         return self.pages[i][0]
-    
+
     # MyTabCtrl2 uses this to register itself with us
     def add2(self, ctrl2):
         self.ctrl2 = ctrl2
@@ -294,7 +294,7 @@ class MyTabCtrl(wx.Window):
     # select given page
     def selectPage(self, page):
         self.selected = page
-        
+
         for i in range(len(self.pages)):
             w = self.pages[i][0]
 
@@ -344,7 +344,7 @@ class MyTabCtrl(wx.Window):
     def getLastVisibleTab(self):
         return util.clamp(self.firstTab + self.calcMaxVisibleTabs() - 1,
                           maxVal = len(self.pages) - 1)
-        
+
     # make sure selected tab is visible
     def makeSelectedTabVisible(self):
         maxTab = self.getLastVisibleTab()
@@ -357,7 +357,7 @@ class MyTabCtrl(wx.Window):
         self.firstTab = util.clamp(
             self.selected - self.calcMaxVisibleTabs() + 1,
             0)
-        
+
     # set text for tab 'i' to 's'
     def setTabText(self, i, s):
         self.pages[i][1] = s
@@ -375,7 +375,7 @@ class MyTabCtrl(wx.Window):
             return
 
         w = self.GetClientSizeTuple()[0]
-        
+
         # start of left arrow
         lx = w - 1 - self.paddingX - self.arrowWidth - self.arrowSpacing \
              - self.arrowWidth + 1
@@ -529,10 +529,10 @@ class ScriptChooserDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
-        
+
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
@@ -549,17 +549,17 @@ class ScriptChooserDlg(wx.Dialog):
         al = wx.ALIGN_CENTER_VERTICAL | wx.RIGHT
         if sel == 1:
             al |= wx.ALIGN_RIGHT
-            
+
         sizer.Add(wx.StaticText(parent, -1, descr), 0, al, 10)
-        
+
         combo = wx.ComboBox(parent, -1, style = wx.CB_READONLY)
         util.setWH(combo, w = 200)
-        
+
         for s in items:
             combo.Append(s)
 
         combo.SetSelection(sel)
-        
+
         sizer.Add(combo)
 
         setattr(self, name + "Combo", combo)
@@ -568,7 +568,7 @@ class ScriptChooserDlg(wx.Dialog):
         self.sel1 = self.firstCombo.GetSelection()
         self.sel2 = self.secondCombo.GetSelection()
         self.forceSameCfg = bool(self.forceCb.GetValue())
-        
+
         self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
@@ -587,15 +587,15 @@ class CheckBoxItem:
     @staticmethod
     def getClientData(cbil):
         tmp = {}
-        
+
         for i in range(len(cbil)):
             cbi = cbil[i]
-            
+
             if cbi.selected:
                 tmp[cbi.cdata] = None
 
         return tmp
-    
+
 # shows one or two (one if cbil2 = None) checklistbox widgets with
 # contents from cbil1 and possibly cbil2, which are lists of
 # CheckBoxItems. btns[12] are bools for whether or not to include helper
@@ -611,7 +611,7 @@ class CheckBoxDlg(wx.Dialog):
 
         self.cbil1 = cbil1
         self.list1 = self.addList(descr1, self, vsizer, cbil1, btns1, True)
-        
+
         if cbil2 != None:
             self.cbil2 = cbil2
             self.list2 = self.addList(descr2, self, vsizer, cbil2, btns2,
@@ -620,10 +620,10 @@ class CheckBoxDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add((1, 1), 1)
-        
+
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
@@ -635,7 +635,7 @@ class CheckBoxDlg(wx.Dialog):
         wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
 
         okBtn.SetFocus()
-        
+
     def addList(self, descr, parent, sizer, items, doBtns, isFirst, pad = 0):
         sizer.Add(wx.StaticText(parent, -1, descr), 0, wx.TOP, pad)
 
@@ -660,7 +660,7 @@ class CheckBoxDlg(wx.Dialog):
             wx.EVT_BUTTON(self, tmp.GetId(), funcs[2])
 
             sizer.Add(hsizer, 0, wx.TOP | wx.BOTTOM, 5)
-        
+
         tmp = wx.CheckListBox(parent, -1)
 
         longest = -1
@@ -692,7 +692,7 @@ class CheckBoxDlg(wx.Dialog):
         h *= util.getFontHeight(tmp.GetFont()) + 5
         h += 5
         h = max(25, h)
-        
+
         util.setWH(tmp, w, h)
         sizer.Add(tmp, 0, wx.EXPAND)
 
@@ -705,26 +705,26 @@ class CheckBoxDlg(wx.Dialog):
     def setAll(self, ctrl, state):
         for i in range(ctrl.GetCount()):
             ctrl.Check(i, state)
-        
+
     def toggle(self, ctrl):
         for i in range(ctrl.GetCount()):
             ctrl.Check(i, not ctrl.IsChecked(i))
 
     def OnSet1(self, event):
         self.setAll(self.list1, True)
-        
+
     def OnClear1(self, event):
         self.setAll(self.list1, False)
-        
+
     def OnToggle1(self, event):
         self.toggle(self.list1)
-        
+
     def OnSet2(self, event):
         self.setAll(self.list2, True)
-        
+
     def OnClear2(self, event):
         self.setAll(self.list2, False)
-        
+
     def OnToggle2(self, event):
         self.toggle(self.list2)
 
@@ -733,7 +733,7 @@ class CheckBoxDlg(wx.Dialog):
 
         if hasattr(self, "list2"):
             self.storeResults(self.cbil2, self.list2)
-        
+
         self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event):
@@ -751,9 +751,9 @@ class TextDlg(wx.Dialog):
                          style = wx.TE_MULTILINE | wx.TE_READONLY | wx.TE_LINEWRAP)
         tc.SetValue(text)
         vsizer.Add(tc, 1, wx.EXPAND);
-        
+
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         vsizer.Add(okBtn, 0, wx.ALIGN_CENTER)
 
@@ -787,17 +787,17 @@ class TextInputDlg(wx.Dialog):
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         vsizer.Add(wx.StaticText(self, -1, text), 1, wx.EXPAND | wx.BOTTOM, 5)
-        
+
         self.tc = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
         vsizer.Add(self.tc, 1, wx.EXPAND);
-        
+
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         cancelBtn = gutil.createStockButton(self, "Cancel")
         hsizer.Add(cancelBtn)
-        
+
         okBtn = gutil.createStockButton(self, "OK")
         hsizer.Add(okBtn, 0, wx.LEFT, 10)
 
@@ -827,7 +827,7 @@ class TextInputDlg(wx.Dialog):
 
         if kc == wx.WXK_ESCAPE:
             self.OnCancel()
-            
+
         elif (kc == wx.WXK_RETURN) and isEntry:
                 self.OnOK()
 
@@ -844,7 +844,7 @@ class TextInputDlg(wx.Dialog):
                 wx.MessageBox(msg, "Error", wx.OK, self)
 
                 return
-        
+
         self.EndModal(wx.ID_OK)
 
     def OnCancel(self, event = None):

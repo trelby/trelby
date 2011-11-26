@@ -54,7 +54,7 @@ class NamesDlg(wx.Dialog):
                            style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         self.ctrl = ctrl
-        
+
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
@@ -63,7 +63,7 @@ class NamesDlg(wx.Dialog):
 
         self.typeList = wx.ListCtrl(self, -1,
             style = wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES)
-        
+
         self.typeList.InsertColumn(0, "Count")
         self.typeList.InsertColumn(1, "Type")
 
@@ -82,7 +82,7 @@ class NamesDlg(wx.Dialog):
         w += self.typeList.GetColumnWidth(1)
 
         util.setWH(self.typeList, w + 15, 425)
-        
+
         self.typeList.SortItems(self.CmpFreq)
         self.selectAllTypes()
         vsizer.Add(self.typeList, 1, wx.EXPAND | wx.BOTTOM, 5)
@@ -93,11 +93,11 @@ class NamesDlg(wx.Dialog):
         hsizer.Add(vsizer, 0, wx.EXPAND)
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
-        
+
         hsizer2 = wx.BoxSizer(wx.HORIZONTAL)
-        
+
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
-        
+
         searchBtn = wx.Button(self, -1, "Search")
         wx.EVT_BUTTON(self, searchBtn.GetId(), self.OnSearch)
         vsizer2.Add(searchBtn, 0, wx.BOTTOM | wx.TOP, 10)
@@ -121,11 +121,11 @@ class NamesDlg(wx.Dialog):
             choices = [ "Male", "Female", "Both" ])
         self.sexRb.SetSelection(2)
         hsizer2.Add(self.sexRb, 0, wx.LEFT, 5)
-        
+
         vsizer.Add(hsizer2, 0, wx.EXPAND | wx.ALIGN_CENTER)
 
         vsizer.Add(wx.StaticText(self, -1, "Results:"))
-        
+
         self.list = MyListCtrl(self)
         vsizer.Add(self.list, 1, wx.EXPAND | wx.BOTTOM, 5)
 
@@ -148,7 +148,7 @@ class NamesDlg(wx.Dialog):
         for i in range(len(nameArr.typeNamesById)):
             self.typeList.SetItemState(i, wx.LIST_STATE_SELECTED,
                                        wx.LIST_STATE_SELECTED)
-        
+
     def OnHeaderClick(self, event):
         if event.GetColumn() == 0:
             self.typeList.SortItems(self.CmpFreq)
@@ -157,7 +157,7 @@ class NamesDlg(wx.Dialog):
 
     def CmpFreq(self, i1, i2):
         return nameArr.typeNamesCnt[nameArr.typeNamesById[i2]] - nameArr.typeNamesCnt[nameArr.typeNamesById[i1]]
-    
+
     def CmpType(self, i1, i2):
         return cmp(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
 
@@ -179,14 +179,14 @@ class NamesDlg(wx.Dialog):
         l = []
 
         wx.BeginBusyCursor()
-        
+
         s = util.lower(misc.fromGUI(self.searchEntry.GetValue()))
         sex = self.sexRb.GetSelection()
         nt = self.nameRb.GetSelection()
 
         selTypes = {}
         item = -1
-        
+
         while 1:
             item = self.typeList.GetNextItem(item, wx.LIST_NEXT_ALL,
                 wx.LIST_STATE_SELECTED)
@@ -207,10 +207,10 @@ class NamesDlg(wx.Dialog):
 
             if doTypes and nameArr.type[i] not in selTypes:
                 continue
-            
+
             if s:
                 name = util.lower(nameArr.name[i])
-                
+
                 if nt == 0:
                     if not name.startswith(s):
                         continue
@@ -238,7 +238,7 @@ class MyListCtrl(wx.ListCtrl):
                     wx.LC_HRULES | wx.LC_VRULES)
 
         self.sex = ["Female", "Male"]
-        
+
         self.InsertColumn(0, "Name")
         self.InsertColumn(1, "Type")
         self.InsertColumn(2, "Sex")
@@ -255,7 +255,7 @@ class MyListCtrl(wx.ListCtrl):
 
     def OnGetItemText(self, item, col):
         n = self.items[item]
-        
+
         if col == 0:
             return nameArr.name[n]
         elif col == 1:
@@ -265,7 +265,7 @@ class MyListCtrl(wx.ListCtrl):
 
         # shouldn't happen
         return ""
-    
+
     # for some reason this must be overridden as well, otherwise we get
     # assert failures under windows.
     def OnGetItemImage(self, item):
