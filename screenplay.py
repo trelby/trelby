@@ -494,7 +494,7 @@ class Screenplay:
         length = len(ls)
         i = 0
 
-        magicslash = "OSKUSOFT-MAGIC-SLASH"
+        magicslash = "TRELBY-MAGIC-SLASH"
         
         while i < length:
             lt = ls[i].lt

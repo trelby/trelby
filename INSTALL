@@ -10,5 +10,5 @@ The supplied makefile copies everything to the right place if you run
 writable with normal user permissions) and WILL DO "rm -rf
 /opt/blyte", so be sure there's nothing important stored there.
 
-See the website (http://www.oskusoft.com) for the requirements for running
+See the website (http://www.trelby.org/) for the requirements for running
 Blyte on Linux.
