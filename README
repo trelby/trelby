@@ -35,7 +35,7 @@ distribution package which you can ignore.
 2.5. Preparing for a Windows build
 ================================
 If you're looking to package for Windows, you'll need to place the windows
-redistributable runtime file vcredist_x86.exe in the blyte directory.
+redistributable runtime file vcredist_x86.exe in the trelby directory.
 
 be sure to have the following installed:
  * python-2.7.2.msi
@@ -56,7 +56,7 @@ Finally ensure you had run make dist in the directory on a linux machine,
 so all files are in place. (and ensure vcredist_x86.exe is here as well)
 
 Then, on windows, to get the installer:
-1) cd <blyte directory>
+1) cd <trelby directory>
 2) build.bat
 4) nsis.bat
 
@@ -73,7 +73,7 @@ On Linux:
 
 On Windows:
 
- $ cd \blyte\src
+ $ cd \trelby\src
  $\python23\python trelby.py --test sample.trelby
 
  (Substitute correct path to python.) The file t.bat contains the
