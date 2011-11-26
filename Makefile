@@ -3,11 +3,8 @@
 BINDIR = $(DESTDIR)/opt/trelby
 DESKTOPDIR = $(DESTDIR)/usr/share/applications
 
-dist: names.txt.gz dict_en.dat.gz manual.pdf
-	./gen_linux_dist.sh linux
-
-src:
-	./gen_linux_dist.sh src
+dist: names.txt.gz dict_en.dat.gz manual.html
+	./gen_linux_dist.sh
 	debuild -us -uc -b
 
 names.txt.gz: names.txt
@@ -16,7 +13,7 @@ names.txt.gz: names.txt
 dict_en.dat.gz: dict_en.dat
 	gzip -c dict_en.dat > dict_en.dat.gz
 
-manual.pdf: doc/*
+manual.html: doc/*
 	make -C doc && mv doc/book.html manual.html
 
 clean:
