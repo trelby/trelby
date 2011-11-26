@@ -81,6 +81,8 @@ class SplashWindow(wx.Frame):
         util.drawText(dc, "Version %s" % (misc.version),
                       200, 170, util.ALIGN_RIGHT)
 
+        util.drawText(dc, "http://www.trelby.org/", 200, 185, util.ALIGN_RIGHT)
+
         if self.quote:
             dc.SetFont(self.sourceFont)
             dc.DrawText(self.quote.source, 50, 280)
