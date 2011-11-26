@@ -75,7 +75,7 @@ def getFlags(filename):
 # run tests from a single file, either all of them or a specific one.
 def doTest(opts):
     # FIXME
-    sys.path.insert(0, "..")
+    sys.path.insert(0, "../src")
 
     # strip .py suffix
     name = opts.file[0:-3]
@@ -104,7 +104,7 @@ def doTest(opts):
 # run all tests
 def doTests(opts):
     # FIXME
-    sys.path.insert(0, "..")
+    sys.path.insert(0, "../src")
 
     # total number of tests (files)
     cntTotal = 0

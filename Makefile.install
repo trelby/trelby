@@ -1,8 +1,0 @@
-DIR := /opt/trelby
-
-install:
-	rm -rf $(DIR)/*
-	cp * $(DIR)
-	cp $(DIR)/trelby.desktop /usr/share/applications/
-	rm -f $(DIR)/INSTALL $(DIR)/Makefile
-	echo Installation finished

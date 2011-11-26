@@ -68,13 +68,13 @@ Your freshly created Setup-Trelby-<version>.exe should be ready.
 
 On Linux:
 
- $ cd ~/trelby/src
- $ ./trelby.py --test
+ $ cd ~/trelby/
+ $ src/trelby.py --test
 
 On Windows:
 
- $ cd \trelby\src
- $\python23\python trelby.py --test sample.trelby
+ $ cd \trelby
+ $\python23\python src/trelby.py --test sample.trelby
 
  (Substitute correct path to python.) The file t.bat contains the
  last command.

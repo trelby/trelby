@@ -17,7 +17,7 @@ options = {
     }
     }
 
-target = { "script" : "trelby.py",
+target = { "script" : "src/trelby.py",
            "icon_resources": [(1, "icon32.ico")],
            }
 
