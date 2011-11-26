@@ -190,7 +190,7 @@ class Screenplay:
     @staticmethod
     def load(s, cfgGl):
         if s[0:3] != codecs.BOM_UTF8:
-            raise error.MiscError("File is not a Blyte screenplay.")
+            raise error.MiscError("File is not a Trelby screenplay.")
 
         lines = s[3:].splitlines()
             

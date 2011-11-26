@@ -1,4 +1,4 @@
-This file is intented for people wishing to run Blyte using the sources,
+This file is intented for people wishing to run Trelby using the sources,
 i.e., not using a released package. This means mostly developers who want
 to inspect/modify the code.
 
@@ -6,7 +6,7 @@ to inspect/modify the code.
 ===============
 
 You will need Python (2.6 or 2.7) and wxWidgets (2.8) and its Python
-bindings to run Blyte. You also need the lxml Python library
+bindings to run Trelby. You also need the lxml Python library
 (http://lxml.de/).
 
 To build the manual, you will also need xsltproc.
@@ -14,7 +14,7 @@ To build the manual, you will also need xsltproc.
 2. Preparing data files
 =======================
 
-Blyte needs special preparation for 3 of its data files. If you do not do
+Trelby needs special preparation for 3 of its data files. If you do not do
 this, that aspect of the program will not work.
 
  * Name list
@@ -60,11 +60,11 @@ Then, on windows, to get the installer:
 2) build.bat
 4) nsis.bat
 
-Your freshly created Setup-Blyte-<version>.exe should be ready.
+Your freshly created Setup-Trelby-<version>.exe should be ready.
 
 
-3. Running Blyte
-================
+3. Running Trelby
+=================
 
 On Linux:
 
@@ -82,7 +82,7 @@ On Windows:
 4. Differences from packaged versions
 =====================================
 
-The "--test" command line argument makes Blyte differ from normal running
+The "--test" command line argument makes Trelby differ from normal running
 as follows:
 
  -No splash window is displayed on startup.

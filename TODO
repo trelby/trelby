@@ -2,10 +2,6 @@
 
 -add suffix automatically if missing in save/export
 
--should probably have menu commands for switching the element's type, once
- the combobox is deleted. otherwise only way to do it through keyboard
- commands.
-
 -move some/all of GlobalData/MyPanel/MyCtrl/MyFrame out of blyte.py
 
 -rename: blyte -> trelby

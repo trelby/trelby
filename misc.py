@@ -48,8 +48,8 @@ def init(doWX = True):
             progPath = "/opt/blyte"
             confPath = os.environ["HOME"] + "/.blyte"
         else:
-            progPath = r"C:\Program Files\Blyte"
-            confPath = os.environ["USERPROFILE"] + r"\Blyte\conf"
+            progPath = r"C:\Program Files\Trelby"
+            confPath = os.environ["USERPROFILE"] + r"\Trelby\conf"
             if not os.path.exists(confPath):
                 os.makedirs(confPath)
 

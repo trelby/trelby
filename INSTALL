@@ -1,5 +1,5 @@
-Installation instructions for Blyte on Linux
---------------------------------------------
+Installation instructions for Trelby on Linux
+---------------------------------------------
 
 You have to copy all the files (excluding INSTALL and Makefile) to
 /opt/blyte. Afterwards you can run the program with the command
@@ -11,4 +11,4 @@ writable with normal user permissions) and WILL DO "rm -rf
 /opt/blyte", so be sure there's nothing important stored there.
 
 See the website (http://www.trelby.org/) for the requirements for running
-Blyte on Linux.
+Trelby on Linux.

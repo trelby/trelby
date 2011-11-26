@@ -276,7 +276,7 @@ class MyCtrl(wx.Control):
 
         try:
             (sp, msg) = screenplay.Screenplay.load(s, cfgGl)
-        except BlyteError, e:
+        except TrelbyError, e:
             wx.MessageBox("Error loading file:\n\n%s" % e, "Error",
                           wx.OK, mainFrame)
 
@@ -1040,7 +1040,7 @@ class MyCtrl(wx.Control):
         dlg = wx.FileDialog(mainFrame, "Filename to save as",
             defaultDir = dDir,
             defaultFile = dFile,
-            wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
+            wildcard = "Trelby files (*.blyte)|*.blyte|All files|*",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
         if dlg.ShowModal() == wx.ID_OK:
             if self.saveFile(dlg.GetPath()):
@@ -1520,7 +1520,7 @@ class MyCtrl(wx.Control):
 class MyFrame(wx.Frame):
 
     def __init__(self, parent, id, title):
-        wx.Frame.__init__(self, parent, id, title, name = "Blyte")
+        wx.Frame.__init__(self, parent, id, title, name = "Trelby")
 
         if misc.isUnix:
             # automatically reaps zombies
@@ -1924,7 +1924,7 @@ class MyFrame(wx.Frame):
         return newPanel
 
     def setTitle(self, text):
-        self.SetTitle("Blyte - %s" % text)
+        self.SetTitle("Trelby - %s" % text)
 
     def setTabText(self, panel, text):
         i = self.findPage(panel)
@@ -2031,7 +2031,7 @@ class MyFrame(wx.Frame):
     def OnOpen(self, event = None):
         dlg = wx.FileDialog(self, "File to open",
             misc.scriptDir,
-            wildcard = "Blyte files (*.blyte)|*.blyte|All files|*",
+            wildcard = "Trelby files (*.blyte)|*.blyte|All files|*",
             style = wx.OPEN)
         
         if dlg.ShowModal() == wx.ID_OK:
@@ -2420,7 +2420,7 @@ class MyApp(wx.App):
             if s:
                 gd.scDict.load(s)
         
-        mainFrame = MyFrame(None, -1, "Blyte")
+        mainFrame = MyFrame(None, -1, "Trelby")
         mainFrame.init()
         
         for arg in opts.filenames:

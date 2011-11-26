@@ -86,6 +86,6 @@ def showTempPDF(pdfData, cfgGl, mainFrame):
         except IOError, (errno, strerror):
             raise MiscError("IOError: %s" % strerror)
 
-    except BlyteError, e:
+    except TrelbyError, e:
         wx.MessageBox("Error writing temporary PDF file: %s" % e,
                       "Error", wx.OK, mainFrame)

@@ -1,7 +1,7 @@
 [Desktop Entry]
 Version=1.6-dev
 Encoding=UTF-8
-Name=Blyte
+Name=Trelby
 Comment=Screenwriting Application
 Exec=/opt/blyte/blyte.py
 Icon=/opt/blyte/resources/icon64.png
