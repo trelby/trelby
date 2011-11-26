@@ -2,11 +2,12 @@ Source: trelby
 Section: python
 Priority: extra
 Maintainer: Anil Gulecha <anil.verve@gmail.com>
-Build-Depends: debhelper (>= 7), python-support, xsltproc, docbook-xsl
+Build-Depends: debhelper (>= 7), python-support, xsltproc, docbook-xsl, devscripts, fakeroot
 Standards-Version: 3.8.0
 Homepage: http://www.trelby.org/
 
 Package: trelby
 Architecture: all
 Depends: python (>= 2.6), python-wxgtk2.8, python-crypto, python-lxml
-Description: A simple, powerful, full-featured, multi-platform, free screenwriting software. Use as a free alternative to Final Draft / Movie Magic Screenwriter.
+Description: Movie screenplay writing software.
+ A simple, powerful, full-featured, multi-platform, program for writing movie screenplays. Free alternative to Final Draft / Movie Magic Screenwriter.

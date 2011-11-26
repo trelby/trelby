@@ -5,10 +5,10 @@ DESKTOPDIR = $(DESTDIR)/usr/share/applications
 
 dist: names.txt.gz dict_en.dat.gz manual.pdf
 	./gen_linux_dist.sh linux
-	debuild -b
 
 src:
 	./gen_linux_dist.sh src
+	debuild -us -uc -b
 
 names.txt.gz: names.txt
 	gzip -c names.txt > names.txt.gz
@@ -20,14 +20,14 @@ manual.pdf: doc/*
 	make -C doc && mv doc/book.html manual.html
 
 clean:
-	rm -f *.pyc
+	rm -f src/*.pyc
 	dh_clean
 
 install:
 	mkdir -p $(BINDIR)
-	cp -r *.py trelby.desktop names.txt.gz dict_en.dat.gz sample.trelby manual.html fileformat.txt LICENSE INSTALL resources $(BINDIR)
+	rm -f src/*.pyc
+	cp -r src/ trelby.desktop names.txt.gz dict_en.dat.gz sample.trelby manual.html fileformat.txt LICENSE INSTALL README resources $(BINDIR)
 	cp trelby.desktop $(DESKTOPDIR)
-	rm $(BINDIR)/setup.py
 
 uninstall:
 	rm -f $(BINDIR)
