@@ -4,9 +4,6 @@
 
 -move some/all of GlobalData/MyPanel/MyCtrl/MyFrame out of trelby.py
 
--settings dialog for colors should have a "restore default" button for
- each item
-
 -try using graphics contexts for tab ctrl drawing to get anti-aliased
  lines (http://docs.wxwidgets.org/trunk/classwx_graphics_context.html)
 

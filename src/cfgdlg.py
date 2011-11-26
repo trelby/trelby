@@ -470,13 +470,21 @@ class ColorsPanel(wx.Panel):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
+        vsizer2 = wx.BoxSizer(wx.VERTICAL)
+
         btn = wx.Button(self, -1, "Change")
         wx.EVT_BUTTON(self, btn.GetId(), self.OnChangeColor)
-        hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        vsizer2.Add(btn, 0, wx.BOTTOM, 10)
+
+        btn = wx.Button(self, -1, "Restore default")
+        wx.EVT_BUTTON(self, btn.GetId(), self.OnDefaultColor)
+        vsizer2.Add(btn)
+
+        hsizer.Add(vsizer2, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
 
         self.colorSample = misc.MyColorSample(self, -1,
             size = wx.Size(200, 50))
-        hsizer.Add(self.colorSample)
+        hsizer.Add(self.colorSample, 1, wx.EXPAND)
 
         vsizer.Add(hsizer, 0, wx.EXPAND)
 
@@ -501,6 +509,10 @@ class ColorsPanel(wx.Panel):
                     util.MyColor.fromWx(dlg.GetColourData().GetColour()))
         dlg.Destroy()
 
+        self.cfg2gui()
+
+    def OnDefaultColor(self, event):
+        setattr(self.cfg, self.color, self.cfg.cvars.getDefault(self.color))
         self.cfg2gui()
 
     def cfg2gui(self):
