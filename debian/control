@@ -4,6 +4,7 @@ Priority: extra
 Maintainer: Anil Gulecha <anil.verve@gmail.com>
 Build-Depends: debhelper (>= 7), python-support, xsltproc, docbook-xsl
 Standards-Version: 3.8.0
+Homepage: http://www.trelby.org/
 
 Package: blyte
 Architecture: all
