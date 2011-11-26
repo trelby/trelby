@@ -6,23 +6,23 @@
 set -eu
 
 VER=$(grep 'version =' misc.py | cut -d'"' -f2)
-DIR="linux-dist/blyte-$VER"
+DIR="linux-dist/trelby-$VER"
 
 rm -rf linux-dist
 mkdir -p $DIR
 
 if test $1 = "src"; then
- FNAME="blyte-src-$VER.tar"
+ FNAME="trelby-src-$VER.tar"
  svn export --force . $DIR
 else
- FNAME="blyte-$VER.tar"
+ FNAME="trelby-$VER.tar"
  cp -r *.py trelby.desktop names.txt.gz dict_en.dat.gz sample.trelby manual.html fileformat.txt LICENSE INSTALL resources/ $DIR
  rm $DIR/setup.py
  cp Makefile.install $DIR/Makefile
 fi
 
 cd linux-dist
-tar cvf $FNAME "blyte-$VER"
+tar cvf $FNAME "trelby-$VER"
 gzip -9 $FNAME
 
 mv "${FNAME}.gz" ..

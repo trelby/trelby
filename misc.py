@@ -15,7 +15,7 @@ def init(doWX = True):
            progPath, confPath, tmpPrefix, version
 
     # prefix used for temp files
-    tmpPrefix = "blyte-tmp-"
+    tmpPrefix = "trelby-tmp-"
 
     version = "1.6-dev"
 
