@@ -120,6 +120,9 @@ class SplashWindow(wx.Frame):
     def loadQuotes(parent):
         try:
             data = util.loadFile(misc.getFullPath("resources/quotes.txt"), parent)
+            if data is None:
+                return
+
             data = data.decode("utf-8")
             lines = data.splitlines()
 
