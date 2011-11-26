@@ -3,7 +3,6 @@
 
 from error import *
 import autocompletiondlg
-import bugreport
 import cfgdlg
 import characterreport
 import charmapdlg
@@ -2422,7 +2421,6 @@ class MyApp(wx.App):
                 gd.scDict.load(s)
         
         mainFrame = MyFrame(None, -1, "Blyte")
-        bugreport.mainFrame = mainFrame
         mainFrame.init()
         
         for arg in opts.filenames:
@@ -2446,12 +2444,7 @@ def main():
     global myApp
 
     opts.init()
-    
-    if not opts.isTest:
-        brh = bugreport.BugReportHandler()
-        sys.stdout = brh
-        sys.stderr = brh
-    
+
     myApp = MyApp(0)
     myApp.MainLoop()
 
