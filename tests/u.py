@@ -23,7 +23,7 @@ def new():
     return screenplay.Screenplay(config.ConfigGlobal())
     
 # load script from the given file
-def load(filename = "test.blyte"):
+def load(filename = "test.trelby"):
     init()
 
     return screenplay.Screenplay.load(open(filename, "r").read(),

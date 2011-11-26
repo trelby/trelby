@@ -1,6 +1,6 @@
 *.pyc
 *.pyo
-.blyte/
+.trelby/
 names.txt.gz
 manual.pdf
 data.dat

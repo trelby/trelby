@@ -74,7 +74,7 @@ On Linux:
 On Windows:
 
  $ cd \blyte\src
- $ \python23\python blyte.py --test sample.blyte
+ $\python23\python blyte.py --test sample.trelby
 
  (Substitute correct path to python.) The file t.bat contains the
  last command.
@@ -88,14 +88,14 @@ as follows:
  -No splash window is displayed on startup.
 
  -No global directory locations are used; configuration/state files
- instead go under ".blyte" in the current directory.
+ instead go under ".trelby" in the current directory.
 
  -Unhandled exceptions are not caught and reported in a dialog box,
   instead, they are printed normally to stderr.
 
  -The following characters activate special behavior:
 
-  -"å": Load "sample.blyte".
+  -"å": Load "sample.trelby".
 
   -"¤": Call function MyCtrl.cmdTest.
 

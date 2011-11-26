@@ -232,7 +232,7 @@ def save(ops, cnt):
     f.write(ops.save())
     f.close()
 
-    f = open("%d.blyte" % cnt, "w")
+    f = open("%d.trelby" % cnt, "w")
     f.write(ops.sp.save())
     f.close()
 

@@ -42,11 +42,11 @@ def init(doWX = True):
     # opts (the doWX name is just for similarity with util)
     if not doWX or opts.isTest:
         progPath = "."
-        confPath = ".blyte"
+        confPath = ".trelby"
     else:
         if isUnix:
             progPath = "/opt/blyte"
-            confPath = os.environ["HOME"] + "/.blyte"
+            confPath = os.environ["HOME"] + "/.trelby"
         else:
             progPath = r"C:\Program Files\Trelby"
             confPath = os.environ["USERPROFILE"] + r"\Trelby\conf"

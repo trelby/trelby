@@ -1040,7 +1040,7 @@ class MyCtrl(wx.Control):
         dlg = wx.FileDialog(mainFrame, "Filename to save as",
             defaultDir = dDir,
             defaultFile = dFile,
-            wildcard = "Trelby files (*.blyte)|*.blyte|All files|*",
+            wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
         if dlg.ShowModal() == wx.ID_OK:
             if self.saveFile(dlg.GetPath()):
@@ -1217,7 +1217,7 @@ class MyCtrl(wx.Control):
             cs.char = chr(kc)
 
             if opts.isTest and (cs.char == "å"):
-                self.loadFile(u"sample.blyte")
+                self.loadFile(u"sample.trelby")
             elif opts.isTest and (cs.char == "¤"):
                 self.cmdTest(cs)
             elif opts.isTest and (cs.char == "½"):
@@ -1930,13 +1930,13 @@ class MyFrame(wx.Frame):
         i = self.findPage(panel)
 
         if i != -1:
-            # strip out ".blyte" suffix from tab names (it's a bit
+            # strip out ".trelby" suffix from tab names (it's a bit
             # complicated since if we open the same file multiple times,
-            # we have e.g. "foo.blyte" and "foo.blyte<2>", so actually we
-            # just strip out ".blyte" if it's found anywhere in the
+            # we have e.g. "foo.trelby" and "foo.trelby<2>", so actually
+            # we just strip out ".trelby" if it's found anywhere in the
             # string)
 
-            pos = text.find(u".blyte")
+            pos = text.find(u".trelby")
             if pos != -1:
                 s = text[0:pos] + text[pos + 6:]
             else:
@@ -2031,7 +2031,7 @@ class MyFrame(wx.Frame):
     def OnOpen(self, event = None):
         dlg = wx.FileDialog(self, "File to open",
             misc.scriptDir,
-            wildcard = "Trelby files (*.blyte)|*.blyte|All files|*",
+            wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
             style = wx.OPEN)
         
         if dlg.ShowModal() == wx.ID_OK:

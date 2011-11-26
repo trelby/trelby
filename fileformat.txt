@@ -233,4 +233,4 @@ More line types are probably going to be added in the future without
 increasing the fileformat version number, so unknown line types should be
 converted to Action, and a warning given to user about this.
 
-See sample.blyte for an example screenplay.
+See sample.trelby for an example screenplay.
