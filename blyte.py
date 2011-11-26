@@ -1936,12 +1936,7 @@ class MyFrame(wx.Frame):
             # we just strip out ".trelby" if it's found anywhere in the
             # string)
 
-            pos = text.find(u".trelby")
-            if pos != -1:
-                s = text[0:pos] + text[pos + 6:]
-            else:
-                s = text
-
+            s = text.replace(".trelby", "")
             self.tabCtrl.setTabText(i, s)
     
     # iterates over all tabs and finds out the corresponding page number
