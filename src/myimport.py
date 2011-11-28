@@ -56,7 +56,11 @@ def importFDX(fileName, frame):
 
             s = u""
             for text in para.xpath("Text"):
-                s += text.text
+                # text.text is None for paragraphs with no text, and +=
+                # blows up trying to add a string object and None, so
+                # guard against that
+                if text.text:
+                    s += text.text
 
             # FD uses some fancy unicode apostrophe, replace it with a
             # normal one
