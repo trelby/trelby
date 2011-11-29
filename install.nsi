@@ -20,7 +20,7 @@ RequestExecutionLevel admin
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Trelby"
-!define PRODUCT_VERSION "2.0-dev"
+!define PRODUCT_VERSION "2.0.0.0-dev"
 !define PRODUCT_PUBLISHER "Trelby.org"
 !define PRODUCT_WEB_SITE "http://www.trelby.org/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\trelby.exe"
@@ -176,7 +176,7 @@ Section Uninstall
   Delete "$INSTDIR\w9xpopen.exe"
   Delete "$INSTDIR\wxc2.pyd"
   Delete "$INSTDIR\wxc.pyd"
-  Delete "$INSTDIR\sample.trel"
+  Delete "$INSTDIR\sample.trelby"
   Delete "$INSTDIR\_socket.pyd"
   Delete "$INSTDIR\_ssl.pyd"
   Delete "$INSTDIR\_winreg.pyd"
@@ -196,7 +196,7 @@ Section Uninstall
 
   DeleteRegKey ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}"
   DeleteRegKey HKLM "${PRODUCT_DIR_REGKEY}"
-  DeleteRegKey HKCR ".trel"
+  DeleteRegKey HKCR ".trelby"
   DeleteRegKey HKCR "Trelby.Screenplay\DefaultIcon"
   DeleteRegKey HKCR "Trelby.Screenplay\shell"
   DeleteRegKey HKCR "Trelby.Screenplay\shell\open\command"
