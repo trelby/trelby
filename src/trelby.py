@@ -100,7 +100,7 @@ class GlobalData:
         v.addInt("width", defaultW, "Width", 500, 9999)
 
         v.addInt("height", 830, "Height", 300, 9999)
-        v.addInt("viewMode", VIEWMODE_LAYOUT, "ViewMode", VIEWMODE_DRAFT,
+        v.addInt("viewMode", VIEWMODE_DRAFT, "ViewMode", VIEWMODE_DRAFT,
                  VIEWMODE_OVERVIEW_LARGE)
 
         v.addList("files", [], "Files",
