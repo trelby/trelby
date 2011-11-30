@@ -66,7 +66,7 @@ def importFDX(fileName, frame):
             # normal one
             s = s.replace(u"\u2019", "'")
 
-            s = util.toLatin1(s)
+            s = util.toInputStr(util.toLatin1(s))
 
             lines.append(screenplay.Line(screenplay.LB_LAST, lt, s))
 
