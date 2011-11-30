@@ -119,7 +119,7 @@ Section -Post
   WriteRegStr ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" "Publisher" "${PRODUCT_PUBLISHER}"
 
   ; file associations
-  WriteRegStr HKCR ".trel" "" "Trelby.Screenplay"
+  WriteRegStr HKCR ".trelby" "" "Trelby.Screenplay"
   WriteRegStr HKCR "Trelby.Screenplay" "" "Trelby Screenplay"
   WriteRegStr HKCR "Trelby.Screenplay\DefaultIcon" "" "$INSTDIR\trelby.exe,0"
   WriteRegStr HKCR "Trelby.Screenplay\shell" "" "open"
