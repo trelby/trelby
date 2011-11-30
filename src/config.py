@@ -962,7 +962,7 @@ class ConfigGlobal:
                    "Text foreground (headers)")
         v.addColor("textBg", 255, 255, 255, "TextBG", "Text background")
         v.addColor("workspace", 237, 237, 237, "Workspace", "Workspace")
-        v.addColor("pageBorder", 170, 170, 170, "PageBorder", "Page border")
+        v.addColor("pageBorder", 202, 202, 202, "PageBorder", "Page border")
         v.addColor("pageShadow", 153, 153, 153, "PageShadow", "Page shadow")
         v.addColor("selected", 221, 221, 221, "Selected", "Selection")
         v.addColor("search", 255, 127, 0, "SearchResult", "Search result")
