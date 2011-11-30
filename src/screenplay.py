@@ -39,6 +39,8 @@ import re
 import sys
 import time
 
+from lxml import etree
+
 # screenplay
 class Screenplay:
     def __init__(self, cfgGl):
@@ -434,6 +436,69 @@ class Screenplay:
                 output += " " * tcfg.indent + text + "\n"
 
         return str(output)
+
+    # Return screenplay as list of tuples of the form (lineType, lineText)
+    def getElementsAsList(self):
+        ls = self.lines
+        eleList = []
+        curLine = ""
+
+        for line in ls:
+            lineType = line.lt
+            lineText = line.text
+
+            if self.cfg.getType(line.lt).export.isCaps:
+                lineText = util.upper(lineText)
+
+            curLine += lineText
+
+            if line.lb == LB_LAST:
+                eleList.append((lineType, curLine))
+                curLine = ""
+            elif line.lb == LB_SPACE:
+                curLine += " "
+            elif line.lb == LB_FORCED:
+                curLine += "\n"
+
+        return eleList
+
+    # Generate a Final Draft XML file and return as string.
+    def generateFDX(self):
+        eleList = self.getElementsAsList()
+        fd = etree.Element("FinalDraft")
+        fd.set("DocumentType", "Script")
+        fd.set("Template", "No")
+        fd.set("Version", "1")
+        content = etree.SubElement(fd, "Content")
+
+        xmlMap = {
+            ACTION : "Action",
+            CHARACTER : "Character",
+            DIALOGUE : "Dialogue",
+            PAREN : "Parenthetical",
+            SCENE : "Scene Heading",
+            SHOT : "Shot",
+            TRANSITION : "Transition",
+            NOTE : "Action",
+        }
+
+        for ele in eleList:
+            typ, txt = ele
+            if typ == NOTE:
+                dummyPara = etree.SubElement(content, "Paragraph")
+                dummyPara.set("Type", xmlMap[typ])
+                scriptnote = etree.SubElement(dummyPara, "ScriptNote")
+                scriptnote.set("ID", "1")
+                para = etree.SubElement(scriptnote, "Paragraph")
+            else:
+                para = etree.SubElement(content, "Paragraph")
+                para.set("Type", xmlMap[typ])
+
+            paratxt = etree.SubElement(para, "Text")
+            paratxt.text = unicode(txt, "ISO-8859-1")
+
+        return etree.tostring(fd, xml_declaration=True,
+                encoding='UTF-8', pretty_print=True)
 
     # generate RTF and return it as a string.
     def generateRTF(self):

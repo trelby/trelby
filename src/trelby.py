@@ -1057,7 +1057,7 @@ class MyCtrl(wx.Control):
 
         dlg = wx.FileDialog(mainFrame, "Filename to export as",
             misc.scriptDir,
-            wildcard = "PDF|*.pdf|RTF|*.rtf|Formatted text|*.txt",
+            wildcard = "PDF|*.pdf|RTF|*.rtf|Final Draft XML|*.fdx|Formatted text|*.txt",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
@@ -1068,6 +1068,8 @@ class MyCtrl(wx.Control):
                 data = sp.generatePDF(True)
             elif choice == 1:
                 data = sp.generateRTF()
+            elif choice == 2:
+                data = sp.generateFDX()
             else:
                 data = self.getExportText(sp)
 
