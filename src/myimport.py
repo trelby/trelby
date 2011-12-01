@@ -9,8 +9,6 @@ from lxml import etree
 
 import wx
 
-from xml.etree.ElementTree import ElementTree
-
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."
 SCENE_ACTION = -2
