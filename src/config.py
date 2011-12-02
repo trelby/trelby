@@ -59,6 +59,11 @@ PDF_FONT_BOLD = "Bold"
 PDF_FONT_ITALIC = "Italic"
 PDF_FONT_BOLD_ITALIC = "Bold-Italic"
 
+# scrolling  directions
+DIRECTION_UP = 0
+DIRECTION_DOWN = 1
+DIRECTION_CENTER = 2
+
 # construct reverse lookup tables
 
 for k, v in _char2lb.items():
@@ -190,7 +195,9 @@ class Command:
     cvars = None
 
     def __init__(self, name, desc, defKeys = [], isMovement = False,
-                 isFixed = False, isMenu = False):
+                 isFixed = False, isMenu = False,
+                 scrollDirection = DIRECTION_CENTER):
+
         # name, e.g. "MoveLeft"
         self.name = name
 
@@ -209,6 +216,9 @@ class Command:
 
         # is this a menu item
         self.isMenu = isMenu
+
+        # this moves the page
+        self.scrollDirection = scrollDirection
 
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
@@ -746,7 +756,8 @@ class ConfigGlobal:
             Command("LocationsDlg", "Open the locations dialog.",
                     isMenu = True),
 
-            Command("MoveDown", "Move down.", [wx.WXK_DOWN], isMovement = True),
+            Command("MoveDown", "Move down.", [wx.WXK_DOWN], isMovement = True,
+                    scrollDirection = DIRECTION_UP),
 
             Command("MoveEndOfLine", "Move to the end of the line or"
                     " finish auto-completion.",
@@ -783,7 +794,8 @@ class ConfigGlobal:
                     [util.Key(wx.WXK_HOME, ctrl = True).toInt()],
                     isMovement = True),
 
-            Command("MoveUp", "Move up.", [wx.WXK_UP], isMovement = True),
+            Command("MoveUp", "Move up.", [wx.WXK_UP], isMovement = True,
+                    scrollDirection = DIRECTION_DOWN),
 
             Command("NameDatabase", "Open the character name database.",
                     isMenu = True),
@@ -937,6 +949,9 @@ class ConfigGlobal:
 
         # whether to open scripts on their last saved position
         v.addBool("honorSavedPos", True, "OpenScriptOnSavedPos")
+
+        # whether to use emacs like scrolling
+        v.addBool("legacyScroll", False, "LegacyScrolling")
 
         # page break indicators to show
         v.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,

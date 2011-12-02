@@ -5,6 +5,10 @@ import util
 
 import wx
 
+# Number of lines the smooth scroll will try to search.
+# 15-20 is good number to use with the layout mode margins we have.
+MAX_JUMP_DISTANCE = 17
+
 # a piece of text on screen.
 class TextString:
     def __init__(self, line, text, x, y, fi, isUnderlined):
@@ -96,7 +100,7 @@ class ViewMode:
 
     # make line, which is not currently visible, visible. texts =
     # self.getScreen(ctrl, False)[0].
-    def makeLineVisible(self, ctrl, line, texts):
+    def makeLineVisible(self, ctrl, line, texts, direction = config.DIRECTION_CENTER):
         raise "makeLineVisible not implemented"
 
     # handle page up (dir == -1) or page down (dir == 1) command. cursor
@@ -130,11 +134,33 @@ class ViewMode:
         return (line, column)
 
     # semi-generic implementation, for use by Draft and Layout modes.
-    def makeLineVisibleGeneric(self, ctrl, line, texts):
-        ctrl.sp.setTopLine(max(0, int(line - (len(texts) * 0.5))))
+    def makeLineVisibleGeneric(self, ctrl, line, texts, direction = config.DIRECTION_CENTER, jumpAhead= 3):
+        curTopLine = ctrl.sp.getTopLine()
+        def legacyTopLine(ln):
+            ctrl.sp.setTopLine(max(0, int(ln - (len(texts) * 0.5))))
+            if not ctrl.isLineVisible(ln):
+                ctrl.sp.setTopLine(line)
 
-        if not ctrl.isLineVisible(line):
-            ctrl.sp.setTopLine(line)
+        if ctrl.sp.cfgGl.legacyScroll or direction == config.DIRECTION_CENTER:
+            legacyTopLine(line)
+
+        elif direction == config.DIRECTION_UP:
+            if not ctrl.isLineVisible(line):
+                i = 1
+                while not ctrl.isLineVisible(line):
+                    ctrl.sp.setTopLine(curTopLine+i)
+                    i += jumpAhead
+                    if i > MAX_JUMP_DISTANCE:
+                        legacyTopLine(line)
+
+        else: # config.DIRECTION_DOWN
+            if not ctrl.isLineVisible(line):
+                i = 1
+                while not ctrl.isLineVisible(line):
+                    ctrl.sp.setTopLine(curTopLine-i)
+                    i += jumpAhead
+                    if i > MAX_JUMP_DISTANCE:
+                        legacyTopLine(line)
 
     # semi-generic implementation, for use by Draft and Layout modes.
     def pageCmdGeneric(self, ctrl, cs, dir, texts, dpages):
@@ -228,8 +254,8 @@ class ViewModeDraft(ViewMode):
     def pos2linecol(self, ctrl, x, y):
         return self.pos2linecolGeneric(ctrl, x, y)
 
-    def makeLineVisible(self, ctrl, line, texts):
-        self.makeLineVisibleGeneric(ctrl, line, texts)
+    def makeLineVisible(self, ctrl, line, texts, direction = config.DIRECTION_CENTER):
+        self.makeLineVisibleGeneric(ctrl, line, texts, direction, jumpAhead = 1)
 
     def pageCmd(self, ctrl, cs, dir, texts, dpages):
         self.pageCmdGeneric(ctrl, cs, dir, texts, dpages)
@@ -365,8 +391,8 @@ class ViewModeLayout(ViewMode):
     def pos2linecol(self, ctrl, x, y):
         return self.pos2linecolGeneric(ctrl, x, y)
 
-    def makeLineVisible(self, ctrl, line, texts):
-        self.makeLineVisibleGeneric(ctrl, line, texts)
+    def makeLineVisible(self, ctrl, line, texts, direction = config.DIRECTION_CENTER):
+        self.makeLineVisibleGeneric(ctrl, line, texts, direction, jumpAhead = 3)
 
     def pageCmd(self, ctrl, cs, dir, texts, dpages):
         self.pageCmdGeneric(ctrl, cs, dir, texts, dpages)
@@ -486,7 +512,7 @@ class ViewModeSideBySide(ViewMode):
 
         return (line, column)
 
-    def makeLineVisible(self, ctrl, line, texts):
+    def makeLineVisible(self, ctrl, line, texts, direction = config.DIRECTION_CENTER):
         ctrl.sp.setTopLine(line)
 
     def pageCmd(self, ctrl, cs, dir, texts, dpages):
@@ -604,7 +630,7 @@ class ViewModeOverview(ViewMode):
 
         return (None, None)
 
-    def makeLineVisible(self, ctrl, line, texts):
+    def makeLineVisible(self, ctrl, line, texts, direction = config.DIRECTION_CENTER):
         ctrl.sp.setTopLine(line)
 
     # not implemented for overview mode at least for now.

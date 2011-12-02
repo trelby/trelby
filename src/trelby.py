@@ -385,13 +385,13 @@ class MyCtrl(wx.Control):
 
         return (line >= texts[0].line) and (line <= texts[-1].line)
 
-    def makeLineVisible(self, line):
+    def makeLineVisible(self, line, direction = config.DIRECTION_CENTER):
         texts = gd.vm.getScreen(self, False)[0]
 
         if self.isLineVisible(line, texts):
             return
 
-        gd.vm.makeLineVisible(self, line, texts)
+        gd.vm.makeLineVisible(self, line, texts, direction)
 
     def adjustScrollBar(self):
         height = self.GetClientSize().height
@@ -1209,6 +1209,7 @@ class MyCtrl(wx.Control):
 
         cs = screenplay.CommandState()
         cs.mark = bool(ev.ShiftDown())
+        scrollDirection = config.DIRECTION_CENTER
 
         if not ev.ControlDown() and not ev.AltDown() and \
                util.isValidInputChar(kc):
@@ -1232,6 +1233,7 @@ class MyCtrl(wx.Control):
                 ev.ControlDown(), ev.AltDown(), ev.ShiftDown()).toInt())
 
             if cmd:
+                scrollDirection = cmd.scrollDirection
                 if cmd.isMenu:
                     getattr(mainFrame, "On" + cmd.name)()
                     return
@@ -1252,7 +1254,7 @@ class MyCtrl(wx.Control):
                 cs.needsVisifying = True
 
         if cs.needsVisifying:
-            self.makeLineVisible(self.sp.line)
+            self.makeLineVisible(self.sp.line, scrollDirection)
 
         self.updateScreen()
 
