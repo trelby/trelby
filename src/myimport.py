@@ -60,9 +60,22 @@ def importFDX(fileName, frame):
         for para in root.xpath("Content//Paragraph"):
             et = para.get("Type")
 
+            # The top level paragraph can be checked for notes.
+            # XML path is Content/Paragraph/ScriptNote/Paragraph/Text
+            s = u""
+            for notes in para.xpath("ScriptNote/Paragraph/Text"):
+                if notes.text:
+                    s += notes.text
+                if (notes.get("AdornmentStyle") == "0"):
+                    s += "\n"
+            if s != u"":
+                addText(screenplay.NOTE, s)
+
             # "General" has embedded Dual Dialogue paragraphs inside it;
             # nothing to do for the General element itself.
-            if et == "General":
+            #
+            # If no type is defined (like inside scriptnote), skip.
+            if (et == "General") or (et is None):
                 continue
 
             s = u""
