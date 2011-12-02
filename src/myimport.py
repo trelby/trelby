@@ -41,6 +41,22 @@ def importFDX(fileName, frame):
         root = etree.XML(data)
         lines = []
 
+        def treatLine(s):
+            s = util.toInputStr(util.toLatin1(util.removeFancyUnicode(s)))
+            return s
+
+        def addText(eleType, eleText):
+            lns = eleText.split(u"\n")
+            # remove extraneous newlines at the end of any given lines.
+            if lns[-1] == "" and len(lns) > 1:
+                lns = lns[0:-1]
+
+            for ln in lns[0:-1]:
+                ln = treatLine(ln)
+                lines.append(screenplay.Line(screenplay.LB_FORCED, eleType, ln))
+            ln = treatLine(lns[-1])
+            lines.append(screenplay.Line(screenplay.LB_LAST, eleType, ln))
+
         for para in root.xpath("Content//Paragraph"):
             et = para.get("Type")
 
@@ -48,9 +64,6 @@ def importFDX(fileName, frame):
             # nothing to do for the General element itself.
             if et == "General":
                 continue
-
-            # all unknown linetypes are converted to Action
-            lt = elemMap.get(et, screenplay.ACTION)
 
             s = u""
             for text in para.xpath("Text"):
@@ -60,9 +73,8 @@ def importFDX(fileName, frame):
                 if text.text:
                     s += text.text
 
-            s = util.toInputStr(util.toLatin1(util.removeFancyUnicode(s)))
-
-            lines.append(screenplay.Line(screenplay.LB_LAST, lt, s))
+            lt = elemMap.get(et, screenplay.ACTION)
+            addText(lt,s)
 
         if len(lines) == 0:
             wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
