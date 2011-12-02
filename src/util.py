@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from error import *
 
 import datetime
@@ -56,6 +58,12 @@ _normalize_tbl = ""
 
 # identity table that maps each character to itself. used by deleteChars.
 _identity_tbl = ""
+
+# map some fancy unicode characters to their nearest ASCII/Latin-1
+# equivalents so when people import text it's not mangled to uselessness
+_fancy_unicode_map = {
+    ord(u"’") : u"'",
+    }
 
 # permanent memory DC to get text extents etc
 permDc = None
@@ -147,6 +155,10 @@ def isValidInputChar(kc):
 # characters, except form feeds, which are just deleted.
 def toInputStr(s):
     return s.translate(_input_tbl, "\f")
+
+# replace fancy unicode characters with their ASCII/Latin1 equivalents.
+def removeFancyUnicode(s):
+    return s.translate(_fancy_unicode_map)
 
 # replace s[start:start + width] with toInputStr(new) and return s
 def replace(s, new, start, width):

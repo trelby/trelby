@@ -60,11 +60,7 @@ def importFDX(fileName, frame):
                 if text.text:
                     s += text.text
 
-            # FD uses some fancy unicode apostrophe, replace it with a
-            # normal one
-            s = s.replace(u"\u2019", "'")
-
-            s = util.toInputStr(util.toLatin1(s))
+            s = util.toInputStr(util.toLatin1(util.removeFancyUnicode(s)))
 
             lines.append(screenplay.Line(screenplay.LB_LAST, lt, s))
 

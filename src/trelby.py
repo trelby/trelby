@@ -822,7 +822,7 @@ class MyCtrl(wx.Control):
             if wx.TheClipboard.IsSupported(df):
                 data = wx.TextDataObject()
                 wx.TheClipboard.GetData(data)
-                s = misc.fromGUI(data.GetText())
+                s = misc.fromGUI(util.removeFancyUnicode(data.GetText()))
 
             wx.TheClipboard.Close()
 
