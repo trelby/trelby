@@ -430,6 +430,14 @@ def isWordBoundary(c):
 def isAlnum(c):
     return unicode(c, "ISO-8859-1").isalnum()
 
+# make sure s (unicode) ends in suffix (case-insensitively) and return
+# that. suffix must already be lower-case.
+def ensureEndsIn(s, suffix):
+    if s.lower().endswith(suffix):
+        return s
+    else:
+        return s + suffix
+
 # return string 's' split into words (as a list), using isWordBoundary.
 def splitToWords(s):
     tmp = ""

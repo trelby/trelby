@@ -296,6 +296,8 @@ class MyCtrl(wx.Control):
 
     # save script to given filename. returns True on success.
     def saveFile(self, fileName):
+        fileName = util.ensureEndsIn(fileName, ".trelby")
+
         if util.writeToFile(fileName, self.sp.save(), mainFrame):
             self.setFile(fileName)
             self.sp.markChanged(False)
@@ -1064,15 +1066,21 @@ class MyCtrl(wx.Control):
             choice = dlg.GetFilterIndex()
             if choice == 0:
                 data = sp.generatePDF(True)
+                suffix = ".pdf"
             elif choice == 1:
                 data = sp.generateRTF()
+                suffix = ".rtf"
             elif choice == 2:
                 data = sp.generateFDX()
+                suffix = ".fdx"
             else:
                 data = self.getExportText(sp)
+                suffix = ".txt"
+
+            fileName = util.ensureEndsIn(dlg.GetPath(), suffix)
 
             if data:
-                util.writeToFile(dlg.GetPath(), data, mainFrame)
+                util.writeToFile(fileName, data, mainFrame)
 
         dlg.Destroy()
 

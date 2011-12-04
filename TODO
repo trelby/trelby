@@ -1,7 +1,5 @@
 -pml->pdf font baseline wrong for non-courier fonts?
 
--add suffix automatically if missing in save/export
-
 -move some/all of GlobalData/MyPanel/MyCtrl/MyFrame out of trelby.py
 
 -version information needs to be updated in way too many places. figure
