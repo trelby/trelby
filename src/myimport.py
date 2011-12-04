@@ -71,6 +71,7 @@ def importFDX(fileName, frame):
 
             if s:
                 addElem(screenplay.NOTE, s)
+                continue
 
             # "General" has embedded Dual Dialogue paragraphs inside it;
             # nothing to do for the General element itself.
