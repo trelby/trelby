@@ -437,7 +437,8 @@ class Screenplay:
 
         return str(output)
 
-    # Return screenplay as list of tuples of the form (lineType, lineText)
+    # Return screenplay as list of tuples of the form (elType, elText).
+    # forced linebreaks are represented as \n characters.
     def getElementsAsList(self):
         ls = self.lines
         eleList = []
@@ -497,8 +498,8 @@ class Screenplay:
             paratxt = etree.SubElement(para, "Text")
             paratxt.text = unicode(txt, "ISO-8859-1")
 
-        return etree.tostring(fd, xml_declaration=True,
-                encoding='UTF-8', pretty_print=True)
+        return etree.tostring(
+            fd, xml_declaration=True, encoding='UTF-8', pretty_print=True)
 
     # generate RTF and return it as a string.
     def generateRTF(self):
