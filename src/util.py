@@ -160,6 +160,11 @@ def toInputStr(s):
 def removeFancyUnicode(s):
     return s.translate(_fancy_unicode_map)
 
+# transform external input (unicode) into a form suitable for having in a
+# script
+def cleanInput(s):
+    return toInputStr(toLatin1(removeFancyUnicode(s)))
+
 # replace s[start:start + width] with toInputStr(new) and return s
 def replace(s, new, start, width):
     return s[0 : start] + toInputStr(new) + s[start + width:]

@@ -824,7 +824,7 @@ class MyCtrl(wx.Control):
             if wx.TheClipboard.IsSupported(df):
                 data = wx.TextDataObject()
                 wx.TheClipboard.GetData(data)
-                s = misc.fromGUI(util.removeFancyUnicode(data.GetText()))
+                s = util.cleanInput(data.GetText())
 
             wx.TheClipboard.Close()
 
@@ -842,9 +842,7 @@ class MyCtrl(wx.Control):
         lines = []
 
         for s in inLines:
-            s = util.toInputStr(s)
-
-            if len(s) != 0:
+            if s:
                 lines.append(screenplay.Line(screenplay.LB_LAST,
                                              screenplay.ACTION, s))
 

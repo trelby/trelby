@@ -41,35 +41,36 @@ def importFDX(fileName, frame):
         root = etree.XML(data)
         lines = []
 
-        def treatLine(s):
-            s = util.toInputStr(util.toLatin1(util.removeFancyUnicode(s)))
-            return s
+        def addElem(eleType, eleText):
+            lns = eleText.split("\n")
 
-        def addText(eleType, eleText):
-            lns = eleText.split(u"\n")
-            # remove extraneous newlines at the end of any given lines.
-            if lns[-1] == "" and len(lns) > 1:
-                lns = lns[0:-1]
+            # if elem ends in a newline, last line is empty and useless;
+            # get rid of it
+            if not lns[-1] and (len(lns) > 1):
+                lns = lns[:-1]
 
-            for ln in lns[0:-1]:
-                ln = treatLine(ln)
-                lines.append(screenplay.Line(screenplay.LB_FORCED, eleType, ln))
-            ln = treatLine(lns[-1])
-            lines.append(screenplay.Line(screenplay.LB_LAST, eleType, ln))
+            for s in lns[:-1]:
+                lines.append(screenplay.Line(
+                        screenplay.LB_FORCED, eleType, util.cleanInput(s)))
+
+            lines.append(screenplay.Line(
+                    screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
 
         for para in root.xpath("Content//Paragraph"):
             et = para.get("Type")
 
-            # The top level paragraph can be checked for notes.
-            # XML path is Content/Paragraph/ScriptNote/Paragraph/Text
+            # Check for script notes
             s = u""
             for notes in para.xpath("ScriptNote/Paragraph/Text"):
                 if notes.text:
                     s += notes.text
-                if (notes.get("AdornmentStyle") == "0"):
+
+                # TODO: what's this about? needs a comment
+                if notes.get("AdornmentStyle") == "0":
                     s += "\n"
-            if s != u"":
-                addText(screenplay.NOTE, s)
+
+            if s:
+                addElem(screenplay.NOTE, s)
 
             # "General" has embedded Dual Dialogue paragraphs inside it;
             # nothing to do for the General element itself.
@@ -87,7 +88,7 @@ def importFDX(fileName, frame):
                     s += text.text
 
             lt = elemMap.get(et, screenplay.ACTION)
-            addText(lt,s)
+            addElem(lt, s)
 
         if len(lines) == 0:
             wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
