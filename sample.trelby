@@ -23,7 +23,7 @@ Paper/Height:297.00
 Paper/Width:210.00
 PageBreakActionLines:2
 PageBreakDialogueLines:2
-SceneContinueds:True
+SceneContinueds:False
 SceneContinuedIndent:45
 ShowSceneNumbers:False
 IncludeTOC:True
@@ -33,7 +33,7 @@ RemoveNotes:False
 OutlineNotes:True
 ShowMargins:False
 ShowLineNumbers:False
-Cursor/Line:0
+Cursor/Line:34
 Cursor/Column:0
 String/MoreDialogue:(MORE)
 String/ContinuedPageEnd:(CONTINUED)

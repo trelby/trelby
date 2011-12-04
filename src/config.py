@@ -450,7 +450,7 @@ class Config:
         v.addInt("pbDialogueLines", 2, "PageBreakDialogueLines", 1, 30)
 
         # whether scene continueds are enabled
-        v.addBool("sceneContinueds", True, "SceneContinueds")
+        v.addBool("sceneContinueds", False, "SceneContinueds")
 
         # scene continued text indent width
         v.addInt("sceneContinuedIndent", 45, "SceneContinuedIndent", -20, 80)
