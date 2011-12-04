@@ -484,6 +484,8 @@ class MyCtrl(wx.Control):
         if writeCfg:
             util.writeToFile(gd.confFilename, cfgGl.save(), mainFrame)
 
+        mainFrame.checkFonts()
+
     def applyHeaders(self, newHeaders):
         self.sp.headers = newHeaders
         self.sp.markChanged()
@@ -1993,6 +1995,21 @@ class MyFrame(wx.Frame):
         self.panel.ctrl.updateScreen()
         gd.mru.add(filename)
 
+    def checkFonts(self):
+        names = ["Normal", "Bold", "Italic", "Bold-Italic"]
+        failed = []
+
+        for i, fi in enumerate(cfgGui.fonts):
+            if not util.isFixedWidth(fi.font):
+                failed.append(names[i])
+
+        if failed:
+            wx.MessageBox(
+                "The fonts listed below are not fixed width and\n"
+                "will cause the program not to function correctly.\n"
+                "Please change the fonts at File/Settings/Change.\n\n"
+                + "\n".join(failed), "Error", wx.OK, self)
+
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
         # override it and do nothing
@@ -2427,6 +2444,8 @@ class MyApp(wx.App):
         mainFrame.panel.ctrl.SetFocus()
 
         self.SetTopWindow(mainFrame)
+
+        mainFrame.checkFonts()
 
         if cfgGl.splashTime > 0:
             win = splash.SplashWindow(mainFrame, cfgGl.splashTime * 1000)
