@@ -1297,6 +1297,10 @@ class Screenplay:
             if line.lt == SCENE:
                 i = self.removeDanglingElement(i, SCENE, lastBreak)
 
+            elif line.lt == SHOT:
+                i = self.removeDanglingElement(i, SHOT, lastBreak)
+                i = self.removeDanglingElement(i, SCENE, lastBreak)
+
             elif line.lt == ACTION:
                 if line.lb != LB_LAST:
                     first = self.getElemFirstIndexFromLine(i)
