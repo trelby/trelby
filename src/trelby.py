@@ -385,7 +385,7 @@ class MyCtrl(wx.Control):
 
         return (line >= texts[0].line) and (line <= texts[-1].line)
 
-    def makeLineVisible(self, line, direction = config.DIRECTION_CENTER):
+    def makeLineVisible(self, line, direction = config.SCROLL_CENTER):
         texts = gd.vm.getScreen(self, False)[0]
 
         if self.isLineVisible(line, texts):
@@ -1209,7 +1209,7 @@ class MyCtrl(wx.Control):
 
         cs = screenplay.CommandState()
         cs.mark = bool(ev.ShiftDown())
-        scrollDirection = config.DIRECTION_CENTER
+        scrollDirection = config.SCROLL_CENTER
 
         if not ev.ControlDown() and not ev.AltDown() and \
                util.isValidInputChar(kc):

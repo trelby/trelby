@@ -1015,10 +1015,10 @@ class MiscPanel(wx.Panel):
         wx.EVT_CHECKBOX(self, self.honorSavedPos.GetId(), self.OnMisc)
         vsizer.Add(self.honorSavedPos, 0, wx.BOTTOM, pad)
 
-        self.legacyScroll = wx.CheckBox(self, -1,
-                "Use old-school page scrolling")
-        wx.EVT_CHECKBOX(self, self.legacyScroll.GetId(), self.OnMisc)
-        vsizer.Add(self.legacyScroll, 0, wx.BOTTOM, pad)
+        self.recenterOnScroll = wx.CheckBox(self, -1,
+            "Recenter screen on scrolling")
+        wx.EVT_CHECKBOX(self, self.recenterOnScroll.GetId(), self.OnMisc)
+        vsizer.Add(self.recenterOnScroll, 0, wx.BOTTOM, pad)
 
         self.checkErrorsCb = wx.CheckBox(self, -1,
             "Check script for errors before print, export or compare")
@@ -1076,7 +1076,7 @@ class MiscPanel(wx.Panel):
         self.cfg.capitalizeI = self.autoCapI.GetValue()
         self.cfg.honorSavedPos = self.honorSavedPos.GetValue()
         self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
-        self.cfg.legacyScroll = self.legacyScroll.GetValue()
+        self.cfg.recenterOnScroll = self.recenterOnScroll.GetValue()
         self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
         self.cfg.confirmDeletes = util.getSpinValue(self.confDelEntry)
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
@@ -1116,7 +1116,7 @@ class MiscPanel(wx.Panel):
         self.autoCapI.SetValue(self.cfg.capitalizeI)
         self.honorSavedPos.SetValue(self.cfg.honorSavedPos)
         self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
-        self.legacyScroll.SetValue(self.cfg.legacyScroll)
+        self.recenterOnScroll.SetValue(self.cfg.recenterOnScroll)
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
         self.confDelEntry.SetValue(self.cfg.confirmDeletes)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
