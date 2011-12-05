@@ -4,7 +4,13 @@
 
 -version information needs to be updated in way too many places. figure
  out a way to have it in as few places as possible so it's easier to
- update.
+ update. currently it must be updated in:
+
+  -misc.py
+  -install.nsi
+  -trelby.desktop
+  -debian/changelog
+  -doc/version.xml
 
 -try using graphics contexts for tab ctrl drawing to get anti-aliased
  lines (http://docs.wxwidgets.org/trunk/classwx_graphics_context.html)
