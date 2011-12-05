@@ -57,6 +57,7 @@ def importFDX(fileName, frame):
                     screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
 
         for para in root.xpath("Content//Paragraph"):
+            addedNote = False
             et = para.get("Type")
 
             # Check for script notes
@@ -71,7 +72,7 @@ def importFDX(fileName, frame):
 
             if s:
                 addElem(screenplay.NOTE, s)
-                continue
+                addedNote = True
 
             # "General" has embedded Dual Dialogue paragraphs inside it;
             # nothing to do for the General element itself.
@@ -88,8 +89,11 @@ def importFDX(fileName, frame):
                 if text.text:
                     s += text.text
 
-            lt = elemMap.get(et, screenplay.ACTION)
-            addElem(lt, s)
+            # don't remove paragraphs with no text, unless that paragraph
+            # contained a scriptnote
+            if s or not addedNote:
+                lt = elemMap.get(et, screenplay.ACTION)
+                addElem(lt, s)
 
         if len(lines) == 0:
             wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
