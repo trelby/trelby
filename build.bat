@@ -1,3 +1,8 @@
+REM FIXME: apparently, the way we use py2exe it doesn't produce a
+REM working executable if source files are in src/. nobody has time
+REM to figure out the proper fix, so as a temporary hack we just
+REM create a temporary build directory and move everything there.
+
 rd /s /q winbuild
 rd /s /q dist
 mkdir winbuild\dist
@@ -21,7 +26,7 @@ xcopy /i /y resources winbuild\dist\resources
 cd winbuild
 python -OO setup.py py2exe
 call nsis.bat
-move /y setup*.exe .. 
+move /y setup*.exe ..
 move /y dist ..\dist
 
 cd ..
