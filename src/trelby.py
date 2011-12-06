@@ -336,6 +336,16 @@ class MyCtrl(wx.Control):
 
         return sp.generateText(inf[0].selected)
 
+    def getExportHtml(self, sp):
+        inf = []
+        inf.append(misc.CheckBoxItem("Include Notes"))
+        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf,
+                               "Options:", False)
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return None
+        return sp.generateHtml(inf[0].selected)
+
     def setFile(self, fileName):
         self.fileName = fileName
         if fileName:
@@ -1057,7 +1067,7 @@ class MyCtrl(wx.Control):
 
         dlg = wx.FileDialog(mainFrame, "Filename to export as",
             misc.scriptDir,
-            wildcard = "PDF|*.pdf|RTF|*.rtf|Final Draft XML|*.fdx|Formatted text|*.txt",
+            wildcard = "PDF|*.pdf|RTF|*.rtf|Final Draft XML|*.fdx|HTML|*.html|Formatted text|*.txt",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
@@ -1073,6 +1083,9 @@ class MyCtrl(wx.Control):
             elif choice == 2:
                 data = sp.generateFDX()
                 suffix = ".fdx"
+            elif choice == 3:
+                data = self.getExportHtml(sp)
+                suffix = ".html"
             else:
                 data = self.getExportText(sp)
                 suffix = ".txt"
