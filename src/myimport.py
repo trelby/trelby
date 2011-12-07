@@ -66,7 +66,7 @@ def importFDX(fileName, frame):
                 if notes.text:
                     s += notes.text
 
-                # TODO: what's this about? needs a comment
+                # FD has AdornmentStyle set to "0" on notes with newline.
                 if notes.get("AdornmentStyle") == "0":
                     s += "\n"
 
