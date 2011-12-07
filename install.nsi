@@ -11,7 +11,7 @@
 !define SHCNF_FLUSH        0x1000
 
 RequestExecutionLevel admin
- 
+
 !macro UPDATEFILEASSOC
 ; Using the system.dll plugin to call the SHChangeNotify Win32 API function
 ; so we can update the shell.
@@ -73,11 +73,11 @@ ShowInstDetails show
 ShowUnInstDetails show
 
 Function .onInit
- 
+
   ReadRegStr $R0 ${PRODUCT_UNINST_ROOT_KEY} "${PRODUCT_UNINST_KEY}" \
   "UninstallString"
   StrCmp $R0 "" done
- 
+
   MessageBox MB_OK "${PRODUCT_NAME} is already installed. You need to uninstall the old version first before installing this new version."
   Abort
 
@@ -92,6 +92,7 @@ Section MFCRUNTIME
 SectionEnd
 
 Section "MainSection" SEC01
+  SetShellVarContext all
   SetOutPath "$INSTDIR"
   SetOverwrite on
   File /r "dist\*"
@@ -102,6 +103,7 @@ Section "MainSection" SEC01
 SectionEnd
 
 Section -AdditionalIcons
+  SetShellVarContext all
   WriteIniStr "$INSTDIR\${PRODUCT_NAME}.url" "InternetShortcut" "URL" "${PRODUCT_WEB_SITE}"
   CreateShortCut "$SMPROGRAMS\Trelby\Manual.lnk" "$INSTDIR\manual.html"
   CreateShortCut "$SMPROGRAMS\Trelby\Website.lnk" "$INSTDIR\${PRODUCT_NAME}.url"
@@ -184,6 +186,7 @@ Section Uninstall
   Delete "$INSTDIR\fileformat.txt"
   Delete "$INSTDIR\LICENSE"
 
+  SetShellVarContext all
   Delete "$SMPROGRAMS\Trelby\Uninstall.lnk"
   Delete "$SMPROGRAMS\Trelby\Website.lnk"
   Delete "$DESKTOP\Trelby.lnk"
