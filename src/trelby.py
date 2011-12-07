@@ -339,11 +339,15 @@ class MyCtrl(wx.Control):
     def getExportHtml(self, sp):
         inf = []
         inf.append(misc.CheckBoxItem("Include Notes"))
+
         dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf,
                                "Options:", False)
+
         if dlg.ShowModal() != wx.ID_OK:
             dlg.Destroy()
+
             return None
+
         return sp.generateHtml(inf[0].selected)
 
     def setFile(self, fileName):

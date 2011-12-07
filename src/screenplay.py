@@ -437,10 +437,10 @@ class Screenplay:
 
         return str(output)
 
-    # Generate HTML file from screenplay.
+    # generate HTML output and return it as a string, optionally including
+    # notes.
     def generateHtml(self, includeNotes = True):
         ls = self.lines
-        numLines = len(ls)
 
         # We save space by shorter class names in html.
         htmlMap = {
@@ -456,8 +456,11 @@ class Screenplay:
 
         # html header for files
         htmlHeader = """
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
-<head><title>Exported Screenplay</title>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>Exported Screenplay</title>
 <style type="text/css">
 body {background: #ffffff; color: #000000; text-align: center;}
 pre, p {font: 12px/14px Courier, "Courier New", monospace !important;}
@@ -467,53 +470,58 @@ p {text-align: center;}
 .spcenter {margin: 0 auto; width: 500px;}
 .sc {font-weight: bold !important;}
 .nt {color: blue; font-style: italic !important;}
-</style></head><body>
+</style>
+</head>
+<body>
 """
-        htmlFooter = "</html>"
+        htmlFooter = """<p class = "footer">***<br>
+Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
+</body>
+</html>"""
 
         content = etree.Element("div")
         content.set("class","spcenter")
 
-        # first add all title texts (centered)
-        # is there a title page?
-        if len(self.titles.pages) != 0:
-            # and does it have atleast one title
-            if len(self.titles.pages[0]) !=0:
-                for item in self.titles.pages[0]:
-                    para = etree.SubElement(content, "p")
-                    para.set("class", "title")
-                    para.text = item.text
+        # title pages
+        for page in self.titles.pages:
+            for s in page:
                 para = etree.SubElement(content, "p")
                 para.set("class", "title")
-                para.text = "***"
+                para.text = unicode(s.text, "ISO-8859-1")
 
-        for i in range(0,numLines):
+            para = etree.SubElement(content, "p")
+            para.set("class", "title")
+            para.text = "***"
+
+        for i in range(len(ls)):
             line = ls[i]
-            if (not includeNotes) and (line.lt == NOTE):
+
+            if not includeNotes and (line.lt == NOTE):
                 continue
+
             tcfg = self.cfg.getType(line.lt)
             if tcfg.export.isCaps:
                 text = util.upper(line.text)
             else:
                 text = line.text
+
             text = " " * tcfg.indent + text
 
             # do we need space before this line?
             lineSpaces = self.getSpacingBefore(i) // 10
-            for num in range(0,lineSpaces):
+
+            for num in range(lineSpaces):
                 para = etree.SubElement(content, "pre")
                 para.set("class", htmlMap[line.lt])
-                para.text = " " #single space
+                para.text = " "
 
             # and now the line text
             para = etree.SubElement(content, "pre")
             para.set("class", htmlMap[line.lt])
-            para.text = text
+            para.text = unicode(text, "ISO-8859-1")
 
-        # add a footer
-        footer = etree.XML('<p class = "footer">***<br/>Generated with <a href="http://www.trelby.org">Trelby</a>.</p>')
-        content.append(footer)
-        bodyText = etree.tostring(content, pretty_print=True)
+        bodyText = etree.tostring(content, encoding='UTF-8', pretty_print=True)
+
         return htmlHeader + bodyText + htmlFooter
 
     # Return screenplay as list of tuples of the form (elType, elText).
