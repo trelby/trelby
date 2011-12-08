@@ -566,6 +566,13 @@ class MyCtrl(wx.Control):
     def OnLeftUp(self, event):
         self.mouseSelectActive = False
 
+        # to avoid phantom selections (Windows sends some strange events
+        # sometimes), check if anything worthwhile is actually selected.
+        cd = self.sp.getSelectedAsCD(False)
+
+        if not cd or ((len(cd.lines) == 1) and (len(cd.lines[0].text) < 2)):
+            self.sp.clearMark()
+
     def OnMotion(self, event):
         if event.LeftIsDown():
             self.OnLeftDown(event, mark = True)
