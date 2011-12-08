@@ -1838,6 +1838,7 @@ class MyFrame(wx.Frame):
         addTBMenu(ID_TOOLBAR_TOOLS, toolsMenu)
 
         wx.EVT_CLOSE(self, self.OnCloseWindow)
+        wx.EVT_SET_FOCUS(self, self.OnFocus)
 
         self.Layout()
 
@@ -2036,6 +2037,10 @@ class MyFrame(wx.Frame):
                 "will cause the program not to function correctly.\n"
                 "Please change the fonts at File/Settings/Change.\n\n"
                 + "\n".join(failed), "Error", wx.OK, self)
+
+    # If we get focus, pass it on to ctrl.
+    def OnFocus(self, event):
+        self.panel.ctrl.SetFocus()
 
     def OnMenuHighlight(self, event):
         # default implementation modifies status bar, so we need to
