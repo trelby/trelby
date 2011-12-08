@@ -336,8 +336,9 @@ def isFixedWidth(font):
 # get extent of 's' as (w, h)
 def getTextExtent(font, s):
     permDc.SetFont(font)
-
-    return permDc.GetTextExtent(s)
+    (widthTwice, h) = permDc.GetTextExtent(s+s)
+    (widthOnce, h) = permDc.GetTextExtent(s)
+    return (widthTwice - widthOnce, h)
 
 # get height of font in pixels
 def getFontHeight(font):
