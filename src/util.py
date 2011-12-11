@@ -336,9 +336,38 @@ def isFixedWidth(font):
 # get extent of 's' as (w, h)
 def getTextExtent(font, s):
     permDc.SetFont(font)
-    (widthTwice, h) = permDc.GetTextExtent(s+s)
-    (widthOnce, h) = permDc.GetTextExtent(s)
-    return (widthTwice - widthOnce, h)
+
+    # if we simply return permDc.GetTextExtent(s) from here, on some
+    # versions of Windows we will incorrectly reject as non-fixed width
+    # fonts (through isFixedWidth) some fonts that actually are fixed
+    # width. it's especially bad because one of them is our default font,
+    # "Courier New".
+    #
+    # these are the widths we get for the strings below for Courier New, italic:
+    #
+    # iiiii 40
+    # iiiiiiiiii 80
+    # OOOOO 41
+    # OOOOOOOOOO 81
+    #
+    # we can see i and O are both 8 pixels wide, so the font is
+    # fixed-width, but for whatever reason, on the O variants there is one
+    # additional pixel returned in the width, no matter what the length of
+    # the string is.
+    #
+    # to get around this, we actually call GetTextExtent twice, once with
+    # the actual string we want to measure, and once with the string
+    # duplicated, and take the difference between those two as the actual
+    # width. this handily negates the one-extra-pixel returned and gives
+    # us an accurate way of checking if a font is fixed width or not.
+    #
+    # it's a bit slower but this is not called from anywhere that's
+    # performance critical.
+
+    w1, h = permDc.GetTextExtent(s)
+    w2 = permDc.GetTextExtent(s + s)[0]
+
+    return (w2 - w1, h)
 
 # get height of font in pixels
 def getFontHeight(font):
