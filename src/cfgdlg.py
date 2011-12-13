@@ -981,6 +981,10 @@ class MiscPanel(wx.Panel):
         wx.EVT_BUTTON(self, btn.GetId(), self.OnBrowsePDF)
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
+        btn = wx.Button(self, -1, "Guess")
+        wx.EVT_BUTTON(self, btn.GetId(), self.OnGuessPDF)
+        hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
+
         bsizer.Add(hsizer, 1, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -1102,6 +1106,14 @@ class MiscPanel(wx.Panel):
             self.progEntry.SetValue(dlg.GetPath())
 
         dlg.Destroy()
+
+    def OnGuessPDF(self, event):
+        viewer = util.getWindowsPDFViewer()
+        if viewer:
+            self.progEntry.SetValue(viewer)
+        else:
+            wx.MessageBox("Unable to guess. Please set the path manually.",
+                          "PDF Viewer", wx.OK, cfgFrame)
 
     def cfg2gui(self):
         # stupid wxwindows/wxpython displays empty box if the initial
