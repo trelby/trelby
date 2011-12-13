@@ -961,23 +961,69 @@ class TimerDev:
         print "%s%s took %.5f seconds" % (" " * self.__class__.nestingLevel,
                                           self.msg, self.t)
 
+# Function to get windows default PDF viewer path from registry.
+# * On failure, returns None
+# * On success, returns a valid path of the PDF viewer as string
+def getWindowsPDFViewer():
+#
+# This is by looking up HKCR/.pdf/default, which gives the class of the PDF program.
+#    Example : AcroRead.Document or FoxitReader.Document
+#
+# Next lookup HKCR/<class>/shell/open/command/default, to get the value.
+#    Example:  "C:\Program Files\Acrobat 8.0\acroread.exe" "%1"
+# The above convention is followed by Adobe, Foxit, Sumatra.
+# Exract the path via .split('"')[1]
+#
+# Almost every PDF program out there works with passing the PDF path as the argument,
+# so we don't parse the arguments from the registry.
+#
+    try:
+        import _winreg
+        regPdfKey = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, ".pdf")
+        pdfKey = _winreg.QueryValue(regPdfKey, "")
+        pdfApp = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, pdfKey + r"\shell\open\command")
+        pdf = _winreg.QueryValue(pdfApp, "").split('"')[1]
+        if fileExists(pdf):
+            return pdf
+    except:
+        pass
+
+    return None
+
 # show PDF file.
 def showPDF(filename, cfgGl, frame):
     def complain():
         wx.MessageBox("PDF viewer application not found.\n\n"
                       "You can change your PDF viewer\n"
-                      "settings at File/Settings/Change.", "Error", wx.OK,
+                      "settings at File/Settings/Change/Misc.", "Error", wx.OK,
                       frame)
 
-    if not fileExists(cfgGl.pdfViewerPath):
-        complain()
+    pdfProgram = cfgGl.pdfViewerPath
+    pdfArgs = cfgGl.pdfViewerArgs
 
-        return
+    # If current set path is no good, check in windows registry if possible.
+    if not fileExists(pdfProgram):
+        if not misc.isWindows:
+            complain()
+            return
+        else:
+            # on Windows, try to get registry
+            regPDF = getWindowsPDFViewer()
+            if regPDF:
+                wx.MessageBox("Currently set PDF viewer (%s) was not found. "
+                        "Change this in File/Settings/Misc.\n\n"
+                        "Opening instead with current Windows default (%s)\n" % (pdfProgram, regPDF),
+                        "PDF settings", wx.OK, frame)
+                pdfProgram = regPDF
+                pdfArgs = ""
+            else:
+                complain()
+                return
 
     # on Windows, Acrobat complains about "invalid path" if we
     # give the full path of the program as first arg, so give a
     # dummy arg.
-    args = ["pdf"] + cfgGl.pdfViewerArgs.split() + [filename]
+    args = ["pdf"] + pdfArgs.split() + [filename]
 
     # there's a race condition in checking if the path exists, above, and
     # using it, below. if the file disappears between those two we get an
@@ -986,6 +1032,6 @@ def showPDF(filename, cfgGl, frame):
     # TODO: spawnv does not support Unicode paths as of this moment
     # (Python 2.4). for now, convert it to UTF-8 and hope for the best.
     try:
-        os.spawnv(os.P_NOWAIT, cfgGl.pdfViewerPath.encode("UTF-8"), args)
+        os.spawnv(os.P_NOWAIT, pdfProgram.encode("UTF-8"), args)
     except OSError:
         complain()

@@ -1143,6 +1143,13 @@ class ConfigGlobal:
                 (u"kpdf", ""),
                 ]
         elif misc.isWindows:
+            # get value via registry if possible, or fallback to old method.
+            viewer = util.getWindowsPDFViewer()
+            if viewer:
+                self.pdfViewerPath = viewer
+                self.pdfViewerArgs = ""
+                return
+
             progs = [
                 (ur"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe",
                  ""),
