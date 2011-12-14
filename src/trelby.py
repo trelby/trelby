@@ -585,11 +585,16 @@ class MyCtrl(wx.Control):
         pos = event.GetPosition()
         line, col = gd.vm.pos2linecol(self, pos.x, pos.y)
 
-        if line is not None and line != self.sp.line:
-            self.sp.gotoPos(line, 0, False)
-            self.updateScreen()
+        if self.sp.mark:
+            m = mainFrame.rightClickMenuWithCut
+        else:
+            m = mainFrame.rightClickMenu
 
-        self.PopupMenu(mainFrame.typeMenu)
+            if line is not None and (line != self.sp.line):
+                self.sp.gotoPos(line, col, False)
+                self.updateScreen()
+
+        self.PopupMenu(m)
 
     def OnMouseWheel(self, event):
         if event.GetWheelRotation() > 0:
@@ -1763,16 +1768,29 @@ class MyFrame(wx.Frame):
         self.tabCtrl.setPageChangedFunc(self.OnPageChange)
 
         # see OnRightDown
-        self.typeMenu = wx.Menu()
+        self.rightClickMenu = wx.Menu()
+        self.rightClickMenuWithCut = wx.Menu()
 
-        self.typeMenu.Append(ID_ELEM_TO_SCENE, "&Scene")
-        self.typeMenu.Append(ID_ELEM_TO_ACTION, "&Action")
-        self.typeMenu.Append(ID_ELEM_TO_CHARACTER, "&Character")
-        self.typeMenu.Append(ID_ELEM_TO_PAREN, "&Parenthetical")
-        self.typeMenu.Append(ID_ELEM_TO_DIALOGUE, "&Dialogue")
-        self.typeMenu.Append(ID_ELEM_TO_TRANSITION, "&Transition")
-        self.typeMenu.Append(ID_ELEM_TO_SHOT, "Sh&ot")
-        self.typeMenu.Append(ID_ELEM_TO_NOTE, "&Note")
+        for m in (self.rightClickMenu, self.rightClickMenuWithCut):
+            tmp = wx.Menu()
+
+            tmp.Append(ID_ELEM_TO_SCENE, "&Scene")
+            tmp.Append(ID_ELEM_TO_ACTION, "&Action")
+            tmp.Append(ID_ELEM_TO_CHARACTER, "&Character")
+            tmp.Append(ID_ELEM_TO_PAREN, "&Parenthetical")
+            tmp.Append(ID_ELEM_TO_DIALOGUE, "&Dialogue")
+            tmp.Append(ID_ELEM_TO_TRANSITION, "&Transition")
+            tmp.Append(ID_ELEM_TO_SHOT, "Sh&ot")
+            tmp.Append(ID_ELEM_TO_NOTE, "&Note")
+
+            m.AppendSubMenu(tmp, "Element type")
+            m.AppendSeparator()
+
+            if m is self.rightClickMenuWithCut:
+                m.Append(ID_EDIT_CUT, "Cut")
+                m.Append(ID_EDIT_COPY, "Copy")
+
+            m.Append(ID_EDIT_PASTE, "Paste")
 
         wx.EVT_MENU(self, ID_FILE_NEW, self.OnNewScript)
         wx.EVT_MENU(self, ID_FILE_OPEN, self.OnOpen)
