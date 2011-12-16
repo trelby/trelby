@@ -63,6 +63,10 @@ _identity_tbl = ""
 # equivalents so when people import text it's not mangled to uselessness
 _fancy_unicode_map = {
     ord(u"’") : u"'",
+    ord(u"“") : u'"',
+    ord(u"”") : u'"',
+    ord(u"—") : u"--",
+    ord(u"–") : u"-",
     }
 
 # permanent memory DC to get text extents etc
