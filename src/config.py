@@ -986,7 +986,7 @@ class ConfigGlobal:
                    "Auto-completion foreground")
         v.addColor("autoCompBg", 255, 240, 168, "AutoCompletionBG",
                    "Auto-completion background")
-        v.addColor("note", 221, 217, 215, "ScriptNote", "Script note")
+        v.addColor("note", 255, 237, 223, "ScriptNote", "Script note")
         v.addColor("pagebreak", 221, 221, 221, "PageBreakLine",
                    "Page-break line")
         v.addColor("pagebreakNoAdjust", 221, 221, 221,
