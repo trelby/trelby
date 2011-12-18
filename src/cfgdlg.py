@@ -1108,7 +1108,11 @@ class MiscPanel(wx.Panel):
         dlg.Destroy()
 
     def OnGuessPDF(self, event):
+        # TODO: there must be a way to find out the default PDF viewer on
+        # Linux; we should do that here.
+
         viewer = util.getWindowsPDFViewer()
+
         if viewer:
             self.progEntry.SetValue(viewer)
         else:

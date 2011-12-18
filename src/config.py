@@ -1145,9 +1145,11 @@ class ConfigGlobal:
         elif misc.isWindows:
             # get value via registry if possible, or fallback to old method.
             viewer = util.getWindowsPDFViewer()
+
             if viewer:
                 self.pdfViewerPath = viewer
                 self.pdfViewerArgs = ""
+
                 return
 
             progs = [

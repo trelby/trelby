@@ -961,30 +961,32 @@ class TimerDev:
         print "%s%s took %.5f seconds" % (" " * self.__class__.nestingLevel,
                                           self.msg, self.t)
 
-# Function to get windows default PDF viewer path from registry.
-# * On failure, returns None
-# * On success, returns a valid path of the PDF viewer as string
+# Get the Windows default PDF viewer path from registry and return that,
+# or None on errors.
 def getWindowsPDFViewer():
-#
-# This is by looking up HKCR/.pdf/default, which gives the class of the PDF program.
-#    Example : AcroRead.Document or FoxitReader.Document
-#
-# Next lookup HKCR/<class>/shell/open/command/default, to get the value.
-#    Example:  "C:\Program Files\Acrobat 8.0\acroread.exe" "%1"
-# The above convention is followed by Adobe, Foxit, Sumatra.
-# Exract the path via .split('"')[1]
-#
-# Almost every PDF program out there works with passing the PDF path as the argument,
-# so we don't parse the arguments from the registry.
-#
     try:
         import _winreg
-        regPdfKey = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, ".pdf")
-        pdfKey = _winreg.QueryValue(regPdfKey, "")
-        pdfApp = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, pdfKey + r"\shell\open\command")
-        pdf = _winreg.QueryValue(pdfApp, "").split('"')[1]
-        if fileExists(pdf):
-            return pdf
+
+        # HKCR/.pdf: gives the class of the PDF program.
+        # Example : AcroRead.Document or FoxitReader.Document
+
+        key = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, ".pdf")
+        pdfClass = _winreg.QueryValue(key, "")
+
+        # HKCR/<class>/shell/open/command: the path to the PDF viewer program
+        # Example: "C:\Program Files\Acrobat 8.0\acroread.exe" "%1"
+
+        key2 = _winreg.OpenKey(
+            _winreg.HKEY_CLASSES_ROOT, pdfClass + r"\shell\open\command")
+
+        # Almost every PDF program out there accepts passing the PDF path
+        # as the argument, so we don't parse the arguments from the
+        # registry, just get the program path.
+
+        path = _winreg.QueryValue(key2, "").split('"')[1]
+
+        if fileExists(path):
+            return path
     except:
         pass
 
@@ -995,30 +997,37 @@ def showPDF(filename, cfgGl, frame):
     def complain():
         wx.MessageBox("PDF viewer application not found.\n\n"
                       "You can change your PDF viewer\n"
-                      "settings at File/Settings/Change/Misc.", "Error", wx.OK,
-                      frame)
+                      "settings at File/Settings/Change/Misc.",
+                      "Error", wx.OK, frame)
 
     pdfProgram = cfgGl.pdfViewerPath
     pdfArgs = cfgGl.pdfViewerArgs
 
-    # If current set path is no good, check in windows registry if possible.
+    # If configured pdf viewer does not exist, try finding one
+    # automatically
     if not fileExists(pdfProgram):
-        if not misc.isWindows:
-            complain()
-            return
-        else:
-            # on Windows, try to get registry
+        found = False
+
+        if misc.isWindows:
             regPDF = getWindowsPDFViewer()
+
             if regPDF:
-                wx.MessageBox("Currently set PDF viewer (%s) was not found. "
-                        "Change this in File/Settings/Misc.\n\n"
-                        "Opening instead with current Windows default (%s)\n" % (pdfProgram, regPDF),
-                        "PDF settings", wx.OK, frame)
+                wx.MessageBox(
+                    "Currently set PDF viewer (%s) was not found.\n"
+                    "Change this in File/Settings/Change/Misc.\n\n"
+                    "Using the default PDF viewer for Windows instead:\n"
+                    "%s" % (pdfProgram, regPDF),
+                    "Warning", wx.OK, frame)
+
                 pdfProgram = regPDF
                 pdfArgs = ""
-            else:
-                complain()
-                return
+
+                found = True
+
+        if not found:
+            complain()
+
+            return
 
     # on Windows, Acrobat complains about "invalid path" if we
     # give the full path of the program as first arg, so give a
