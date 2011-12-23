@@ -11,9 +11,9 @@
   <title>Trelby Manual</title>
 
   <subtitle>Version &trelby.version;</subtitle>
-  
+
   <bookinfo>
-	
+
     <authorgroup>
 	  <corpauthor>Trelby developers</corpauthor>
     </authorgroup>
@@ -51,7 +51,7 @@
 		  <listitem>
 
 			<para>Scene header. Example: "INT. MOTEL ROOM - NIGHT".</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -61,7 +61,7 @@
 
 			<para>Describes action. Example: "John grabs the gun from the
 			desk."</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -70,7 +70,7 @@
 		  <listitem>
 
 			<para>A speaking character's name. Example: "HARRY".</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -81,7 +81,7 @@
 			<para>Speech. Example: "You could do that, sure. On the other
 			hand, if you want to live beyond the next minute or so, you
 			might want to rethink your approach."</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -91,7 +91,7 @@
 
 			<para>Describes how the actor should say the following
 			dialogue. Example: "(serious)".</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -101,7 +101,7 @@
 
 			<para>Describes a non-standard transition between scenes.
 			Example: "DISSOLVE TO:".</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -111,7 +111,7 @@
 
 			<para>Describes an in-scene shot. Example: "THE
 			NECKLACE".</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -123,16 +123,16 @@
 			is used to insert notes to yourself or to others about that
 			part of the script. Example: "Should Bobby shoot
 			first?".</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
 	  </variablelist>
-	  
+
 	</sect1>
 
   </chapter>
-  
+
   <chapter>
 	<title>Basic usage</title>
 
@@ -152,7 +152,7 @@
 
 			<para>This shows the style of the element the cursor is
 			currently positioned in and allows you to change it.</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -163,7 +163,7 @@
 			<para>Each script gets its own tab, with the tab's name being
 			the filename of each script. You can click on each tab to
 			change the active script to that one.</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -173,7 +173,7 @@
 
 			<para>This is where the actual script is shown and
 			edited.</para>
-			
+
 		  </listitem>
 		</varlistentry>
 
@@ -185,12 +185,12 @@
 			current page and total page count in the last section, and
 			information about what the Enter/Tab keys would do in the
 			first two sections.</para>
-			
+
 		  </listitem>
 		</varlistentry>
-		
+
 	  </variablelist>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -205,7 +205,7 @@
 		Home/End to move to start/end of script.</para>
 
 		<para>CTRL + Up/Down moves one scene up or down.</para>
-	  
+
 	  </sect2>
 
 	  <sect2>
@@ -216,7 +216,7 @@
 		respectively, at the end or at the start of an element. The joined
 		element will always have the style of the preceding
 		element.</para>
-		
+
 	  </sect2>
 
 	  <sect2 id="add_element">
@@ -246,9 +246,9 @@
 
 		<para>Shift + Enter or CTRL + Enter will insert a forced
 		linebreak.</para>
-		
+
 	  </sect2>
-	  
+
 	  <sect2>
 		<title>Selecting text</title>
 
@@ -266,7 +266,7 @@
 		cut/copy/paste commands to move text around, delete it, etc. You
 		can also press Del to simply delete it. Note that this is not
 		undoable in any way.</para>
-		
+
 	  </sect2>
 
 	  <sect2>
@@ -289,7 +289,7 @@
 		a new element, while pressing End will complete the text but will
 		not start a new element. Pressing ESC will make the list go
 		away.</para>
-		
+
 	  </sect2>
 
 	  <sect2>
@@ -307,11 +307,11 @@
 		<para>If you write "EXT." or "INT." (case doesn't matter) at the
 		start of any element, it will switch to a scene element
 		automatically.</para>
-		
+
 	  </sect2>
 
 	</sect1>
-	
+
   </chapter>
 
   <chapter>
@@ -332,11 +332,11 @@
 	  linkend="display_cfg"/>).</para>
 
 	  <para>Reasons you might want to use this mode:</para>
-	  
+
 	  <itemizedlist>
 
 		<listitem>
-		  
+
 		  <para>The left margin is not shown, so you can use a narrower
 		  window.</para>
 
@@ -350,11 +350,11 @@
 		</listitem>
 
 		<listitem>
-		  
+
 		  <para>It's the fastest view mode.</para>
-		  
+
 		</listitem>
-				
+
 	  </itemizedlist>
 
 	</sect1>
@@ -380,20 +380,20 @@
 		  using this mode, auto-pagination is kept on and the interval at
 		  a low value, preferably 1 second (see <xref
 		  linkend="misc_cfg"/>).</para>
-		  
+
 		</listitem>
-		
+
 		<listitem>
 
 		  <para>If you have scene continueds enabled, they will always
 		  show as plain "CONTINUED:" on top of the page, whereas in the
 		  PDF output, they will be "CONTINUED: (n)" if needed (see <xref
 		  linkend="format_cfg"/>).</para>
-		  
+
 		</listitem>
-		
+
 	  </itemizedlist>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -408,7 +408,7 @@
 	  <para>Note that this mode also assumes that the entire pages fit
 	  vertically on the screen, so Page up/down commands behave somewhat
 	  differently.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -421,11 +421,11 @@
 	  become useful once production-oriented features are implemented,
 	  when it will show each page's revision by coloring it
 	  accordingly.</para>
-	  
+
 	</sect1>
 
   </chapter>
-  
+
   <chapter>
 	<title>Other commands</title>
 
@@ -435,7 +435,7 @@
 	  <title>File/New,Open,Save,Save as,Close,Revert</title>
 
 	  <para>These do what you'd expect them to do.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -444,7 +444,7 @@
 	  <para>This opens up the current script in your configured PDF viewer
 	  program, from which you can print it, or just see what it looks
 	  like.</para>
-	  
+
 	</sect1>
 
 	<sect1 id="globcfg_menu">
@@ -452,11 +452,11 @@
 
 	  <para>These allow you to edit/load/save global settings (see <xref
 	  linkend="settings"/>).</para>
-	  
+
 	  <para>By default, &trelby; loads settings from a file named
 	  "default.conf" on startup. See <xref linkend="cmdparams"/> for
 	  customizing this.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -466,7 +466,7 @@
 	  checker user-defined dictionary. Insert new words by entering them
 	  on separate lines, or delete existing words by deleting the lines
 	  they are on.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -476,7 +476,7 @@
 	  other program. Note that these commands use &trelby;'s internal
 	  clipboard so can't be used for copying text to/from other programs.
 	  For that, see below.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -486,14 +486,14 @@
 	  used for communicating with other programs. Note that if you copy
 	  text to the clipboard from &trelby;, you must keep &trelby; open until
 	  you've pasted the text to the destination program.</para>
-	  
+
 	</sect1>
 
 	<sect1>
 	  <title>Edit/Select scene</title>
 
 	  <para>Select all the text of the current scene.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -526,14 +526,14 @@
 	  <para>Pressing Enter while the cursor is in either text box is
 	  equivalent to pressing the 'Find next' button. The Esc key will
 	  close the dialog.</para>
-	  
+
 	  <para>If you're doing partial replacing, i.e. replacing some, but
 	  not all, occurrences of 'foo' with 'bar', the efficient way to do
 	  that is to press Tab until the focus is on the 'Find next' button,
 	  and then use the 'F' (Find next) and 'R' (Replace) keys on the
 	  keyboard. Press 'F' whenever you don't want to replace that
 	  occurrence, and 'R' when you do want to replace it.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -548,7 +548,7 @@
 	  copies of the script, or if you want a version of the script with
 	  only the dialog, only the action, or only the scene headers, or
 	  whatever else you can come up with.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -567,7 +567,7 @@
 
 	  <para>It's also useful for seeing exactly how much space you've got
 	  left on a given line.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -593,7 +593,7 @@
 
 		  <para>An empty line, or a parenthetical element containing only
 		  ().</para>
-		  
+
 		</listitem>
 
 		<listitem>
@@ -607,14 +607,14 @@
 
 		  <para>A parenthetical element that does not follow a character or
 		  a dialogue element.</para>
-		  
+
 		</listitem>
 
 		<listitem>
 
 		  <para>A dialogue element that does not follow a character or a
 			parenthetical element.</para>
-		  
+
 		</listitem>
 
 		<listitem>
@@ -629,11 +629,11 @@
 
 		  <para>The messages for these all say "(BUG)" at the end so they
 		  can be identified from normal errors.</para>
-		  
+
 		</listitem>
-		
+
 	  </itemizedlist>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -643,7 +643,7 @@
 	  need to run this if you have automatic repagination enabled, but the
 	  command is available for use when automatic repagination is disabled
 	  or you want immediate repagination for some reason.</para>
-	  
+
 	</sect1>
 
 	<sect1 id="autocomp">
@@ -659,9 +659,9 @@
 	  recurring cast of characters and locations, and it's nice to have
 	  them always available, even if they haven't yet been used in the
 	  current episode's script.</para>
-	  
+
 	</sect1>
-	
+
 	<sect1>
 	  <title>Script/Headers</title>
 
@@ -669,14 +669,14 @@
 	  are lines that are automatically added to the top of each page of
 	  the script, excluding title pages and the first page of the actual
 	  script.</para>
-	  
+
 	  <para>Topmost in the window is a setting for how many empty lines
 	  you want inserted after your header lines.</para>
-	  
+
 	  <para>After that is a listbox of all the strings in your headers.
 	  Select the text string you want to edit in this listbox, and use the
 	  add/delete buttons to add/delete text strings.</para>
-	  
+
 	  <para>Below the listbox are the settings for the selected string.
 	  You can adjust the string text, style, alignment, line and
 	  positioning.</para>
@@ -687,7 +687,7 @@
 	  parameter can be negative, so for example, if you want your header
 	  string to start 2 characters before the left margin, select
 	  'Alignment: Left' and 'X offset: -2'.</para>
-	  
+
 	  <para>Any occurrences of '${PAGE}' in the text string will be
 	  replaced by the page number in the actual headers.</para>
 
@@ -696,7 +696,7 @@
 	  your PDF viewer program, while 'Apply' applies the new headers to
 	  the open script, so you can e.g. see how the page count of the
 	  script would change.</para>
-	  
+
 	</sect1>
 
 	<sect1 id="locations_dlg">
@@ -720,9 +720,9 @@
 	  If you want to add scenes to a new location, select one of the
 	  "-----------" lines in the top listbox as the destination before
 	  clicking 'Add'.</para>
-	  
+
 	</sect1>
-	
+
 	<sect1>
 	  <title>Script/Title pages</title>
 
@@ -741,7 +741,7 @@
 	  <para>On the right side of the listbox is a coarse preview showing
 	  the approximate location of text strings on the current page, with
 	  the selected text string shown in red.</para>
-	  
+
 	  <para>At the bottom of the window are the settings for the selected
 	  text string. There's the text itself, the position of its upper left
 	  corner as an offset from the paper's upper left corner, font, size,
@@ -750,7 +750,7 @@
 
 	  <para>Finally there's a 'Preview' button that you can use to get an
 	  accurate preview of all of the title pages.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -760,7 +760,7 @@
 	  spell checker dictionary. Insert new words by entering them on
 	  separate lines, or delete existing words by deleting the lines they
 	  are on.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -768,23 +768,23 @@
 
 	  <para>These allow you to edit/load/save script format settings (see
 	  <xref linkend="format_settings"/>).</para>
-	  
+
 	</sect1>
-	
+
 	<sect1>
 	  <title>Tools/Spell checker</title>
 
 	  <para>This spell checks the current script beginning at the current
 	  position. If you want to spell check the entire script, be sure to
 	  position the cursor at the first line of the script.</para>
-	  
+
 	  <para>If it finds any words it doesn't recognize, it jumps to that
 	  position in the script, highlights the word, and opens a dialog
 	  window that has a text box for editing the word, and the following 5
 	  buttons:</para>
 
 	  <variablelist>
-		
+
 		<varlistentry>
 		  <term>Replace</term>
 		  <listitem>
@@ -792,37 +792,37 @@
 			<para>Replace the word in the script with the (modified) one
 			in the text box. You can also do this by pressing Enter in the
 			text box.</para>
-			
+
 		  </listitem>
 		</varlistentry>
-		
+
 		<varlistentry>
 		  <term>Skip</term>
 		  <listitem>
 
 			<para>Skip the word for now.</para>
-			
+
 		  </listitem>
 		</varlistentry>
-		
+
 		<varlistentry>
 		  <term>Add to script dictionary</term>
 		  <listitem>
 
 			<para>Add the word to the script-specific dictionary.</para>
-			
+
 		  </listitem>
 		</varlistentry>
-		
+
 		<varlistentry>
 		  <term>Add to global dictionary</term>
 		  <listitem>
 
 			<para>Add the word to the (super-)global dictionary.</para>
-			
+
 		  </listitem>
 		</varlistentry>
-		
+
 		<varlistentry>
 		  <term>Suggest replacement</term>
 		  <listitem>
@@ -837,10 +837,10 @@
 			reasons). So while it can correct "accommdoate" to
 			"accommodate", it can't correct "cmoputer" to
 			"computer".</para>
-			
+
 		  </listitem>
 		</varlistentry>
-		
+
 	  </variablelist>
 
 	  <para>After pressing any of the above buttons, the spell checker
@@ -864,27 +864,27 @@
 	  categories. The main groups available are nationalities, but there
 	  are some other interesting groups, e.g. Shakespeare, Medieval,
 	  Flowers etc.</para>
-	  
+
 	  <para>Select the groups you want to search in, either a single one
 	  by simply clicking on it, or multiple ones by holding down CTRL and
 	  then clicking on multiple items. If you want to go back to the
 	  default of having all the groups selected, press the 'Select all'
 	  button at the bottom of the list.</para>
-	  
+
 	  <para>On the upper right side of the window are the other search
 	  parameters. There's a text box in which you can write the text you
 	  want to search for, and two radio button groups.</para>
-	  
+
 	  <para>The first one affects how your search string is used. The
 	  string has to match either a) at the start of the name, b) anywhere
 	  in the name or c) at the end of the name.</para>
-	  
+
 	  <para>The second one selects whether male/female/both names are
 	  included in the search results.</para>
-	  
+
 	  <para>The search is always case-insensitive, and a blank search
 	  string matches all names.</para>
-	  
+
 	  <para>After having set all the search parameters, press the 'Search'
 	  button, at which point the results list will change to contain only
 	  the names matching the search parameters. A count of the matching
@@ -902,7 +902,7 @@
 	  <para>'Character map' opens a window allowing you to insert any
 	  character from the supported ISO-8859-1 (i.e. Latin-1) character set
 	  into your script.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -924,7 +924,7 @@
 	  green, non-changed lines (shown for context) are white, and marker
 	  lines for single-line changes are yellow. The changed parts are
 	  separated by two gray lines.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -934,14 +934,14 @@
 	  current keyboard shortcuts. It also has a menu allowing you to save
 	  this as a HTML file if you e.g. want to print it for
 	  reference.</para>
-	  
+
 	</sect1>
 
 	<sect1>
 	  <title>Help/Manual</title>
 
 	  <para>'Manual' opens this manual you're reading right now.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -950,9 +950,9 @@
 	  <para>'About' opens the about screen for &trelby;, showing
 	  information such as the version and the date this version was
 	  released on.</para>
-	  
+
 	</sect1>
-	
+
   </chapter>
 
   <chapter id="settings">
@@ -964,7 +964,7 @@
 	<para>Super-global settings are the current view mode, window size and
 	position, and the global spell checker dictionary. There can only be
 	one set of these.</para>
-	
+
 	<para>Global settings are things like interface colors, keyboard
 	shortcuts, display fonts and other settings that only affect the user
 	interface of the program, not the script output. You can have multiple
@@ -1007,7 +1007,7 @@
 	  closing the dialog. Note that pressing Cancel after Apply has no
 	  effect, it only cancels changes that haven't yet been
 	  committed.</para>
-	  
+
 	  <para>The following sections detail the various settings.</para>
 
 	  <sect2>
@@ -1016,9 +1016,9 @@
 		<para>Color configuration; not much to explain here, besides the
 		fact that these only affect the display, the PDF output is always
 		black on white.</para>
-		
+
 	  </sect2>
-	  
+
 	  <sect2 id="display_cfg">
 		<title>Display</title>
 
@@ -1047,9 +1047,9 @@
 		the character line, you know that if you can trim just one line
 		from the page, all three lines will then fit on the page instead
 		of being pushed to the next page.</para>
-		
+
 	  </sect2>
-	  
+
 	  <sect2 id="elements_gcfg">
 		<title>Elements</title>
 
@@ -1065,7 +1065,7 @@
 		this element style, or what element style Tab/Shift+Tab switches
 		the element to. See <xref linkend="add_element"/> for more
 		information.</para>
-		
+
 	  </sect2>
 
 	  <sect2>
@@ -1074,9 +1074,9 @@
 		<para>Here you can configure keyboard shortcuts for each command.
 		Note that a few command/keys (Enter, Tab, etc.) can't be changed
 		because they're an integral part of the program's design.</para>
-		
+
 	  </sect2>
-	  
+
 	  <sect2 id="misc_cfg">
 		<title>Misc</title>
 
@@ -1122,7 +1122,7 @@
 		just sit back and wait for the repagination to happen, you have to
 		keep making changes. (You can always use Script/Paginate if you
 		want immediate repagination.)</para>
-		
+
 		<para>The 'Confirm deletes' setting allows you to configure how
 		many lines you can delete without confirmation. It exists because
 		otherwise it'd be too easy to select a large block of text, press
@@ -1130,9 +1130,9 @@
 
 		<para>'Lines to scroll per mouse wheel event' needs no
 		explaining.</para>
-		
+
 	  </sect2>
-	  
+
 	</sect1>
 
 	<sect1 id="format_settings">
@@ -1147,7 +1147,7 @@
 
 		<para>This is where you configure the formatting parameters for
 		each element style.</para>
-		
+
 		<para>At the top is a combo box where you specify what element
 		style you're configuring. All things below that are
 		element-specific settings.</para>
@@ -1178,7 +1178,7 @@
 
 		<para>Here you can configure parameters affecting the formatting
 		of the script.</para>
-		
+
 		<para>The first two settings affect how many action and dialogue
 		lines there must be left at the end of a page to allow breaking at
 		that position. This only affects elements that are broken in the
@@ -1209,7 +1209,7 @@
 		problems.</para>
 
 	  </sect2>
-	  
+
 	  <sect2>
 		<title>Paper</title>
 
@@ -1217,7 +1217,7 @@
 		You can use A4, Letter, or a custom paper size. At the bottom of
 		the page is shown the number of lines that will fit on a page with
 		the given settings.</para>
-		
+
 	  </sect2>
 
 	  <sect2>
@@ -1230,11 +1230,11 @@
 		have a table of contents listing all the scenes. Note that this is
 		not printed, it's just shown in PDF viewer applications allowing
 		one to quickly jump to the selected scene.</para>
-		
+
 		<para>'Show table of contents on PDF open', if on, will cause the
 		table of contents to be shown by default when opening the PDF
 		file.</para>
-		
+
 		<para>'Open PDF on current page', if on, will insert a command
 		into the PDF file telling the PDF viewer application to show the
 		current page when opening the file. Not all PDF viewer
@@ -1251,7 +1251,7 @@
 		<para>'Draw rectangles around Note elements', if on, will cause
 		rounded rectangles to be drawn around Note elements in the PDF
 		output to make them stand out more.</para>
-		
+
 		<para>'Show margins' draws a rectangle on each page showing the
 		margin settings. It can be considered a debug option as it has no
 		use in normal operation, but it can be useful if you're trying to
@@ -1305,21 +1305,21 @@
 			<para>The file is checked to be a valid TrueType font file.</para>
 
 		  </listitem>
-		  
+
 		  <listitem>
 
 			<para>The font's Postscript name is located from the font file
 			and put in the 'Name' field.</para>
 
 		  </listitem>
-		  
+
 		  <listitem>
 
 			<para>The licensing terms of the font are checked and if
 			embedding is not allowed, a warning is printed.</para>
 
 		  </listitem>
-		  
+
 		</itemizedlist>
 
 		<para>Note that the chosen fonts have to be able to be substituted
@@ -1355,7 +1355,7 @@
 		few characters of the filename, after which a completion pop-up
 		should show up from which you can select the correct
 		filename.</para>
-		
+
 	  </sect2>
 
 	  <sect2>
@@ -1372,42 +1372,42 @@
 
 			  <para>Added at the end of a page when a scene spans multiple
 			  pages.</para>
-			  
+
 			</listitem>
 		  </varlistentry>
-		  
+
 		  <varlistentry>
 			<term>CONTINUED:</term>
 			<listitem>
 
 			  <para>Added at the start of a page when a scene spans
 			  multiple pages.</para>
-			  
+
 			</listitem>
 		  </varlistentry>
-		  
+
 		  <varlistentry>
 			<term>(MORE)</term>
 			<listitem>
 
 			  <para>Added at the end of a dialogue element that spans
 			  multiple pages.</para>
-			  
+
 			</listitem>
 		  </varlistentry>
-		  
+
 		  <varlistentry>
 			<term> (cont'd)</term>
 			<listitem>
 
 			  <para>Added after the speaker's name at the start of a page
 			  when a dialogue element spans multiple pages.</para>
-			  
+
 			</listitem>
 		  </varlistentry>
-		  
+
 		</variablelist>
-		
+
 	  </sect2>
 
 	</sect1>
@@ -1417,11 +1417,11 @@
 
 	  <para>Decriptions for these start at <xref
 	  linkend="autocomp"/>.</para>
-	  
+
 	</sect1>
-	
+
   </chapter>
-  
+
   <chapter>
 	<title>Import and export</title>
 
@@ -1446,17 +1446,17 @@
 	  file format: as formatted ASCII text. The following section
 	  documents the format these files should have for optimal import
 	  processing.</para>
-	
+
 	  <sect2>
 		<title>ASCII Text files</title>
-	  
+
 		<para>ASCII text files should have the following
 		  characteristics:</para>
 
 		<itemizedlist>
-		  
+
 		  <listitem>
-		  
+
 			<para>Each element style should begin at a unique column. An
 			exception is that Scene and Action can begin at the same
 			column.</para>
@@ -1465,28 +1465,28 @@
 			element style, i.e. all dialogue should begin at the same
 			column, it shouldn't sometimes start at column 25, sometimes
 			at 27, etc.</para>
-		  
+
 		  </listitem>
 
 		  <listitem>
 
 			<para>No production markings, e.g. scene numbers, page
 			numbers, cast lists, or anything like that.</para>
-		  
+
 		  </listitem>
 
 		  <listitem>
 
 			<para>Elements should be separated by a single empty
 			line.</para>
-		  
+
 		  </listitem>
-		
+
 		</itemizedlist>
 
 		<para>Below is a short example of the kind of format best
 		recognized by &trelby;.</para>
-		
+
 		<screen>
 EXT. OCEAN - NIGHT
 
@@ -1538,9 +1538,9 @@ Something starts beeping.
 	  file or with the program you tried to use.</para>
 
 	</sect1>
-	
+
   </chapter>
-  
+
   <chapter>
 	<title>Reports</title>
 
@@ -1562,7 +1562,7 @@ Something starts beeping.
 		  <para>Total line count of the script and line counts for each
 		  element type, both in absolute terms and as a percentage of the
 		  whole.</para>
-		  
+
 		</listitem>
 
 		<listitem>
@@ -1570,27 +1570,27 @@ Something starts beeping.
 		  <para>Percentage of lines found in interior and exterior scenes
 		  (it determines this based solely on whether the scene element
 		  starts with INT. or EXT.)</para>
-		  
+
 		</listitem>
 
 		<listitem>
 
 		  <para>Maximum and average scene lengths in lines.</para>
-		  
+
 		</listitem>
 
 		<listitem>
 
 		  <para>Maximum and average action element lengths in lines.</para>
-		  
+
 		</listitem>
 
 		<listitem>
 
 		  <para>Number of different speaking characters.</para>
-		  
+
 		</listitem>
-		
+
 	  </itemizedlist>
 
 	</sect1>
@@ -1616,7 +1616,7 @@ Something starts beeping.
 	  the location appears in, list of pages that the location appears in,
 	  and optionally a list of all speaking characters in the location
 	  along with the number of lines they speak.</para>
-	  
+
 	</sect1>
 
 	<sect1>
@@ -1628,9 +1628,9 @@ Something starts beeping.
 	  list of pages that the scene appears in, and optionally a list of
 	  all speaking characters in the scene along with the number of lines
 	  they speak.</para>
-	  
+
 	</sect1>
-	
+
 	<sect1>
 	  <title>Character report</title>
 
@@ -1669,11 +1669,11 @@ Something starts beeping.
 			location.</para>
 		  </listitem>
 		</varlistentry>
-		
+
 	  </variablelist>
 
 	</sect1>
-	
+
 	<sect1>
 	  <title>Dialogue chart</title>
 
@@ -1710,7 +1710,7 @@ Something starts beeping.
 	  most useful for seeing how the percentage of action lines
 	  fluctuates, allowing one to easily see where the major action scenes
 	  are, etc.</para>
-	  
+
 	</sect1>
 
   </chapter>
@@ -1731,19 +1731,19 @@ Something starts beeping.
 
 		</listitem>
 	  </varlistentry>
-	  
+
 	  <varlistentry>
 		<term>FILENAME1 FILENAME2 ...</term>
 		<listitem>
 
 		  <para>Open the given script files.</para>
-		  
+
 		</listitem>
 	  </varlistentry>
-	  
+
 	</variablelist>
   </chapter>
-  
+
   <chapter>
 	<title>Troubleshooting</title>
 
@@ -1767,16 +1767,16 @@ Something starts beeping.
 			first so it can allocate the resources (video memory, mainly)
 			that it needs for fast operation before starting other
 			programs.</para>
-			
+
 		  </listitem>
 		</itemizedlist>
-		
+
 	  </listitem>
-	  
+
 	</itemizedlist>
 
   </chapter>
-  
+
   <appendix>
 	<title>File format</title>
 
@@ -1789,7 +1789,7 @@ Something starts beeping.
 	program's installation directory, and read through the sample script
 	file provided. If you still have questions about the file format, feel
 	free to contact us by email.</para>
-	
+
   </appendix>
-  
+
 </book>
