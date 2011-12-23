@@ -147,22 +147,15 @@
 	  <variablelist>
 
 		<varlistentry>
-		  <term>Element style combo box</term>
-		  <listitem>
-
-			<para>This shows the style of the element the cursor is
-			currently positioned in and allows you to change it.</para>
-
-		  </listitem>
-		</varlistentry>
-
-		<varlistentry>
-		  <term>Script tabs</term>
+		  <term>Script tabs and Status</term>
 		  <listitem>
 
 			<para>Each script gets its own tab, with the tab's name being
 			the filename of each script. You can click on each tab to
 			change the active script to that one.</para>
+
+            <para>Two columns of status indicate the current element style,
+            the tab/enter element styles, and the current page number.</para>
 
 		  </listitem>
 		</varlistentry>
@@ -173,18 +166,6 @@
 
 			<para>This is where the actual script is shown and
 			edited.</para>
-
-		  </listitem>
-		</varlistentry>
-
-		<varlistentry>
-		  <term>Status bars</term>
-		  <listitem>
-
-			<para>At the bottom is a three-part status bar that shows
-			current page and total page count in the last section, and
-			information about what the Enter/Tab keys would do in the
-			first two sections.</para>
 
 		  </listitem>
 		</varlistentry>
@@ -264,8 +245,8 @@
 
 		<para>After you've selected the desired text, you can use the
 		cut/copy/paste commands to move text around, delete it, etc. You
-		can also press Del to simply delete it. Note that this is not
-		undoable in any way.</para>
+		can also press Del to simply delete it. Note that as of not this
+        is not undoable in any way.</para>
 
 	  </sect2>
 
@@ -337,8 +318,8 @@
 
 		<listitem>
 
-		  <para>The left margin is not shown, so you can use a narrower
-		  window.</para>
+		  <para>You view only your script and no other breaks or formatting
+          related text.</para>
 
 		</listitem>
 
@@ -1442,10 +1423,10 @@
 	<sect1>
 	  <title>Import</title>
 
-	  <para>Existing screenplays can currently be imported from only one
-	  file format: as formatted ASCII text. The following section
-	  documents the format these files should have for optimal import
-	  processing.</para>
+	  <para>Existing screenplays can currently be imported from two
+	  file formats: as formatted ASCII text, and Final Draft XML (.fdx).
+      The following section documents the format these files should have
+      for optimal import processing.</para>
 
 	  <sect2>
 		<title>ASCII Text files</title>
@@ -1520,13 +1501,36 @@ Something starts beeping.
 		</screen>
 	  </sect2>
 
+	  <sect2>
+		<title>Final Draft XML (.fdx)</title>
+
+		<para>Final Draft files saved with version 8 of the programs are
+        automatically imported. Currently the following are imported</para>
+
+		<itemizedlist>
+
+		  <listitem>
+
+            <para>Texts of the the screenplay elements (Action, Dialog, etc)
+            that Trelby understands.</para>
+
+            <para>Script notes in Final Draft are imported as notes.</para>
+
+          </listitem>
+
+        </itemizedlist>
+	  </sect2>
+
+
 	</sect1>
 
 	<sect1>
 	  <title>Export</title>
 
-	  <para>You can export the script in PDF, RTF or in a formatted ASCII
-	  format. All are found in the File/Export dialog, which allows you to
+	  <para>You can export the script in PDF, RTF, formatted ASCII, HTML,
+      and Final Draft XML (.fdx) format.</para>
+
+	  <para>All are found in the File/Export dialog, which allows you to
 	  choose which one to export as. If you export as a text file, &trelby;
 	  will ask whether you want the page markers included or not. If
 	  you're planning on importing the script to some other program, you
