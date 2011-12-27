@@ -147,15 +147,16 @@
 	  <variablelist>
 
 		<varlistentry>
-		  <term>Script tabs and Status</term>
+		  <term>Script tabs and status</term>
 		  <listitem>
 
 			<para>Each script gets its own tab, with the tab's name being
 			the filename of each script. You can click on each tab to
 			change the active script to that one.</para>
 
-            <para>Two columns of status indicate the current element style,
-            the tab/enter element styles, and the current page number.</para>
+            <para>After tabs is a column showing the current element's
+            style, a column showing what the Enter/Tab keys would do, and
+            a column showing the current/total page number.</para>
 
 		  </listitem>
 		</varlistentry>
@@ -245,8 +246,8 @@
 
 		<para>After you've selected the desired text, you can use the
 		cut/copy/paste commands to move text around, delete it, etc. You
-		can also press Del to simply delete it. Note that as of not this
-        is not undoable in any way.</para>
+		can also press Del to simply delete it. Note that as of now this
+		is not undoable in any way.</para>
 
 	  </sect2>
 
@@ -1504,21 +1505,25 @@ Something starts beeping.
 	  <sect2>
 		<title>Final Draft XML (.fdx)</title>
 
-		<para>Final Draft files saved with version 8 of the programs are
-        automatically imported. Currently the following are imported</para>
+		<para>Final Draft files saved with version 8 of the program are
+		supported with these contents imported:</para>
 
 		<itemizedlist>
 
 		  <listitem>
 
-            <para>Texts of the the screenplay elements (Action, Dialog, etc)
-            that Trelby understands.</para>
+            <para>Text of the the screenplay elements (Action, Dialog,
+            etc) that Trelby understands.</para>
 
-            <para>Script notes in Final Draft are imported as notes.</para>
+            <para>Script notes in Final Draft are imported as
+            notes.</para>
 
           </listitem>
 
         </itemizedlist>
+
+		<para>Note that no formatting settings are imported at all.</para>
+
 	  </sect2>
 
 
