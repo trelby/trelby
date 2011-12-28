@@ -803,7 +803,7 @@ class MyCtrl(wx.Control):
     def OnCopy(self):
         self.OnCut(doDelete = False)
 
-    def OnCopySystemCb(self):
+    def OnCopySystem(self, formatted = False):
         cd = self.sp.getSelectedAsCD(False)
 
         if not cd:
@@ -812,11 +812,17 @@ class MyCtrl(wx.Control):
         tmpSp = screenplay.Screenplay(cfgGl)
         tmpSp.lines = cd.lines
 
-        s = util.String()
-        for ln in tmpSp.lines:
-            s += ln.text + config.lb2str(ln.lb)
-
-        s = str(s).replace("\n", os.linesep)
+        if formatted:
+            tmpSp.paginate()
+            s = tmpSp.generateText(False)
+        else:
+            s = util.String()
+            for ln in tmpSp.lines:
+                txt = ln.text
+                if tmpSp.cfg.getType(ln.lt).export.isCaps:
+                    txt = util.upper(txt)
+                s += txt + config.lb2str(ln.lb)
+            s = str(s).replace("\n", os.linesep)
 
         if wx.TheClipboard.Open():
             wx.TheClipboard.UsePrimarySelection(False)
@@ -1617,7 +1623,12 @@ class MyFrame(wx.Frame):
         editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
         editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_COPY_TO_CB, "C&opy (system)")
+
+        tmp = wx.Menu()
+        tmp.Append(ID_EDIT_COPY_TO_CB, "&Unformatted")
+        tmp.Append(ID_EDIT_COPYFMT_TO_CB, "&Formatted")
+
+        editMenu.AppendMenu(ID_EDIT_COPY_SYSTEM, "C&opy (system)", tmp)
         editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste (system)")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene")
@@ -1810,6 +1821,7 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         wx.EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
         wx.EVT_MENU(self, ID_EDIT_COPY_TO_CB, self.OnCopySystemCb)
+        wx.EVT_MENU(self, ID_EDIT_COPYFMT_TO_CB, self.OnCopySystemFormattedCb)
         wx.EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteSystemCb)
         wx.EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         wx.EVT_MENU(self, ID_EDIT_GOTO_PAGE, self.OnGotoPage)
@@ -1884,7 +1896,9 @@ class MyFrame(wx.Frame):
     def allocIds(self):
         names = [
             "ID_EDIT_COPY",
+            "ID_EDIT_COPY_SYSTEM",
             "ID_EDIT_COPY_TO_CB",
+            "ID_EDIT_COPYFMT_TO_CB",
             "ID_EDIT_CUT",
             "ID_EDIT_DELETE_ELEMENTS",
             "ID_EDIT_FIND",
@@ -2194,7 +2208,10 @@ class MyFrame(wx.Frame):
         self.panel.ctrl.OnCopy()
 
     def OnCopySystemCb(self, event = None):
-        self.panel.ctrl.OnCopySystemCb()
+        self.panel.ctrl.OnCopySystem(formatted = False)
+
+    def OnCopySystemFormattedCb(self, event = None):
+        self.panel.ctrl.OnCopySystem(formatted = True)
 
     def OnPaste(self, event = None):
         self.panel.ctrl.OnPaste()
