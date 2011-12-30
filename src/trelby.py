@@ -813,15 +813,21 @@ class MyCtrl(wx.Control):
         tmpSp.lines = cd.lines
 
         if formatted:
+            # have to call paginate, otherwise generateText will not
+            # process all the text
             tmpSp.paginate()
             s = tmpSp.generateText(False)
         else:
             s = util.String()
+
             for ln in tmpSp.lines:
                 txt = ln.text
+
                 if tmpSp.cfg.getType(ln.lt).export.isCaps:
                     txt = util.upper(txt)
+
                 s += txt + config.lb2str(ln.lb)
+
             s = str(s).replace("\n", os.linesep)
 
         if wx.TheClipboard.Open():
@@ -1626,7 +1632,7 @@ class MyFrame(wx.Frame):
 
         tmp = wx.Menu()
         tmp.Append(ID_EDIT_COPY_TO_CB, "&Unformatted")
-        tmp.Append(ID_EDIT_COPYFMT_TO_CB, "&Formatted")
+        tmp.Append(ID_EDIT_COPY_TO_CB_FMT, "&Formatted")
 
         editMenu.AppendMenu(ID_EDIT_COPY_SYSTEM, "C&opy (system)", tmp)
         editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste (system)")
@@ -1821,7 +1827,7 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         wx.EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
         wx.EVT_MENU(self, ID_EDIT_COPY_TO_CB, self.OnCopySystemCb)
-        wx.EVT_MENU(self, ID_EDIT_COPYFMT_TO_CB, self.OnCopySystemFormattedCb)
+        wx.EVT_MENU(self, ID_EDIT_COPY_TO_CB_FMT, self.OnCopySystemCbFormatted)
         wx.EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteSystemCb)
         wx.EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
         wx.EVT_MENU(self, ID_EDIT_GOTO_PAGE, self.OnGotoPage)
@@ -1898,7 +1904,7 @@ class MyFrame(wx.Frame):
             "ID_EDIT_COPY",
             "ID_EDIT_COPY_SYSTEM",
             "ID_EDIT_COPY_TO_CB",
-            "ID_EDIT_COPYFMT_TO_CB",
+            "ID_EDIT_COPY_TO_CB_FMT",
             "ID_EDIT_CUT",
             "ID_EDIT_DELETE_ELEMENTS",
             "ID_EDIT_FIND",
@@ -2210,7 +2216,7 @@ class MyFrame(wx.Frame):
     def OnCopySystemCb(self, event = None):
         self.panel.ctrl.OnCopySystem(formatted = False)
 
-    def OnCopySystemFormattedCb(self, event = None):
+    def OnCopySystemCbFormatted(self, event = None):
         self.panel.ctrl.OnCopySystem(formatted = True)
 
     def OnPaste(self, event = None):

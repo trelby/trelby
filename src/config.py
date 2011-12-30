@@ -694,7 +694,10 @@ class ConfigGlobal:
                     isFixed = True, isMenu = True),
 
             Command("CopySystemCb", "Copy selected text to the system's"
-                    " clipboard.", isMenu = True),
+                    " clipboard, unformatted.", isMenu = True),
+
+            Command("CopySystemCbFormatted", "Copy selected text to the system's"
+                    " clipboard, formatted.", isMenu = True),
 
             Command("Cut", "Cut selected text to internal clipboard.",
                     [util.Key(24, ctrl = True).toInt()],
