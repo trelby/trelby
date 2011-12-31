@@ -2162,11 +2162,16 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             prev = self.getTypeOfPrevElem(line)
             next = self.getTypeOfNextElem(line)
 
-            if len(ln.text) == 0:
+            # notes are allowed to contain empty lines, because a) they do
+            # not appear in the final product b) they're basically
+            # free-format text anyway, and people may want to format them
+            # however they want
+
+            if (len(ln.text) == 0) and (ln.lt != NOTE):
                 msg = "Empty line."
                 break
 
-            if len(ln.text.strip(" ")) == 0:
+            if (len(ln.text.strip(" ")) == 0) and (ln.lt != NOTE):
                 msg = "Empty line (contains only spaces)."
                 break
 
