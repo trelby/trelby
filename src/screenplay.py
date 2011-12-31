@@ -1497,27 +1497,46 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         return line
 
-    # convert current element to given type
-    def convertCurrentTo(self, lt):
+    # convert element(s) to given type
+    #  - if multiple elements are selected, all are changed
+    #  - if not, the change is applied to element under cursor.
+    def convertTypeTo(self, lt):
         ls = self.lines
-        first, last = self.getElemIndexes()
+        selection = self.getMarkedLines()
+        if selection is None:
+            startSection, endSection = self.getElemIndexes()
+        else:
+            startSection, endSection = selection
 
-        # if changing away from PAREN containing only "()", remove it
-        if (first == last) and (ls[first].lt == PAREN) and\
-               (ls[first].text == "()"):
-            ls[first].text = ""
-            self.column = 0
+        # iterate over all the elements in the section
+        currentLine = startSection
+        while currentLine <= endSection:
+            first, last = self.getElemIndexesFromLine(currentLine)
+            # if changing away from PAREN containing only "()", remove it
+            if (first == last) and (ls[first].lt == PAREN) and\
+                   (ls[first].text == "()"):
+                ls[first].text = ""
+                if first == self.line:
+                    self.column = 0
 
-        for i in range(first, last + 1):
-            ls[i].lt = lt
+            for i in range(first, last + 1):
+                ls[i].lt = lt
 
-        # if changing empty element to PAREN, add "()"
-        if (first == last) and (ls[first].lt == PAREN) and\
-               (len(ls[first].text) == 0):
-            ls[first].text = "()"
-            self.column = 1
+            # if changing empty element to PAREN, add "()"
+            if (first == last) and (ls[first].lt == PAREN) and\
+                   (len(ls[first].text) == 0):
+                ls[first].text = "()"
+                if first == self.line:
+                    self.column = 1
 
-        self.rewrapElem(first)
+            currentLine = last + 1
+
+        if selection:
+            self.clearMark()
+            self.reformatAll()
+        else:
+            self.rewrapElem(first)
+
         self.markChanged()
 
     # join lines 'line' and 'line + 1' and position cursor at the join
@@ -1557,6 +1576,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def splitElement(self, newType):
         ls = self.lines
 
+        #if text is selected, simply unselect it.
+        if self.getMarkedLines():
+            self.clearMark()
+            return
+
         if not self.acItems:
             if self.isAtEndOfParen():
                 self.column += 1
@@ -1567,7 +1591,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.splitLine()
         ls[self.line - 1].lb = LB_LAST
 
-        self.convertCurrentTo(newType)
+        self.convertTypeTo(newType)
 
         self.rewrapPara()
         self.rewrapPrevPara()
@@ -2607,17 +2631,25 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # either creates a new element or converts the current one to
     # nextTypeTab, depending on circumstances.
     def tabCmd(self, cs):
-        tcfg = self.cfgGl.getType(self.lines[self.line].lt)
-
-        if self.tabMakesNew():
-            self.splitElement(tcfg.newTypeTab)
+        #If text is selected, unselect it, else change type.
+        if self.getMarkedLines():
+            self.clearMark()
         else:
-            self.convertCurrentTo(tcfg.nextTypeTab)
+            tcfg = self.cfgGl.getType(self.lines[self.line].lt)
+
+            if self.tabMakesNew():
+                self.splitElement(tcfg.newTypeTab)
+            else:
+                self.convertTypeTo(tcfg.nextTypeTab)
 
     # switch current element to prevTypeTab.
     def toPrevTypeTabCmd(self, cs):
-        tcfg = self.cfgGl.getType(self.lines[self.line].lt)
-        self.convertCurrentTo(tcfg.prevTypeTab)
+        #If text is selected, unselect it, else change type.
+        if self.getMarkedLines():
+            self.clearMark()
+        else:
+            tcfg = self.cfgGl.getType(self.lines[self.line].lt)
+            self.convertTypeTo(tcfg.prevTypeTab)
 
     # add character cs.char if it's a valid one.
     def addCharCmd(self, cs):
@@ -2673,28 +2705,28 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         cs.doAutoComp = cs.AC_REDO
 
     def toSceneCmd(self, cs):
-        self.convertCurrentTo(SCENE)
+        self.convertTypeTo(SCENE)
 
     def toActionCmd(self, cs):
-        self.convertCurrentTo(ACTION)
+        self.convertTypeTo(ACTION)
 
     def toCharacterCmd(self, cs):
-        self.convertCurrentTo(CHARACTER)
+        self.convertTypeTo(CHARACTER)
 
     def toDialogueCmd(self, cs):
-        self.convertCurrentTo(DIALOGUE)
+        self.convertTypeTo(DIALOGUE)
 
     def toParenCmd(self, cs):
-        self.convertCurrentTo(PAREN)
+        self.convertTypeTo(PAREN)
 
     def toTransitionCmd(self, cs):
-        self.convertCurrentTo(TRANSITION)
+        self.convertTypeTo(TRANSITION)
 
     def toShotCmd(self, cs):
-        self.convertCurrentTo(SHOT)
+        self.convertTypeTo(SHOT)
 
     def toNoteCmd(self, cs):
-        self.convertCurrentTo(NOTE)
+        self.convertTypeTo(NOTE)
 
     # check script for internal consistency. raises an AssertionError on
     # errors. ONLY MEANT TO BE USED IN TEST CODE.
