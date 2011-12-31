@@ -119,10 +119,9 @@
 		  <term>Note</term>
 		  <listitem>
 
-			<para>Note style has a yellow background so it stands out, and
-			is used to insert notes to yourself or to others about that
-			part of the script. Example: "Should Bobby shoot
-			first?".</para>
+			<para>Note style is used to insert notes to yourself or to
+			others about that part of the script. Example: "Should Bobby
+			shoot first?".</para>
 
 		  </listitem>
 		</varlistentry>
@@ -218,13 +217,13 @@
 		create/switch to is dependent on the current style of the element,
 		and is configurable by the user (see <xref
 		linkend="elements_gcfg"/>). These values for Enter/Tab are always
-		shown at the bottom of the window at the status bar. Additionally
-		the Tab section will have a "[change]" at the end if pressing Tab
-		would switch the element's style, not create a new one.</para>
+		shown to the right of the tab-bar.</para>
 
-		<para>Other ways to change an element's style are using the combo
-		box at the top of the window, or pressing a short-cut key for each
-		element style..</para>
+		<para>Other ways to change an element's style are right-clicking
+		with the mouse which will show a menu where you can change the
+		element's style, or pressing a short-cut key for each element
+		style. Note that if you have selected text belonging to multiple
+		elements, all of those elements' types will be changed.</para>
 
 		<para>Shift + Enter or CTRL + Enter will insert a forced
 		linebreak.</para>
@@ -248,6 +247,8 @@
 		cut/copy/paste commands to move text around, delete it, etc. You
 		can also press Del to simply delete it. Note that as of now this
 		is not undoable in any way.</para>
+
+		<para>You can unselect the selected text by pressing Esc.</para>
 
 	  </sect2>
 
@@ -319,8 +320,8 @@
 
 		<listitem>
 
-		  <para>You view only your script and no other breaks or formatting
-          related text.</para>
+		  <para>You want to see only actual words you've written, and not
+		  be distracted by page-break related formatting.</para>
 
 		</listitem>
 
@@ -346,9 +347,8 @@
 
 	  <para>'Layout' mode shows an almost exact representation of the page
 	  as it would appear when printed. Page borders, margins, headers,
-	  CONTINUED/(MORE) and so on are all shown at their correct places.
-	  This is the default mode and what most people will probably want to
-	  use.</para>
+	  CONTINUED/(MORE) and so on are all shown at their correct
+	  places.</para>
 
 	  <para>Ways in which the display in this mode can differ from the
 	  printed output:</para>
@@ -462,12 +462,16 @@
 	</sect1>
 
 	<sect1>
-	  <title>Edit/Copy to,paste from clipboard</title>
+	  <title>Edit/Copy/paste, system</title>
 
 	  <para>These copy/paste text to the system wide clipboard so can be
 	  used for communicating with other programs. Note that if you copy
 	  text to the clipboard from &trelby;, you must keep &trelby; open until
 	  you've pasted the text to the destination program.</para>
+
+	  <para>There's two variants of the copy command: formatted and
+	  unformatted. Which one you want to use depends on what you're trying
+	  to do. Best to try out both and see which one works better.</para>
 
 	</sect1>
 
@@ -549,6 +553,15 @@
 
 	  <para>It's also useful for seeing exactly how much space you've got
 	  left on a given line.</para>
+
+	</sect1>
+
+	<sect1>
+	  <title>View/Fullscreen</title>
+
+	  <para>Changes the display to fullscreen mode, hiding all
+	  distractions. To exit fullscreen mode, either press F11 or press the
+	  icon at top-left corner.</para>
 
 	</sect1>
 
@@ -637,7 +650,7 @@
 
 	  <para>Transition auto-completes are pretty generic so by default
 	  there are a few of them here, but the Scene and Character lists are
-	  empty. The main use for them are episodic TV shows, where you have a
+	  empty. The main use for them are TV shows, where you have a
 	  recurring cast of characters and locations, and it's nice to have
 	  them always available, even if they haven't yet been used in the
 	  current episode's script.</para>
@@ -930,8 +943,8 @@
 	  <title>Help/About</title>
 
 	  <para>'About' opens the about screen for &trelby;, showing
-	  information such as the version and the date this version was
-	  released on.</para>
+	  information such as the version of the program. It also shows a
+	  random famous movie quote.</para>
 
 	</sect1>
 
@@ -1089,6 +1102,12 @@
 		the cursor position be restored to the point it was at when the
 		script was saved.</para>
 
+		<para>'Recenter screen on scrolling' causes moving around the
+		script using up/down keys to scroll a bit differently: when cursor
+		is at bottom of the screen, and you press down, instead of moving
+		the display down just one line, it will recenter the display on
+		the cursor.</para>
+
 		<para>'Check script for errors before print, export or compare',
 		if checked, causes the program to run 'Script/Find next error' for
 		the entire script automatically before print/export/compare
@@ -1096,6 +1115,10 @@
 		there's an error on one of them, fixing of which causes
 		repagination of the entire script, and having to print all the 100
 		pages again.</para>
+
+		<para>'Show splash screen for X seconds' can be used to customize
+		for how long to show the splash screen on startup for, or to
+		disable showing it completely.</para>
 
 		<para>'Auto-paginate interval' defines how often to repaginate the
 		script automatically. If you have a particularly slow machine, you
@@ -1409,17 +1432,6 @@
 
 	<para>This chapter discusses the import/export support of the
 	program.</para>
-
-	<para>It is unfortunate that the screenplay industry does not have a
-	universally recognized vendor-neutral format for exchanging scripts
-	between programs. Designing such a format (probably XML-based) would
-	be almost trivial, but when we contacted the authors of other
-	screenplay writing programs none of them were interested in supporting
-	it. They seem more interested in trying to lock their users to their
-	own programs than helping them.</para>
-
-	<para>So, for now, the best format for exchanging data between
-	programs is plain old ASCII (with ISO-8859-1 extensions).</para>
 
 	<sect1>
 	  <title>Import</title>
