@@ -25,27 +25,29 @@ this, that aspect of the program will not work.
 
   $ make dict_en.dat.gz
 
- * Manual (PDF)
+ * Manual
 
-  $ make manual.pdf
+  $ make manual.html
 
 You can run "make dist", which prepares all 3 and also generates a Linux
-distribution package which you can ignore.
+distribution package which you can ignore. It will also try to build a
+Debian package which you can also ignore.
 
 2.5. Preparing for a Windows build
-================================
-If you're looking to package for Windows, you'll need to place the windows
-redistributable runtime file vcredist_x86.exe in the trelby directory.
+==================================
 
-be sure to have the following installed:
+If you want to create the Windows package, you'll need to place the
+Windows redistributable runtime file vcredist_x86.exe in the trelby
+directory.
+
+Be sure to have the following installed:
+
  * python-2.7.2.msi
   - py2exe-0.6.9.win32-py2.7.exe
   - wxPython2.8-win32-unicode-2.8.12.1-py27.exe
   - nsis-2.46-setup.exe
   - lxml-2.3.win32-py2.7.exe
   - pycrypto exe
-
-If you go with python 2.6, get the relevant py2exe and wxpython as well.
 
 Install vcredist_x86.exe locally. On Win Vista/7, msvcp90.dll will not be
 under windows/system32, but under windows/winsxs. Hunt this file down,
@@ -55,7 +57,8 @@ but is required so nsis won't complain about a missing DLL.
 Finally ensure you had run make dist in the directory on a linux machine,
 so all files are in place. (and ensure vcredist_x86.exe is here as well)
 
-Then, on windows, to get the installer:
+Then, on Windows, to create the installer:
+
 1) cd <trelby directory>
 2) build.bat
 4) nsis.bat
@@ -63,8 +66,8 @@ Then, on windows, to get the installer:
 Your freshly created Setup-Trelby-<version>.exe should be ready.
 
 
-3. Running Trelby
-=================
+3. Running Trelby in test mode
+==============================
 
 On Linux:
 
@@ -89,9 +92,6 @@ as follows:
 
  -No global directory locations are used; configuration/state files
  instead go under ".trelby" in the current directory.
-
- -Unhandled exceptions are not caught and reported in a dialog box,
-  instead, they are printed normally to stderr.
 
  -The following characters activate special behavior:
 
