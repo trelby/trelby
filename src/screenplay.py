@@ -1503,19 +1503,22 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def convertTypeTo(self, lt):
         ls = self.lines
         selection = self.getMarkedLines()
-        if selection is None:
-            startSection, endSection = self.getElemIndexes()
-        else:
-            startSection, endSection = selection
 
-        # iterate over all the elements in the section
+        if selection:
+            startSection, endSection = selection
+        else:
+            startSection, endSection = self.getElemIndexes()
+
         currentLine = startSection
+
         while currentLine <= endSection:
             first, last = self.getElemIndexesFromLine(currentLine)
+
             # if changing away from PAREN containing only "()", remove it
             if (first == last) and (ls[first].lt == PAREN) and\
                    (ls[first].text == "()"):
                 ls[first].text = ""
+
                 if first == self.line:
                     self.column = 0
 
@@ -1526,6 +1529,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             if (first == last) and (ls[first].lt == PAREN) and\
                    (len(ls[first].text) == 0):
                 ls[first].text = "()"
+
                 if first == self.line:
                     self.column = 1
 
@@ -1576,9 +1580,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def splitElement(self, newType):
         ls = self.lines
 
-        #if text is selected, simply unselect it.
-        if self.getMarkedLines():
+        if self.mark:
             self.clearMark()
+
             return
 
         if not self.acItems:
@@ -2631,25 +2635,27 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # either creates a new element or converts the current one to
     # nextTypeTab, depending on circumstances.
     def tabCmd(self, cs):
-        #If text is selected, unselect it, else change type.
-        if self.getMarkedLines():
+        if self.mark:
             self.clearMark()
-        else:
-            tcfg = self.cfgGl.getType(self.lines[self.line].lt)
 
-            if self.tabMakesNew():
-                self.splitElement(tcfg.newTypeTab)
-            else:
-                self.convertTypeTo(tcfg.nextTypeTab)
+            return
+
+        tcfg = self.cfgGl.getType(self.lines[self.line].lt)
+
+        if self.tabMakesNew():
+            self.splitElement(tcfg.newTypeTab)
+        else:
+            self.convertTypeTo(tcfg.nextTypeTab)
 
     # switch current element to prevTypeTab.
     def toPrevTypeTabCmd(self, cs):
-        #If text is selected, unselect it, else change type.
-        if self.getMarkedLines():
+        if self.mark:
             self.clearMark()
-        else:
-            tcfg = self.cfgGl.getType(self.lines[self.line].lt)
-            self.convertTypeTo(tcfg.prevTypeTab)
+
+            return
+
+        tcfg = self.cfgGl.getType(self.lines[self.line].lt)
+        self.convertTypeTo(tcfg.prevTypeTab)
 
     # add character cs.char if it's a valid one.
     def addCharCmd(self, cs):

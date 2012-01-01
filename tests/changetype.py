@@ -1,15 +1,20 @@
 import u
 import screenplay as scr
 
-# test change of element type
-def testTabChangeLineType():
+# test changing type of one element
+def testChangeOneElem():
     sp = u.load()
-    sp.cmd("tab")
-    assert(sp.lines[0].lt == scr.ACTION)
-    sp.cmd("toPrevTypeTab")
-    assert(sp.lines[0].lt == scr.CHARACTER)
+    ls = sp.lines
 
-    functionMap = { 
+    sp.cmd("moveDown")
+
+    sp.cmd("tab")
+    assert ls[1].lt == scr.CHARACTER
+
+    sp.cmd("toPrevTypeTab")
+    assert ls[1].lt == scr.ACTION
+
+    functionMap = {
         "toScene" : scr.SCENE,
         "toCharacter" : scr.CHARACTER,
         "toAction" : scr.ACTION,
@@ -22,21 +27,40 @@ def testTabChangeLineType():
 
     for (func, ele) in functionMap.items():
         sp.cmd(func)
-        assert(sp.lines[0].lt == ele)
 
-# test selecting text, and changing them all
-def testSelectionChange():
+        assert ls[0].lt == scr.SCENE
+
+        i = 1
+        while 1:
+            assert ls[i].lt == ele
+
+            if ls[i].lb == scr.LB_LAST:
+                break
+
+            i += 1
+
+        assert ls[i + 1].lt == scr.CHARACTER
+
+# test that when text belonging to multiple elements is selected, changing
+# type changes all of those elements
+def testChangeManyElemes():
     sp = u.load()
-    # start selection
-    sp.gotoPos(0, 0, False)
-    sp.gotoPos(0, 0, True)
-    # end it a little below
-    sp.gotoPos(5, 4, True)
-    # convert selected to Dialogue 
-    sp.convertTypeTo(scr.DIALOGUE)
-    # ensure the 8th line is "weather." in dialogue type, 
-    # and ends with LB_LAST
-    assert(sp.lines[7].text == "weather.")
-    assert(sp.lines[7].lt == scr.DIALOGUE)
-    assert(sp.lines[7].lb == scr.LB_LAST)
+    ls = sp.lines
+
+    # select second and third elements
+    sp.cmd("moveDown")
+    sp.cmd("setMark")
+    sp.cmd("moveDown", count = 4)
+
+    sp.cmd("toTransition")
+
+    assert ls[0].lt == scr.SCENE
+
+    for i in range(1, 13):
+        assert ls[i].lt == scr.TRANSITION
+
+    assert ls[11].lb == scr.LB_LAST
+    assert ls[12].lb == scr.LB_LAST
+
+    assert ls[13].lt == scr.DIALOGUE
 
