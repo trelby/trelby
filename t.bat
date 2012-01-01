@@ -1,1 +1,1 @@
-\python23\python src/trelby.py --test sample.trelby
+\python27\python src/trelby.py --test sample.trelby

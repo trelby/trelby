@@ -14,6 +14,3 @@
 
 -try using graphics contexts for tab ctrl drawing to get anti-aliased
  lines (http://docs.wxwidgets.org/trunk/classwx_graphics_context.html)
-
--go through README/INSTALL/t.bat etc and make sure nothing references
- python2.3 anymore
