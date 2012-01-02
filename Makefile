@@ -17,7 +17,7 @@ manual.html: doc/*
 	make -C doc && mv doc/book.html manual.html
 
 clean:
-	rm -f src/*.pyc names.txt.gz dict_en.dat.gz manual.html
+	rm -f src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html
 	dh_clean
 
 install:
