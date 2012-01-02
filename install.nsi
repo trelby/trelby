@@ -185,6 +185,7 @@ Section Uninstall
   Delete "$INSTDIR\manual.html"
   Delete "$INSTDIR\fileformat.txt"
   Delete "$INSTDIR\LICENSE"
+  Delete "$INSTDIR\README"
 
   SetShellVarContext all
   Delete "$SMPROGRAMS\Trelby\Uninstall.lnk"

@@ -1,0 +1,11 @@
+Installation instructions for Trelby on Linux (tar.gz)
+------------------------------------------------------
+
+You have to copy trelby/ to /opt/trelby/. Afterwards you can run the
+program with the command "/opt/trelby/src/trelby.py".
+
+External dependencies required:
+
+ * Python (2.6 or 2.7)
+ * wxWidgets (2.8) and its Python bindings (wxPython)
+ * lxml

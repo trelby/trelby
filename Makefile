@@ -23,7 +23,7 @@ clean:
 install:
 	mkdir -p $(BINDIR)
 	rm -f src/*.pyc
-	cp -r src/ trelby.desktop names.txt.gz dict_en.dat.gz sample.trelby manual.html fileformat.txt LICENSE INSTALL README resources $(BINDIR)
+	cp -r src/ trelby.desktop names.txt.gz dict_en.dat.gz sample.trelby manual.html fileformat.txt LICENSE README resources $(BINDIR)
 	cp trelby.desktop $(DESKTOPDIR)
 
 uninstall:

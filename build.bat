@@ -19,6 +19,7 @@ xcopy /i sample.trelby winbuild\dist
 xcopy /i manual.html winbuild\dist
 xcopy /i fileformat.txt winbuild\dist
 xcopy /i LICENSE winbuild\dist
+xcopy /i README winbuild\dist
 xcopy /i dict_en.dat.gz winbuild\dist
 
 xcopy /i /y resources winbuild\dist\resources
