@@ -1,5 +1,11 @@
-trelby (2.0-dev) unstable; urgency=low
+trelby (2.1-dev) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Anil Gulecha <anil.verve@gmail.com>  Mon, 2 Jan 2012 16:00:00 +0000
+
+trelby (2.0) unstable; urgency=low
 
   * Initial release.
 
- -- Anil Gulecha <anil.verve@gmail.com>  Mon, 2 Jan 2012 15:00:00 +0000
+ -- Anil Gulecha <anil.verve@gmail.com>  Mon, 2 Jan 2012 12:00:00 +0000
