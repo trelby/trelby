@@ -12,16 +12,14 @@ class Titles:
     def addDefaults(self):
         a = []
 
-        y = 70.0
+        y = 105.0
         a.append(TitleString("UNTITLED SCREENPLAY", y = y, size = 24,
                              isBold = True, font = pml.HELVETICA))
         a.append(TitleString("by", y = y + 15.46))
         a.append(TitleString("My Name Here", y = y + 23.93))
 
-        x = 150.0
+        x = 15.0
         y = 240.0
-        a.append(TitleString("42 Random Street", x, y, False))
-        a.append(TitleString("Nowhere, CA 90210", x, y + 4.23, False))
         a.append(TitleString("123/456-7890", x, y + 8.46, False))
         a.append(TitleString("no.such@thing.com", x, y + 12.7, False))
 
