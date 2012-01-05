@@ -91,6 +91,7 @@ class CfgDlg(wx.Dialog):
         if isGlobal:
             self.SetTitle("Settings dialog")
 
+            self.AddPage(GlobalAboutPanel, "About")
             self.AddPage(ColorsPanel, "Colors")
             self.AddPage(DisplayPanel, "Display")
             self.AddPage(ElementsGlobalPanel, "Elements")
@@ -99,6 +100,7 @@ class CfgDlg(wx.Dialog):
         else:
             self.SetTitle("Script settings dialog")
 
+            self.AddPage(ScriptAboutPanel, "About")
             self.AddPage(ElementsPanel, "Elements")
             self.AddPage(FormattingPanel, "Formatting")
             self.AddPage(PaperPanel, "Paper")
@@ -164,6 +166,41 @@ class CfgDlg(wx.Dialog):
 
     def OnCancel(self, event):
         self.EndModal(wx.ID_CANCEL)
+
+class AboutPanel(wx.Panel):
+    def __init__(self, parent, id, cfg, text):
+        wx.Panel.__init__(self, parent, id)
+
+        vsizer = wx.BoxSizer(wx.VERTICAL)
+
+        vsizer.Add(wx.StaticText(self, -1, text))
+
+        util.finishWindow(self, vsizer, center = False)
+
+class GlobalAboutPanel(AboutPanel):
+    def __init__(self, parent, id, cfg):
+        s = \
+"""This is the config dialog for global settings, which means things
+that affect the user interface of the program like interface colors,
+keyboard shortcuts, display fonts, and so on.
+
+None of the settings here have any effect on the generated PDF
+output for a script. See Script/Settings for those."""
+
+        AboutPanel.__init__(self, parent, id, cfg, s)
+
+class ScriptAboutPanel(AboutPanel):
+    def __init__(self, parent, id, cfg):
+        s = \
+"""This is the config dialog for script format settings, which means
+things that affect the generated PDF output of a script. Things like
+paper size, indendation/line widths/font styles for the different
+element types, and so on.
+
+If you're looking for the user interface settings (colors, keyboard
+shortcuts, etc.), those are found in File/Settings."""
+
+        AboutPanel.__init__(self, parent, id, cfg, s)
 
 class DisplayPanel(wx.Panel):
     def __init__(self, parent, id, cfg):
