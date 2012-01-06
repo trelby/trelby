@@ -421,7 +421,7 @@
 	</sect1>
 
 	<sect1>
-	  <title>File/Print</title>
+	  <title>File/Print (via PDF)</title>
 
 	  <para>This opens up the current script in your configured PDF viewer
 	  program, from which you can print it, or just see what it looks

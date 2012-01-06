@@ -1604,7 +1604,7 @@ class MyFrame(wx.Frame):
         fileMenu.Append(ID_FILE_IMPORT, "&Import...")
         fileMenu.Append(ID_FILE_EXPORT, "&Export...")
         fileMenu.AppendSeparator()
-        fileMenu.Append(ID_FILE_PRINT, "&Print\tCTRL-P")
+        fileMenu.Append(ID_FILE_PRINT, "&Print (via PDF)\tCTRL-P")
         fileMenu.AppendSeparator()
 
         tmp = wx.Menu()
@@ -1731,7 +1731,7 @@ class MyFrame(wx.Frame):
         addTB(ID_FILE_SAVE_AS, "saveas.png", "Save as..")
         addTB(ID_FILE_CLOSE, "close.png", "Close Script")
         addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.png", "Script settings")
-        addTB(ID_FILE_PRINT, "pdf.png", "Print")
+        addTB(ID_FILE_PRINT, "pdf.png", "Print (via PDF)")
 
         self.toolBar.AddSeparator()
 
