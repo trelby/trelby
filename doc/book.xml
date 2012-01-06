@@ -245,10 +245,11 @@
 
 		<para>After you've selected the desired text, you can use the
 		cut/copy/paste commands to move text around, delete it, etc. You
-		can also press Del to simply delete it. Note that as of now this
-		is not undoable in any way.</para>
+		can also press Del or Backspace to simply delete it. Note that as of
+ 		now this is not undoable in any way.</para>
 
-		<para>You can unselect the selected text by pressing Esc.</para>
+		<para>You can unselect the selected text by pressing Esc., or simply
+ 		clicking the mouse on the screen.</para>
 
 	  </sect2>
 

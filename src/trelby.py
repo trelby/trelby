@@ -1185,7 +1185,10 @@ class MyCtrl(wx.Control):
             self.OnCut(doUpdate = False, copyToClip = False)
 
     def cmdDeleteBackward(self, cs):
-        self.sp.deleteBackwardCmd(cs)
+        if not self.sp.mark:
+            self.sp.deleteBackwardCmd(cs)
+        else:
+            self.OnCut(doUpdate = False, copyToClip = False)
 
     def cmdForcedLineBreak(self, cs):
         self.sp.insertForcedLineBreakCmd(cs)
