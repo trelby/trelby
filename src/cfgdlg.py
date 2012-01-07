@@ -184,6 +184,9 @@ class GlobalAboutPanel(AboutPanel):
 that affect the user interface of the program like interface colors,
 keyboard shortcuts, display fonts, and so on.
 
+The settings here are independent of any script being worked on,
+and unique to this computer.
+
 None of the settings here have any effect on the generated PDF
 output for a script. See Script/Settings for those."""
 
@@ -196,6 +199,8 @@ class ScriptAboutPanel(AboutPanel):
 things that affect the generated PDF output of a script. Things like
 paper size, indendation/line widths/font styles for the different
 element types, and so on.
+
+The settings here are saved within the screenplay itself.
 
 If you're looking for the user interface settings (colors, keyboard
 shortcuts, etc.), those are found in File/Settings."""
