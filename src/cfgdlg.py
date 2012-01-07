@@ -528,7 +528,12 @@ class ColorsPanel(wx.Panel):
             size = wx.Size(200, 50))
         hsizer.Add(self.colorSample, 1, wx.EXPAND)
 
-        vsizer.Add(hsizer, 0, wx.EXPAND)
+        vsizer.Add(hsizer, 0, wx.EXPAND | wx.BOTTOM, 10)
+
+        self.useCustomElemColors = wx.CheckBox(
+            self, -1, "Use per-element-type colors")
+        wx.EVT_CHECKBOX(self, self.useCustomElemColors.GetId(), self.OnMisc)
+        vsizer.Add(self.useCustomElemColors)
 
         util.finishWindow(self, vsizer, center = False)
 
@@ -557,7 +562,12 @@ class ColorsPanel(wx.Panel):
         setattr(self.cfg, self.color, self.cfg.cvars.getDefault(self.color))
         self.cfg2gui()
 
+    def OnMisc(self, event = None):
+        self.cfg.useCustomElemColors = self.useCustomElemColors.GetValue()
+
     def cfg2gui(self):
+        self.useCustomElemColors.SetValue(self.cfg.useCustomElemColors)
+
         self.colorSample.SetBackgroundColour(
             getattr(self.cfg, self.color).toWx())
         self.colorSample.Refresh()

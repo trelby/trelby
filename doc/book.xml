@@ -1009,9 +1009,13 @@
 	  <sect2>
 		<title>Colors</title>
 
-		<para>Color configuration; not much to explain here, besides the
-		fact that these only affect the display, the PDF output is always
-		black on white.</para>
+		<para>Color configuration. These only affect the display, the PDF
+		output is always black on white.</para>
+
+		<para>The 'Use per-element-type colors' checkbox controls whether
+		to use the same text color for all element types (Text foreground)
+		or whether to use the per-element color settings (Text foreground
+		for Action, Text foreground for Character, etc.). </para>
 
 	  </sect2>
 

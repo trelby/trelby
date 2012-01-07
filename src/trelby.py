@@ -1462,7 +1462,10 @@ class MyCtrl(wx.Control):
                 tl[0].append(t.text)
                 tl[1].append((t.x, y))
                 if t.line != -1:
-                    tl[2].append(cfgGui.textColor)
+                    if cfgGl.useCustomElemColors:
+                        tl[2].append(cfgGui.lt2textColor(ls[t.line].lt))
+                    else:
+                        tl[2].append(cfgGui.textColor)
                 else:
                     tl[2].append(cfgGui.textHdrColor)
 
@@ -1486,8 +1489,6 @@ class MyCtrl(wx.Control):
 
             for ul in ulinesHdr:
                 util.drawLine(dc, ul[0], ul[1], ul[2], 0)
-
-        dc.SetTextForeground(cfgGui.textColor)
 
         for tl in texts.iteritems():
             gd.vm.drawTexts(self, dc, tl)

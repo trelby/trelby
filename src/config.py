@@ -956,6 +956,10 @@ class ConfigGlobal:
         # whether to recenter screen when cursor moves out of it
         v.addBool("recenterOnScroll", False, "RecenterOnScroll")
 
+        # whether to use per-elem-type colors (textSceneColor etc.)
+        # instead of using textColor for all elem types
+        v.addBool("useCustomElemColors", False, "UseCustomElemColors")
+
         # page break indicators to show
         v.addInt("pbi", PBI_REAL, "PageBreakIndicators", PBI_FIRST,
                     PBI_LAST)
@@ -1002,6 +1006,10 @@ class ConfigGlobal:
         v.addColor("tabBarBg", 221, 217, 215, "TabBarBG",
                    "Tab bar background")
         v.addColor("tabNonActiveBg", 234, 232, 233, "TabNonActiveBg", "Tab, non-active")
+
+        for t in getTIs():
+            v.addColor("text%s" % t.name, 0, 0, 0, "Text%sFG" % t.name,
+                       "Text foreground for %s" % t.name)
 
         v.makeDicts()
 
@@ -1221,6 +1229,12 @@ class ConfigGui:
             tmp = wx.Colour(c.r, c.g, c.b)
             setattr(self, it.name, tmp)
 
+        # key = line type, value = wx.Colour
+        self._lt2textColor = {}
+
+        for t in getTIs():
+            self._lt2textColor[t.lt] = getattr(self, "text%sColor" % t.name)
+
         self.textPen = wx.Pen(self.textColor)
         self.textHdrPen = wx.Pen(self.textHdrColor)
 
@@ -1312,6 +1326,10 @@ class ConfigGui:
     # TextType -> FontInfo
     def tt2fi(self, tt):
         return self.fonts[tt.isBold | (tt.isItalic << 1)]
+
+    # line type -> wx.Colour
+    def lt2textColor(self, lt):
+        return self._lt2textColor[lt]
 
 def _conv(dict, key, raiseException = True):
     val = dict.get(key)
