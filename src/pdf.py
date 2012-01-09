@@ -2,6 +2,13 @@ import fontinfo
 import pml
 import util
 
+# PDF transform matrixes where key is the angle from x-axis
+# in counter-clockwise direction.
+TRANSFORM_MATRIX = {
+    45 : (1, 1, -1, 1),
+    90 : (0, 1, -1, 0),
+}
+
 # users should only use this.
 def generate(doc):
     tmp = PDFExporter(doc)
@@ -37,7 +44,19 @@ class PDFTextOp(PDFDrawOp):
             output += "/%s Tf\n" % newFont
             pe.currentFont = newFont
 
-        output += "BT\n"\
+        if pmlOp.angle is not None:
+            matrix = TRANSFORM_MATRIX.get(pmlOp.angle)
+            if matrix:
+                output += "BT\n"\
+                   "%f %f %f %f %f %f Tm\n"\
+                   "(%s) Tj\n"\
+                   "ET\n" % (matrix[0], matrix[1], matrix[2], matrix[3],
+                    x, y, pe.escapeStr(pmlOp.text))
+            else:
+                # unsupported angle, don't print it.
+                pass
+        else:
+            output += "BT\n"\
                   "%f %f Td\n"\
                   "(%s) Tj\n"\
                   "ET\n" % (x, y, pe.escapeStr(pmlOp.text))

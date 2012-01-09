@@ -917,7 +917,10 @@ class ConfigGlobal:
                     " overview.", isMenu = True),
 
             Command("ViewModeSideBySide", "Change view mode to side by"
-                    " side.", isMenu = True)
+                    " side.", isMenu = True),
+
+            Command("Watermark", "Generate watermarked PDFs.",
+                    isMenu = True),
             ]
 
         self.recalc()

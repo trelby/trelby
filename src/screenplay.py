@@ -682,6 +682,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # "export to file" operation, False if we're just going to launch a
     # PDF viewer with the data.
     def generatePDF(self, isExport):
+        return pdf.generate(self.generatePML(isExport))
+
+    # Same arguments as generatePDF, but returns a PML document.
+    def generatePML(self, isExport):
         pager = mypager.Pager(self.cfg)
         self.titles.generatePages(pager.doc)
 
@@ -728,7 +732,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 pager.doc.addFont(pf.style,
                                   pml.PDFFontInfo(pf.pdfName, fontProgram))
 
-        return pdf.generate(pager.doc)
+        return pager.doc
 
     # generate one page of PML data and return it.
     #

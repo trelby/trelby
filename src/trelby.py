@@ -30,6 +30,7 @@ import splash
 import titlesdlg
 import util
 import viewmode
+import watermarkdlg
 
 import copy
 import datetime
@@ -663,6 +664,11 @@ class MyCtrl(wx.Control):
             self.sp.scDict = dlg.scDict
             self.sp.markChanged()
 
+        dlg.Destroy()
+
+    def OnWatermark(self):
+        dlg = watermarkdlg.WatermarkDlg(mainFrame, self.sp, self.fileNameDisplay)
+        dlg.ShowModal()
         dlg.Destroy()
 
     def OnReportDialogueChart(self):
@@ -1705,6 +1711,7 @@ class MyFrame(wx.Frame):
         toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
         toolsMenu.Append(ID_TOOLS_CHARMAP, "&Character map...")
         toolsMenu.Append(ID_TOOLS_COMPARE_SCRIPTS, "C&ompare scripts...")
+        toolsMenu.Append(ID_TOOLS_WATERMARK, "&Generate watermarked PDFs...")
 
         helpMenu = wx.Menu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
@@ -1865,6 +1872,7 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDatabase)
         wx.EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharacterMap)
         wx.EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
+        wx.EVT_MENU(self, ID_TOOLS_WATERMARK, self.OnWatermark)
         wx.EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
         wx.EVT_MENU(self, ID_HELP_MANUAL, self.OnHelpManual)
         wx.EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
@@ -1955,6 +1963,7 @@ class MyFrame(wx.Frame):
             "ID_TOOLS_COMPARE_SCRIPTS",
             "ID_TOOLS_NAME_DB",
             "ID_TOOLS_SPELL_CHECK",
+            "ID_TOOLS_WATERMARK",
             "ID_VIEW_SHOW_FORMATTING",
             "ID_VIEW_STYLE_DRAFT",
             "ID_VIEW_STYLE_LAYOUT",
@@ -2330,6 +2339,9 @@ class MyFrame(wx.Frame):
 
     def OnSpellCheckerScriptDictionaryDlg(self, event = None):
         self.panel.ctrl.OnSpellCheckerScriptDictionaryDlg()
+
+    def OnWatermark(self, event = None):
+        self.panel.ctrl.OnWatermark()
 
     def OnScriptSettings(self, event = None):
         self.panel.ctrl.OnScriptSettings()

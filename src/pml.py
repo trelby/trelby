@@ -81,6 +81,9 @@ class Page:
     def add(self, op):
         self.ops.append(op)
 
+    def addOpsToFront(self, opsList):
+        self.ops = opsList + self.ops
+
 # Table of content item (Outline item, in PDF lingo)
 class TOCItem:
     def __init__(self, text, op):
@@ -112,18 +115,20 @@ class DrawOp:
 # Draw text string 'text', at position (x, y) mm from the upper left
 # corner of the page. Font used is 'size' points, and Courier / Times/
 # Helvetica as indicated by the flags, possibly being bold / italic /
-# underlined.
+# underlined. angle is None, or an integer from 0 to 360 that gives the
+# slant of the text counter-clockwise from x-axis.
 class TextOp(DrawOp):
     pdfOp = pdf.PDFTextOp()
 
     def __init__(self, text, x, y, size, flags = NORMAL | COURIER,
                  align = util.ALIGN_LEFT, valign = util.VALIGN_TOP,
-                 line = -1):
+                 line = -1, angle = None):
         self.text = text
         self.x = x
         self.y = y
         self.size = size
         self.flags = flags
+        self.angle = angle
 
         # TOCItem, by default we have none
         self.toc = None
