@@ -667,7 +667,8 @@ class MyCtrl(wx.Control):
         dlg.Destroy()
 
     def OnWatermark(self):
-        dlg = watermarkdlg.WatermarkDlg(mainFrame, self.sp, self.fileNameDisplay)
+        dlg = watermarkdlg.WatermarkDlg(
+            mainFrame, self.sp, self.fileNameDisplay.replace(".trelby", ""))
         dlg.ShowModal()
         dlg.Destroy()
 

@@ -46,20 +46,21 @@ class PDFTextOp(PDFDrawOp):
 
         if pmlOp.angle is not None:
             matrix = TRANSFORM_MATRIX.get(pmlOp.angle)
+
             if matrix:
                 output += "BT\n"\
-                   "%f %f %f %f %f %f Tm\n"\
-                   "(%s) Tj\n"\
-                   "ET\n" % (matrix[0], matrix[1], matrix[2], matrix[3],
-                    x, y, pe.escapeStr(pmlOp.text))
+                    "%f %f %f %f %f %f Tm\n"\
+                    "(%s) Tj\n"\
+                    "ET\n" % (matrix[0], matrix[1], matrix[2], matrix[3],
+                              x, y, pe.escapeStr(pmlOp.text))
             else:
                 # unsupported angle, don't print it.
                 pass
         else:
             output += "BT\n"\
-                  "%f %f Td\n"\
-                  "(%s) Tj\n"\
-                  "ET\n" % (x, y, pe.escapeStr(pmlOp.text))
+                "%f %f Td\n"\
+                "(%s) Tj\n"\
+                "ET\n" % (x, y, pe.escapeStr(pmlOp.text))
 
         if pmlOp.flags & pml.UNDERLINED:
 

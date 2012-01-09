@@ -924,7 +924,7 @@
 	</sect1>
 
     <sect1>
-      <title>Tools/Watermark PDFs</title>
+      <title>Tools/Generate watermarked PDFs</title>
 
       <para>This tool allows you to generate multiple watermarked PDFs to
       distribute to multiple people. Watermarks are handy when you want to
