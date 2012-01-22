@@ -302,6 +302,7 @@ class MyCtrl(wx.Control):
         if util.writeToFile(fileName, self.sp.save(), mainFrame):
             self.setFile(fileName)
             self.sp.markChanged(False)
+            gd.mru.add(fileName)
 
             return True
         else:
@@ -1090,8 +1091,7 @@ class MyCtrl(wx.Control):
             wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
         if dlg.ShowModal() == wx.ID_OK:
-            if self.saveFile(dlg.GetPath()):
-                gd.mru.add(dlg.GetPath())
+            self.saveFile(dlg.GetPath())
 
         dlg.Destroy()
 
