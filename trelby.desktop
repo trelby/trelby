@@ -4,7 +4,7 @@ Encoding=UTF-8
 Name=Trelby
 Comment=Screenwriting Application
 Exec=/opt/trelby/src/trelby.py
-Icon=/opt/trelby/resources/icon64.png
+Icon=/opt/trelby/resources/icon256.png
 Type=Application
 Categories=Utility;Publishing;
 

@@ -1907,7 +1907,7 @@ class MyFrame(wx.Frame):
 
         ib = wx.IconBundle()
 
-        for sz in ("16", "32", "64"):
+        for sz in ("16", "32", "64", "128", "256"):
             ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("resources/icon%s.png" % sz)))
 
         self.SetIcons(ib)
