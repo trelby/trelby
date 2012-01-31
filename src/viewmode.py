@@ -230,8 +230,14 @@ class ViewModeDraft(ViewMode):
                 text = l.text
 
             fi = cfgGui.tt2fi(tcfg.screen)
+
+            if ctrl.sp.addParenIndent(i):
+                appendIndent = 1
+            else:
+                appendIndent = 0
+
             texts.append(TextString(i, text,
-                cox + marginLeft + tcfg.indent * fi.fx, y, fi,
+                cox + marginLeft + (appendIndent + tcfg.indent) * fi.fx, y, fi,
                 tcfg.screen.isUnderlined))
 
             y += fyd

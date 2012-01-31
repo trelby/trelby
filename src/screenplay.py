@@ -100,6 +100,10 @@ class Screenplay:
     def markChanged(self, state = True):
         self.hasChanged = state
 
+    # return true if line is parenthetical and needs to be indented.
+    def addParenIndent(self, line):
+        return(self.lines[line].lt == PAREN and not self.isFirstLineOfElem(line))
+
     def getSpacingBefore(self, i):
         if i == 0:
             return 0
@@ -433,6 +437,9 @@ class Screenplay:
                 if (i != 0) and (not doPages or (i != start)):
                     output += (self.getSpacingBefore(i) // 10) * "\n"
 
+                if self.addParenIndent(i) and text:
+                    text = " " + text
+
                 output += " " * tcfg.indent + text + "\n"
 
         return str(output)
@@ -504,6 +511,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 text = util.upper(line.text)
             else:
                 text = line.text
+
+            if self.addParenIndent(i) and text:
+                text = " " + text
 
             text = " " * tcfg.indent + text
 
@@ -843,8 +853,13 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             else:
                 text = line.text
 
+            if self.addParenIndent(i):
+                appendIndent = 1
+            else:
+                appendIndent = 0
+
             to = pml.TextOp(text,
-                cfg.marginLeft + tcfg.indent * chX,
+                cfg.marginLeft + (tcfg.indent + appendIndent) * chX,
                 cfg.marginTop + (y / 10.0) * chY, fs, typ, line = i)
 
             pg.add(to)
@@ -978,12 +993,18 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # new lines.
     def wrapLine(self, line):
         ret = []
-        w = self.cfg.getType(line.lt).width
+        width = self.cfg.getType(line.lt).width
 
         # text remaining to be wrapped
         text = line.text
 
         while 1:
+            # reduce PAREN width by 1 from second line onwards
+            if line.lt == PAREN and ret:
+                w = width - 1
+            else:
+                w = width
+
             if len(text) <= w:
                 ret.append(Line(line.lb, line.lt, text))
                 break
