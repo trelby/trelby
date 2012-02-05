@@ -1249,13 +1249,50 @@ class MyCtrl(wx.Control):
         self.sp.toPrevTypeTabCmd(cs)
 
     def cmdSpeedTest(self, cs):
-        zz = util.TimerDev("50 paints")
+        def testReformatAll():
+            self.sp.reformatAll()
 
-        for i in xrange(50):
-            self.OnKeyChar(util.MyKeyEvent(ord("a")))
+        def testPaginate():
+            self.sp.paginate()
+
+        def testUpdateScreen():
+            self.updateScreen()
             self.Update()
 
-        del zz
+        def testAddRemoveChar():
+            self.OnKeyChar(util.MyKeyEvent(ord("a")))
+            self.OnKeyChar(util.MyKeyEvent(wx.WXK_BACK))
+
+        def testDeepcopy():
+            copy.deepcopy(self.sp)
+
+        # contains (name, func) tuples
+        tests = []
+
+        for name, var in locals().iteritems():
+            if callable(var):
+                tests.append((name, var))
+
+        tests.sort()
+        count = 100
+
+        print "-" * 20
+
+        for name, func in tests:
+            t = time.time()
+
+            for i in xrange(count):
+                func()
+
+            t = time.time() - t
+
+            print "%.5f seconds per %s" % (t / count, name)
+
+        print "-" * 20
+
+        # it's annoying having the program ask if you want to save after
+        # running these tests, so pretend the script hasn't changed
+        self.sp.markChanged(False)
 
     def cmdTest(self, cs):
         pass
