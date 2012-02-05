@@ -99,6 +99,6 @@ as follows:
 
   -"¤": Call function MyCtrl.cmdTest.
 
-  -"½": Time how long 50 screen refreshes take.
+  -"½": Run speed tests.
 
    (The above characters are in the ISO-8859-1 character set.)
