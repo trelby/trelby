@@ -1458,12 +1458,11 @@ class MyCtrl(wx.Control):
                 if mainFrame.showFormatting:
                     dc.SetPen(cfgGui.bluePen)
                     util.drawLine(dc, t.x, y, 0, lineh)
-                    if self.sp.addParenIndent(i):
-                        decreaseIndent = 1
-                    else:
-                        decreaseIndent = 0
+
+                    extraIndent = 1 if self.sp.needsExtraParenIndent(i) else 0
+
                     util.drawLine(dc,
-                        t.x + (self.sp.cfg.getType(l.lt).width - decreaseIndent) * fx,
+                        t.x + (self.sp.cfg.getType(l.lt).width - extraIndent) * fx,
                         y, 0, lineh)
 
                     dc.SetTextForeground(cfgGui.redColor)

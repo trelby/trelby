@@ -100,9 +100,10 @@ class Screenplay:
     def markChanged(self, state = True):
         self.hasChanged = state
 
-    # return true if line is parenthetical and needs to be indented.
-    def addParenIndent(self, line):
-        return(self.lines[line].lt == PAREN and not self.isFirstLineOfElem(line))
+    # return True if the line is a parenthetical and not the first line of
+    # that element (such lines need an extra space of indenting).
+    def needsExtraParenIndent(self, line):
+        return (self.lines[line].lt == PAREN) and not self.isFirstLineOfElem(line)
 
     def getSpacingBefore(self, i):
         if i == 0:
@@ -437,7 +438,7 @@ class Screenplay:
                 if (i != 0) and (not doPages or (i != start)):
                     output += (self.getSpacingBefore(i) // 10) * "\n"
 
-                if self.addParenIndent(i) and text:
+                if text and self.needsExtraParenIndent(i):
                     text = " " + text
 
                 output += " " * tcfg.indent + text + "\n"
@@ -512,7 +513,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             else:
                 text = line.text
 
-            if self.addParenIndent(i) and text:
+            if text and self.needsExtraParenIndent(i):
                 text = " " + text
 
             text = " " * tcfg.indent + text
@@ -853,13 +854,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             else:
                 text = line.text
 
-            if self.addParenIndent(i):
-                appendIndent = 1
-            else:
-                appendIndent = 0
+            extraIndent = 1 if self.needsExtraParenIndent(i) else 0
 
             to = pml.TextOp(text,
-                cfg.marginLeft + (tcfg.indent + appendIndent) * chX,
+                cfg.marginLeft + (tcfg.indent + extraIndent) * chX,
                 cfg.marginTop + (y / 10.0) * chY, fs, typ, line = i)
 
             pg.add(to)
@@ -994,13 +992,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def wrapLine(self, line):
         ret = []
         width = self.cfg.getType(line.lt).width
+        isParen = line.lt == PAREN
 
         # text remaining to be wrapped
         text = line.text
 
         while 1:
-            # reduce PAREN width by 1 from second line onwards
-            if line.lt == PAREN and ret:
+            # reduce parenthetical width by 1 from second line onwards
+            if isParen and ret:
                 w = width - 1
             else:
                 w = width
