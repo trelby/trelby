@@ -307,12 +307,12 @@ class MyTabCtrl(wx.Window):
         self.makeSelectedTabVisible()
         self.Refresh(False)
 
-    # delete currently selected page
-    def deletePage(self):
-        self.pages[self.selected][0].Destroy()
-        del self.pages[self.selected]
+    # delete given page
+    def deletePage(self, i):
+        self.pages[i][0].Destroy()
+        del self.pages[i]
 
-        self.selectPage(util.clamp(self.selected, 0, len(self.pages) - 1))
+        self.selectPage(util.clamp(i, 0, len(self.pages) - 1))
 
     # try to change the first visible tag by the given amount.
     def scroll(self, delta):
@@ -381,10 +381,24 @@ class MyTabCtrl(wx.Window):
              - self.arrowWidth + 1
 
         if x < lx:
-            page = self.firstTab + (x - self.paddingX) // self.tabWidth
+            page, pageOffset = divmod(x - self.paddingX, self.tabWidth)
+            page += self.firstTab
 
             if page < len(self.pages):
-                self.selectPage(page)
+                hitX = pageOffset >= (self.tabWidth - self.paddingX * 2)
+
+                if hitX:
+                    panel = self.pages[page][0]
+                    if not panel.ctrl.canBeClosed():
+                        return
+
+                    if self.getPageCount() > 1:
+                        self.deletePage(page)
+                    else:
+                        panel.ctrl.createEmptySp()
+                        panel.ctrl.updateScreen()
+                else:
+                    self.selectPage(page)
         else:
             if x < (lx + self.arrowWidth):
                 self.scroll(-1)
@@ -450,11 +464,14 @@ class MyTabCtrl(wx.Window):
 
             # clip the text to fit within the tabs
             dc.DestroyClippingRegion()
-            dc.SetClippingRegion(xpos, tabY, tabW - self.paddingX, tabH)
+            dc.SetClippingRegion(xpos, tabY, tabW - self.paddingX * 3, tabH)
 
             dc.SetPen(cfgGui.tabTextPen)
             dc.SetTextForeground(cfgGui.tabTextColor)
             dc.DrawText(p[1], xpos + self.paddingX, self.textY)
+
+            dc.DestroyClippingRegion()
+            dc.DrawText("x", xpos + tabW - self.paddingX * 2, self.textY)
 
             xpos += tabW
 

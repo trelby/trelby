@@ -151,7 +151,8 @@
 
 			<para>Each script gets its own tab, with the tab's name being
 			the filename of each script. You can click on each tab to
-			change the active script to that one.</para>
+			change the active script to that one, or the X at the end of
+			each tab to close that tab.</para>
 
             <para>After tabs is a column showing the current element's
             style, a column showing what the Enter/Tab keys would do, and

@@ -2224,7 +2224,7 @@ class MyFrame(wx.Frame):
             return
 
         if self.tabCtrl.getPageCount() > 1:
-            self.tabCtrl.deletePage()
+            self.tabCtrl.deletePage(self.tabCtrl.getSelectedPageIndex())
         else:
             self.panel.ctrl.createEmptySp()
             self.panel.ctrl.updateScreen()
