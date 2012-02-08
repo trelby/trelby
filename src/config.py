@@ -871,6 +871,8 @@ class ConfigGlobal:
             Command("ScriptSettings", "Change script-specific settings.",
                     isMenu = True),
 
+            Command("SelectAll", "Select the entire script.", isMenu = True),
+
             Command("SelectScene", "Select the current scene.",
                     [util.Key(1, ctrl = True).toInt()], isMenu = True),
 

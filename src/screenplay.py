@@ -2643,6 +2643,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.line = l2
         self.column = len(self.lines[l2].text)
 
+    # select all text of the screenplay. sets mark at beginning and moves
+    # cursor to the end.
+    def selectAllCmd(self, cs):
+        self.mark = Mark(0, 0)
+
+        self.line = len(self.lines) - 1
+        self.column = len(self.lines[self.line].text)
+
     def insertForcedLineBreakCmd(self, cs):
         self.splitLine()
 

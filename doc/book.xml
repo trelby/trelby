@@ -484,6 +484,13 @@
 	</sect1>
 
 	<sect1>
+	  <title>Edit/Select all</title>
+
+	  <para>Select all the text in the entire script.</para>
+
+	</sect1>
+
+	<sect1>
 	  <title>Edit/Goto page</title>
 
 	  <para>This opens a dialog allowing you to type in a page number to

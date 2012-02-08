@@ -902,6 +902,12 @@ class MyCtrl(wx.Control):
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
+    def OnSelectAll(self):
+        self.sp.cmd("selectAll")
+
+        self.makeLineVisible(self.sp.line)
+        self.updateScreen()
+
     def OnGotoScene(self):
         self.sp.paginate()
         self.clearAutoComp()
@@ -1689,6 +1695,7 @@ class MyFrame(wx.Frame):
         editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste (system)")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene")
+        editMenu.Append(ID_EDIT_SELECT_ALL, "Select a&ll")
         editMenu.Append(ID_EDIT_GOTO_PAGE, "&Goto page...\tCTRL-G")
         editMenu.Append(ID_EDIT_GOTO_SCENE, "Goto sc&ene...\tALT-G")
         editMenu.AppendSeparator()
@@ -1882,6 +1889,7 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_EDIT_COPY_TO_CB_FMT, self.OnCopySystemCbFormatted)
         wx.EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteSystemCb)
         wx.EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
+        wx.EVT_MENU(self, ID_EDIT_SELECT_ALL, self.OnSelectAll)
         wx.EVT_MENU(self, ID_EDIT_GOTO_PAGE, self.OnGotoPage)
         wx.EVT_MENU(self, ID_EDIT_GOTO_SCENE, self.OnGotoScene)
         wx.EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
@@ -1965,6 +1973,7 @@ class MyFrame(wx.Frame):
             "ID_EDIT_GOTO_PAGE",
             "ID_EDIT_PASTE",
             "ID_EDIT_PASTE_FROM_CB",
+            "ID_EDIT_SELECT_ALL",
             "ID_EDIT_SELECT_SCENE",
             "ID_FILE_CLOSE",
             "ID_FILE_EXIT",
@@ -2281,6 +2290,9 @@ class MyFrame(wx.Frame):
 
     def OnSelectScene(self, event = None):
         self.panel.ctrl.OnSelectScene()
+
+    def OnSelectAll(self, event = None):
+        self.panel.ctrl.OnSelectAll()
 
     def OnGotoPage(self, event = None):
         self.panel.ctrl.OnGotoPage()
