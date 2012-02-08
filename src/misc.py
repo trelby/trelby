@@ -448,6 +448,10 @@ class MyTabCtrl(wx.Window):
 
             dc.DrawPolygon(points,xpos,tabY)
 
+            # clip the text to fit within the tabs
+            dc.DestroyClippingRegion()
+            dc.SetClippingRegion(xpos, tabY, tabW - self.paddingX, tabH)
+
             dc.SetPen(cfgGui.tabTextPen)
             dc.SetTextForeground(cfgGui.tabTextColor)
             dc.DrawText(p[1], xpos + self.paddingX, self.textY)
