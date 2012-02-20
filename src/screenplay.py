@@ -19,6 +19,7 @@ PAREN = 5
 TRANSITION = 6
 SHOT = 7
 NOTE = 8
+ACTBREAK = 9
 
 import autocompletion
 import config
@@ -2762,6 +2763,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     def toShotCmd(self, cs):
         self.convertTypeTo(SHOT)
+
+    def toActBreakCmd(self, cs):
+        self.convertTypeTo(ACTBREAK)
 
     def toNoteCmd(self, cs):
         self.convertTypeTo(NOTE)

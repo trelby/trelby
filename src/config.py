@@ -407,6 +407,17 @@ class Config:
         t.export.isCaps = True
         self.types[t.lt] = t
 
+        t = Type(screenplay.ACTBREAK)
+        t.beforeSpacing = 10
+        t.indent = 25
+        t.width = 10
+        t.screen.isCaps = True
+        t.screen.isBold = True
+        t.screen.isUnderlined = True
+        t.export.isCaps = True
+        t.export.isUnderlined = True
+        self.types[t.lt] = t
+
         t = Type(screenplay.NOTE)
         t.beforeSpacing = 10
         t.indent = 5
@@ -633,6 +644,13 @@ class ConfigGlobal:
         t.prevTypeTab = screenplay.SCENE
         self.types[t.lt] = t
 
+        t = TypeGlobal(screenplay.ACTBREAK)
+        t.newTypeEnter = screenplay.SCENE
+        t.newTypeTab = screenplay.ACTION
+        t.nextTypeTab = screenplay.SCENE
+        t.prevTypeTab = screenplay.SCENE
+        self.types[t.lt] = t
+
         t = TypeGlobal(screenplay.NOTE)
         t.newTypeEnter = screenplay.ACTION
         t.newTypeTab = screenplay.CHARACTER
@@ -679,6 +697,10 @@ class ConfigGlobal:
             Command("ChangeToTransition", "Change current element's style to"
                     " transition.",
                     [util.Key(ord("T"), alt = True).toInt()]),
+
+            Command("ChangeToActBreak", "Change current element's style to"
+                    "Act Break.",
+                    [util.Key(ord("B"), alt = True).toInt()]),
 
             Command("CharacterMap", "Open the character map.",
                     isMenu = True),
@@ -1383,6 +1405,7 @@ def _init():
         (screenplay.PAREN,      "(",  "Parenthetical"),
         (screenplay.TRANSITION, "/",  "Transition"),
         (screenplay.SHOT,       "=",  "Shot"),
+        (screenplay.ACTBREAK,   "@",  "Act break"),
         (screenplay.NOTE,       "%",  "Note")
         ):
 

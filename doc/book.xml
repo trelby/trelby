@@ -115,6 +115,17 @@
 		  </listitem>
 		</varlistentry>
 
+        <varlistentry>
+		  <term>Act break</term>
+		  <listitem>
+
+			<para>Defines an act (typically used in teleplays).
+            Example: "ACT ONE" or "TEASER".
+            </para>
+
+		  </listitem>
+		</varlistentry>
+
 		<varlistentry>
 		  <term>Note</term>
 		  <listitem>
