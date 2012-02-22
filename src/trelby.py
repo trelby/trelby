@@ -1860,7 +1860,7 @@ class MyFrame(wx.Frame):
             tmp.Append(ID_ELEM_TO_DIALOGUE, "&Dialogue")
             tmp.Append(ID_ELEM_TO_TRANSITION, "&Transition")
             tmp.Append(ID_ELEM_TO_SHOT, "Sh&ot")
-            tmp.Append(ID_ELEM_TO_ACTBREAK, "Act &Break")
+            tmp.Append(ID_ELEM_TO_ACTBREAK, "Act &break")
             tmp.Append(ID_ELEM_TO_NOTE, "&Note")
 
             m.AppendSubMenu(tmp, "Element type")

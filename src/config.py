@@ -658,7 +658,7 @@ class ConfigGlobal:
         t.prevTypeTab = screenplay.CHARACTER
         self.types[t.lt] = t
 
-        # keyboard commands
+        # keyboard commands. these must be in alphabetical order.
         self.commands = [
             Command("Abort", "Abort something, e.g. selection,"
                     " auto-completion, etc.", [wx.WXK_ESCAPE], isFixed = True),
@@ -667,6 +667,10 @@ class ConfigGlobal:
 
             Command("AutoCompletionDlg", "Open the auto-completion dialog.",
                     isMenu = True),
+
+            Command("ChangeToActBreak", "Change current element's style to"
+                    " act break.",
+                    [util.Key(ord("B"), alt = True).toInt()]),
 
             Command("ChangeToAction", "Change current element's style to"
                     " action.",
@@ -697,10 +701,6 @@ class ConfigGlobal:
             Command("ChangeToTransition", "Change current element's style to"
                     " transition.",
                     [util.Key(ord("T"), alt = True).toInt()]),
-
-            Command("ChangeToActBreak", "Change current element's style to"
-                    "Act Break.",
-                    [util.Key(ord("B"), alt = True).toInt()]),
 
             Command("CharacterMap", "Open the character map.",
                     isMenu = True),
