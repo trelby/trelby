@@ -885,9 +885,11 @@ class ConfigGlobal:
                     isMenu = True),
 
             Command("ScriptNext", "Change to next open script.",
+                    [util.Key(wx.WXK_TAB, ctrl = True).toInt()],
                     isMenu = True),
 
             Command("ScriptPrev", "Change to previous open script.",
+                    [util.Key(wx.WXK_TAB, shift = True, ctrl = True).toInt()],
                     isMenu = True),
 
             Command("ScriptSettings", "Change script-specific settings.",
