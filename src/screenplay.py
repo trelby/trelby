@@ -461,6 +461,7 @@ class Screenplay:
             SHOT : "sh",
             TRANSITION : "tr",
             NOTE : "nt",
+            ACTBREAK : "ab",
         }
 
         # html header for files
@@ -477,7 +478,7 @@ pre {text-align: left !important; letter-spacing: 0 !important; margin-top: 0px 
 p {text-align: center;}
 .title, .footer {margin: 15px;}
 .spcenter {margin: 0 auto; width: 500px;}
-.sc {font-weight: bold !important;}
+.sc, .ab {font-weight: bold !important;}
 .nt {color: blue; font-style: italic !important;}
 </style>
 </head>
@@ -580,6 +581,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             SHOT : "Shot",
             TRANSITION : "Transition",
             NOTE : "Action",
+            ACTBREAK : "New Act",
         }
 
         for ele in eleList:
@@ -596,6 +598,15 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             paratxt = etree.SubElement(para, "Text")
             paratxt.text = unicode(txt, "ISO-8859-1")
+
+        # FD does not recognize "New Act" by default. It needs an
+        # ElementSettings element added.
+        eleSet = etree.SubElement(fd, "ElementSettings")
+        eleSet.set("Type", xmlMap[ACTBREAK])
+        eleSetFont = etree.SubElement(eleSet, "FontSpec")
+        eleSetFont.set("Style", "Underline+AllCaps")
+        eleSetPara = etree.SubElement(eleSet, "ParagraphSpec")
+        eleSetPara.set("Alignment","Center")
 
         return etree.tostring(
             fd, xml_declaration=True, encoding='UTF-8', pretty_print=True)
