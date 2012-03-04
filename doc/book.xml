@@ -427,9 +427,17 @@
 	<para>This chapter describes commands not discussed elsewhere.</para>
 
 	<sect1>
-	  <title>File/New,Open,Save,Save as,Close,Revert</title>
+	  <title>File/New,Open,Save,Save as,Close</title>
 
 	  <para>These do what you'd expect them to do.</para>
+
+	</sect1>
+
+	<sect1>
+	  <title>File/Revert</title>
+
+	  <para>Replaces the open script with the last version of it saved to
+	  disk.</para>
 
 	</sect1>
 
