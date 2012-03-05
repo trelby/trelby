@@ -124,22 +124,31 @@ class MyCharMap(wx.Window):
         pad = 5
 
         if self.selected:
-            self.drawCharBox(dc, "Selected:", self.selected, self.offset,
-                             y + pad, 75)
+            if ord(self.selected) == 32:
+                dc.SetFont(self.smallFont)
+                dc.DrawText("This character is a normal space.", self.offset,
+                            y + pad)
+            elif ord(self.selected) == 160:
+                dc.SetFont(self.smallFont)
+                dc.DrawText("This character is a non-breaking space.", self.offset,
+                            y + pad)
+            else:
+                self.drawCharBox(dc, "Selected:", self.selected, self.offset,
+                                 y + pad, 75)
 
-            c = util.upper(self.selected)
-            if c == self.selected:
-                c = util.lower(self.selected)
+                c = util.upper(self.selected)
                 if c == self.selected:
-                    c = None
+                    c = util.lower(self.selected)
+                    if c == self.selected:
+                        c = None
 
-            if c:
-                self.drawCharBox(dc, "Opposite case:", c, self.offset + 150,
-                                 y + pad, 110)
+                if c:
+                    self.drawCharBox(dc, "Opposite case:", c, self.offset + 150,
+                                     y + pad, 110)
 
-            dc.SetFont(self.smallFont)
-            dc.DrawText("Character code: %d" % ord(self.selected),
-                        360, y + pad)
+                dc.SetFont(self.smallFont)
+                dc.DrawText("Character code: %d" % ord(self.selected),
+                            360, y + pad)
         else:
             dc.SetFont(self.smallFont)
             dc.DrawText("Click on a character to select it.", self.offset,

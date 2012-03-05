@@ -528,6 +528,15 @@
 
 	</sect1>
 
+    <sect1>
+      <title>Edit/Insert non-breaking space</title>
+
+      <para>This adds a non-breaking space at the current cursor position.
+      This will ensure that the line will not break at this position when
+      it is being typed/formatted in.</para>
+
+    </sect1>
+
 	<sect1>
 	  <title>Edit/Find &amp; Replace</title>
 

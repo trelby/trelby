@@ -961,6 +961,9 @@ class MyCtrl(wx.Control):
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
+    def OnInsertNbsp(self):
+        self.OnKeyChar(util.MyKeyEvent(160))
+
     def OnFindNextError(self):
         self.clearAutoComp()
 
@@ -1702,6 +1705,8 @@ class MyFrame(wx.Frame):
         editMenu.Append(ID_EDIT_GOTO_PAGE, "&Goto page...\tCTRL-G")
         editMenu.Append(ID_EDIT_GOTO_SCENE, "Goto sc&ene...\tALT-G")
         editMenu.AppendSeparator()
+        editMenu.Append(ID_EDIT_INSERT_NBSP, "Insert non-breaking space...\tCTRL-SHIFT-SPACE")
+        editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_DELETE_ELEMENTS, "&Delete elements...")
@@ -1896,6 +1901,7 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_EDIT_SELECT_ALL, self.OnSelectAll)
         wx.EVT_MENU(self, ID_EDIT_GOTO_PAGE, self.OnGotoPage)
         wx.EVT_MENU(self, ID_EDIT_GOTO_SCENE, self.OnGotoScene)
+        wx.EVT_MENU(self, ID_EDIT_INSERT_NBSP, self.OnInsertNbsp)
         wx.EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
         wx.EVT_MENU(self, ID_EDIT_DELETE_ELEMENTS, self.OnDeleteElements)
         wx.EVT_MENU(self, ID_VIEW_STYLE_DRAFT, self.OnViewModeChange)
@@ -1975,6 +1981,7 @@ class MyFrame(wx.Frame):
             "ID_EDIT_FIND",
             "ID_EDIT_GOTO_SCENE",
             "ID_EDIT_GOTO_PAGE",
+            "ID_EDIT_INSERT_NBSP",
             "ID_EDIT_PASTE",
             "ID_EDIT_PASTE_FROM_CB",
             "ID_EDIT_SELECT_ALL",
@@ -2325,6 +2332,9 @@ class MyFrame(wx.Frame):
 
     def OnFind(self, event = None):
         self.panel.ctrl.OnFind()
+
+    def OnInsertNbsp(self, event = None):
+        self.panel.ctrl.OnInsertNbsp()
 
     def OnDeleteElements(self, event = None):
         self.panel.ctrl.OnDeleteElements()

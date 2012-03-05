@@ -773,6 +773,10 @@ class ConfigGlobal:
 
             Command("ImportScript", "Import a script.", isMenu = True),
 
+            Command("InsertNbsp", "Insert non-breaking space.",
+                    [util.Key(wx.WXK_SPACE, shift = True, ctrl = True).toInt()],
+                    isFixed = True, isMenu = True),
+
             Command("LoadScriptSettings", "Load script-specific settings.",
                     isMenu = True),
 

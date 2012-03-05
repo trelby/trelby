@@ -153,7 +153,7 @@ def isValidInputChar(kc):
     # characters like euro etc in windows-1252. 0x7F = backspace, 0xA0 =
     # non-breaking space, 0xAD = soft hyphen.
     return (kc >= 32) and (kc <= 255) and not\
-           ((kc >= 0x7F) and (kc <= 0xA0)) and (kc != 0xAD)
+           ((kc >= 0x7F) and (kc < 0xA0)) and (kc != 0xAD)
 
 # return s with all non-valid input characters converted to valid input
 # characters, except form feeds, which are just deleted.
