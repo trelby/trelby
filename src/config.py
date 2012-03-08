@@ -756,12 +756,12 @@ class ConfigGlobal:
                     [util.Key(wx.WXK_F11).toInt()], isFixed = True,
                     isMenu = True),
 
-            Command("GotoScene", "Goto to a given scene.",
-                    [util.Key(ord("G"), alt = True).toInt()], isFixed = True,
-                    isMenu = True),
-
             Command("GotoPage", "Goto to a given page.",
                     [util.Key(7, ctrl = True).toInt()], isFixed = True,
+                    isMenu = True),
+
+            Command("GotoScene", "Goto to a given scene.",
+                    [util.Key(ord("G"), alt = True).toInt()], isFixed = True,
                     isMenu = True),
 
             Command("HeadersDlg", "Open the headers dialog.", isMenu = True),
@@ -773,10 +773,10 @@ class ConfigGlobal:
 
             Command("ImportScript", "Import a script.", isMenu = True),
 
-            Command("LoadSettings", "Load global settings.", isMenu = True),
-
             Command("LoadScriptSettings", "Load script-specific settings.",
                     isMenu = True),
+
+            Command("LoadSettings", "Load global settings.", isMenu = True),
 
             Command("LocationsDlg", "Open the locations dialog.",
                     isMenu = True),
@@ -871,17 +871,17 @@ class ConfigGlobal:
             Command("RevertScript", "Revert current script to the"
                     " version on disk.", isMenu = True),
 
-            Command("SaveScriptSettingsAs", "Save script-specific settings"
-                    " to a new file.", isMenu = True),
-
-            Command("SaveSettingsAs", "Save global settings to a new file.",
-                    isMenu = True),
-
             Command("SaveScript", "Save the current script.",
                     [util.Key(19, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
 
             Command("SaveScriptAs", "Save the current script to a new file.",
+                    isMenu = True),
+
+            Command("SaveScriptSettingsAs", "Save script-specific settings"
+                    " to a new file.", isMenu = True),
+
+            Command("SaveSettingsAs", "Save global settings to a new file.",
                     isMenu = True),
 
             Command("ScriptNext", "Change to next open script.",
@@ -903,12 +903,12 @@ class ConfigGlobal:
 
             Command("Settings", "Change global settings.", isMenu = True),
 
-            Command("SpellCheckerDlg","Spell check the script.",
-                    [util.Key(wx.WXK_F8).toInt()], isMenu = True),
-
             Command("SpellCheckerDictionaryDlg",
                     "Open the global spell checker dictionary dialog.",
                     isMenu = True),
+
+            Command("SpellCheckerDlg","Spell check the script.",
+                    [util.Key(wx.WXK_F8).toInt()], isMenu = True),
 
             Command("SpellCheckerScriptDictionaryDlg",
                     "Open the script-specific spell checker dictionary"
@@ -1135,6 +1135,20 @@ class ConfigGlobal:
     # version, etc. this is not at the end of __init__ because
     # non-interactive uses have no needs for these.
     def setDefaults(self):
+        # check keyboard commands are listed in correct order
+        commands = [cmd.name for cmd in self.commands]
+        commandsSorted = sorted(commands)
+
+        if commands != commandsSorted:
+            # for i in range(len(commands)):
+            #     if commands[i] != commandsSorted[i]:
+            #         print "Got: %s Expected: %s" % (commands[i], commandsSorted[i])
+
+            # if you get this error, you've put a new command you've added
+            # in an incorrect place in the command list. uncomment the
+            # above lines to figure out where it should be.
+            raise ConfigError("Commands not listed in correct order")
+
         self.setDefaultFonts()
         self.findPDFViewer()
 
