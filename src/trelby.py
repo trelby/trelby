@@ -2167,17 +2167,31 @@ class MyFrame(wx.Frame):
         self.panel.ctrl.updateCommon()
         self.setTitle(self.panel.ctrl.fileNameDisplay)
 
-    def OnScriptNext(self, event = None):
-        now = self.tabCtrl.getSelectedPageIndex()
-        ln = self.tabCtrl.getPageCount()
+    def selectScript(self, toNext):
+        current = self.tabCtrl.getSelectedPageIndex()
+        pageCnt = self.tabCtrl.getPageCount()
 
-        self.tabCtrl.selectPage((now + 1) % ln)
+        if toNext:
+            pageNr = current + 1
+        else:
+            pageNr = current - 1
+
+        if pageNr == -1:
+            pageNr = pageCnt - 1
+        elif pageNr == pageCnt:
+            pageNr = 0
+
+        if pageNr == current:
+            # only one tab, nothing to do
+            return
+
+        self.tabCtrl.selectPage(pageNr)
+
+    def OnScriptNext(self, event = None):
+        self.selectScript(True)
 
     def OnScriptPrev(self, event = None):
-        now = self.tabCtrl.getSelectedPageIndex()
-        ln = self.tabCtrl.getPageCount()
-
-        self.tabCtrl.selectPage((now - 1) % ln)
+        self.selectScript(False)
 
     def OnNewScript(self, event = None):
         self.panel = self.createNewPanel()
