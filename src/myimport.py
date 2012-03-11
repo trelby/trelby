@@ -8,10 +8,90 @@ import re
 from lxml import etree
 
 import wx
+import zipfile
 
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."
 SCENE_ACTION = -2
+
+# like importTextFile, but for Celtx files.
+def importCeltx(fileName, frame):
+    # Celtx files are zipfiles, and the script content is within a file
+    # called "script-xxx.html", where xxx can be random.
+
+    try:
+        z = zipfile.ZipFile(fileName)
+    except:
+        wx.MessageBox("Unable to extract contents from this file.", "Error", wx.OK, frame)
+        return None
+
+    files = z.namelist()
+    scripts = [s for s in files if s.startswith("script") ]
+
+    if len(scripts) == 0:
+        wx.MessageBox("Unable to find script in this celtx file.", "Error", wx.OK, frame)
+        return None
+
+    f = z.open(scripts[0])
+    content = f.read()
+    f.close()
+
+    if not content:
+        wx.MessageBox("Script seems to be empty.", "Error", wx.OK, frame)
+        return None
+
+    elemMap = {
+        "action" : screenplay.ACTION,
+        "character" : screenplay.CHARACTER,
+        "dialog" : screenplay.DIALOGUE,
+        "parenthetical" : screenplay.PAREN,
+        "sceneheading" : screenplay.SCENE,
+        "shot" : screenplay.SHOT,
+        "transition" : screenplay.TRANSITION,
+        "act" : screenplay.ACTBREAK,
+    }
+
+    try:
+        parser = etree.HTMLParser()
+        root = etree.XML(content, parser)
+    except:
+        wx.MessageBox("Could not parse input file", "Error", wx.OK, frame)
+        return None
+
+    lines = []
+
+    def addElem(eleType, eleText):
+        lns = eleText.split("\n")
+
+        # if elem ends in a newline, last line is empty and useless;
+        # get rid of it
+        if not lns[-1] and (len(lns) > 1):
+            lns = lns[:-1]
+        for s in lns[:-1]:
+            lines.append(screenplay.Line(
+                    screenplay.LB_FORCED, eleType, util.cleanInput(s)))
+
+        lines.append(screenplay.Line(
+                screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
+
+    for para in root.xpath("/html/body/p"):
+
+        cls = para.get("class")
+        if (cls == "") or (cls is None):
+            cls = "action"
+
+        s = []
+        for line in para.itertext():
+            s.append(line.replace("\n", " "))
+
+        lt = elemMap.get(cls, screenplay.ACTION)
+        addElem(lt, u"\n".join(s))
+
+    if len(lines) == 0:
+        wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
+        return None
+
+    return lines
 
 # like importTextFile, but for Final Draft files.
 def importFDX(fileName, frame):

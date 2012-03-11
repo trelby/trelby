@@ -1529,10 +1529,10 @@
 	<sect1>
 	  <title>Import</title>
 
-	  <para>Existing screenplays can currently be imported from two
-	  file formats: as formatted ASCII text, and Final Draft XML (.fdx).
-      The following section documents the format these files should have
-      for optimal import processing.</para>
+	  <para>Existing screenplays can currently be imported from three
+  	  file formats: as formatted ASCII text, Final Draft XML (.fdx) and
+      Celtx (.celtx). The following section documents the format these
+      files should have for optimal import processing.</para>
 
 	  <sect2>
 		<title>ASCII Text files</title>
@@ -1622,6 +1622,27 @@ Something starts beeping.
 
             <para>Script notes in Final Draft are imported as
             notes.</para>
+
+          </listitem>
+
+        </itemizedlist>
+
+		<para>Note that no formatting settings are imported at all.</para>
+
+	  </sect2>
+
+	  <sect2>
+		<title>Celtx (.celtx)</title>
+
+		<para>These files are created by the Celtx program.</para>
+
+		<itemizedlist>
+
+		  <listitem>
+
+            <para>Screenplay elements (Action, Dialog, etc) that Trelby
+            understands are imported. Others are converted to 'Action'
+            type.</para>
 
           </listitem>
 

@@ -311,6 +311,8 @@ class MyCtrl(wx.Control):
     def importFile(self, fileName):
         if fileName[-3:] == "fdx":
             lines = myimport.importFDX(fileName, mainFrame)
+        elif fileName[-5:] == "celtx":
+            lines = myimport.importCeltx(fileName, mainFrame)
         else:
             lines = myimport.importTextFile(fileName, mainFrame)
         if not lines:
@@ -2228,7 +2230,7 @@ class MyFrame(wx.Frame):
     def OnImportScript(self, event = None):
         dlg = wx.FileDialog(self, "File to import",
             misc.scriptDir,
-            wildcard = "Importable files (*.txt;*.fdx)|*.fdx;*.txt|Formatted text files (*.txt)|*.txt|Final Draft XML(*.fdx)|*.fdx|All files|*",
+            wildcard = "Importable files (*.txt;*.fdx;*.celtx)|*.fdx;*.txt;*.celtx|Celtx files (*.celtx)|*.celtx|Formatted text files (*.txt)|*.txt|Final Draft XML(*.fdx)|*.fdx|All files|*",
             style = wx.OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
