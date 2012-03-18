@@ -1705,7 +1705,7 @@ class MyFrame(wx.Frame):
         editMenu.Append(ID_EDIT_GOTO_PAGE, "&Goto page...\tCTRL-G")
         editMenu.Append(ID_EDIT_GOTO_SCENE, "Goto sc&ene...\tALT-G")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_INSERT_NBSP, "Insert non-breaking space...\tCTRL-SHIFT-SPACE")
+        editMenu.Append(ID_EDIT_INSERT_NBSP, "Insert non-breaking space")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
         editMenu.AppendSeparator()

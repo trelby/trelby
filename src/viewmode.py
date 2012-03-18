@@ -1,3 +1,5 @@
+# -*- coding: iso-8859-1 -*-
+
 import config
 import mypager
 import pml
@@ -613,7 +615,7 @@ class ViewModeOverview(ViewMode):
             sx, sy = tl[1][1][i]
 
             for j in xrange(len(s)):
-                if s[j] != " ":
+                if s[j] not in (" ", " "):
                     off = sx + j * self.size
 
                     for x in range(self.size):

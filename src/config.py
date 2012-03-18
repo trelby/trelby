@@ -775,7 +775,7 @@ class ConfigGlobal:
 
             Command("InsertNbsp", "Insert non-breaking space.",
                     [util.Key(wx.WXK_SPACE, shift = True, ctrl = True).toInt()],
-                    isFixed = True, isMenu = True),
+                    isMenu = True),
 
             Command("LoadScriptSettings", "Load script-specific settings.",
                     isMenu = True),

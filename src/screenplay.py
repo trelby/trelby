@@ -1,3 +1,5 @@
+# -*- coding: iso-8859-1 -*-
+
 # linebreak types
 
 LB_SPACE = 1
@@ -2235,7 +2237,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 msg = "Empty line."
                 break
 
-            if (len(ln.text.strip(" ")) == 0) and (ln.lt != NOTE):
+            if (len(ln.text.strip("  ")) == 0) and (ln.lt != NOTE):
                 msg = "Empty line (contains only spaces)."
                 break
 

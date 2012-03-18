@@ -24,7 +24,7 @@ def testNbspAtEOL():
     sp.cmd("addChar", char = chr(160))
     sp.cmd("addChar", char = "a")
     assert sp.lines[3].text.endswith("mind")
-    assert sp.lines[4].text.startswith("would")
+    assert sp.lines[4].text.startswith("would%sa" % chr(160))
     assert (sp.line == 4) and (sp.column == 7)
     assert sp.lines[3].lb == scr.LB_SPACE
     assert sp.lines[4].lb == scr.LB_LAST
