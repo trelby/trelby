@@ -729,7 +729,7 @@ class ConfigGlobal:
                     " or selected text.", [wx.WXK_DELETE], isFixed = True),
 
             Command("DeleteBackward", "Delete the character behind the"
-                    " cursor.", [wx.WXK_BACK], isFixed = True),
+                    " cursor.", [wx.WXK_BACK, util.Key(wx.WXK_BACK, shift = True).toInt()], isFixed = True),
 
             Command("DeleteElements", "Open the 'Delete elements' dialog.",
                     isMenu = True),
