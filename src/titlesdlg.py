@@ -123,6 +123,21 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
+        hsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
+        self.alignCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
+
+        for it in [ ("Left", util.ALIGN_LEFT), ("Center", util.ALIGN_CENTER),
+                    ("Right", util.ALIGN_RIGHT) ]:
+            self.alignCombo.Append(it[0], it[1])
+
+        hsizer.Add(self.alignCombo, 0, wx.LEFT, 10)
+        wx.EVT_COMBOBOX(self, self.alignCombo.GetId(), self.OnMisc)
+
+        vsizer2.Add(hsizer, 0, wx.TOP, 5)
+
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
+
         hsizer.Add(wx.StaticText(self, -1, "Font:"), 0,
                    wx.ALIGN_CENTER_VERTICAL)
         self.fontCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
@@ -162,7 +177,6 @@ class TitlesDlg(wx.Dialog):
         if misc.isWindows:
             pad = 5
 
-        self.addCheckBox("Centered", self, vsizer2, pad)
         self.addCheckBox("Bold", self, vsizer2, pad)
         self.addCheckBox("Italic", self, vsizer2, pad)
         self.addCheckBox("Underlined", self, vsizer2, pad)
@@ -197,7 +211,7 @@ class TitlesDlg(wx.Dialog):
         wx.EVT_LISTBOX(self, self.stringsLb.GetId(), self.OnStringsLb)
 
         # list of widgets that are specific to editing the selected string
-        self.widList = [ self.textEntry, self.xEntry, self.centeredCb,
+        self.widList = [ self.textEntry, self.xEntry, self.alignCombo,
                          self.yEntry, self.fontCombo, self.sizeEntry,
                          self.boldCb, self.italicCb, self.underlinedCb ]
 
@@ -349,7 +363,6 @@ class TitlesDlg(wx.Dialog):
 
             self.textEntry.SetValue("")
             self.xEntry.SetValue("")
-            self.centeredCb.SetValue(False)
             self.yEntry.SetValue("")
             self.sizeEntry.SetValue(12)
             self.boldCb.SetValue(False)
@@ -369,9 +382,10 @@ class TitlesDlg(wx.Dialog):
             self.xEntry.Disable()
 
         self.textEntry.SetValue(ts.text)
-        self.centeredCb.SetValue(ts.isCentered)
         self.xEntry.SetValue("%.2f" % ts.x)
         self.yEntry.SetValue("%.2f" % ts.y)
+
+        util.reverseComboSelect(self.alignCombo, ts.getAlignment())
 
         util.reverseComboSelect(self.fontCombo, ts.font)
         self.sizeEntry.SetValue(ts.size)
@@ -396,7 +410,7 @@ class TitlesDlg(wx.Dialog):
         ts.x = util.str2float(self.xEntry.GetValue(), 0.0)
         ts.y = util.str2float(self.yEntry.GetValue(), 0.0)
 
-        ts.isCentered = self.centeredCb.GetValue()
+        ts.setAlignment(self.alignCombo.GetClientData(self.alignCombo.GetSelection()))
         self.xEntry.Enable(not ts.isCentered)
 
         ts.size = util.getSpinValue(self.sizeEntry)
@@ -477,6 +491,9 @@ class TitlesPreview(wx.Window):
                     xp = w // 2 - textW // 2
                 else:
                     xp = int((ts.x / self.cfg.paperWidth) * w)
+
+                if ts.isRightJustified:
+                    xp -= textW
 
                 yp = int((ts.y / self.cfg.paperHeight) * h)
 

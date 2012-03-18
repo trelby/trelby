@@ -74,6 +74,10 @@ class TitleString:
         # whether this is centered in the horizontal direction
         self.isCentered = isCentered
 
+        # whether this is right-justified (xpos = rightmost edge of last
+        # character)
+        self.isRightJustified = False
+
         # style flags
         self.isBold = isBold
         self.isItalic = False
@@ -96,17 +100,33 @@ class TitleString:
 
         return fl
 
+    def getAlignment(self):
+        if self.isCentered:
+            return util.ALIGN_CENTER
+        elif self.isRightJustified:
+            return util.ALIGN_RIGHT
+        else:
+            return util.ALIGN_LEFT
+
+    def setAlignment(self, align):
+        if align == util.ALIGN_CENTER:
+            self.isCentered = True
+            self.isRightJustified = False
+        elif align == util.ALIGN_RIGHT:
+            self.isCentered = False
+            self.isRightJustified = True
+        else:
+            self.isCentered = False
+            self.isRightJustified = False
+
     def generatePML(self, page):
         x = self.x
 
-        align = util.ALIGN_LEFT
-
         if self.isCentered:
             x = page.doc.w / 2.0
-            align = util.ALIGN_CENTER
 
         page.add(pml.TextOp(self.text, x, self.y, self.size,
-                            self.getStyle(), align))
+                            self.getStyle(), self.getAlignment()))
 
     # return a (rough) RTF fragment representation of this string
     def generateRTF(self):
@@ -114,6 +134,8 @@ class TitleString:
 
         if self.isCentered:
             tmp += " \qc"
+        elif self.isRightJustified:
+            tmp += " \qr"
 
         if self.isBold:
             tmp += r" \b"
@@ -141,8 +163,8 @@ class TitleString:
         self.y = util.str2float(a[1], 0.0)
         self.size = util.str2int(a[2], 12, 4, 288)
 
-        self.isCentered, self.isBold, self.isItalic, self.isUnderlined = \
-            util.flags2bools(a[3], "cbiu")
+        self.isCentered, self.isRightJustified, self.isBold, self.isItalic, \
+            self.isUnderlined = util.flags2bools(a[3], "crbiu")
 
         tmp = { "Courier" : pml.COURIER,
                 "Helvetica" : pml.HELVETICA,
@@ -155,7 +177,7 @@ class TitleString:
     def __str__(self):
         s = "%f,%f,%d," % (self.x, self.y, self.size)
 
-        s += util.bools2flags("cbiu", self.isCentered, self.isBold,
+        s += util.bools2flags("crbiu", self.isCentered, self.isRightJustified, self.isBold,
                                self.isItalic, self.isUnderlined)
         s += ","
 

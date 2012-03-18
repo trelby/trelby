@@ -150,6 +150,9 @@ pages exist yet, creates one. Example:
    c: Text is centered horizontally on the page. In this case xpos is not
    used for anything.
 
+   r: Text is right-justified; meaning of xpos changes to mean the
+   rightmost edge of the last character.
+
    b, i, u: Text is bold / italic / underlined.
 
   'font' is the font name. Currently supported are Courier, Helvetica and

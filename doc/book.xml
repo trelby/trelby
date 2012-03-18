@@ -775,10 +775,43 @@
 	  the selected text string shown in red.</para>
 
 	  <para>At the bottom of the window are the settings for the selected
-	  text string. There's the text itself, the position of its upper left
-	  corner as an offset from the paper's upper left corner, font, size,
-	  and style. 'Centered' means that the text is centered horizontally
-	  on the page.</para>
+	  text string. There's the text itself, the position of it, and its
+	  font, size, and style.</para>
+
+      <para>The aligment setting has three possible options:</para>
+
+	  <variablelist>
+
+		<varlistentry>
+		  <term>Left</term>
+		  <listitem>
+
+			<para>Left-justified. X-Pos setting means the horizontal
+			position of the leftmost edge of the first character.</para>
+
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Center</term>
+		  <listitem>
+
+			<para>Centered on the page. X-Pos setting is ignored.</para>
+
+		  </listitem>
+		</varlistentry>
+
+		<varlistentry>
+		  <term>Right</term>
+		  <listitem>
+
+			<para>Right-justified. X-Pos setting means the horizontal
+			position of the rightmost edge of the last character.</para>
+
+		  </listitem>
+		</varlistentry>
+
+	  </variablelist>
 
 	  <para>Finally there's a 'Preview' button that you can use to get an
 	  accurate preview of all of the title pages.</para>
