@@ -85,7 +85,7 @@ The following config sections exists and appear in the file in this order:
 
   In addition, there are element-type specific config directives, which
   are named "Element/x/y", where x is (Scene|Action|Character|Dialogue|
-  Parenthetical|Transition|Shot|Note) and y is one of:
+  Parenthetical|Transition|Shot|Note|Act break) and y is one of:
 
    BeforeSpacing (integer): How many lines to leave empty above a block,
    in units of line * 10, i.e. a value of 15 would mean 1.5 lines.
