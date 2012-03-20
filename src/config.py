@@ -991,6 +991,9 @@ class ConfigGlobal:
         # whether to recenter screen when cursor moves out of it
         v.addBool("recenterOnScroll", False, "RecenterOnScroll")
 
+        # whether to replace selected text or not.
+        v.addBool("overwriteSelectionOnInsert", True, "overwriteSelectionOnInsert")
+
         # whether to use per-elem-type colors (textSceneColor etc.)
         # instead of using textColor for all elem types
         v.addBool("useCustomElemColors", False, "UseCustomElemColors")

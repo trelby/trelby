@@ -1076,6 +1076,13 @@ class MiscPanel(wx.Panel):
         wx.EVT_CHECKBOX(self, self.recenterOnScroll.GetId(), self.OnMisc)
         vsizer.Add(self.recenterOnScroll, 0, wx.BOTTOM, pad)
 
+        self.overwriteSelectionOnInsert = wx.CheckBox(self, -1,
+            "When text is selected, typing replaces text")
+        wx.EVT_CHECKBOX(self, self.overwriteSelectionOnInsert.GetId(), self.OnMisc)
+        vsizer.Add(self.overwriteSelectionOnInsert, 0, wx.BOTTOM, pad)
+
+
+
         self.checkErrorsCb = wx.CheckBox(self, -1,
             "Check script for errors before print, export or compare")
         wx.EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
@@ -1133,6 +1140,7 @@ class MiscPanel(wx.Panel):
         self.cfg.honorSavedPos = self.honorSavedPos.GetValue()
         self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
         self.cfg.recenterOnScroll = self.recenterOnScroll.GetValue()
+        self.cfg.overwriteSelectionOnInsert = self.overwriteSelectionOnInsert.GetValue()
         self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
         self.cfg.confirmDeletes = util.getSpinValue(self.confDelEntry)
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
@@ -1185,6 +1193,7 @@ class MiscPanel(wx.Panel):
         self.honorSavedPos.SetValue(self.cfg.honorSavedPos)
         self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
         self.recenterOnScroll.SetValue(self.cfg.recenterOnScroll)
+        self.overwriteSelectionOnInsert.SetValue(self.cfg.overwriteSelectionOnInsert)
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
         self.confDelEntry.SetValue(self.cfg.confirmDeletes)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)

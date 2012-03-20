@@ -789,18 +789,20 @@ class MyCtrl(wx.Control):
             self.loadFile(self.fileName)
             self.updateScreen()
 
+    # Hook function for cut/copy/delete operations.
+    # Returns True if something was deleted, else False.
     def OnCut(self, doUpdate = True, doDelete = True, copyToClip = True):
         marked = self.sp.getMarkedLines()
 
         if not marked:
-            return None
+            return False
 
         if not copyToClip and cfgGl.confirmDeletes and (
             (marked[1] - marked[0] + 1) >= cfgGl.confirmDeletes):
             if wx.MessageBox("Are you sure you want to delete\n"
                              "the selected text?", "Confirm",
                              wx.YES_NO | wx.NO_DEFAULT, self) == wx.NO:
-                return
+                return False
 
         cd = self.sp.getSelectedAsCD(doDelete)
 
@@ -810,6 +812,8 @@ class MyCtrl(wx.Control):
         if doUpdate:
             self.makeLineVisible(self.sp.line)
             self.updateScreen()
+
+        return True
 
     def OnCopy(self):
         self.OnCut(doDelete = False)
@@ -1328,6 +1332,14 @@ class MyCtrl(wx.Control):
             # how to get around the isValidInputChar test in the preceding
             # line, need to test what GetUnicodeKey() returns on
             # non-input-character events)
+
+            # If there's something selected, either remove it, or clear selection.
+            if self.sp.mark and self.sp.cfgGl.overwriteSelectionOnInsert:
+                if not self.OnCut(doUpdate = False, copyToClip = False):
+                    self.sp.clearMark()
+                    self.updateScreen()
+                    return
+
             cs.char = chr(kc)
 
             if opts.isTest and (cs.char == "å"):
