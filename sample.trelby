@@ -135,6 +135,18 @@ Element/Note/Export/AllCaps:False
 Element/Note/Export/Bold:False
 Element/Note/Export/Italic:True
 Element/Note/Export/Underlined:False
+Element/Act break/BeforeSpacing:10
+Element/Act break/IntraSpacing:0
+Element/Act break/Indent:25
+Element/Act break/Width:10
+Element/Act break/Screen/AllCaps:True
+Element/Act break/Screen/Bold:True
+Element/Act break/Screen/Italic:False
+Element/Act break/Screen/Underlined:True
+Element/Act break/Export/AllCaps:True
+Element/Act break/Export/Bold:False
+Element/Act break/Export/Italic:False
+Element/Act break/Export/Underlined:True
 Font/Bold-Italic/Name:
 Font/Bold-Italic/Filename:
 Font/Bold/Name:
@@ -165,10 +177,9 @@ Words/13:walkie
 Words/14:zzzz
 #End-Spell-Checker-Dict 
 #Title-String 0.000000,80.000000,32,cb,Times,,THE KOALA INCIDENT
-#Title-String 0.000000,100.000000,12,c,Courier,,by
-#Title-String 0.000000,108.470000,12,c,Courier,,Anonymous Person
-#Title-String 67.000000,200.000000,12,c,Courier,,Sample script for Trelby.
-#Title-String 160.000000,208.000000,12,c,Courier,,All rights reserved.
+#Title-String 0.000000,100.000000,12,c,Courier,,by\n\nAnonymous Person
+#Title-String 67.000000,200.000000,12,c,Courier,,Sample script for Trelby.\n\nAll rights reserved.
+#Title-String 200.000000,240.000000,12,r,Courier,,Agent: Nobody Nowhere\nTel: 123 456 789
 #Header-String 1,0,r,,${PAGE}.
 #Header-Empty-Lines 1
 #Start-Script 

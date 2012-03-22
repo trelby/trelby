@@ -53,3 +53,20 @@ def testFromUTF8():
     assert f("yÃ¶") == "yö"
     assert f("yö12345") == "y12345"
     assert f("a\xE2\x82\xACb") == "ab"
+
+def testEscapeStrings():
+    u.init()
+
+    data = [
+        ([], ""),
+        (["a"], "a"),
+        (["a", "b"], "a\\nb"),
+        (["a", "b", "cc"], "a\\nb\\ncc"),
+        (["foo\\bar", "blaa"], "foo\\\\bar\\nblaa"),
+        (["a\\n", "c"], "a\\\\n\\nc"),
+        (["a\\", "b"], "a\\\\\\nb"),
+        ]
+
+    for items,s in data:
+        assert util.escapeStrings(items) == s
+        assert util.unescapeStrings(s) == items

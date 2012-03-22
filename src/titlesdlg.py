@@ -91,11 +91,15 @@ class TitlesDlg(wx.Dialog):
 
         hsizer.Add(wx.StaticText(self, -1, "Text:"), 0,
                    wx.ALIGN_CENTER_VERTICAL)
-        self.textEntry = wx.TextCtrl(self, -1)
+        self.textEntry = wx.TextCtrl(
+            self, -1, style = wx.TE_MULTILINE | wx.TE_DONTWRAP, size = (200, 75))
         hsizer.Add(self.textEntry, 1, wx.LEFT, 10)
         wx.EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
+
+        # TODO: should use FlexGridSizer, like headersdlg, to get neater
+        # layout
 
         hsizerTop = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -305,7 +309,7 @@ class TitlesDlg(wx.Dialog):
             ts = copy.deepcopy(self.titles.pages[self.pageIndex][self.tsIndex])
             ts.y += util.getTextHeight(ts.size)
         else:
-            ts = titles.TitleString("new string", 0.0, 100.0)
+            ts = titles.TitleString(["new string"], 0.0, 100.0)
 
         self.titles.pages[self.pageIndex].append(ts)
         self.tsIndex = len(self.titles.pages[self.pageIndex]) - 1
@@ -342,7 +346,7 @@ class TitlesDlg(wx.Dialog):
             self.delBtn.Enable(len(page) > 0)
 
             for s in page:
-                self.stringsLb.Append(s.text)
+                self.stringsLb.Append("--".join(s.items))
 
             if self.tsIndex != -1:
                 self.stringsLb.SetSelection(self.tsIndex)
@@ -381,7 +385,8 @@ class TitlesDlg(wx.Dialog):
         if ts.isCentered:
             self.xEntry.Disable()
 
-        self.textEntry.SetValue(ts.text)
+        self.textEntry.SetValue("\n".join(ts.items))
+
         self.xEntry.SetValue("%.2f" % ts.x)
         self.yEntry.SetValue("%.2f" % ts.y)
 
@@ -404,8 +409,10 @@ class TitlesDlg(wx.Dialog):
 
         ts = self.titles.pages[self.pageIndex][self.tsIndex]
 
-        ts.text = util.toInputStr(misc.fromGUI(self.textEntry.GetValue()))
-        self.stringsLb.SetString(self.tsIndex, ts.text)
+        ts.items = [util.toInputStr(s) for s in
+                    misc.fromGUI(self.textEntry.GetValue()).split("\n")]
+
+        self.stringsLb.SetString(self.tsIndex, "--".join(ts.items))
 
         ts.x = util.str2float(self.xEntry.GetValue(), 0.0)
         ts.y = util.str2float(self.yEntry.GetValue(), 0.0)
@@ -476,32 +483,42 @@ class TitlesPreview(wx.Window):
             for i in range(len(page)):
                 ts = page[i]
 
-                if len(ts.text) == 0:
-                    continue
+                # text height in mm
+                textHinMM = util.getTextHeight(ts.size)
 
-                textW = int((util.getTextWidth(ts.text, ts.getStyle(),
-                    ts.size) / self.cfg.paperWidth) * w)
-                textW = max(1, textW)
-
-                textH = int((util.getTextHeight(ts.size) /
-                             self.cfg.paperHeight) * h)
+                textH = int((textHinMM / self.cfg.paperHeight) * h)
                 textH = max(1, textH)
+                y = ts.y
 
-                if ts.isCentered:
-                    xp = w // 2 - textW // 2
-                else:
-                    xp = int((ts.x / self.cfg.paperWidth) * w)
+                for line in ts.items:
+                    # people may have empty lines in between non-empty
+                    # lines to achieve double spaced lines; don't draw a
+                    # rectangle for lines consisting of nothing but
+                    # whitespace
 
-                if ts.isRightJustified:
-                    xp -= textW
+                    if line.strip():
+                        textW = int((util.getTextWidth(line, ts.getStyle(),
+                            ts.size) / self.cfg.paperWidth) * w)
+                        textW = max(1, textW)
 
-                yp = int((ts.y / self.cfg.paperHeight) * h)
+                        if ts.isCentered:
+                            xp = w // 2 - textW // 2
+                        else:
+                            xp = int((ts.x / self.cfg.paperWidth) * w)
 
-                if i == self.ctrl.tsIndex:
-                    dc.SetPen(wx.RED_PEN)
-                    dc.SetBrush(wx.RED_BRUSH)
-                else:
-                    dc.SetPen(wx.BLACK_PEN)
-                    dc.SetBrush(wx.BLACK_BRUSH)
+                        if ts.isRightJustified:
+                            xp -= textW
 
-                dc.DrawRectangle(ox + xp, oy + yp, textW, textH)
+                        if i == self.ctrl.tsIndex:
+                            dc.SetPen(wx.RED_PEN)
+                            dc.SetBrush(wx.RED_BRUSH)
+                        else:
+                            dc.SetPen(wx.BLACK_PEN)
+                            dc.SetBrush(wx.BLACK_BRUSH)
+
+                        yp = int((y / self.cfg.paperHeight) * h)
+
+                        dc.DrawRectangle(ox + xp, oy + yp, textW, textH)
+
+                    y += textHinMM
+

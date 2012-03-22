@@ -281,7 +281,7 @@ class Screenplay:
                     if len(sp.titles.pages) == 0:
                         sp.titles.pages.append([])
 
-                    tmp = titles.TitleString()
+                    tmp = titles.TitleString([])
                     tmp.load(val)
                     sp.titles.pages[-1].append(tmp)
 
@@ -496,10 +496,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         # title pages
         for page in self.titles.pages:
-            for s in page:
-                para = etree.SubElement(content, "p")
-                para.set("class", "title")
-                para.text = unicode(s.text, "ISO-8859-1")
+            for ts in page:
+                for s in ts.items:
+                    para = etree.SubElement(content, "p")
+                    para.set("class", "title")
+                    para.text = unicode(s, "ISO-8859-1")
 
             para = etree.SubElement(content, "p")
             para.set("class", "title")

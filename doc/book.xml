@@ -775,8 +775,8 @@
 	  the selected text string shown in red.</para>
 
 	  <para>At the bottom of the window are the settings for the selected
-	  text string. There's the text itself, the position of it, and its
-	  font, size, and style.</para>
+	  text string. There's the text itself (which can consist of multiple
+	  lines), the position of it, and its font, size, and style.</para>
 
       <para>The aligment setting has three possible options:</para>
 

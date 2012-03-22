@@ -63,7 +63,7 @@ The following config sections exists and appear in the file in this order:
 
   ShowTOC (boolean): Whether to show the table of contents when opening
   the PDF file.
-        
+
   OpenOnCurrentPage (boolean): If True, display current page in the PDF
   file when opening it.
 
@@ -160,7 +160,10 @@ pages exist yet, creates one. Example:
 
   'reserved' is reserved for future expansion and is empty for now.
 
-  'text' is the text string.
+  'text' is the text string. Multi-line strings are indicated by embedded
+  \n escapes. The literal \ character is escaped as \\. For multi-line
+  string, each additional line's y position should be increased by the
+  font's size.
 
 "Header-String". Adds a new header string. Example:
 

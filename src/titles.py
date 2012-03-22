@@ -13,15 +13,13 @@ class Titles:
         a = []
 
         y = 105.0
-        a.append(TitleString("UNTITLED SCREENPLAY", y = y, size = 24,
+        a.append(TitleString(["UNTITLED SCREENPLAY"], y = y, size = 24,
                              isBold = True, font = pml.HELVETICA))
-        a.append(TitleString("by", y = y + 15.46))
-        a.append(TitleString("My Name Here", y = y + 23.93))
+        a.append(TitleString(["by", "", "My Name Here"], y = y + 15.46))
 
         x = 15.0
         y = 240.0
-        a.append(TitleString("123/456-7890", x, y + 8.46, False))
-        a.append(TitleString("no.such@thing.com", x, y + 12.7, False))
+        a.append(TitleString(["123/456-7890", "no.such@thing.com"], x, y + 8.46, False))
 
         self.pages.append(a)
 
@@ -58,11 +56,11 @@ class Titles:
 
 # a single string displayed on a title page
 class TitleString:
-    def __init__(self, text = "", x = 0.0, y = 0.0, isCentered = True,
+    def __init__(self, items, x = 0.0, y = 0.0, isCentered = True,
                  isBold = False, size = 12, font = pml.COURIER):
 
-        # contents of string
-        self.text = text
+        # list of text strings
+        self.items = items
 
         # position
         self.x = x
@@ -120,33 +118,43 @@ class TitleString:
             self.isRightJustified = False
 
     def generatePML(self, page):
-        x = self.x
+        y = self.y
 
-        if self.isCentered:
-            x = page.doc.w / 2.0
+        for line in self.items:
+            x = self.x
 
-        page.add(pml.TextOp(self.text, x, self.y, self.size,
-                            self.getStyle(), self.getAlignment()))
+            if self.isCentered:
+                x = page.doc.w / 2.0
+
+            page.add(pml.TextOp(line, x, y, self.size,
+                                self.getStyle(), self.getAlignment()))
+
+            y += util.getTextHeight(self.size)
 
     # return a (rough) RTF fragment representation of this string
     def generateRTF(self):
-        tmp = "\\fs%d" % (self.size * 2)
+        s = ""
 
-        if self.isCentered:
-            tmp += " \qc"
-        elif self.isRightJustified:
-            tmp += " \qr"
+        for line in self.items:
+            tmp = "\\fs%d" % (self.size * 2)
 
-        if self.isBold:
-            tmp += r" \b"
+            if self.isCentered:
+                tmp += " \qc"
+            elif self.isRightJustified:
+                tmp += " \qr"
 
-        if self.isItalic:
-            tmp += r" \i"
+            if self.isBold:
+                tmp += r" \b"
 
-        if self.isUnderlined:
-            tmp += r" \ul"
+            if self.isItalic:
+                tmp += r" \i"
 
-        return r"{\pard\plain%s %s}{\par}" % (tmp, util.escapeRTF(self.text))
+            if self.isUnderlined:
+                tmp += r" \ul"
+
+            s += r"{\pard\plain%s %s}{\par}" % (tmp, util.escapeRTF(line))
+
+        return s
 
     # parse information from s, which must be a string created by __str__,
     # and set object state accordingly. keeps default settings on any
@@ -171,8 +179,7 @@ class TitleString:
                 "Times" : pml.TIMES_ROMAN }
 
         self.font = tmp.get(a[4], pml.COURIER)
-
-        self.text = a[6]
+        self.items = util.unescapeStrings(a[6])
 
     def __str__(self):
         s = "%f,%f,%d," % (self.x, self.y, self.size)
@@ -188,6 +195,6 @@ class TitleString:
         else:
             s += "Times"
 
-        s += ",,%s" % self.text
+        s += ",,%s" % util.escapeStrings(self.items)
 
         return util.toUTF8(s)

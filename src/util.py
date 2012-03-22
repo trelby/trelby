@@ -290,6 +290,44 @@ def bools2flags(chars, *bools):
 
     return s
 
+# return items, which is a list of ISO-8859-1 strings, as a single string
+# with \n between each string. any \ characters in the individual strings
+# are escaped as \\.
+def escapeStrings(items):
+    return "\\n".join([s.replace("\\", "\\\\") for s in items])
+
+# opposite of escapeStrings. takes in a string, returns a list of strings.
+def unescapeStrings(s):
+    if not s:
+        return []
+
+    items = []
+
+    tmp = ""
+    i = 0
+    while i < (len(s) - 1):
+        ch = s[i]
+
+        if ch != "\\":
+            tmp += ch
+            i += 1
+        else:
+            ch = s[i + 1]
+
+            if ch == "n":
+                items.append(tmp)
+                tmp = ""
+            else:
+                tmp += ch
+
+            i += 2
+
+    if i < len(s):
+        tmp += s[i]
+        items.append(tmp)
+
+    return items
+
 # return s encoded so that all characters outside the range [32,126] (and
 # "\\") are escaped.
 def encodeStr(s):
