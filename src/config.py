@@ -1021,7 +1021,7 @@ class ConfigGlobal:
         v.addColor("workspace", 237, 237, 237, "Workspace", "Workspace")
         v.addColor("pageBorder", 202, 202, 202, "PageBorder", "Page border")
         v.addColor("pageShadow", 153, 153, 153, "PageShadow", "Page shadow")
-        v.addColor("selected", 221, 221, 221, "Selected", "Selection")
+        v.addColor("selected", 200, 200, 200, "Selected", "Selection")
         v.addColor("search", 255, 127, 0, "SearchResult", "Search result")
         v.addColor("cursor", 135, 135, 253, "Cursor", "Cursor")
         v.addColor("autoCompFg", 0, 0, 0, "AutoCompletionFG",
