@@ -3,11 +3,11 @@ import gutil
 import screenplay
 import util
 
-import re
-
 from lxml import etree
-
 import wx
+
+import StringIO
+import re
 import zipfile
 
 # special linetype that means that indent contains action and scene lines,
@@ -19,22 +19,36 @@ def importCeltx(fileName, frame):
     # Celtx files are zipfiles, and the script content is within a file
     # called "script-xxx.html", where xxx can be random.
 
+    # the 5 MB limit is arbitrary, we just want to avoid getting a
+    # MemoryError exception for /dev/zero etc.
+    data = util.loadFile(fileName, frame, 5000000)
+
+    if data == None:
+        return None
+
+    if len(data) == 0:
+        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+
+        return None
+
+    buf = StringIO.StringIO(data)
+
     try:
-        z = zipfile.ZipFile(fileName)
+        z = zipfile.ZipFile(buf)
     except:
-        wx.MessageBox("Unable to extract contents from this file.", "Error", wx.OK, frame)
+        wx.MessageBox("File is not a valid Celtx script file.", "Error", wx.OK, frame)
         return None
 
     files = z.namelist()
     scripts = [s for s in files if s.startswith("script") ]
 
     if len(scripts) == 0:
-        wx.MessageBox("Unable to find script in this celtx file.", "Error", wx.OK, frame)
+        wx.MessageBox("Unable to find script in this Celtx file.", "Error", wx.OK, frame)
         return None
 
     f = z.open(scripts[0])
     content = f.read()
-    f.close()
+    z.close()
 
     if not content:
         wx.MessageBox("Script seems to be empty.", "Error", wx.OK, frame)
@@ -60,13 +74,12 @@ def importCeltx(fileName, frame):
 
     lines = []
 
-    def addElem(eleType, eleText):
-        lns = eleText.split("\n")
-
+    def addElem(eleType, lns):
         # if elem ends in a newline, last line is empty and useless;
         # get rid of it
         if not lns[-1] and (len(lns) > 1):
             lns = lns[:-1]
+
         for s in lns[:-1]:
             lines.append(screenplay.Line(
                     screenplay.LB_FORCED, eleType, util.cleanInput(s)))
@@ -75,17 +88,14 @@ def importCeltx(fileName, frame):
                 screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
 
     for para in root.xpath("/html/body/p"):
-
-        cls = para.get("class")
-        if (cls == "") or (cls is None):
-            cls = "action"
-
-        s = []
+        items = []
         for line in para.itertext():
-            s.append(line.replace("\n", " "))
+            items.append(unicode(line.replace("\n", " ")))
 
-        lt = elemMap.get(cls, screenplay.ACTION)
-        addElem(lt, u"\n".join(s))
+        lt = elemMap.get(para.get("class"), screenplay.ACTION)
+
+        if items:
+            addElem(lt, items)
 
     if len(lines) == 0:
         wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
