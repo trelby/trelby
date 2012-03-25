@@ -17,7 +17,7 @@ def init(doWX = True):
     # prefix used for temp files
     tmpPrefix = "trelby-tmp-"
 
-    version = "2.1-dev"
+    version = "2.2-dev"
 
     isWindows = False
     isUnix = False
