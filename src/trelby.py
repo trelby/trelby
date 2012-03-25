@@ -789,8 +789,7 @@ class MyCtrl(wx.Control):
             self.loadFile(self.fileName)
             self.updateScreen()
 
-    # Hook function for cut/copy/delete operations.
-    # Returns True if something was deleted, else False.
+    # returns True if something was deleted
     def OnCut(self, doUpdate = True, doDelete = True, copyToClip = True):
         marked = self.sp.getMarkedLines()
 
@@ -813,7 +812,7 @@ class MyCtrl(wx.Control):
             self.makeLineVisible(self.sp.line)
             self.updateScreen()
 
-        return True
+        return doDelete
 
     def OnCopy(self):
         self.OnCut(doDelete = False)
@@ -1333,23 +1332,25 @@ class MyCtrl(wx.Control):
             # line, need to test what GetUnicodeKey() returns on
             # non-input-character events)
 
+            addChar = True
+
             # If there's something selected, either remove it, or clear selection.
-            if self.sp.mark and self.sp.cfgGl.overwriteSelectionOnInsert:
+            if self.sp.mark and cfgGl.overwriteSelectionOnInsert:
                 if not self.OnCut(doUpdate = False, copyToClip = False):
                     self.sp.clearMark()
-                    self.updateScreen()
-                    return
+                    addChar = False
 
-            cs.char = chr(kc)
+            if addChar:
+                cs.char = chr(kc)
 
-            if opts.isTest and (cs.char == "å"):
-                self.loadFile(u"sample.trelby")
-            elif opts.isTest and (cs.char == "¤"):
-                self.cmdTest(cs)
-            elif opts.isTest and (cs.char == "½"):
-                self.cmdSpeedTest(cs)
-            else:
-                self.sp.addCharCmd(cs)
+                if opts.isTest and (cs.char == "å"):
+                    self.loadFile(u"sample.trelby")
+                elif opts.isTest and (cs.char == "¤"):
+                    self.cmdTest(cs)
+                elif opts.isTest and (cs.char == "½"):
+                    self.cmdSpeedTest(cs)
+                else:
+                    self.sp.addCharCmd(cs)
 
         else:
             cmd = mainFrame.kbdCommands.get(util.Key(kc,

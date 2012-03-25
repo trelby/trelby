@@ -1201,9 +1201,9 @@
 		the display down just one line, it will recenter the display on
 		the cursor.</para>
 
-        <para>'When text is selected, typing replaces text' causes
-        selected text to be removed whenever a key is pressed after a
-        selection operation in the screenplay.</para>
+        <para>'Typing replaces selected text' causes selected text to be
+        removed and replaced with the character entered whenever a key is
+        pressed and there's an active selection.</para>
 
 		<para>'Check script for errors before print, export or compare',
 		if checked, causes the program to run 'Script/Find next error' for
