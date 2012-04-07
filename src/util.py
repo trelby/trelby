@@ -978,7 +978,7 @@ def findFileInPath(filename):
 
     # only accept absolute paths. this strips out things like "~/bin/"
     # etc.
-    dirs = [d for d in dirs if d[0] == u"/"]
+    dirs = [d for d in dirs if d and d[0] == u"/"]
 
     return findFile(filename, dirs)
 
