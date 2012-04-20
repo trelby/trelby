@@ -1,8 +1,53 @@
-Format: http://dep.debian.net/deps/dep5
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: trelby
 Source: https://github.com/oskusalerma/trelby
 
 Files: *
-Copyright: Osku Salerma
-           Anil Gulecha
-License: GPL
+Copyright: 2003-2006, 2011-2012 Osku Salerma <osku.salerma@gmail.com>
+           2011-2012 Anil Gulecha <anil.verve@gmail.com>
+License: GPL-2
+
+Files: resources/*.png
+Copyright: 2010-2012 Matthieu James <matthieu.james@gmail.com>
+License: GPL-3+
+Comment: The icons in that directory that are not custom drawn for this program
+ come from the Faenza icon set, which can be found at
+ http://gnome-look.org/content/show.php/Faenza?content=128143, and is
+ available under GPL.
+
+Files: resources/icon*.png
+       resources/logo.jpg
+       icon32.ico
+Copyright: 2012 Tobias Bernard <bertob93@gmail.com>
+License: GPL-2
+
+Files: debian/*
+Copyright: 2012 Bernhard Reiter <ockham@raz.or.at>
+License: GPL-2
+
+License: GPL-2
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License version 2, as
+ published by the Free Software Foundation.
+ .
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
+ .
+ On Debian systems the full text of the GNU General Public License 2
+ can be found in the `/usr/share/common-licenses/GPL-2' file.
+
+License: GPL-3+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation, either version 3 of the License, or
+ (at your option) any later version.
+ .
+ This program is distributed in the hope that it will be useful, but
+ WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ General Public License for more details.
+ .
+ On Debian systems the full text of the GNU General Public License 3
+ can be found in the `/usr/share/common-licenses/GPL-3' file.

@@ -1,41 +1,5 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
-configure: configure-stamp
-configure-stamp:
-		dh_testdir
-		touch configure-stamp
-build: build-stamp
-build-stamp: configure-stamp
-		dh_testdir
-		touch $@
-clean:
-		dh_testdir
-		dh_testroot
-		rm -f build-stamp configure-stamp
-		dh_clean
-install: build
-		dh_testdir
-		dh_testroot
-		dh_prep
-		dh_installdirs
-		$(MAKE) DESTDIR=$(CURDIR)/debian/trelby install
-binary-arch: build install
-		# emptiness
-binary-indep: build install
-		dh_testdir
-		dh_testroot
-		#dh_install
-		dh_installchangelogs
-		dh_installdocs
-		dh_installexamples
-		dh_compress
-		dh_pysupport
-		dh_link
-		dh_fixperms
-		dh_installdeb
-		dh_shlibdeps
-		dh_gencontrol
-		dh_md5sums
-		dh_builddeb
-binary: binary-indep
-.PHONY: build clean binary-indep binary install configure
+
+%:
+	dh $@
