@@ -8,7 +8,6 @@
 
   -misc.py
   -install.nsi
-  -trelby.desktop
   -debian/changelog
   -doc/version.xml
 
