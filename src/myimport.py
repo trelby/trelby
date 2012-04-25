@@ -14,6 +14,74 @@ import zipfile
 # and scene lines are the ones that begin with "EXT." or "INT."
 SCENE_ACTION = -2
 
+#like importTextFile, but for adobe story files.
+def importAstx(fileName, frame):
+    # astx files are xml files. The textlines can be found under
+    # AdobeStory/document/stream/section/scene/paragraph which contain
+    # one or more textRun/break elements, to be joined. The paragraph
+    # attribute "element" gives us the element style.
+
+    data = util.loadFile(fileName, frame, 5000000)
+
+    if data == None:
+        return None
+
+    if len(data) == 0:
+        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+
+        return None
+
+    elemMap = {
+        "Action" : screenplay.ACTION,
+        "Character" : screenplay.CHARACTER,
+        "Dialog" : screenplay.DIALOGUE,
+        "Parenthetical" : screenplay.PAREN,
+        "SceneHeading" : screenplay.SCENE,
+        "Shot" : screenplay.SHOT,
+        "Transition" : screenplay.TRANSITION,
+    }
+
+    try:
+        root = etree.XML(data)
+    except:
+        wx.MessageBox("Could not parse input file", "Error", wx.OK, frame)
+        return None
+
+    lines = []
+
+    def addElem(eleType, lns):
+        # if elem ends in a newline, last line is empty and useless;
+        # get rid of it
+        if not lns[-1] and (len(lns) > 1):
+            lns = lns[:-1]
+
+        for s in lns[:-1]:
+            lines.append(screenplay.Line(
+                    screenplay.LB_FORCED, eleType, util.cleanInput(s)))
+
+        lines.append(screenplay.Line(
+                screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
+
+    for para in root.xpath("/AdobeStory/document/stream/section/scene/paragraph"):
+        lt = elemMap.get(para.get("element"), screenplay.ACTION)
+
+        lns = []
+        s = u""
+        for text in para:
+            if text.tag == "textRun" and text.text:
+                s += text.text
+            elif text.tag == "break":
+                lns.append(s.rstrip())
+                s = u""
+        lns.append(s.rstrip())
+
+        addElem(lt, lns)
+
+    if not lines:
+        wx.MessageBox("Looks like there's othing importable in this file.", "Error", wx.OK, frame)
+        return None
+    return lines
+
 # like importTextFile, but for Celtx files.
 def importCeltx(fileName, frame):
     # Celtx files are zipfiles, and the script content is within a file

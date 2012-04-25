@@ -313,6 +313,8 @@ class MyCtrl(wx.Control):
             lines = myimport.importFDX(fileName, mainFrame)
         elif fileName[-5:] == "celtx":
             lines = myimport.importCeltx(fileName, mainFrame)
+        elif fileName[-4:] == "astx":
+            lines = myimport.importAstx(fileName, mainFrame)
         else:
             lines = myimport.importTextFile(fileName, mainFrame)
 
@@ -2244,11 +2246,12 @@ class MyFrame(wx.Frame):
     def OnImportScript(self, event = None):
         dlg = wx.FileDialog(self, "File to import",
             misc.scriptDir,
-            wildcard = "Importable files (*.txt;*.fdx;*.celtx)|" +
-                       "*.fdx;*.txt;*.celtx|" +
+            wildcard = "Importable files (*.txt;*.fdx;*.celtx;*.astx)|" +
+                       "*.fdx;*.txt;*.celtx;*.astx|" +
                        "Formatted text files (*.txt)|*.txt|" +
                        "Final Draft XML(*.fdx)|*.fdx|" +
                        "Celtx files (*.celtx)|*.celtx|" +
+                       "Adobe Story XML files (*.astx)|*.astx|" +
                        "All files|*",
             style = wx.OPEN)
 
