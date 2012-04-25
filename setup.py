@@ -53,7 +53,7 @@ class install_data(_install_data):
     """install_data command
 
     This specific install_data command only really installs trelby.desktop
-    if the target path is either /usr or /usr/local.
+    and trelby's manpage if the target path is either /usr or /usr/local.
     """
 
     def run(self):
@@ -98,6 +98,7 @@ else:
 
 dataFiles = [
     ("applications", ["trelby.desktop"]),
+    ("man/man1", ["trelby.1.gz"]),
     ]
 
 setup(
