@@ -14,7 +14,7 @@ import zipfile
 # and scene lines are the ones that begin with "EXT." or "INT."
 SCENE_ACTION = -2
 
-#like importTextFile, but for adobe story files.
+#like importTextFile, but for Adobe Story files.
 def importAstx(fileName, frame):
     # astx files are xml files. The textlines can be found under
     # AdobeStory/document/stream/section/scene/paragraph which contain
@@ -49,37 +49,40 @@ def importAstx(fileName, frame):
 
     lines = []
 
-    def addElem(eleType, lns):
+    def addElem(eleType, items):
         # if elem ends in a newline, last line is empty and useless;
         # get rid of it
-        if not lns[-1] and (len(lns) > 1):
-            lns = lns[:-1]
+        if not items[-1] and (len(items) > 1):
+            items = items[:-1]
 
-        for s in lns[:-1]:
+        for s in items[:-1]:
             lines.append(screenplay.Line(
                     screenplay.LB_FORCED, eleType, util.cleanInput(s)))
 
         lines.append(screenplay.Line(
-                screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
+                screenplay.LB_LAST, eleType, util.cleanInput(items[-1])))
 
     for para in root.xpath("/AdobeStory/document/stream/section/scene/paragraph"):
         lt = elemMap.get(para.get("element"), screenplay.ACTION)
 
-        lns = []
+        items = []
         s = u""
+
         for text in para:
             if text.tag == "textRun" and text.text:
                 s += text.text
             elif text.tag == "break":
-                lns.append(s.rstrip())
+                items.append(s.rstrip())
                 s = u""
-        lns.append(s.rstrip())
 
-        addElem(lt, lns)
+        items.append(s.rstrip())
+
+        addElem(lt, items)
 
     if not lines:
-        wx.MessageBox("Looks like there's othing importable in this file.", "Error", wx.OK, frame)
+        wx.MessageBox("File has no content.", "Error", wx.OK, frame)
         return None
+
     return lines
 
 # like importTextFile, but for Celtx files.
