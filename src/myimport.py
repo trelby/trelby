@@ -43,8 +43,8 @@ def importAstx(fileName, frame):
 
     try:
         root = etree.XML(data)
-    except:
-        wx.MessageBox("Could not parse input file", "Error", wx.OK, frame)
+    except etree.XMLSyntaxError, e:
+        wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
         return None
 
     lines = []
@@ -136,8 +136,8 @@ def importCeltx(fileName, frame):
     try:
         parser = etree.HTMLParser()
         root = etree.XML(content, parser)
-    except:
-        wx.MessageBox("Could not parse input file", "Error", wx.OK, frame)
+    except etree.XMLSyntaxError, e:
+        wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
         return None
 
     lines = []
