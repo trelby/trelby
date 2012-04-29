@@ -2812,7 +2812,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             # lines with LB_NONE linebreaks that end in a space should be
             # LB_SPACE instead
             if ln.lb == LB_NONE:
-                assert ln.text[-1:] != " "
+                assert not ln.text.endswith(" ")
 
             if prevType:
                 assert ln.lt == prevType

@@ -309,11 +309,11 @@ class MyCtrl(wx.Control):
             return False
 
     def importFile(self, fileName):
-        if fileName[-3:] == "fdx":
+        if fileName.endswith("fdx"):
             lines = myimport.importFDX(fileName, mainFrame)
-        elif fileName[-5:] == "celtx":
+        elif fileName.endswith("celtx"):
             lines = myimport.importCeltx(fileName, mainFrame)
-        elif fileName[-4:] == "astx":
+        elif fileName.endswith("astx"):
             lines = myimport.importAstx(fileName, mainFrame)
         else:
             lines = myimport.importTextFile(fileName, mainFrame)
