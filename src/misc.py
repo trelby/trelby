@@ -41,16 +41,15 @@ def init(doWX = True):
     # stupid hack to keep testcases working, since they don't initialize
     # opts (the doWX name is just for similarity with util)
     if not doWX or opts.isTest:
-        progPath = "."
+        progPath = u"."
         confPath = ".trelby"
     else:
         if isUnix:
-            progPath = "/opt/trelby"
+            progPath = u"/opt/trelby"
             confPath = os.environ["HOME"] + "/.trelby"
-            # convert the path settings to Unicode - in the windows code path, the registry returns a unicode path so no need to convert it
-            progPath = unicode(progPath, "UTF-8")
         else:
             progPath = getPathFromRegistry()
+
             confPath = os.environ["USERPROFILE"] + r"\Trelby\conf"
             if not os.path.exists(confPath):
                 os.makedirs(confPath)
@@ -59,21 +58,24 @@ def init(doWX = True):
     confPath = unicode(confPath, "UTF-8")
 
 def getPathFromRegistry():
+    registryPath = r"Software\Microsoft\Windows\CurrentVersion\App Paths\trelby.exe"
+
     try:
         import _winreg
-        registryPath = r"Software\Microsoft\Windows\CurrentVersion\App Paths\trelby.exe"
-        regPathKey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, registryPath )
+
+        regPathKey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, registryPath)
         regPathValue, regPathType = _winreg.QueryValueEx(regPathKey, "Path")
+
         if regPathType == _winreg.REG_SZ:
-            progPath = regPathValue
+            return regPathValue
         else:
             raise TypeError
 
     except:
-        wx.MessageBox("There was an error reading the following registry key: %s.  You may need to reinstall the program to fix this error." % registryPath, "Error", wx.OK)
+        wx.MessageBox("There was an error reading the following registry key: %s.\n"
+                      "You may need to reinstall the program to fix this error." %
+                      registryPath, "Error", wx.OK)
         sys.exit()
-
-    return progPath
 
 # convert s, which is returned from the wxWidgets GUI and is an Unicode
 # string, to a normal string.
