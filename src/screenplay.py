@@ -2736,6 +2736,67 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             cs.doAutoComp = cs.AC_KEEP
 
+    def moveNextWordCmd(self, cs):
+        if not self.acItems:
+            spaceFound = False
+            l = self.line
+            i = self.column
+
+            t = self.lines[l].text
+            while True:
+                if i == len(self.lines[l].text): # end of line
+                    l = l+1
+                    i = 0
+                    if l == len(self.lines): #last line
+                        return
+                    else:
+                        self.column = i
+                        self.line = l
+                        return
+
+                if spaceFound:
+                    if not t[i].isspace():
+                        self.column = i
+                        self.line = l
+                        return
+                else:
+                    if t[i].isspace():
+                        spaceFound = True
+
+                i = i+1
+
+    def movePrevWordCmd(self, cs):
+        #returns a reverse list of indexes of words in string s.
+        def getWordIndex(s):
+            l = []
+            if s and not s[0].isspace():
+                l.append(0)
+            for i in xrange(1, len(s)):
+                if not s[i].isspace() and s[i-1].isspace():
+                    l.append(i)
+            l.reverse()
+            return l
+
+        if not self.acItems:
+            l = self.line
+            i = self.column
+
+            words = getWordIndex(self.lines[l].text)
+            while True:
+                for word in words:
+                    if word < i:
+                        self.column = word
+                        self.line = l
+                        return
+                l = l-1
+                if l == -1:
+                    self.line = 0
+                    self.column = 0
+                    return
+                words = getWordIndex(self.lines[l].text)
+                if words:
+                    i = words[0] + 1
+
     def moveLineEndCmd(self, cs):
         if self.acItems:
             self.lines[self.line].text = self.acItems[self.acSel]

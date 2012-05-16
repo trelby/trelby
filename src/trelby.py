@@ -1225,11 +1225,17 @@ class MyCtrl(wx.Control):
     def cmdMoveLeft(self, cs):
         self.sp.moveLeftCmd(cs)
 
+    def cmdMoveNextWord(self, cs):
+        self.sp.moveNextWordCmd(cs)
+
     def cmdMovePageDown(self, cs):
         self.pageCmd(cs, 1)
 
     def cmdMovePageUp(self, cs):
         self.pageCmd(cs, -1)
+
+    def cmdMovePrevWord(self, cs):
+        self.sp.movePrevWordCmd(cs)
 
     def cmdMoveRight(self, cs):
         self.sp.moveRightCmd(cs)
