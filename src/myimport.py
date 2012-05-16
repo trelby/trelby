@@ -13,6 +13,7 @@ import zipfile
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."
 SCENE_ACTION = -2
+IGNORE = -3
 
 #like importTextFile, but for Adobe Story files.
 def importAstx(fileName, frame):
@@ -383,6 +384,9 @@ def importTextFile(fileName, frame):
         if s:
             lt = indDict[cnt].lt
 
+            if lt == IGNORE:
+                continue
+
             if lt == SCENE_ACTION:
                 if s.startswith("EXT.") or s.startswith("INT."):
                     lt = screenplay.SCENE
@@ -496,6 +500,7 @@ class ImportDlg(wx.Dialog):
         self.styleCombo.Append("Scene / Action", SCENE_ACTION)
         for t in config.getTIs():
             self.styleCombo.Append(t.name, t.lt)
+        self.styleCombo.Append("Ignore", IGNORE)
 
         util.setWH(self.styleCombo, w = 150)
 
