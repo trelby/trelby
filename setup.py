@@ -1,5 +1,6 @@
 # setup.py
 from distutils.command.build_scripts import build_scripts as _build_scripts
+from distutils.command.bdist_rpm import bdist_rpm as _bdist_rpm
 from distutils.core import setup
 from distutils.util import convert_path
 
@@ -34,6 +35,18 @@ class build_scripts(_build_scripts):
                     line = """sys.path.insert(0, "%s/src")""" % libDir
 
                 print line,
+
+class bdist_rpm(_bdist_rpm):
+    """bdist_rpm command
+
+    This specific bdist_rpm command generates an RPM package that
+    will install to /usr/share/trelby and /usr/bin, respectively.
+    """
+    def _make_spec_file(self):
+        specFile = _bdist_rpm._make_spec_file(self)
+        line = next(i for i, s in enumerate(specFile) if s.startswith("%install"))
+        specFile[line+1] += " --prefix=/usr --install-data=/usr/share/trelby --install-lib /usr/share/trelby"
+        return specFile
 
 sys.path.append(os.path.join(os.path.split(__file__)[0], "src"))
 import misc
@@ -80,7 +93,7 @@ dataFiles = [
 
 setup(
     name = "Trelby",
-    cmdclass = {"build_scripts": build_scripts},
+    cmdclass = {"build_scripts": build_scripts, "bdist_rpm": bdist_rpm},
     version = misc.version,
     description = "Free, multiplatform, feature-rich screenwriting program",
 

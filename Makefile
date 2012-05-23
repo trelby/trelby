@@ -17,6 +17,9 @@ dict_en.dat.gz: dict_en.dat
 manual.html: doc/*
 	make -C doc && mv doc/manual.html .
 
+rpm: dist
+	python setup.py bdist_rpm
+
 clean:
 	rm -f bin/*.pyc src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html MANIFEST
 	rm -rf build dist
