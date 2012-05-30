@@ -20,7 +20,7 @@ class PDFDrawOp:
     # write PDF drawing operations corresponding to the PML object pmlOp
     # to output (util.String). pe = PDFExporter.
     def draw(self, pmlOp, pageNr, output, pe):
-        raise "draw not implemented"
+        raise Exception("draw not implemented")
 
 class PDFTextOp(PDFDrawOp):
     def draw(self, pmlOp, pageNr, output, pe):

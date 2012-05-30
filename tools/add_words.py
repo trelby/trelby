@@ -4,7 +4,7 @@
 import sys
 
 if len(sys.argv) < 2:
-    raise "add_word.py word1 word2..."
+    raise Exception("add_word.py word1 word2...")
 
 sys.path.insert(0, "../src")
 
@@ -16,7 +16,7 @@ misc.init(False)
 
 s = util.loadFile("../dict_en.dat", None)
 if s == None:
-    raise "error"
+    raise Exception("error")
 
 words = {}
 lines = s.splitlines()
