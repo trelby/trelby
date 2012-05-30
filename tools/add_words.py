@@ -6,10 +6,13 @@ import sys
 if len(sys.argv) < 2:
     raise "add_word.py word1 word2..."
 
-sys.path.insert(0, "..")
+sys.path.insert(0, "../src")
 
+import misc
 import util
+
 util.init(False)
+misc.init(False)
 
 s = util.loadFile("../dict_en.dat", None)
 if s == None:
