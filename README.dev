@@ -60,7 +60,7 @@ Then, on Windows, to create the installer:
 
 1) cd <trelby directory>
 2) build.bat
-4) nsis.bat
+3) nsis.bat
 
 Your freshly created Setup-Trelby-<version>.exe should be ready.
 
@@ -76,10 +76,9 @@ On Linux:
 On Windows:
 
  $ cd \trelby
- $ \python27\python src/trelby.py --test sample.trelby
+ $ python src/trelby.py --test sample.trelby
 
- (Substitute correct path to python.) The file t.bat contains the
- last command.
+ The file t.bat contains the last command.
 
 4. Differences from packaged versions
 =====================================
