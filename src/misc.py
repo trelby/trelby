@@ -12,14 +12,14 @@ import wx
 
 TAB_BAR_HEIGHT = 24
 
+version = "2.3-dev"
+
 def init(doWX = True):
     global isWindows, isUnix, unicodeFS, wxIsUnicode, doDblBuf, \
            progPath, confPath, tmpPrefix, version
 
     # prefix used for temp files
     tmpPrefix = "trelby-tmp-"
-
-    version = "2.3-dev"
 
     isWindows = False
     isUnix = False
@@ -47,12 +47,15 @@ def init(doWX = True):
         confPath = u".trelby"
     else:
         if isUnix:
-            progPath = u"/opt/trelby"
+            progPath = unicode(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                "UTF-8")
+
             confPath = unicode(os.environ["HOME"], "UTF-8") + u"/.trelby"
         else:
             progPath = getPathFromRegistry()
 
-            confPath = util.getWindowsUnicodeEnvVar(u"USERPROFILE") + ur"\Trelby\conf"
+            confPath = getWindowsUnicodeEnvVar("USERPROFILE") + ur"\Trelby\conf"
 
             if not os.path.exists(confPath):
                 os.makedirs(confPath)

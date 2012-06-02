@@ -1,10 +1,9 @@
-BINDIR = $(DESTDIR)/opt/trelby
-DESKTOPDIR = $(DESTDIR)/usr/share/applications
+PREFIX = $(DESTDIR)/usr
 
 .PHONY : clean dist deb
 
 dist: names.txt.gz dict_en.dat.gz manual.html
-	./gen_linux_dist.sh
+	python setup.py sdist
 
 deb: dist
 	debuild -us -uc -b
@@ -19,15 +18,14 @@ manual.html: doc/*
 	make -C doc && mv doc/manual.html .
 
 clean:
-	rm -f src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html
+	rm -f bin/*.pyc src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html MANIFEST
+	rm -rf build dist
 	dh_clean
 
-install:
-	mkdir -p $(BINDIR)
-	rm -f src/*.pyc
-	cp -r src/ trelby.desktop names.txt.gz dict_en.dat.gz sample.trelby manual.html fileformat.txt LICENSE README resources $(BINDIR)
-	cp trelby.desktop $(DESKTOPDIR)
+install: dist
+	python setup.py install
 
 uninstall:
-	rm -f $(BINDIR)
-	rm -f $(DESKTOPDIR)/trelby.desktop
+	rm -f $(shell cat $(PREFIX)/share/trelby/installed-files.txt)
+	rm -f $(PREFIX)/share/trelby/installed-files.txt
+	rm -rf $(PREFIX)/share/trelby

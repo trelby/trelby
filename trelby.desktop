@@ -1,8 +1,8 @@
 [Desktop Entry]
 Name=Trelby
 Comment=Screenwriting Application
-Exec=/opt/trelby/src/trelby.py
-Icon=/opt/trelby/resources/icon256.png
+Exec=trelby
+Icon=/usr/share/trelby/resources/icon256.png
 Type=Application
 Categories=Utility;Publishing;
 

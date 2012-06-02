@@ -2,4 +2,10 @@
 # -*- makefile -*-
 
 %:
-	dh $@
+	dh $@ --with python2 --buildsystem=python_distutils
+
+override_dh_auto_install:
+	dh_auto_install --buildsystem=python_distutils \
+            -- --prefix=/usr \
+			   --install-data=/usr/share/trelby \
+			   --install-lib /usr/share/trelby

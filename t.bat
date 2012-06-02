@@ -1,1 +1,1 @@
-python src/trelby.py --test sample.trelby
+python bin/trelby --test sample.trelby

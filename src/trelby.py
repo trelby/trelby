@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # -*- coding: iso-8859-1 -*-
 
 from error import *
@@ -2693,5 +2692,3 @@ def main():
 
     myApp = MyApp(0)
     myApp.MainLoop()
-
-main()
