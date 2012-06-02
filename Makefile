@@ -1,7 +1,7 @@
-.PHONY = dist
-
 BINDIR = $(DESTDIR)/opt/trelby
 DESKTOPDIR = $(DESTDIR)/usr/share/applications
+
+.PHONY : clean dist
 
 dist: names.txt.gz dict_en.dat.gz manual.html
 	./gen_linux_dist.sh
