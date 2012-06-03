@@ -14,7 +14,7 @@ dict_en.dat.gz: dict_en.dat
 	gzip -c dict_en.dat > dict_en.dat.gz
 
 manual.html: doc/*
-	make -C doc && mv doc/book.html manual.html
+	make -C doc && mv doc/manual.html .
 
 clean:
 	rm -f src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html

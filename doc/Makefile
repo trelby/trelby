@@ -1,8 +1,8 @@
 XSLTPROC = xsltproc
 
-BOOK_HTML_TARGET = book.html
+BOOK_HTML_TARGET = manual.html
 
-BOOK_XML_SOURCE = book.xml
+BOOK_XML_SOURCE = manual.xml
 BOOK_VERSION_SOURCE = version.xml
 BOOK_ALL_SOURCE = *.xml
 
