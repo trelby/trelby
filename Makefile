@@ -1,10 +1,12 @@
 BINDIR = $(DESTDIR)/opt/trelby
 DESKTOPDIR = $(DESTDIR)/usr/share/applications
 
-.PHONY : clean dist
+.PHONY : clean dist deb
 
 dist: names.txt.gz dict_en.dat.gz manual.html
 	./gen_linux_dist.sh
+
+deb: dist
 	debuild -us -uc -b
 
 names.txt.gz: names.txt

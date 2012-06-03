@@ -30,8 +30,7 @@ this, that aspect of the program will not work.
   $ make manual.html
 
 You can run "make dist", which prepares all 3 and also generates a Linux
-distribution package which you can ignore. It will also try to build a
-Debian package which you can also ignore.
+distribution package which you can ignore.
 
 2.5. Preparing for a Windows build
 ==================================
