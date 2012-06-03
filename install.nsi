@@ -179,7 +179,7 @@ Section Uninstall
   Delete "$INSTDIR\wx._windows_.pyd"
   Delete "$INSTDIR\unicodedata.pyd"
   Delete "$INSTDIR\w9xpopen.exe"
-  Delete "$INSTDIR\wxc2.pyd"
+  Delete "$INSTDIR\library.zip"
   Delete "$INSTDIR\wxc.pyd"
   Delete "$INSTDIR\sample.trelby"
   Delete "$INSTDIR\_socket.pyd"
