@@ -1284,7 +1284,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         ls = self.lines
 
         while 1:
-            if ls[top].lt == SCENE:
+            if ls[top].lt in (SCENE, ACTBREAK):
                 break
 
             tmp = top - 1
@@ -1298,7 +1298,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             if tmp >= len(ls):
                 break
 
-            if ls[tmp].lt == SCENE:
+            if ls[tmp].lt in (SCENE, ACTBREAK):
                 break
 
             bottom = self.getElemIndexesFromLine(tmp)[1]
