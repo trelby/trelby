@@ -1658,6 +1658,27 @@ Something starts beeping.
 	  </sect2>
 
 	  <sect2>
+		<title>Adobe Story (.astx)</title>
+
+		<para>These files are created by the Adobe Story editor.</para>
+
+		<itemizedlist>
+
+		  <listitem>
+
+            <para>Screenplay elements (Action, Dialog, etc) that Trelby
+            understands are imported. Others are converted to 'Action'
+            type.</para>
+
+          </listitem>
+
+        </itemizedlist>
+
+		<para>Note that no formatting settings are imported at all.</para>
+
+	  </sect2>
+
+	  <sect2>
 		<title>Fountain (.fountain)</title>
 
 		<para>Fountain is an open, plaintext screenplay markup language.
