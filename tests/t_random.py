@@ -10,7 +10,7 @@ import sys
 import traceback
 
 # FIXME
-sys.path.insert(0, "..")
+sys.path.insert(0, "../src")
 
 import u
 
