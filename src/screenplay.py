@@ -614,6 +614,75 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         return etree.tostring(
             fd, xml_declaration=True, encoding='UTF-8', pretty_print=True)
 
+    # generate Fountain and return it as a string.
+    def generateFountain(self):
+        eleList = self.getElementsAsList()
+        flines = []
+        TWOSPACE = "  "
+        sceneStartsList = ("INT", "EXT", "EST", "INT./EXT", "INT/EXT", "I/E", "I./E")
+
+
+        # does s look like a fountain scene line:
+        def looksLikeScene(s):
+            s = s.upper()
+            looksGood = False
+            for t in sceneStartsList:
+                if s.startswith(t):
+                    looksGood = True
+                    break
+            return looksGood
+
+        for ele in eleList:
+            typ, txt = ele
+            lns = txt.split("\n")
+
+            #ensure last element of flines is empty for some types.
+            if typ in (SCENE, ACTION, CHARACTER, TRANSITION, SHOT, ACTBREAK, NOTE):
+                if flines and flines[-1] != "":
+                    flines.append("")
+
+            # special handling of some elements.
+            if typ == SCENE:
+                # if the line would not be recognized as Scene by fountain,
+                # append a "." so it is forced as a scene line.
+                if not looksLikeScene(txt):
+                    txt = "." + txt
+
+            elif typ == ACTION:
+                tmp = []
+                for ln in lns:
+                    if ln and (ln.isupper() or looksLikeScene(txt)):
+                        tmp.append(ln + TWOSPACE)
+                    else:
+                        tmp.append(ln)
+                txt = "\n".join(tmp)
+
+            elif typ == TRANSITION:
+                if not txt.endswith("TO:"):
+                    txt = "> " + txt
+
+            elif typ == DIALOGUE:
+                tmp = []
+                for ln in lns:
+                    if not ln:
+                        tmp.append(TWOSPACE)
+                    else:
+                        tmp.append(ln)
+                txt = "\n".join(tmp)
+
+            elif typ == NOTE:
+                txt = "[[" + txt + "]]"
+
+            elif typ == ACTBREAK:
+                txt = ">" + txt + "<"
+
+            elif typ == SHOT:
+                txt += TWOSPACE
+
+            flines.append(txt)
+
+        return util.toUTF8("\n".join(flines))
+
     # generate RTF and return it as a string.
     def generateRTF(self):
         ls = self.lines

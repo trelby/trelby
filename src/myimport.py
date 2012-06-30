@@ -1,5 +1,6 @@
 import config
 import gutil
+import misc
 import screenplay
 import util
 
@@ -270,6 +271,293 @@ def importFDX(fileName, frame):
         wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
         return None
 
+# import Fountain files.
+# http://fountain.io
+def importFountain(fileName, frame):
+    # regular expressions for fountain markdown.
+    # https://github.com/vilcans/screenplain/blob/master/screenplain/richstring.py
+    ire = re.compile(
+            # one star
+            r'\*'
+            # anything but a space, then text
+            r'([^\s].*?)'
+            # finishing with one star
+            r'\*'
+            # must not be followed by star
+            r'(?!\*)'
+        )
+    bre = re.compile(
+            # two stars
+            r'\*\*'
+            # must not be followed by space
+            r'(?=\S)'
+            # inside text
+            r'(.+?[*_]*)'
+            # finishing with two stars
+            r'(?<=\S)\*\*'
+        )
+    ure = re.compile(
+            # underline
+            r'_'
+            # must not be followed by space
+            r'(?=\S)'
+            # inside text
+            r'([^_]+)'
+            # finishing with underline
+            r'(?<=\S)_'
+        )
+    boneyard_re = re.compile('/\\*.*?\\*/', flags=re.DOTALL)
+
+    # random magicstring used to escape literal star '\*'
+    literalstar = "Aq7RR"
+
+    # returns s with markdown formatting removed.
+    def unmarkdown(s):
+        s = s.replace("\\*", literalstar)
+        for style in (bre, ire, ure):
+            s = style.sub(r'\1', s)
+        return s.replace(literalstar, "*")
+
+    data = util.loadFile(fileName, frame, 1000000)
+
+    if data == None:
+        return None
+
+    if len(data) == 0:
+        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+        return None
+
+    inf = []
+    inf.append(misc.CheckBoxItem("Import titles as action lines."))
+    inf.append(misc.CheckBoxItem("Remove unsupported formatting markup."))
+    inf.append(misc.CheckBoxItem("Import section/synopsis as notes."))
+
+    dlg = misc.CheckBoxDlg(frame, "Fountain import options", inf,
+        "Import options:", False)
+
+    if dlg.ShowModal() != wx.ID_OK:
+        dlg.Destroy()
+        return None
+
+    importTitles = inf[0].selected
+    removeMarkdown = inf[1].selected
+    importSectSyn = inf[2].selected
+
+    # pre-process data - fix newlines, remove boneyard.
+    data = util.fixNL(data)
+    data = boneyard_re.sub('', data)
+    prelines = data.split("\n")
+    for i in xrange(len(prelines)):
+        try:
+            util.toLatin1(prelines[i])
+        except:
+            prelines[i] = util.cleanInput(u"" + prelines[i].decode('UTF-8', "ignore"))
+    lines = []
+
+    tabWidth = 4
+    lns = []
+    sceneStartsList = ("INT", "EXT", "EST", "INT./EXT", "INT/EXT", "I/E", "I./E")
+    TWOSPACE = "  "
+    skipone = False
+
+    # First check if title lines are present:
+    c = 0
+    while c < len(prelines):
+        if prelines[c] != "":
+            c = c+1
+        else:
+            break
+
+    # prelines[0:i] are the first bunch of lines, that could be titles.
+    # Our check for title is simple:
+    #   - the line does not start with 'fade'
+    #   - the first line has a single ':'
+
+    if c > 0:
+        l = util.toInputStr(prelines[0].expandtabs(tabWidth).lstrip().lower())
+        if not l.startswith("fade") and l.count(":") == 1:
+            # these are title lines. Now do what the user requested.
+            if importTitles:
+                # add TWOSPACE to all the title lines.
+                for i in xrange(c):
+                    prelines[i] += TWOSPACE
+            else:
+                #remove these lines
+                prelines = prelines[c+1:]
+
+    for l in prelines:
+        if l != TWOSPACE:
+            lines.append(util.toInputStr(l.expandtabs(tabWidth)))
+        else:
+            lines.append(TWOSPACE)
+
+    linesLen = len(lines)
+
+    def isPrevEmpty():
+        if lns and lns[-1].text == "":
+            return True
+        return False
+
+    def isPrevType(ltype):
+        return (lns and lns[-1].lt == ltype)
+
+    # looks ahead to check if next line is not empty
+    def isNextEmpty(i):
+        return  (i+1 < len(lines) and lines[i+1] == "")
+
+    def getPrevType():
+        if lns:
+            return lns[-1].lt
+        else:
+            return screenplay.ACTION
+
+    def isParen(s):
+        return (s.startswith('(') and s.endswith(')'))
+
+    def isScene(s):
+        if s.endswith(TWOSPACE):
+            return False
+        if s.startswith(".") and not s.startswith(".."):
+            return True
+        tmp = s.upper()
+        if (re.match(r'^(INT|EXT|EST)[ .]', tmp) or
+            re.match(r'^(INT\.?/EXT\.?)[ .]', tmp) or
+            re.match(r'^I/E[ .]', tmp)):
+            return True
+        return False
+
+    def isTransition(s):
+        return ((s.isupper() and s.endswith("TO:")) or
+                (s.startswith(">") and not s.endswith("<")))
+
+    def isCentered(s):
+        return s.startswith(">") and s.endswith("<")
+
+    def isPageBreak(s):
+        return s.startswith('===') and s.lstrip('=') == ''
+
+    def isNote(s):
+        return s.startswith("[[") and s.endswith("]]")
+
+    def isSection(s):
+        return s.startswith("#")
+
+    def isSynopsis(s):
+        return s.startswith("=") and not s.startswith("==")
+
+    # first pass - identify linetypes
+    for i in range(linesLen):
+        if skipone:
+            skipone = False
+            continue
+
+        s = lines[i]
+        sl = s.lstrip()
+        # mark as ACTION by default.
+        line = screenplay.Line(screenplay.LB_FORCED, screenplay.ACTION, s)
+
+        # Start testing lines for element type. Go in order:
+        # Scene Character, Paren, Dialog, Transition, Note.
+
+        if s == "" or isCentered(s) or isPageBreak(s):
+            # do nothing - import as action.
+            pass
+
+        elif s == TWOSPACE:
+            line.lt = getPrevType()
+
+        elif isScene(s):
+            line.lt = screenplay.SCENE
+            if sl.startswith('.'):
+                line.text = sl[1:]
+            else:
+                line.text = sl
+
+        elif isTransition(sl) and isPrevEmpty() and isNextEmpty(i):
+            line.lt = screenplay.TRANSITION
+            if line.text.startswith('>'):
+                line.text = sl[1:].lstrip()
+
+        elif s.isupper() and isPrevEmpty() and not isNextEmpty(i):
+            line.lt = screenplay.CHARACTER
+            if s.endswith(TWOSPACE):
+                line.lt = screenplay.ACTION
+
+        elif isParen(sl) and (isPrevType(screenplay.CHARACTER) or
+                                isPrevType(screenplay.DIALOGUE)):
+            line.lt = screenplay.PAREN
+
+        elif (isPrevType(screenplay.CHARACTER) or
+             isPrevType(screenplay.DIALOGUE) or
+             isPrevType(screenplay.PAREN)):
+            line.lt = screenplay.DIALOGUE
+
+        elif isNote(sl):
+            line.lt = screenplay.NOTE
+            line.text = sl.strip('[]')
+
+        elif isSection(s) or isSynopsis(s):
+            if not importSectSyn:
+                if isNextEmpty(i):
+                    skipone = True
+                continue
+
+            line.lt = screenplay.NOTE
+            line.text = sl.lstrip('=#')
+
+        if line.text == TWOSPACE:
+            pass
+
+        elif line.lt != screenplay.ACTION:
+            line.text = line.text.lstrip()
+
+        else:
+            tmp = line.text.rstrip()
+            # we don't support center align, so simply add required indent.
+            if isCentered(tmp):
+                tmp = tmp[1:-1].strip()
+                width = frame.panel.ctrl.sp.cfg.getType(screenplay.ACTION).width
+                if len(tmp) < width:
+                    tmp = ' ' * ((width - len(tmp)) // 2) + tmp
+            line.text = tmp
+
+        if removeMarkdown:
+            line.text = unmarkdown(line.text)
+            if line.lt == screenplay.CHARACTER and line.text.endswith('^'):
+                line.text = line.text[:-1]
+
+        lns.append(line)
+
+    ret = []
+
+    # second pass helper functions.
+    def isLastLBForced():
+        return ret and ret[-1].lb == screenplay.LB_FORCED
+
+    def makeLastLBLast():
+        if ret:
+            ret[-1].lb = screenplay.LB_LAST
+
+    def isRetPrevType(t):
+        return ret and ret[-1].lt == t
+
+    # second pass - remove unneeded empty lines, and fix the linebreaks.
+    for ln in lns:
+        if ln.text == '':
+            if isLastLBForced():
+                makeLastLBLast()
+            else:
+                ret.append(ln)
+
+        elif not isRetPrevType(ln.lt):
+            makeLastLBLast()
+            ret.append(ln)
+
+        else:
+            ret.append(ln)
+
+    makeLastLBLast()
+    return ret
 
 # import text file from fileName, return list of Line objects for the
 # screenplay or None if something went wrong. returned list always

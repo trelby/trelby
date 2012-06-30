@@ -315,6 +315,8 @@ class MyCtrl(wx.Control):
             lines = myimport.importCeltx(fileName, mainFrame)
         elif fileName.endswith("astx"):
             lines = myimport.importAstx(fileName, mainFrame)
+        elif fileName.endswith("fountain"):
+            lines = myimport.importFountain(fileName, mainFrame)
         else:
             lines = myimport.importTextFile(fileName, mainFrame)
 
@@ -1119,7 +1121,12 @@ class MyCtrl(wx.Control):
 
         dlg = wx.FileDialog(mainFrame, "Filename to export as",
             misc.scriptDir,
-            wildcard = "PDF|*.pdf|RTF|*.rtf|Final Draft XML|*.fdx|HTML|*.html|Formatted text|*.txt",
+            wildcard = "PDF|*.pdf|"
+                       "RTF|*.rtf|"
+                       "Final Draft XML|*.fdx|"
+                       "HTML|*.html|"
+                       "Fountain|*.fountain|"
+                       "Formatted text|*.txt",
             style = wx.SAVE | wx.OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
@@ -1138,6 +1145,9 @@ class MyCtrl(wx.Control):
             elif choice == 3:
                 data = self.getExportHtml(sp)
                 suffix = ".html"
+            elif choice == 4:
+                data = sp.generateFountain()
+                suffix = ".fountain"
             else:
                 data = self.getExportText(sp)
                 suffix = ".txt"
@@ -2246,12 +2256,13 @@ class MyFrame(wx.Frame):
     def OnImportScript(self, event = None):
         dlg = wx.FileDialog(self, "File to import",
             misc.scriptDir,
-            wildcard = "Importable files (*.txt;*.fdx;*.celtx;*.astx)|" +
-                       "*.fdx;*.txt;*.celtx;*.astx|" +
+            wildcard = "Importable files (*.txt;*.fdx;*.celtx;*.astx;*.fountain)|" +
+                       "*.fdx;*.txt;*.celtx;*.astx;*.fountain|" +
                        "Formatted text files (*.txt)|*.txt|" +
                        "Final Draft XML(*.fdx)|*.fdx|" +
                        "Celtx files (*.celtx)|*.celtx|" +
                        "Adobe Story XML files (*.astx)|*.astx|" +
+                       "Fountain files (*.fountain)|*.fountain|" +
                        "All files|*",
             style = wx.OPEN)
 

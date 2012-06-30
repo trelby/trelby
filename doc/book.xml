@@ -1534,8 +1534,9 @@
 	  <title>Import</title>
 
 	  <para>Existing screenplays can currently be imported from three
-  	  file formats: as formatted ASCII text, Final Draft XML (.fdx) and
-      Celtx (.celtx). The following section documents the format these
+  	  file formats: as formatted ASCII text, Final Draft XML (.fdx),
+      Celtx (.celtx), Adobe Story (.astx) and Fountain (.fountain).
+      The following section documents the format these
       files should have for optimal import processing.</para>
 
 	  <sect2>
@@ -1656,6 +1657,65 @@ Something starts beeping.
 
 	  </sect2>
 
+	  <sect2>
+		<title>Fountain (.fountain)</title>
+
+		<para>Fountain is an open, plaintext screenplay markup language.
+        It is documented at http://fountain.io/syntax.</para>
+
+        <para>Almost all of the spec is supported. The below are unsupported:
+        </para>
+
+		<itemizedlist>
+
+		  <listitem>
+
+            <para>Emphasis markup (bold, italic, etc) is not supported. When
+            importing, you can choose to retain the syntax, or remove it.
+            </para>
+
+          </listitem>
+
+          <listitem>
+
+            <para>Dual dialogue is imported as a couple of dialogues instead.
+            </para>
+
+          </listitem>
+
+          <listitem>
+
+           <para>Section/Synopsis are imported as notes.</para>
+
+          </listitem>
+
+          <listitem>
+
+          <para>Comments that are part of another element are not recognized.
+            (Standalone comments are imported as notes).</para>
+
+          </listitem>
+
+          <listitem>
+
+           <para>Title pages are imported as action lines. You can also choose
+            not to do this when importing.</para>
+
+          </listitem>
+
+          <listitem>
+
+           <para>Page breaks are not supported (imported as an action line).
+            </para>
+
+          </listitem>
+
+        </itemizedlist>
+
+		<para>Note that no formatting settings are imported at all.</para>
+
+	  </sect2>
+
 
 	</sect1>
 
@@ -1663,7 +1723,7 @@ Something starts beeping.
 	  <title>Export</title>
 
 	  <para>You can export the script in PDF, RTF, formatted ASCII, HTML,
-      and Final Draft XML (.fdx) format.</para>
+      Final Draft XML (.fdx) and Fountain (.fountain) format.</para>
 
 	  <para>All are found in the File/Export dialog, which allows you to
 	  choose which one to export as. If you export as a text file, &trelby;
