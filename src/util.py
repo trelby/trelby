@@ -62,6 +62,7 @@ _identity_tbl = ""
 # map some fancy unicode characters to their nearest ASCII/Latin-1
 # equivalents so when people import text it's not mangled to uselessness
 _fancy_unicode_map = {
+    ord(u"‘") : u"'",
     ord(u"’") : u"'",
     ord(u"“") : u'"',
     ord(u"”") : u'"',
