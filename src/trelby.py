@@ -317,6 +317,8 @@ class MyCtrl(wx.Control):
             lines = myimport.importAstx(fileName, mainFrame)
         elif fileName.endswith("fountain"):
             lines = myimport.importFountain(fileName, mainFrame)
+        elif fileName.endswith("fadein"):
+            lines = myimport.importFadein(fileName, mainFrame)
         else:
             lines = myimport.importTextFile(fileName, mainFrame)
 
@@ -2256,13 +2258,14 @@ class MyFrame(wx.Frame):
     def OnImportScript(self, event = None):
         dlg = wx.FileDialog(self, "File to import",
             misc.scriptDir,
-            wildcard = "Importable files (*.txt;*.fdx;*.celtx;*.astx;*.fountain)|" +
-                       "*.fdx;*.txt;*.celtx;*.astx;*.fountain|" +
+            wildcard = "Importable files (*.txt;*.fdx;*.celtx;*.astx;*.fountain;*.fadein)|" +
+                       "*.fdx;*.txt;*.celtx;*.astx;*.fountain;*.fadein|" +
                        "Formatted text files (*.txt)|*.txt|" +
                        "Final Draft XML(*.fdx)|*.fdx|" +
                        "Celtx files (*.celtx)|*.celtx|" +
                        "Adobe Story XML files (*.astx)|*.astx|" +
                        "Fountain files (*.fountain)|*.fountain|" +
+                       "Fadein files (*.fadein)|*.fadein|" +
                        "All files|*",
             style = wx.OPEN)
 

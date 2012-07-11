@@ -90,6 +90,122 @@ def importAstx(fileName, frame):
 
     return lines
 
+# like importTextFile, but for fadein files.
+def importFadein(fileName, frame):
+    # Fadein file is a zipped document.xml file.
+    # the .xml is in open screenplay format:
+    # http://sourceforge.net/projects/openscrfmt/files/latest/download
+
+    # the 5 MB limit is arbitrary, we just want to avoid getting a
+    # MemoryError exception for /dev/zero etc.
+    data = util.loadFile(fileName, frame, 5000000)
+
+    if data == None:
+        return None
+
+    if len(data) == 0:
+        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+
+        return None
+
+    buf = StringIO.StringIO(data)
+
+    try:
+        z = zipfile.ZipFile(buf)
+        f = z.open("document.xml")
+        content = f.read()
+        z.close()
+    except:
+        wx.MessageBox("File is not a valid .fadein file.", "Error", wx.OK, frame)
+        return None
+
+    if not content:
+        wx.MessageBox("Script seems to be empty.", "Error", wx.OK, frame)
+        return None
+
+    elemMap = {
+        "Action" : screenplay.ACTION,
+        "Character" : screenplay.CHARACTER,
+        "Dialogue" : screenplay.DIALOGUE,
+        "Parenthetical" : screenplay.PAREN,
+        "Scene Heading" : screenplay.SCENE,
+        "Shot" : screenplay.SHOT,
+        "Transition" : screenplay.TRANSITION,
+    }
+
+    try:
+        root = etree.XML(content)
+    except etree.XMLSyntaxError, e:
+        wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
+        return None
+
+    lines = []
+
+    def addElem(eleType, lns):
+        # if elem ends in a newline, last line is empty and useless;
+        # get rid of it
+        if not lns[-1] and (len(lns) > 1):
+            lns = lns[:-1]
+
+        for s in lns[:-1]:
+            lines.append(screenplay.Line(
+                    screenplay.LB_FORCED, eleType, util.cleanInput(s)))
+
+        lines.append(screenplay.Line(
+                screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
+
+    # removes html formatting from s, and returns list of lines.
+    # if s is None, return a list with single empty string.
+    re_rem = [r'<font[^>]*>', r'<size[^>]*>', r'<bgcolor[^>]*>']
+    rem = ["<b>", "</b>", "<i>", "</i>", "<u>",
+           "</u>", "</font>", "</size>", "</bgcolor>"]
+    def sanitizeStr(s):
+        if s:
+            s = u"" + s
+            for r in re_rem:
+                s = re.sub(r, "", s)
+            for r in rem:
+                s = s.replace(r,"")
+
+            if s:
+                return s.split("<br>")
+            else:
+                return [u""]
+        else:
+            return [u""]
+
+    for para in root.xpath("paragraphs/para"):
+        # check for notes/synopsis, import as Note.
+        if para.get("note"):
+            lt = screenplay.NOTE
+            items = sanitizeStr(u"" + para.get("note"))
+            addElem(lt, items)
+
+        if para.get("synopsis"):
+            lt = screenplay.NOTE
+            items = sanitizeStr(u"" + para.get("synopsis"))
+            addElem(lt, items)
+
+        # look for the <style> and <text> tags. Bail if no <text> found.
+        styl = para.xpath("style")
+        txt = para.xpath("text")
+        if txt:
+            if styl:
+                lt = elemMap.get(styl[0].get("basestylename"), screenplay.ACTION)
+            else:
+                lt = screenplay.ACTION
+            items = sanitizeStr(txt[0].text)
+        else:
+            continue
+
+        addElem(lt, items)
+
+    if len(lines) == 0:
+        wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
+        return None
+
+    return lines
+
 # like importTextFile, but for Celtx files.
 def importCeltx(fileName, frame):
     # Celtx files are zipfiles, and the script content is within a file
