@@ -306,9 +306,15 @@ class PDFExporter:
     def createInfoObj(self):
         version = self.escapeStr(self.doc.version)
 
+        if self.doc.uniqueId:
+            extra = "/Keywords (%s)\n" % self.doc.uniqueId
+        else:
+            extra = ""
+
         return self.addObj("<< /Creator (Trelby %s)\n"
                            "/Producer (Trelby %s)\n"
-                           ">>" % (version, version))
+                           "%s"
+                           ">>" % (version, version, extra))
 
     # create a PDF object containing a 256-entry array for the widths of a
     # font, with all widths being 600

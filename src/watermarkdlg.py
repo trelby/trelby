@@ -1,5 +1,6 @@
 import pdf
 import pml
+import random
 import util
 
 import wx
@@ -65,6 +66,21 @@ class WatermarkDlg(wx.Dialog):
 
         self.dirEntry.SetFocus()
 
+    @staticmethod
+    def getUniqueId(usedIds):
+        while True:
+            uid = ""
+
+            for i in range(8):
+                uid += '%02x' % random.randint(0, 255)
+
+            if uid in usedIds:
+                continue
+
+            usedIds.add(uid)
+
+            return uid
+
     def OnGenerate(self, event):
         watermarks = self.itemsEntry.GetValue().split("\n")
         common = self.commonMark.GetValue()
@@ -73,6 +89,10 @@ class WatermarkDlg(wx.Dialog):
         fnprefix = self.filenamePrefix.GetValue()
 
         watermarks = set(watermarks)
+
+        # keep track of ids allocated so far, just on the off-chance we
+        # randomly allocated the same id twice
+        usedIds = set()
 
         if not directory:
             wx.MessageBox("Please set directory.", "Error", wx.OK, self)
@@ -114,6 +134,8 @@ class WatermarkDlg(wx.Dialog):
 
             for page in pmldoc.pages:
                 page.addOpsToFront(ops)
+
+            pmldoc.uniqueId = self.getUniqueId(usedIds)
 
             pdfdata = pdf.generate(pmldoc)
 

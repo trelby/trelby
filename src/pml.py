@@ -60,6 +60,10 @@ class Document:
         # dummy value in that case, correct value otherwise.
         self.version = getattr(misc, "version", "dummy_version")
 
+        # a random string to embed in the PDF; only used by watermarked
+        # PDFs
+        self.uniqueId = None
+
     def add(self, page):
         self.pages.append(page)
 

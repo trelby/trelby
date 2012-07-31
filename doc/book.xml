@@ -1009,6 +1009,10 @@
       grey color, as part of the background of the page. The watermark is
       applied on every page.</para>
 
+      <para>A unique ID is also saved in the 'Keywords' metadata
+      of the PDF file, as a second source of identification of a PDF
+      (if it is leaked with only the watermark removed).</para>
+
     </sect1>
 
 	<sect1>
