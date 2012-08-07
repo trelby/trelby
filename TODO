@@ -13,3 +13,43 @@
 
 -try using graphics contexts for tab ctrl drawing to get anti-aliased
  lines (http://docs.wxwidgets.org/trunk/classwx_graphics_context.html)
+
+
+UNDO/REDO
+=========
+
+action                type
+------                ------
+
+done:
+
+delete-elem-types     FullCopy
+addChar               SinglePara
+  charmap
+  namesdlg
+
+remaining:
+
+find-and-replace      SinglePara, N times
+spellcheckerdlg       SinglePara, N times
+delete                1-2 paras (N if selection)
+deleteBackward        1-2 paras (N if selection)
+Tab/tab-prev          1-2 paras
+NewElement            2 paras
+insertForcedLineBreak 2 paras
+change-to-X           1-N paras
+cut                   1-N paras
+paste                 1-N paras
+pasteSystemCB         1-N paras
+
+
+other:
+
+  -applyCfg: clear undo history
+
+  -handle new edit action while in middle of undo history
+
+    -emacs-like behavior
+
+  -implement undo history trimming (estimate memory usage of each item,
+   and cap used memory at X)
