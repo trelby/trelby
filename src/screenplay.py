@@ -2813,6 +2813,8 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if not util.isValidInputChar(kc):
             return
 
+        u = undo.SinglePara(self, self.line)
+
         char = cs.char
         if self.capitalizeNeeded():
             char = util.upper(char)
@@ -2856,6 +2858,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.markChanged()
 
         cs.doAutoComp = cs.AC_REDO
+
+        u.setAfter(self)
+        self.addUndo(u)
 
     def toSceneCmd(self, cs):
         self.convertTypeTo(SCENE)
@@ -2926,7 +2931,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.currentUndo = None
 
         # FIXME: debug stuff, remove
-        print "first %s, last %s" % (self.firstUndo, self.lastUndo)
+        #print "first %s, last %s" % (self.firstUndo, self.lastUndo)
 
     def undo(self):
         if not self.canUndo():
@@ -2942,7 +2947,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.currentUndo = u
 
         # FIXME: debug stuff, remove
-        print "undo: current %s" % self.currentUndo
+        #print "undo: current %s" % self.currentUndo
 
     def redo(self):
         if not self.canRedo():
@@ -2952,7 +2957,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.currentUndo = self.currentUndo.next
 
         # FIXME: debug stuff, remove
-        print "redo: current %s" % self.currentUndo
+        #print "redo: current %s" % self.currentUndo
 
     # check script for internal consistency. raises an AssertionError on
     # errors. ONLY MEANT TO BE USED IN TEST CODE.
