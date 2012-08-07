@@ -540,7 +540,7 @@ class MyCtrl(wx.Control):
         sp = self.sp
         if sp.cfg.pdfRemoveNotes:
             sp = copy.deepcopy(self.sp)
-            sp.removeElementTypes({screenplay.NOTE : None})
+            sp.removeElementTypes({screenplay.NOTE : None}, False)
 
         sp.paginate()
 
@@ -799,14 +799,14 @@ class MyCtrl(wx.Control):
             self.updateScreen()
 
     def OnUndo(self):
-        # FIXME: impl
-        print "undo"
-        pass
+        self.sp.undo()
+        self.makeLineVisible(self.sp.line)
+        self.updateScreen()
 
     def OnRedo(self):
-        # FIXME: impl
-        print "redo"
-        pass
+        self.sp.redo()
+        self.makeLineVisible(self.sp.line)
+        self.updateScreen()
 
     # returns True if something was deleted
     def OnCut(self, doUpdate = True, doDelete = True, copyToClip = True):
@@ -1095,12 +1095,7 @@ class MyCtrl(wx.Control):
         if not ok or (len(tdict) == 0):
             return
 
-        if wx.MessageBox("Are you sure you want to delete\n"
-                         "the selected elements?", "Confirm",
-                         wx.YES_NO | wx.NO_DEFAULT, self) == wx.NO:
-            return
-
-        self.sp.removeElementTypes(tdict)
+        self.sp.removeElementTypes(tdict, True)
         self.sp.paginate()
         self.makeLineVisible(self.sp.line)
         self.updateScreen()

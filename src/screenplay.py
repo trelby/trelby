@@ -33,6 +33,7 @@ import pdf
 import pml
 import spellcheck
 import titles
+import undo
 import util
 
 import codecs
@@ -89,6 +90,16 @@ class Screenplay:
         # True if script has had changes done to it after
         # load/save/creation.
         self.hasChanged = False
+
+        # first/last undo objects (undo.Base)
+        self.firstUndo = None
+        self.lastUndo = None
+
+        # value of this, depending on the user's last action:
+        #  undo: the undo object that was used
+        #  redo: the next undo object from the one that was used
+        #  anything else: None
+        self.currentUndo = None
 
     def isModified(self):
         if not self.hasChanged:
@@ -2520,9 +2531,12 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if mark and not self.mark:
             self.mark = Mark(line, col)
 
-    # remove all lines whose element types are in tdict as keys
-    def removeElementTypes(self, tdict):
+    # remove all lines whose element types are in tdict as keys.
+    def removeElementTypes(self, tdict, saveUndo):
         self.clearAutoComp()
+
+        if saveUndo:
+            u = undo.FullCopy(self)
 
         lsNew = []
         lsOld = self.lines
@@ -2551,6 +2565,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.validatePos()
         self.mark = None
         self.markChanged()
+
+        if saveUndo:
+            u.setAfter(self)
+            self.addUndo(u)
 
     # clear mark
     def clearMark(self):
@@ -2868,13 +2886,73 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     # return True if we can undo
     def canUndo(self):
-        # FIXME: impl
-        return False
+        return bool(
+            # undo history exists
+            self.lastUndo
+
+            # and we either:
+            and (
+                # are not in the middle of undo/redo
+                not self.currentUndo or
+
+                # or are, but can still undo more
+                self.currentUndo.prev))
 
     # return True if we can redo
     def canRedo(self):
-        # FIXME: impl
-        return False
+        return bool(self.currentUndo)
+
+    def addUndo(self, u):
+        # FIXME: handle being in middle of undo history. first implement
+        # "delete everything after current position in undo history", and
+        # later improve that to emacs-like undo handling which pushes
+        # reverse operations to the undo history so that no history is ever
+        # lost
+        assert not self.currentUndo
+
+        if not self.lastUndo:
+            # no undo history at all yet
+            self.firstUndo = u
+            self.lastUndo = u
+        else:
+            self.lastUndo.next = u
+            u.prev = self.lastUndo
+            self.lastUndo = u
+
+        # FIXME: remove items beginning at self.firstUndo until undo history
+        # is small enough (whether in number of items, estimated memory
+        # consumption, or what, to be determined)
+
+        self.currentUndo = None
+
+        # FIXME: debug stuff, remove
+        print "first %s, last %s" % (self.firstUndo, self.lastUndo)
+
+    def undo(self):
+        if not self.canUndo():
+            return
+
+        # the action to undo
+        if self.currentUndo:
+            u = self.currentUndo.prev
+        else:
+            u = self.lastUndo
+
+        u.undo(self)
+        self.currentUndo = u
+
+        # FIXME: debug stuff, remove
+        print "undo: current %s" % self.currentUndo
+
+    def redo(self):
+        if not self.canRedo():
+            return
+
+        self.currentUndo.redo(self)
+        self.currentUndo = self.currentUndo.next
+
+        # FIXME: debug stuff, remove
+        print "redo: current %s" % self.currentUndo
 
     # check script for internal consistency. raises an AssertionError on
     # errors. ONLY MEANT TO BE USED IN TEST CODE.
