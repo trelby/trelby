@@ -1,11 +1,17 @@
 import screenplay
 
+# possible command types. only used for possibly merging consecutive edits.
+CMD_ADD_CHAR, CMD_MISC = range(2)
+
 # abstract base class for storing undo history. concrete subclasses
 # implement undo/redo for specific actions taken on a screenplay.
 class Base:
-    def __init__(self, sp):
+    def __init__(self, sp, cmdType):
         # cursor position before the action
-        self.startPos = screenplay.Mark(sp.line, sp.column)
+        self.startPos = sp.cursorAsMark()
+
+        # type of action; one of the CMD_ values
+        self.cmdType = cmdType
 
         # prev/next undo objects in the history
         self.prev = None
@@ -13,7 +19,10 @@ class Base:
 
     # set cursor position after the action
     def setEndPos(self, sp):
-        self.endPos = screenplay.Mark(sp.line, sp.column)
+        self.endPos = sp.cursorAsMark()
+
+    def getType(self):
+        return self.cmdType
 
     def undo(self, sp):
         raise NotImplementedError
@@ -26,7 +35,7 @@ class Base:
 # actions that modify the screenplay globally.
 class FullCopy(Base):
     def __init__(self, sp):
-        Base.__init__(self, sp)
+        Base.__init__(self, sp, CMD_MISC)
 
         self.linesBefore = [screenplay.Line(ln.lb, ln.lt, ln.text) for ln in sp.lines]
 
@@ -48,8 +57,8 @@ class FullCopy(Base):
 class SinglePara(Base):
     # line is any line belonging to the modified paragraph. there is no
     # requirement for the cursor to be in this paragraph.
-    def __init__(self, sp, line):
-        Base.__init__(self, sp)
+    def __init__(self, sp, cmdType, line):
+        Base.__init__(self, sp, cmdType)
 
         self.elemStartLine = sp.getParaFirstIndexFromLine(line)
         endLine = sp.getParaLastIndexFromLine(line)
@@ -59,7 +68,7 @@ class SinglePara(Base):
             sp.lines[self.elemStartLine : endLine + 1]]
 
         # FIXME: debug stuff, remove
-        #print "init: start: %d end: %d" % (self.elemStartLine, endLine)
+        #print "init: start: %d end: %d line: %d" % (self.elemStartLine, endLine, line)
 
     # called after editing action is over to snapshot the "after" state
     def setAfter(self, sp):

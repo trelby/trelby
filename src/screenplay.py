@@ -114,6 +114,9 @@ class Screenplay:
     def markChanged(self, state = True):
         self.hasChanged = state
 
+    def cursorAsMark(self):
+        return Mark(self.line, self.column)
+
     # return True if the line is a parenthetical and not the first line of
     # that element (such lines need an extra space of indenting).
     def needsExtraParenIndent(self, line):
@@ -2813,7 +2816,18 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if not util.isValidInputChar(kc):
             return
 
-        u = undo.SinglePara(self, self.line)
+        # only merge with the previous item in undo history if:
+        #   -we are not in middle of undo/redo
+        #   -previous item is "add character"
+        #   -cursor is exactly where it was left off by the revious item
+        if (not self.currentUndo and self.lastUndo and
+            (self.lastUndo.getType() == undo.CMD_ADD_CHAR) and
+            (self.lastUndo.endPos == self.cursorAsMark())):
+            u = self.lastUndo
+            mergeUndo = True
+        else:
+            u = undo.SinglePara(self, undo.CMD_ADD_CHAR, self.line)
+            mergeUndo = False
 
         char = cs.char
         if self.capitalizeNeeded():
@@ -2860,7 +2874,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         cs.doAutoComp = cs.AC_REDO
 
         u.setAfter(self)
-        self.addUndo(u)
+
+        if not mergeUndo:
+            self.addUndo(u)
 
     def toSceneCmd(self, cs):
         self.convertTypeTo(SCENE)
@@ -3020,6 +3036,9 @@ class Mark:
     def __init__(self, line, column):
         self.line = line
         self.column = column
+
+    def __eq__(self, other):
+        return (self.line == other.line) and (self.column == other.column)
 
 # data held in internal clipboard.
 class ClipData:
