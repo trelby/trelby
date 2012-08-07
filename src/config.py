@@ -1043,7 +1043,7 @@ class ConfigGlobal:
                    "Tab border")
         v.addColor("tabBarBg", 221, 217, 215, "TabBarBG",
                    "Tab bar background")
-        v.addColor("tabNonActiveBg", 234, 232, 233, "TabNonActiveBg", "Tab, non-active")
+        v.addColor("tabNonActiveBg", 180, 180, 180, "TabNonActiveBg", "Tab, non-active")
 
         for t in getTIs():
             v.addColor("text%s" % t.name, 0, 0, 0, "Text%sFG" % t.name,
