@@ -2924,12 +2924,24 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         return bool(self.currentUndo)
 
     def addUndo(self, u):
-        # FIXME: handle being in middle of undo history. first implement
-        # "delete everything after current position in undo history", and
-        # later improve that to emacs-like undo handling which pushes
-        # reverse operations to the undo history so that no history is ever
-        # lost
-        assert not self.currentUndo
+        if self.currentUndo:
+            # new edit action while navigating undo history; throw away
+            # any undo history after current point
+
+            # FIXME: improve this to emacs-like undo handling which pushes
+            # reverse operations to the undo history so that no history is
+            # ever lost
+
+            if self.currentUndo.prev:
+                # not at beginning of undo history; cut off the rest
+                self.currentUndo.prev.next = None
+                self.lastUndo = self.currentUndo.prev
+            else:
+                # beginning of undo history; throw everything away
+                self.firstUndo = None
+                self.lastUndo = None
+
+            self.currentUndo = None
 
         if not self.lastUndo:
             # no undo history at all yet

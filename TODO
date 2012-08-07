@@ -47,9 +47,8 @@ other:
 
   -applyCfg: clear undo history
 
-  -handle new edit action while in middle of undo history
-
-    -emacs-like behavior
+  -emacs-like behavior while in middle of undo history; keeps us from ever
+   losing any history
 
   -implement undo history trimming (estimate memory usage of each item,
    and cap used memory at X)
