@@ -1289,6 +1289,14 @@ class MyCtrl(wx.Control):
         self.sp.toPrevTypeTabCmd(cs)
 
     def cmdSpeedTest(self, cs):
+        import undo
+        self.speedTestUndo = []
+
+        def testUndoFullCopy():
+            u = undo.FullCopy(self.sp)
+            u.setAfter(self.sp)
+            self.speedTestUndo.append(u)
+
         def testReformatAll():
             self.sp.reformatAll()
 

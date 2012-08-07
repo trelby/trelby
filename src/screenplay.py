@@ -3030,6 +3030,13 @@ class Line:
         return config.lb2char(self.lb) + config.lt2char(self.lt)\
                + self.text
 
+    # opposite of __str__. NOTE: only meant for storing data internally by
+    # the program! NOT USABLE WITH EXTERNAL INPUT DUE TO COMPLETE LACK OF
+    # ERROR CHECKING!
+    @staticmethod
+    def fromStr(s):
+        return Line(config.char2lb(s[0]), config.char2lt(s[1]), s[2:])
+
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.
 class Mark:

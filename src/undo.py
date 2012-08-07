@@ -1,5 +1,8 @@
 import screenplay
 
+import zlib
+
+
 # possible command types. only used for possibly merging consecutive edits.
 CMD_ADD_CHAR, CMD_MISC = range(2)
 
@@ -33,24 +36,44 @@ class Base:
 
 # stores a full copy of the screenplay before/after the action. used by
 # actions that modify the screenplay globally.
+#
+# why we store the line data as compressed text, not as a list of Line
+# objects, is because it's both faster and uses much less memory to do so.
+# figures from a 32-bit machine (a 64-bit machine wastes even more space
+# storing Line objects) from speedTest for a 119-page screenplay:
+#
+#   -Line objects: 1,770 KB, 0.125s
+#   -text, not compressed: 352 KB, 0.078s
+#   -text, zlib fastest(1): 76 KB, 0.088s
+#   -text, zlib medium(6): 36 KB, 0.091s
+#   -text, zlib best(9): 35 KB, 0.093s
+#   -text, bz2 best(9): 42 KB, 0.228s
+#
 class FullCopy(Base):
     def __init__(self, sp):
         Base.__init__(self, sp, CMD_MISC)
 
-        self.linesBefore = [screenplay.Line(ln.lb, ln.lt, ln.text) for ln in sp.lines]
+        lines = [str(ln) for ln in sp.lines]
+        self.linesBeforeRaw = zlib.compress("\n".join(lines), 6)
 
     # called after editing action is over to snapshot the "after" state
     def setAfter(self, sp):
-        self.linesAfter = [screenplay.Line(ln.lb, ln.lt, ln.text) for ln in sp.lines]
+        lines = [str(ln) for ln in sp.lines]
+        self.linesAfterRaw = zlib.compress("\n".join(lines), 6)
+
         self.setEndPos(sp)
 
     def undo(self, sp):
         sp.line, sp.column = self.startPos.line, self.startPos.column
-        sp.lines = [screenplay.Line(ln.lb, ln.lt, ln.text) for ln in self.linesBefore]
+
+        sp.lines = [screenplay.Line.fromStr(s) for s in
+                    zlib.decompress(self.linesBeforeRaw).split("\n")]
 
     def redo(self, sp):
         sp.line, sp.column = self.endPos.line, self.endPos.column
-        sp.lines = [screenplay.Line(ln.lb, ln.lt, ln.text) for ln in self.linesAfter]
+
+        sp.lines = [screenplay.Line.fromStr(s) for s in
+                    zlib.decompress(self.linesAfterRaw).split("\n")]
 
 
 # stores a single modified paragraph
