@@ -1,4 +1,4 @@
-# -*- coding: iso-8859-1 -*-
+# -*- coding: utf-8 -*-
 
 # linebreak types
 
@@ -119,9 +119,16 @@ class Screenplay:
         else:
             return tcfg.intraSpacing
 
-    # this is ~8x faster than the generic deepcopy, which makes a
-    # noticeable difference at least on an Athlon 1.3GHz (0.06s versus
-    # 0.445s)
+    # we implement our own custom deepcopy because it's 8-10x faster than
+    # the generic one (times reported by cmdSpeedTest using a 119-page
+    # screenplay):
+    #
+    # ╭─────────────────────────────┬─────────┬────────╮
+    # │                             │ Generic │ Custom │
+    # ├─────────────────────────────┼─────────┼────────┤
+    # │ Intel Core Duo T2050 1.6GHz │  0.173s │ 0.020s │
+    # │ Intel i5-2400 3.1GHz        │  0.076s │ 0.007s │
+    # ╰─────────────────────────────┴─────────┴────────╯
     def __deepcopy__(self, memo):
         sp = Screenplay(self.cfgGl)
         sp.cfg = copy.deepcopy(self.cfg)
@@ -132,13 +139,7 @@ class Screenplay:
         sp.titles = copy.deepcopy(self.titles)
         sp.scDict = copy.deepcopy(self.scDict)
 
-        # remove the dummy empty line
-        sp.lines = []
-        l = sp.lines
-
-        for i in xrange(len(self.lines)):
-            ln = self.lines[i]
-            l.append(Line(ln.lb, ln.lt, ln.text))
+        sp.lines = [Line(ln.lb, ln.lt, ln.text) for ln in self.lines]
 
         # "open PDF on current page" breaks on scripts we're removing
         # notes from before printing if we don't copy these
@@ -2307,7 +2308,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 msg = "Empty line."
                 break
 
-            if (len(ln.text.strip(" �")) == 0) and (ln.lt != NOTE):
+            if (len(ln.text.strip("  ")) == 0) and (ln.lt != NOTE):
                 msg = "Empty line (contains only spaces)."
                 break
 
