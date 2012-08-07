@@ -857,6 +857,10 @@ class ConfigGlobal:
                     [util.Key(17, ctrl = True).toInt()],
                     isFixed = True, isMenu = True),
 
+            Command("Redo", "Redo a change that was reverted through undo.",
+                    [util.Key(25, ctrl = True).toInt()],
+                    isFixed = True, isMenu = True),
+
             Command("ReportCharacter", "Generate character report.",
                     isMenu = True),
 
@@ -935,6 +939,10 @@ class ConfigGlobal:
 
             Command("ToggleShowFormatting", "Toggle 'Show formatting'"
                     " display.", isMenu = True),
+
+            Command("Undo", "Undo the last change.",
+                    [util.Key(26, ctrl = True).toInt()],
+                    isFixed = True, isMenu = True),
 
             Command("ViewModeDraft", "Change view mode to draft.",
                     isMenu = True),

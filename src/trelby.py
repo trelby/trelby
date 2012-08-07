@@ -469,6 +469,9 @@ class MyCtrl(wx.Control):
 
         mainFrame.statusCtrl.SetValues(page, pageCnt, cur.ti.name, tabNext, enterNext)
 
+        mainFrame.menuBar.Enable(ID_EDIT_UNDO, self.sp.canUndo())
+        mainFrame.menuBar.Enable(ID_EDIT_REDO, self.sp.canRedo())
+
     # apply per-script config
     def applyCfg(self, newCfg):
         self.sp.applyCfg(newCfg)
@@ -794,6 +797,16 @@ class MyCtrl(wx.Control):
 
             self.loadFile(self.fileName)
             self.updateScreen()
+
+    def OnUndo(self):
+        # FIXME: impl
+        print "undo"
+        pass
+
+    def OnRedo(self):
+        # FIXME: impl
+        print "redo"
+        pass
 
     # returns True if something was deleted
     def OnCut(self, doUpdate = True, doDelete = True, copyToClip = True):
@@ -1718,6 +1731,9 @@ class MyFrame(wx.Frame):
         fileMenu.Append(ID_FILE_EXIT, "E&xit\tCTRL-Q")
 
         editMenu = wx.Menu()
+        editMenu.Append(ID_EDIT_UNDO, "&Undo\tCTRL-Z")
+        editMenu.Append(ID_EDIT_REDO, "&Redo\tCTRL-Y")
+        editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_CUT, "Cu&t\tCTRL-X")
         editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
         editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
@@ -1921,6 +1937,8 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_SETTINGS_SAVE_AS, self.OnSaveSettingsAs)
         wx.EVT_MENU(self, ID_SETTINGS_SC_DICT, self.OnSpellCheckerDictionaryDlg)
         wx.EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
+        wx.EVT_MENU(self, ID_EDIT_UNDO, self.OnUndo)
+        wx.EVT_MENU(self, ID_EDIT_REDO, self.OnRedo)
         wx.EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
         wx.EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
         wx.EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
@@ -2002,6 +2020,8 @@ class MyFrame(wx.Frame):
 
     def allocIds(self):
         names = [
+            "ID_EDIT_UNDO",
+            "ID_EDIT_REDO",
             "ID_EDIT_COPY",
             "ID_EDIT_COPY_SYSTEM",
             "ID_EDIT_COPY_TO_CB",
@@ -2334,6 +2354,12 @@ class MyFrame(wx.Frame):
                 gd.confFilename = dlg.GetPath()
 
         dlg.Destroy()
+
+    def OnUndo(self, event = None):
+        self.panel.ctrl.OnUndo()
+
+    def OnRedo(self, event = None):
+        self.panel.ctrl.OnRedo()
 
     def OnCut(self, event = None):
         self.panel.ctrl.OnCut()

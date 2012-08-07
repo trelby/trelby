@@ -473,6 +473,13 @@
 	</sect1>
 
 	<sect1>
+	  <title>Edit/Undo,Redo</title>
+
+	  <para>FIXME: Document undo/redo and their limitations here.</para>
+
+	</sect1>
+
+	<sect1>
 	  <title>Edit/Cut,Copy,Paste</title>
 
 	  <para>Cut, copy and paste work pretty much the same way as in every

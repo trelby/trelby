@@ -2866,6 +2866,16 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def toNoteCmd(self, cs):
         self.convertTypeTo(NOTE)
 
+    # return True if we can undo
+    def canUndo(self):
+        # FIXME: impl
+        return False
+
+    # return True if we can redo
+    def canRedo(self):
+        # FIXME: impl
+        return False
+
     # check script for internal consistency. raises an AssertionError on
     # errors. ONLY MEANT TO BE USED IN TEST CODE.
     def _validate(self):
