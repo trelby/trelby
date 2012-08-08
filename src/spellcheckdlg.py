@@ -1,6 +1,7 @@
 import config
 import misc
 import spellcheck
+import undo
 import util
 
 import wx
@@ -115,6 +116,8 @@ class SpellCheckDlg(wx.Dialog):
         if not self.sc.word:
             return
 
+        u = undo.SinglePara(self.ctrl.sp, undo.CMD_MISC, self.sc.line)
+
         word = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue()))
         ls = self.ctrl.sp.lines
 
@@ -129,6 +132,10 @@ class SpellCheckDlg(wx.Dialog):
         self.sc.col += len(self.sc.word) + diff
         self.didReplaces = True
         self.ctrl.sp.markChanged()
+
+        u.setAfter(self.ctrl.sp)
+        self.ctrl.sp.addUndo(u)
+
         self.gotoNext(False)
 
     def OnSkip(self, event = None, autoFind = False):

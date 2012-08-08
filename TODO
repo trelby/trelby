@@ -24,16 +24,16 @@ action                type
 done:
 
 delete-elem-types     FullCopy
-addChar               SinglePara
+addChar               SinglePara (possibly merged)
   charmap
   namesdlg
+spellcheckerdlg       SinglePara
 
 remaining:
 
-find-and-replace      SinglePara, N times
-spellcheckerdlg       SinglePara, N times
-delete                1-2 paras (N if selection)
-deleteBackward        1-2 paras (N if selection)
+find-and-replace      SinglePara
+delete                1-2 paras
+deleteBackward        1-2 paras
 Tab/tab-prev          1-2 paras
 NewElement            2 paras
 insertForcedLineBreak 2 paras
