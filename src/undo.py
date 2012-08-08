@@ -7,15 +7,42 @@ import zlib
 CMD_ADD_CHAR, CMD_MISC = range(2)
 
 # convert a list of Screenplay.Line objects into an unspecified, but
-# compact, form of storage. storage2lines will convert this blob back to
-# the original form.
+# compact, form of storage. storage2lines will convert this back to the
+# original form.
+#
+# the return type is a tuple: (numberOfLines, ...). the number and type of
+# elements after the first is of no concern to the caller.
+#
+# implementation notes:
+#
+#   tuple[1]: bool; True if tuple[2] is zlib-compressed
+#
+#   tuple[2]: string; the line objects converted to their string
+#   representation and joined by the "\n" character
+#
 def lines2storage(lines):
     lines = [str(ln) for ln in lines]
-    return zlib.compress("\n".join(lines), 6)
+    linesStr = "\n".join(lines)
+
+    # instead of having an arbitrary cutoff figure ("compress if < X
+    # bytes"), always compress, but only use the compressed version if
+    # it's shorter than the non-compressed one.
+
+    linesStrCompressed = zlib.compress(linesStr, 6)
+
+    if len(linesStrCompressed) < len(linesStr):
+        return (len(lines), True, linesStrCompressed)
+    else:
+        return (len(lines), False, linesStr)
 
 # see lines2storage.
-def storage2lines(blob):
-    return [screenplay.Line.fromStr(s) for s in zlib.decompress(blob).split("\n")]
+def storage2lines(storage):
+    if storage[1]:
+        linesStr = zlib.decompress(storage[2])
+    else:
+        linesStr = storage[2]
+
+    return [screenplay.Line.fromStr(s) for s in linesStr.split("\n")]
 
 # abstract base class for storing undo history. concrete subclasses
 # implement undo/redo for specific actions taken on a screenplay.
@@ -89,9 +116,8 @@ class SinglePara(Base):
         self.elemStartLine = sp.getParaFirstIndexFromLine(line)
         endLine = sp.getParaLastIndexFromLine(line)
 
-        self.linesBefore = [
-            screenplay.Line(ln.lb, ln.lt, ln.text) for ln in
-            sp.lines[self.elemStartLine : endLine + 1]]
+        self.linesBefore = lines2storage(
+            sp.lines[self.elemStartLine : endLine + 1])
 
         # FIXME: debug stuff, remove
         #print "init: start: %d end: %d line: %d" % (self.elemStartLine, endLine, line)
@@ -109,9 +135,8 @@ class SinglePara(Base):
         # FIXME: debug stuff, remove
         #print "setAfter: start: %d end: %d" % (self.elemStartLine, endLine)
 
-        self.linesAfter = [
-            screenplay.Line(ln.lb, ln.lt, ln.text) for ln in
-            sp.lines[self.elemStartLine : endLine + 1]]
+        self.linesAfter = lines2storage(
+            sp.lines[self.elemStartLine : endLine + 1])
 
         self.setEndPos(sp)
 
@@ -119,13 +144,13 @@ class SinglePara(Base):
         sp.line, sp.column = self.startPos.line, self.startPos.column
 
         # FIXME: debug stuff, remove
-        #print "undo: start: %d len: %d" % (self.elemStartLine, len(self.linesAfter))
+        #print "undo: start: %d len: %d" % (self.elemStartLine, self.linesAfter[0]))
 
-        sp.lines[self.elemStartLine : self.elemStartLine + len(self.linesAfter)] = \
-            [screenplay.Line(ln.lb, ln.lt, ln.text) for ln in self.linesBefore]
+        sp.lines[self.elemStartLine : self.elemStartLine + self.linesAfter[0]] = \
+            storage2lines(self.linesBefore)
 
     def redo(self, sp):
         sp.line, sp.column = self.endPos.line, self.endPos.column
 
-        sp.lines[self.elemStartLine : self.elemStartLine + len(self.linesBefore)] = \
-            [screenplay.Line(ln.lb, ln.lt, ln.text) for ln in self.linesAfter]
+        sp.lines[self.elemStartLine : self.elemStartLine + self.linesBefore[0]] = \
+            storage2lines(self.linesAfter)
