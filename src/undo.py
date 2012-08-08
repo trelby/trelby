@@ -104,7 +104,7 @@ class SinglePara(Base):
         # impossibility. so we can find the dimensions of the modified
         # paragraph by starting at the first line.
 
-        endLine = sp.getParaLastIndexFromLine(self.startPos.line)
+        endLine = sp.getParaLastIndexFromLine(self.elemStartLine)
 
         # FIXME: debug stuff, remove
         #print "setAfter: start: %d end: %d" % (self.elemStartLine, endLine)
