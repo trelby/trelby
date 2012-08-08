@@ -6,6 +6,17 @@ import zlib
 # possible command types. only used for possibly merging consecutive edits.
 CMD_ADD_CHAR, CMD_MISC = range(2)
 
+# convert a list of Screenplay.Line objects into an unspecified, but
+# compact, form of storage. storage2lines will convert this blob back to
+# the original form.
+def lines2storage(lines):
+    lines = [str(ln) for ln in lines]
+    return zlib.compress("\n".join(lines), 6)
+
+# see lines2storage.
+def storage2lines(blob):
+    return [screenplay.Line.fromStr(s) for s in zlib.decompress(blob).split("\n")]
+
 # abstract base class for storing undo history. concrete subclasses
 # implement undo/redo for specific actions taken on a screenplay.
 class Base:
@@ -53,27 +64,20 @@ class FullCopy(Base):
     def __init__(self, sp):
         Base.__init__(self, sp, CMD_MISC)
 
-        lines = [str(ln) for ln in sp.lines]
-        self.linesBeforeRaw = zlib.compress("\n".join(lines), 6)
+        self.linesBeforeRaw = lines2storage(sp.lines)
 
     # called after editing action is over to snapshot the "after" state
     def setAfter(self, sp):
-        lines = [str(ln) for ln in sp.lines]
-        self.linesAfterRaw = zlib.compress("\n".join(lines), 6)
-
+        self.linesAfterRaw = lines2storage(sp.lines)
         self.setEndPos(sp)
 
     def undo(self, sp):
         sp.line, sp.column = self.startPos.line, self.startPos.column
-
-        sp.lines = [screenplay.Line.fromStr(s) for s in
-                    zlib.decompress(self.linesBeforeRaw).split("\n")]
+        sp.lines = storage2lines(self.linesBeforeRaw)
 
     def redo(self, sp):
         sp.line, sp.column = self.endPos.line, self.endPos.column
-
-        sp.lines = [screenplay.Line.fromStr(s) for s in
-                    zlib.decompress(self.linesAfterRaw).split("\n")]
+        sp.lines = storage2lines(self.linesAfterRaw)
 
 
 # stores a single modified paragraph
