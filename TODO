@@ -45,6 +45,11 @@ pasteSystemCB         1-N paras
 
 other:
 
+  -remove confirmation dialogs for deleting stuff, and their associated
+   config options
+
+  -update manual (document undo, remove delete confirmation settings, ...)
+
   -applyCfg: clear undo history
 
   -emacs-like behavior while in middle of undo history; keeps us from ever
@@ -55,7 +60,7 @@ other:
 
   -write unit tests
 
-    -modify t_random.py to test that each operation can be undone/redone and
-     script contents are exactly the same
+    -modify t_random.py to test that each operation can be undone/redone
+     and script contents are exactly the same
 
     -randomly do undo/redo
