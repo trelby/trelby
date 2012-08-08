@@ -1,6 +1,7 @@
 import config
 import gutil
 import misc
+import undo
 import util
 
 import wx
@@ -372,6 +373,8 @@ class FindDlg(wx.Dialog):
             value = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue()))
             ls = self.ctrl.sp.lines
 
+            u = undo.SinglePara(self.ctrl.sp, undo.CMD_MISC, self.ctrl.searchLine)
+
             ls[self.ctrl.searchLine].text = util.replace(
                 ls[self.ctrl.searchLine].text, value,
                 self.ctrl.searchColumn, self.ctrl.searchWidth)
@@ -402,6 +405,10 @@ class FindDlg(wx.Dialog):
                 self.didReplaces = True
 
             self.ctrl.sp.markChanged()
+
+            u.setAfter(self.ctrl.sp)
+            self.ctrl.sp.addUndo(u)
+
             self.OnFind(autoFind = autoFind)
 
             return True

@@ -28,10 +28,10 @@ addChar               SinglePara (possibly merged)
   charmap
   namesdlg
 spellcheckerdlg       SinglePara
+find-and-replace      SinglePara
 
 remaining:
 
-find-and-replace      SinglePara
 delete                1-2 paras
 deleteBackward        1-2 paras
 Tab/tab-prev          1-2 paras
@@ -52,3 +52,10 @@ other:
 
   -implement undo history trimming (estimate memory usage of each item,
    and cap used memory at X)
+
+  -write unit tests
+
+    -modify t_random.py to test that each operation can be undone/redone and
+     script contents are exactly the same
+
+    -randomly do undo/redo
