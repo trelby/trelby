@@ -48,18 +48,17 @@ class Base:
 # stores a full copy of the screenplay before/after the action. used by
 # actions that modify the screenplay globally.
 #
-# why we store the line data as compressed text, not as a list of Line
-# objects, is because it's both faster and uses much less memory to do so.
-# figures from a 32-bit machine (a 64-bit machine wastes even more space
-# storing Line objects) from speedTest for a 119-page screenplay:
+# we store the line data as compressed text, not as a list of Line
+# objects, because it takes much less memory to do so. figures from a
+# 32-bit machine (a 64-bit machine wastes even more space storing Line
+# objects) from speedTest for a 120-page screenplay (Casablanca):
 #
-#   -Line objects: 1,770 KB, 0.125s
-#   -text, not compressed: 352 KB, 0.078s
-#   -text, zlib fastest(1): 76 KB, 0.088s
-#   -text, zlib medium(6): 36 KB, 0.091s
-#   -text, zlib best(9): 35 KB, 0.093s
-#   -text, bz2 best(9): 42 KB, 0.228s
-#
+#   -Line objects:         1,737 KB, 0.113s
+#   -text, not compressed:   267 KB, 0.076s
+#   -text, zlib fastest(1):  127 KB, 0.090s
+#   -text, zlib medium(6):   109 KB, 0.115s
+#   -text, zlib best(9):     107 KB, 0.126s
+#   -text, bz2 best(9):       88 KB, 0.147s
 class FullCopy(Base):
     def __init__(self, sp):
         Base.__init__(self, sp, CMD_MISC)
