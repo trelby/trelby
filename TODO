@@ -32,15 +32,15 @@ find-and-replace      SinglePara
 
 remaining:
 
-delete                1-2 paras
-deleteBackward        1-2 paras
-Tab/tab-prev          1-2 paras
-NewElement            2 paras
+delete                1-2 elems
+deleteBackward        1-2 elems
+Tab/tab-prev          1-2 elems
+NewElement            2 elems
 insertForcedLineBreak 2 paras
-change-to-X           1-N paras
-cut                   1-N paras
-paste                 1-N paras
-pasteSystemCB         1-N paras
+change-to-X           1-N elems
+cut                   1-N elems
+paste                 1-N elems
+pasteSystemCB         1-N elems
 
 
 other:
