@@ -65,12 +65,21 @@ class Base:
     def getType(self):
         return self.cmdType
 
+    # default implementation for undo. can be overridden by subclasses
+    # that need something different.
     def undo(self, sp):
-        raise NotImplementedError
+        sp.line, sp.column = self.startPos.line, self.startPos.column
 
+        sp.lines[self.elemStartLine : self.elemStartLine + self.linesAfter[0]] = \
+            storage2lines(self.linesBefore)
+
+    # default implementation for redo. can be overridden by subclasses
+    # that need something different.
     def redo(self, sp):
-        raise NotImplementedError
+        sp.line, sp.column = self.endPos.line, self.endPos.column
 
+        sp.lines[self.elemStartLine : self.elemStartLine + self.linesBefore[0]] = \
+            storage2lines(self.linesAfter)
 
 # stores a full copy of the screenplay before/after the action. used by
 # actions that modify the screenplay globally.
@@ -90,20 +99,13 @@ class FullCopy(Base):
     def __init__(self, sp):
         Base.__init__(self, sp, CMD_MISC)
 
+        self.elemStartLine = 0
         self.linesBefore = lines2storage(sp.lines)
 
     # called after editing action is over to snapshot the "after" state
     def setAfter(self, sp):
         self.linesAfter = lines2storage(sp.lines)
         self.setEndPos(sp)
-
-    def undo(self, sp):
-        sp.line, sp.column = self.startPos.line, self.startPos.column
-        sp.lines = storage2lines(self.linesBefore)
-
-    def redo(self, sp):
-        sp.line, sp.column = self.endPos.line, self.endPos.column
-        sp.lines = storage2lines(self.linesAfter)
 
 
 # stores a single modified paragraph
@@ -119,10 +121,6 @@ class SinglePara(Base):
         self.linesBefore = lines2storage(
             sp.lines[self.elemStartLine : endLine + 1])
 
-        # FIXME: debug stuff, remove
-        #print "init: start: %d end: %d line: %d" % (self.elemStartLine, endLine, line)
-
-    # called after editing action is over to snapshot the "after" state
     def setAfter(self, sp):
         # if all we did was modify a single paragraph, the index of its
         # starting line can not have changed, because that would mean one of
@@ -132,31 +130,13 @@ class SinglePara(Base):
 
         endLine = sp.getParaLastIndexFromLine(self.elemStartLine)
 
-        # FIXME: debug stuff, remove
-        #print "setAfter: start: %d end: %d" % (self.elemStartLine, endLine)
-
         self.linesAfter = lines2storage(
             sp.lines[self.elemStartLine : endLine + 1])
 
         self.setEndPos(sp)
 
-    def undo(self, sp):
-        sp.line, sp.column = self.startPos.line, self.startPos.column
 
-        # FIXME: debug stuff, remove
-        #print "undo: start: %d len: %d" % (self.elemStartLine, self.linesAfter[0]))
-
-        sp.lines[self.elemStartLine : self.elemStartLine + self.linesAfter[0]] = \
-            storage2lines(self.linesBefore)
-
-    def redo(self, sp):
-        sp.line, sp.column = self.endPos.line, self.endPos.column
-
-        sp.lines[self.elemStartLine : self.elemStartLine + self.linesBefore[0]] = \
-            storage2lines(self.linesAfter)
-
-
-# stores N modified elements
+# stores N modified consecutive elements
 class ManyElems(Base):
     # line is any line belonging to the first modified element. there is
     # no requirement for the cursor to be in this paragraph.
@@ -178,7 +158,6 @@ class ManyElems(Base):
         self.linesBefore = lines2storage(
             sp.lines[self.elemStartLine : endLine + 1])
 
-    # called after editing action is over to snapshot the "after" state
     def setAfter(self, sp):
         endLine = sp.getElemLastIndexFromLine(self.elemStartLine)
 
@@ -189,15 +168,3 @@ class ManyElems(Base):
             sp.lines[self.elemStartLine : endLine + 1])
 
         self.setEndPos(sp)
-
-    def undo(self, sp):
-        sp.line, sp.column = self.startPos.line, self.startPos.column
-
-        sp.lines[self.elemStartLine : self.elemStartLine + self.linesAfter[0]] = \
-            storage2lines(self.linesBefore)
-
-    def redo(self, sp):
-        sp.line, sp.column = self.endPos.line, self.endPos.column
-
-        sp.lines[self.elemStartLine : self.elemStartLine + self.linesBefore[0]] = \
-            storage2lines(self.linesAfter)
