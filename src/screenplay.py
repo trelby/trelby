@@ -2775,10 +2775,15 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.column = len(self.lines[self.line].text)
 
     def insertForcedLineBreakCmd(self, cs):
+        u = undo.ManyElems(self, undo.CMD_MISC, self.line, 1, 1)
+
         self.splitLine()
 
         self.rewrapPara()
         self.rewrapPrevPara()
+
+        u.setAfter(self)
+        self.addUndo(u)
 
     def splitElementCmd(self, cs):
         tcfg = self.cfgGl.getType(self.lines[self.line].lt)
