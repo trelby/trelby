@@ -90,20 +90,20 @@ class FullCopy(Base):
     def __init__(self, sp):
         Base.__init__(self, sp, CMD_MISC)
 
-        self.linesBeforeRaw = lines2storage(sp.lines)
+        self.linesBefore = lines2storage(sp.lines)
 
     # called after editing action is over to snapshot the "after" state
     def setAfter(self, sp):
-        self.linesAfterRaw = lines2storage(sp.lines)
+        self.linesAfter = lines2storage(sp.lines)
         self.setEndPos(sp)
 
     def undo(self, sp):
         sp.line, sp.column = self.startPos.line, self.startPos.column
-        sp.lines = storage2lines(self.linesBeforeRaw)
+        sp.lines = storage2lines(self.linesBefore)
 
     def redo(self, sp):
         sp.line, sp.column = self.endPos.line, self.endPos.column
-        sp.lines = storage2lines(self.linesAfterRaw)
+        sp.lines = storage2lines(self.linesAfter)
 
 
 # stores a single modified paragraph
