@@ -2800,7 +2800,12 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if self.tabMakesNew():
             self.splitElement(tcfg.newTypeTab)
         else:
+            u = undo.ManyElems(self, undo.CMD_MISC, self.line, 1, 1)
+
             self.convertTypeTo(tcfg.nextTypeTab)
+
+            u.setAfter(self)
+            self.addUndo(u)
 
     # switch current element to prevTypeTab.
     def toPrevTypeTabCmd(self, cs):
@@ -2809,8 +2814,13 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             return
 
+        u = undo.ManyElems(self, undo.CMD_MISC, self.line, 1, 1)
+
         tcfg = self.cfgGl.getType(self.lines[self.line].lt)
         self.convertTypeTo(tcfg.prevTypeTab)
+
+        u.setAfter(self)
+        self.addUndo(u)
 
     # add character cs.char if it's a valid one.
     def addCharCmd(self, cs):

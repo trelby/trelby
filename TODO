@@ -31,13 +31,13 @@ spellcheckerdlg       SinglePara
 find-and-replace      SinglePara
 NewElement            ManyElems(1, 2)
 Tab (end of elem)     ManyElems(1, 2)
+Tab (middle of elem)  ManyElems(1, 1)
+TabPrev               ManyElems(1, 1)
 
 remaining:
 
 delete                1-2 elems
 deleteBackward        1-2 elems
-Tab (middle of elem)  1 elem
-TabPrev               1 elem
 insertForcedLineBreak 2 paras
 change-to-X           1-N elems
 cut                   1-N elems
