@@ -49,8 +49,6 @@ other:
 
   -doing undo/redo must clear auto-comp (and any other state we may have)
 
-  -undo/redo should paginate
-
   -remove confirmation dialogs for deleting stuff, and their associated
    config options
 

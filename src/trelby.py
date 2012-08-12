@@ -800,11 +800,13 @@ class MyCtrl(wx.Control):
 
     def OnUndo(self):
         self.sp.undo()
+        self.sp.paginate()
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
     def OnRedo(self):
         self.sp.redo()
+        self.sp.paginate()
         self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
