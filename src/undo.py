@@ -154,3 +154,50 @@ class SinglePara(Base):
 
         sp.lines[self.elemStartLine : self.elemStartLine + self.linesBefore[0]] = \
             storage2lines(self.linesAfter)
+
+
+# stores N modified elements
+class ManyElems(Base):
+    # line is any line belonging to the first modified element. there is
+    # no requirement for the cursor to be in this paragraph.
+    # nrOfElemsStart is how many elements there are before the edit
+    # operaton and nrOfElemsEnd is how many there are after. so an edit
+    # operation splitting an element would pass in (1, 2) while an edit
+    # operation combining two elements would pass in (2, 1).
+    def __init__(self, sp, cmdType, line, nrOfElemsStart, nrOfElemsEnd):
+        Base.__init__(self, sp, cmdType)
+
+        self.nrOfElemsEnd = nrOfElemsEnd
+
+        self.elemStartLine, endLine = sp.getElemIndexesFromLine(line)
+
+        # find last line of last element to include in linesBefore
+        for i in range(nrOfElemsStart - 1):
+            endLine = sp.getElemLastIndexFromLine(endLine + 1)
+
+        self.linesBefore = lines2storage(
+            sp.lines[self.elemStartLine : endLine + 1])
+
+    # called after editing action is over to snapshot the "after" state
+    def setAfter(self, sp):
+        endLine = sp.getElemLastIndexFromLine(self.elemStartLine)
+
+        for i in range(self.nrOfElemsEnd - 1):
+            endLine = sp.getElemLastIndexFromLine(endLine + 1)
+
+        self.linesAfter = lines2storage(
+            sp.lines[self.elemStartLine : endLine + 1])
+
+        self.setEndPos(sp)
+
+    def undo(self, sp):
+        sp.line, sp.column = self.startPos.line, self.startPos.column
+
+        sp.lines[self.elemStartLine : self.elemStartLine + self.linesAfter[0]] = \
+            storage2lines(self.linesBefore)
+
+    def redo(self, sp):
+        sp.line, sp.column = self.endPos.line, self.endPos.column
+
+        sp.lines[self.elemStartLine : self.elemStartLine + self.linesBefore[0]] = \
+            storage2lines(self.linesAfter)

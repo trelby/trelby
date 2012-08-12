@@ -1708,6 +1708,8 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             return
 
+        u = undo.ManyElems(self, undo.CMD_MISC, self.line, 1, 2)
+
         if not self.acItems:
             if self.isAtEndOfParen():
                 self.column += 1
@@ -1723,6 +1725,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.rewrapPara()
         self.rewrapPrevPara()
         self.markChanged()
+
+        u.setAfter(self)
+        self.addUndo(u)
 
     # delete character at given position and optionally position
     # cursor there.
