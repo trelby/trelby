@@ -2736,13 +2736,40 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.rewrapElem()
 
     def deleteForwardCmd(self, cs):
+        u = None
+        mergeUndo = False
+
+        # only merge with the previous item in undo history if:
+        #   -we are not in middle of undo/redo
+        #   -previous item is "add character"
+        #   -cursor is exactly where it was left off by the revious item
+        if (not self.currentUndo and self.lastUndo and
+            (self.lastUndo.getType() == undo.CMD_DEL_FORWARD) and
+            (self.lastUndo.endPos == self.cursorAsMark())):
+            u = self.lastUndo
+            mergeUndo = True
+
         if self.column != len(self.lines[self.line].text):
+            if not mergeUndo:
+                u = undo.ManyElems(self, undo.CMD_DEL_FORWARD, self.line, 1, 1)
+
             self.deleteChar(self.line, self.column)
             self.markChanged()
             cs.doAutoComp = cs.AC_REDO
         else:
             if self.line != (len(self.lines) - 1):
                 ln = self.lines[self.line]
+
+                # delete at end of the line of the last line of the
+                # element means "join up with next element", so is a 2->1
+                # change. otherwise we just delete a character from
+                # current element so no element count change.
+                if ln.lb == LB_LAST:
+                    u = undo.ManyElems(self, undo.CMD_MISC, self.line, 2, 1)
+                    mergeUndo = False
+                else:
+                    if not mergeUndo:
+                        u = undo.ManyElems(self, undo.CMD_DEL_FORWARD, self.line, 1, 1)
 
                 if ln.lb == LB_NONE:
                     self.deleteChar(self.line + 1, 0, False)
@@ -2752,6 +2779,12 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 self.markChanged()
 
         self.rewrapElem()
+
+        if u:
+            u.setAfter(self)
+
+            if not mergeUndo:
+                self.addUndo(u)
 
     # aborts stuff, like selection, auto-completion, etc
     def abortCmd(self, cs):

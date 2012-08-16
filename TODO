@@ -23,26 +23,27 @@ action                type
 
 done:
 
-delete-elem-types     FullCopy
-addChar               SinglePara (possibly merged)
+delete-elem-types        FullCopy
+addChar                  SinglePara (possibly merged)
   charmap
   namesdlg
-spellcheckerdlg       SinglePara
-find-and-replace      SinglePara
-NewElement            ManyElems(1, 2)
-Tab (end of elem)     ManyElems(1, 2)
-Tab (middle of elem)  ManyElems(1, 1)
-TabPrev               ManyElems(1, 1)
-insertForcedLineBreak ManyElems(1, 1)
+spellcheckerdlg          SinglePara
+find-and-replace         SinglePara
+NewElement               ManyElems(1, 2)
+Tab (end of elem)        ManyElems(1, 2)
+Tab (middle of elem)     ManyElems(1, 1)
+TabPrev                  ManyElems(1, 1)
+insertForcedLineBreak    ManyElems(1, 1)
+delFwd (not end of elem) ManyElems(1, 1)
+delFWd (end of elem)     ManyElems(2, 1)
 
 remaining:
 
-delete                1-2 elems
-deleteBackward        1-2 elems
-change-to-X           1-N elems
-cut                   1-N elems
-paste                 1-N elems
-pasteSystemCB         1-N elems
+deleteBackward           1-2 elems
+change-to-X              1-N elems
+cut                      1-N elems
+paste                    1-N elems
+pasteSystemCB            1-N elems
 
 
 other:

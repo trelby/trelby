@@ -4,7 +4,7 @@ import zlib
 
 
 # possible command types. only used for possibly merging consecutive edits.
-CMD_ADD_CHAR, CMD_MISC = range(2)
+CMD_ADD_CHAR, CMD_DEL_FORWARD, CMD_MISC = range(3)
 
 # convert a list of Screenplay.Line objects into an unspecified, but
 # compact, form of storage. storage2lines will convert this back to the
