@@ -2741,8 +2741,8 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         # only merge with the previous item in undo history if:
         #   -we are not in middle of undo/redo
-        #   -previous item is "add character"
-        #   -cursor is exactly where it was left off by the revious item
+        #   -previous item is "delete forward"
+        #   -cursor is exactly where it was left off by the previous item
         if (not self.currentUndo and self.lastUndo and
             (self.lastUndo.getType() == undo.CMD_DEL_FORWARD) and
             (self.lastUndo.endPos == self.cursorAsMark())):
@@ -2872,7 +2872,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         # only merge with the previous item in undo history if:
         #   -we are not in middle of undo/redo
         #   -previous item is "add character"
-        #   -cursor is exactly where it was left off by the revious item
+        #   -cursor is exactly where it was left off by the previous item
         if (not self.currentUndo and self.lastUndo and
             (self.lastUndo.getType() == undo.CMD_ADD_CHAR) and
             (self.lastUndo.endPos == self.cursorAsMark())):
