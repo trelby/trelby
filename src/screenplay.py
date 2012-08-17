@@ -2717,13 +2717,40 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.column = 0
 
     def deleteBackwardCmd(self, cs):
+        u = None
+        mergeUndo = False
+
+        # only merge with the previous item in undo history if:
+        #   -we are not in middle of undo/redo
+        #   -previous item is "delete backward"
+        #   -cursor is exactly where it was left off by the previous item
+        if (not self.currentUndo and self.lastUndo and
+            (self.lastUndo.getType() == undo.CMD_DEL_BACKWARD) and
+            (self.lastUndo.endPos == self.cursorAsMark())):
+            u = self.lastUndo
+            mergeUndo = True
+
         if self.column != 0:
+            if not mergeUndo:
+                u = undo.ManyElems(self, undo.CMD_DEL_BACKWARD, self.line, 1, 1)
+
             self.deleteChar(self.line, self.column - 1)
             self.markChanged()
             cs.doAutoComp = cs.AC_REDO
         else:
             if self.line != 0:
                 ln = self.lines[self.line - 1]
+
+                # delete at start of the line of the first line of the
+                # element means "join up with previous element", so is a
+                # 2->1 change. otherwise we just delete a character from
+                # current element so no element count change.
+                if ln.lb == LB_LAST:
+                    u = undo.ManyElems(self, undo.CMD_MISC, self.line - 1, 2, 1)
+                    mergeUndo = False
+                else:
+                    if not mergeUndo:
+                        u = undo.ManyElems(self, undo.CMD_DEL_BACKWARD, self.line, 1, 1)
 
                 if ln.lb == LB_NONE:
                     self.deleteChar(self.line - 1, len(ln.text) - 1,
@@ -2734,6 +2761,12 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 self.markChanged()
 
         self.rewrapElem()
+
+        if u:
+            u.setAfter(self)
+
+            if not mergeUndo:
+                self.addUndo(u)
 
     def deleteForwardCmd(self, cs):
         u = None
