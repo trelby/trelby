@@ -73,7 +73,7 @@ def testPaste():
 
 def testRemoveElementTypes():
     sp = u.load()
-    sp.removeElementTypes({ scr.ACTION : 0 })
+    sp.removeElementTypes({ scr.ACTION : 0 }, False)
     assert sp.isModified()
 
 def testApplyCfg():
