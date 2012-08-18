@@ -2193,11 +2193,24 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 ls[self.line - 1].lb = inLines[0].lb
                 ls[self.line:self.line] = inLines[1:]
                 self.line += len(inLines) - 2
+
+                # FIXME: pasting a multi-paragraph ACTION where first line
+                # has FORCED lb, in middle of a CHARACTER block, breaks
+                # things
+
             else:
                 ls[self.line + 1:self.line + 1] = inLines[1:]
                 self.line += len(inLines) - 1
 
+                # FIXME: this doesn't modify .lb, and pasting a
+                # multi-paragraph ACTION at end of line in CHARACTER block
+                # where that line ends in forced linebreak breaks things.
+
             self.column = len(ls[self.line].text)
+
+        # FIXME: copy/paste, when copying elements containing forced
+        # linebreaks, converts them to end of element? this seems like a
+        # bug...
 
         self.reformatRange(wrap1, self.getParaFirstIndexFromLine(self.line))
 
