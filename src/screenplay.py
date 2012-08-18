@@ -2177,15 +2177,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         ln = ls[self.line]
 
-        wasEmpty = len(ln.text) == 0
         atEnd = self.column == len(ln.text)
+
+        if (len(ln.text) == 0) and self.isOnlyLineOfElem(self.line):
+            ln.lt = inLines[0].lt
 
         ln.text = ln.text[:self.column] + inLines[0].text + \
                   ln.text[self.column:]
         self.column += len(inLines[0].text)
-
-        if wasEmpty:
-            ln.lt = inLines[0].lt
 
         if len(inLines) != 1:
 
