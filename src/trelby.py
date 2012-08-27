@@ -221,7 +221,7 @@ class MyCtrl(wx.Control):
 
         lt = idToLTMap[event.GetId()]
 
-        self.sp.convertTypeTo(lt)
+        self.sp.convertTypeTo(lt, True)
         self.sp.cmdPost(cs)
 
         if cs.needsVisifying:

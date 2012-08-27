@@ -1401,6 +1401,25 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         return scene
 
+    # return how many elements one must advance to get from element
+    # containing line1 to element containing line2. line1 must be <=
+    # line2, and either line can be anywhere in their respective elements.
+    # returns 0 if they're in the same element, 1 if they're in
+    # consecutive elements, etc.
+    def elemsDistance(self, line1, line2):
+        ls = self.lines
+
+        count = 0
+        line = line1
+
+        while line < line2:
+            if ls[line].lb == LB_LAST:
+                count += 1
+
+            line += 1
+
+        return count
+
     # returns true if 'line', which must be the last line on a page, needs
     # (MORE) after it and the next page needs a "SOMEBODY (cont'd)".
     def needsMore(self, line):
@@ -1623,16 +1642,22 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # convert element(s) to given type
     #  - if multiple elements are selected, all are changed
     #  - if not, the change is applied to element under cursor.
-    def convertTypeTo(self, lt):
+    def convertTypeTo(self, lt, saveUndo):
         ls = self.lines
         selection = self.getMarkedLines()
 
         if selection:
             startSection, endSection = selection
+            selectedElems = self.elemsDistance(startSection, endSection) + 1
         else:
             startSection, endSection = self.getElemIndexes()
+            selectedElems = 1
 
         currentLine = startSection
+
+        if saveUndo:
+            u = undo.ManyElems(
+                self, undo.CMD_MISC, currentLine, selectedElems, selectedElems)
 
         while currentLine <= endSection:
             first, last = self.getElemIndexesFromLine(currentLine)
@@ -1665,6 +1690,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             self.rewrapElem(first)
 
         self.markChanged()
+
+        if saveUndo:
+            u.setAfter(self)
+            self.addUndo(u)
 
     # join lines 'line' and 'line + 1' and position cursor at the join
     # position.
@@ -1720,7 +1749,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.splitLine()
         ls[self.line - 1].lb = LB_LAST
 
-        self.convertTypeTo(newType)
+        self.convertTypeTo(newType, False)
 
         self.rewrapPara()
         self.rewrapPrevPara()
@@ -2871,12 +2900,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if self.tabMakesNew():
             self.splitElement(tcfg.newTypeTab)
         else:
-            u = undo.ManyElems(self, undo.CMD_MISC, self.line, 1, 1)
-
-            self.convertTypeTo(tcfg.nextTypeTab)
-
-            u.setAfter(self)
-            self.addUndo(u)
+            self.convertTypeTo(tcfg.nextTypeTab, True)
 
     # switch current element to prevTypeTab.
     def toPrevTypeTabCmd(self, cs):
@@ -2885,13 +2909,8 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             return
 
-        u = undo.ManyElems(self, undo.CMD_MISC, self.line, 1, 1)
-
         tcfg = self.cfgGl.getType(self.lines[self.line].lt)
-        self.convertTypeTo(tcfg.prevTypeTab)
-
-        u.setAfter(self)
-        self.addUndo(u)
+        self.convertTypeTo(tcfg.prevTypeTab, True)
 
     # add character cs.char if it's a valid one.
     def addCharCmd(self, cs):
@@ -2965,31 +2984,31 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             self.addUndo(u)
 
     def toSceneCmd(self, cs):
-        self.convertTypeTo(SCENE)
+        self.convertTypeTo(SCENE, True)
 
     def toActionCmd(self, cs):
-        self.convertTypeTo(ACTION)
+        self.convertTypeTo(ACTION, True)
 
     def toCharacterCmd(self, cs):
-        self.convertTypeTo(CHARACTER)
+        self.convertTypeTo(CHARACTER, True)
 
     def toDialogueCmd(self, cs):
-        self.convertTypeTo(DIALOGUE)
+        self.convertTypeTo(DIALOGUE, True)
 
     def toParenCmd(self, cs):
-        self.convertTypeTo(PAREN)
+        self.convertTypeTo(PAREN, True)
 
     def toTransitionCmd(self, cs):
-        self.convertTypeTo(TRANSITION)
+        self.convertTypeTo(TRANSITION, True)
 
     def toShotCmd(self, cs):
-        self.convertTypeTo(SHOT)
+        self.convertTypeTo(SHOT, True)
 
     def toActBreakCmd(self, cs):
-        self.convertTypeTo(ACTBREAK)
+        self.convertTypeTo(ACTBREAK, True)
 
     def toNoteCmd(self, cs):
-        self.convertTypeTo(NOTE)
+        self.convertTypeTo(NOTE, True)
 
     # return True if we can undo
     def canUndo(self):
