@@ -2098,88 +2098,90 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         cd.lines[-1].lb = LB_LAST
 
-        if doDelete:
-            # range of lines, inclusive, that we need to totally delete
-            del1 = sys.maxint
-            del2 = -1
+        if not doDelete:
+            return cd
 
-            # delete selected text from the lines
-            for i in xrange(marked[0], marked[1] + 1):
-                c1, c2 = self.getMarkedColumns(i, marked)
+        # range of lines, inclusive, that we need to totally delete
+        del1 = sys.maxint
+        del2 = -1
 
-                ln = ls[i]
-                ln.text = ln.text[0:c1] + ln.text[c2 + 1:]
+        # delete selected text from the lines
+        for i in xrange(marked[0], marked[1] + 1):
+            c1, c2 = self.getMarkedColumns(i, marked)
 
-                if i == marked[0]:
-                    endCol = c1
+            ln = ls[i]
+            ln.text = ln.text[0:c1] + ln.text[c2 + 1:]
 
-                # if we removed all text, mark this line to be deleted
-                if len(ln.text) == 0:
-                    del1 = min(del1, i)
-                    del2 = max(del2, i)
+            if i == marked[0]:
+                endCol = c1
 
-            # adjust linebreaks
-            if marked[0] == marked[1]:
+            # if we removed all text, mark this line to be deleted
+            if len(ln.text) == 0:
+                del1 = min(del1, i)
+                del2 = max(del2, i)
 
-                # user has selected text from a single line only
+        # adjust linebreaks
+        if marked[0] == marked[1]:
 
+            # user has selected text from a single line only
+
+            ln = ls[marked[0]]
+
+            # if it is a single-line element, we never need to modify
+            # its linebreak
+            if not self.isOnlyLineOfElem(marked[0]):
+                # if we're totally deleting the line and it's the last
+                # line of a multi-line element, mark the preceding
+                # line as the new last line of the element.
+
+                if not ln.text and self.isLastLineOfElem(marked[0]):
+                    ls[marked[0] - 1].lb = LB_LAST
+
+        else:
+
+            # now find the line whose linebreak we need to adjust. if
+            # the starting line is not completely removed, it is that,
+            # otherwise it is the preceding line, unless we delete the
+            # first line of the element, in which case there's nothing
+            # to adjust.
+            if ls[marked[0]].text:
                 ln = ls[marked[0]]
-
-                # if it is a single-line element, we never need to modify
-                # its linebreak
-                if not self.isOnlyLineOfElem(marked[0]):
-                    # if we're totally deleting the line and it's the last
-                    # line of a multi-line element, mark the preceding
-                    # line as the new last line of the element.
-
-                    if not ln.text and self.isLastLineOfElem(marked[0]):
-                        ls[marked[0] - 1].lb = LB_LAST
-
             else:
-
-                # now find the line whose linebreak we need to adjust. if
-                # the starting line is not completely removed, it is that,
-                # otherwise it is the preceding line, unless we delete the
-                # first line of the element, in which case there's nothing
-                # to adjust.
-                if ls[marked[0]].text:
-                    ln = ls[marked[0]]
+                if not self.isFirstLineOfElem(marked[0]):
+                    ln = ls[marked[0] - 1]
                 else:
-                    if not self.isFirstLineOfElem(marked[0]):
-                        ln = ls[marked[0] - 1]
-                    else:
-                        ln = None
+                    ln = None
 
-                if ln:
-                    # if the selection ends by removing completely the
-                    # last line of an element, we need to mark the
-                    # element's new end, otherwise we must set it to
-                    # LB_NONE so that the new element is reformatted
-                    # properly.
-                    if self.isLastLineOfElem(marked[1]) and \
-                           not ls[marked[1]].text:
-                        ln.lb = LB_LAST
-                    else:
-                        ln.lb = LB_NONE
+            if ln:
+                # if the selection ends by removing completely the
+                # last line of an element, we need to mark the
+                # element's new end, otherwise we must set it to
+                # LB_NONE so that the new element is reformatted
+                # properly.
+                if self.isLastLineOfElem(marked[1]) and \
+                       not ls[marked[1]].text:
+                    ln.lb = LB_LAST
+                else:
+                    ln.lb = LB_NONE
 
-            # if we're joining two elements we have to change the line
-            # types for the latter element (starting from the last marked
-            # line, because everything before that will get deleted
-            # anyway) to that of the first element.
-            self.setLineTypes(marked[1], ls[marked[0]].lt)
+        # if we're joining two elements we have to change the line
+        # types for the latter element (starting from the last marked
+        # line, because everything before that will get deleted
+        # anyway) to that of the first element.
+        self.setLineTypes(marked[1], ls[marked[0]].lt)
 
-            del ls[del1:del2 + 1]
+        del ls[del1:del2 + 1]
 
-            self.clearMark()
+        self.clearMark()
 
-            if len(ls) == 0:
-                ls.append(Line(LB_LAST, SCENE))
+        if len(ls) == 0:
+            ls.append(Line(LB_LAST, SCENE))
 
-            self.line = min(marked[0], len(ls) - 1)
-            self.column = min(endCol, len(ls[self.line].text))
+        self.line = min(marked[0], len(ls) - 1)
+        self.column = min(endCol, len(ls[self.line].text))
 
-            self.rewrapElem()
-            self.markChanged()
+        self.rewrapElem()
+        self.markChanged()
 
         return cd
 
