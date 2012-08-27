@@ -1092,9 +1092,6 @@ class MiscPanel(wx.Panel):
         self.addSpin("paginate", "Auto-paginate interval in seconds:\n"
                      " (0 = disable)", self, vsizer, "paginateInterval")
 
-        self.addSpin("confDel", "Confirm deletes >= this many lines\n"
-                     " (0 = disable):", self, vsizer, "confirmDeletes")
-
         self.addSpin("wheelScroll", "Lines to scroll per mouse wheel event:",
                      self, vsizer, "mouseWheelLines")
 
@@ -1140,7 +1137,6 @@ class MiscPanel(wx.Panel):
         self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
         self.cfg.recenterOnScroll = self.recenterOnScroll.GetValue()
         self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
-        self.cfg.confirmDeletes = util.getSpinValue(self.confDelEntry)
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
         self.cfg.splashTime = util.getSpinValue(self.splashTimeEntry)
 
@@ -1181,7 +1177,6 @@ class MiscPanel(wx.Panel):
         # stupid wxwindows/wxpython displays empty box if the initial
         # value is zero if we don't do this...
         self.paginateEntry.SetValue(5)
-        self.confDelEntry.SetValue(5)
 
         self.scriptDirEntry.SetValue(self.cfg.scriptDir)
         self.progEntry.SetValue(self.cfg.pdfViewerPath)
@@ -1193,7 +1188,6 @@ class MiscPanel(wx.Panel):
         self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
         self.recenterOnScroll.SetValue(self.cfg.recenterOnScroll)
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
-        self.confDelEntry.SetValue(self.cfg.confirmDeletes)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
         self.splashTimeEntry.SetValue(self.cfg.splashTime)
 

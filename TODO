@@ -53,10 +53,7 @@ other:
 
   -doing undo/redo must clear auto-comp (and any other state we may have)
 
-  -remove confirmation dialogs for deleting stuff, and their associated
-   config options
-
-  -update manual (document undo, remove delete confirmation settings, ...)
+  -update manual (document undo, ...)
 
   -applyCfg: clear undo history
 

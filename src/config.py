@@ -971,10 +971,6 @@ class ConfigGlobal:
         # how many seconds to show splash screen for on startup (0 = disabled)
         v.addInt("splashTime", 2, "SplashTime", 0, 10)
 
-        # confirm non-undoable delete operations that would delete at
-        # least this many lines. (0 = disabled)
-        v.addInt("confirmDeletes", 2, "ConfirmDeletes", 0, 500)
-
         # vertical distance between rows, in pixels
         v.addInt("fontYdelta", 18, "FontYDelta", 4, 125)
 

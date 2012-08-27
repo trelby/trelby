@@ -1236,11 +1236,6 @@
 		keep making changes. (You can always use Script/Paginate if you
 		want immediate repagination.)</para>
 
-		<para>The 'Confirm deletes' setting allows you to configure how
-		many lines you can delete without confirmation. It exists because
-		otherwise it'd be too easy to select a large block of text, press
-		Delete, and see all your work disappear.</para>
-
 		<para>'Lines to scroll per mouse wheel event' needs no
 		explaining.</para>
 
