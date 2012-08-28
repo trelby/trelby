@@ -18,12 +18,18 @@ class AutoCompletion:
 
         t = Type(screenplay.TRANSITION)
         t.items = [
+            "BACK TO:",
+            "CROSSFADE:",
             "CUT TO:",
             "DISSOLVE TO:",
             "FADE IN:",
             "FADE OUT",
             "FADE TO BLACK",
-            "MATCH CUT TO:"
+            "JUMP CUT TO:",
+            "MATCH CUT TO:",
+            "SLOW FADE TO BLACK",
+            "SMASH CUT TO:",
+            "TIME CUT:"
             ]
         self.types[t.ti.lt] = t
 
