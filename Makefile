@@ -28,3 +28,4 @@ install:
 
 uninstall:
 	rm -f $(BINDIR)
+	rm -f $(DESKTOPDIR)/trelby.desktop
