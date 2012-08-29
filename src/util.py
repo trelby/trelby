@@ -886,7 +886,6 @@ def loadFile(filename, frame, maxSize = -1):
 # like loadFile, but if file doesn't exist, tries to load a .gz compressed
 # version of it.
 def loadMaybeCompressedFile(filename, frame):
-    fname = u"dict_en.dat"
     doGz = False
 
     if not fileExists(filename):
