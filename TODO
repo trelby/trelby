@@ -42,11 +42,12 @@ deleteBackward:
   (not start of elem)  ManyElems(1, 1) (possibly merged)
   (start of elem)      ManyElems(2, 1)
 convertTypeTo          ManyElems(N, N)
+cut                    AnyDifference
+paste                  AnyDifference
 
 remaining:
 
-cut                    1-N elems
-paste                  1-N elems
+none?
 
 
 other:

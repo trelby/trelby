@@ -2101,6 +2101,8 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if not doDelete:
             return cd
 
+        u = undo.AnyDifference(self)
+
         # range of lines, inclusive, that we need to totally delete
         del1 = sys.maxint
         del2 = -1
@@ -2183,12 +2185,17 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.rewrapElem()
         self.markChanged()
 
+        u.setAfter(self)
+        self.addUndo(u)
+
         return cd
 
     # paste data into script. clines is a list of Line objects.
     def paste(self, clines):
         if len(clines) == 0:
             return
+
+        u = undo.AnyDifference(self)
 
         inLines = []
         i = 0
@@ -2263,6 +2270,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         # bug...
 
         self.reformatRange(wrap1, self.getParaFirstIndexFromLine(self.line))
+
+        u.setAfter(self)
+        self.addUndo(u)
 
         self.clearMark()
         self.clearAutoComp()
@@ -3174,6 +3184,11 @@ class Line:
     def __str__(self):
         return config.lb2char(self.lb) + config.lt2char(self.lt)\
                + self.text
+
+    def __ne__(self, line2):
+        return self.lt != line2.lt or self.lb != line2.lb or\
+            self.text != line2.text
+
 
     # opposite of __str__. NOTE: only meant for storing data internally by
     # the program! NOT USABLE WITH EXTERNAL INPUT DUE TO COMPLETE LACK OF

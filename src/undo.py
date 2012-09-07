@@ -173,3 +173,104 @@ class ManyElems(Base):
             sp.lines[self.elemStartLine : endLine + 1])
 
         self.setEndPos(sp)
+
+# stores any block of lines that have changed. Requires before/after lines
+# to compare.
+class AnyDifference(Base):
+    # Will look for difference between sp.lines before and after.
+    # job to make sure that these are available.
+    def __init__(self, sp):
+        Base.__init__(self, sp, CMD_MISC)
+        self.linesBefore = lines2storage(sp.lines)
+
+    def setAfter(self, sp):
+        self.removed = None
+        self.inserted = None
+
+        oldlines = storage2lines(self.linesBefore)
+        del self.linesBefore
+
+        a, b, x, y = mySequenceMatcher(oldlines, sp.lines)
+        if a != b:
+            self.removed = lines2storage(oldlines[a:b])
+        if x != y:
+            self.inserted = lines2storage(sp.lines[x:y])
+
+        self.a, self.b, self.x, self.y = a, b, x, y
+        self.setEndPos(sp)
+
+    # default implementation for undo. can be overridden by subclasses
+    # that need something different.
+    def undo(self, sp):
+        sp.line, sp.column = self.startPos.line, self.startPos.column
+        if self.removed:
+            sp.lines[self.x:self.y] = storage2lines(self.removed)
+        else:
+            sp.lines[self.x:self.y] = []
+
+    # default implementation for redo. can be overridden by subclasses
+    # that need something different.
+    def redo(self, sp):
+        sp.line, sp.column = self.endPos.line, self.endPos.column
+        if self.inserted:
+            sp.lines[self.a:self.b] = storage2lines(self.inserted)
+        else:
+            sp.lines[self.a:self.b] = []
+
+
+# Our own implementation of difflib.SequenceMatcher, since the actual one
+# is too slow for our custom needs.
+#
+# l1, l2 = lists to diff. List elements must have __eq__ defined.
+#
+# Return a, b, x, y such that l1[a:b] could be replaced
+# with l2[x:y] to convert l1 into l2.
+
+def mySequenceMatcher(l1, l2):
+    len1 = len(l1)
+    len2 = len(l2)
+
+    if len1 >= len2:
+        bigger = l1
+        smaller = l2
+        bigLen = len1
+        smallLen = len2
+        l1Big = True
+    else:
+        bigger = l2
+        smaller = l1
+        bigLen = len2
+        smallLen = len1
+        l1Big = False
+
+    i = 0
+    a = b = 0
+
+    m1found = m2found = False
+    while a < smallLen:
+        if not m1found and bigger[a] != smaller [a]:
+            b = a
+            m1found = True
+            break
+        a += 1
+
+    if not m1found:
+        a = b = smallLen
+
+    num = smallLen - a + 1
+    i = 1
+    c = bigLen
+    d = smallLen
+
+    while i <= num and i <= smallLen:
+        c = bigLen - i + 1
+        d = smallLen - i + 1
+        if bigger[-i] != smaller[-i]:
+            m2found = True
+            break
+        i += 1
+
+    if not l1Big:
+        a, c, b, d = a, d, b, c
+
+    return a, c, b, d
