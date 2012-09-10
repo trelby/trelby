@@ -2916,27 +2916,53 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     # add character cs.char if it's a valid one.
     def addCharCmd(self, cs):
-        if len(cs.char) != 1:
+        char = cs.char
+
+        if len(char) != 1:
             return
 
-        kc = ord(cs.char)
+        kc = ord(char)
+
         if not util.isValidInputChar(kc):
             return
+
+        isSpace = char == " "
 
         # only merge with the previous item in undo history if:
         #   -we are not in middle of undo/redo
         #   -previous item is "add character"
         #   -cursor is exactly where it was left off by the previous item
+        #
+        # in addition, to get word-level undo, not element-level undo, we
+        # want to merge all spaces with the word preceding them, but stop
+        # merging when a new word begins. this is implemented by the
+        # following algorith:
+        #
+        # lastUndo    char       merge
+        # --------    -------    -----
+        # non-space   non-space  Y
+        # non-space   space      Y      <- change type of lastUndo to space
+        # space       space      Y
+        # space       non-space  N
+
         if (not self.currentUndo and self.lastUndo and
-            (self.lastUndo.getType() == undo.CMD_ADD_CHAR) and
-            (self.lastUndo.endPos == self.cursorAsMark())):
+            (self.lastUndo.getType() in (undo.CMD_ADD_CHAR, undo.CMD_ADD_CHAR_SPACE)) and
+            (self.lastUndo.endPos == self.cursorAsMark()) and
+            not ((self.lastUndo.getType() == undo.CMD_ADD_CHAR_SPACE) and not isSpace)):
+
             u = self.lastUndo
             mergeUndo = True
+
+            if isSpace:
+                u.cmdType = undo.CMD_ADD_CHAR_SPACE
         else:
-            u = undo.SinglePara(self, undo.CMD_ADD_CHAR, self.line)
             mergeUndo = False
 
-        char = cs.char
+            if isSpace:
+                u = undo.SinglePara(self, undo.CMD_ADD_CHAR_SPACE, self.line)
+            else:
+                u = undo.SinglePara(self, undo.CMD_ADD_CHAR, self.line)
+
         if self.capitalizeNeeded():
             char = util.upper(char)
 
