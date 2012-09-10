@@ -469,8 +469,14 @@ class MyCtrl(wx.Control):
 
         mainFrame.statusCtrl.SetValues(page, pageCnt, cur.ti.name, tabNext, enterNext)
 
-        mainFrame.menuBar.Enable(ID_EDIT_UNDO, self.sp.canUndo())
-        mainFrame.menuBar.Enable(ID_EDIT_REDO, self.sp.canRedo())
+        canUndo = self.sp.canUndo()
+        canRedo = self.sp.canRedo()
+
+        mainFrame.menuBar.Enable(ID_EDIT_UNDO, canUndo)
+        mainFrame.menuBar.Enable(ID_EDIT_REDO, canRedo)
+
+        mainFrame.toolBar.EnableTool(ID_EDIT_UNDO, canUndo)
+        mainFrame.toolBar.EnableTool(ID_EDIT_REDO, canRedo)
 
     # apply per-script config
     def applyCfg(self, newCfg):
@@ -1848,6 +1854,11 @@ class MyFrame(wx.Frame):
 
         addTB(ID_FILE_IMPORT, "import.png", "Import a text script")
         addTB(ID_FILE_EXPORT, "export.png", "Export script")
+
+        self.toolBar.AddSeparator()
+
+        addTB(ID_EDIT_UNDO, "undo.png", "Undo")
+        addTB(ID_EDIT_REDO, "redo.png", "Redo")
 
         self.toolBar.AddSeparator()
 
