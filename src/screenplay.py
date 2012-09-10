@@ -3185,10 +3185,9 @@ class Line:
         return config.lb2char(self.lb) + config.lt2char(self.lt)\
                + self.text
 
-    def __ne__(self, line2):
-        return self.lt != line2.lt or self.lb != line2.lb or\
-            self.text != line2.text
-
+    def __ne__(self, other):
+        return ((self.lt != other.lt) or (self.lb != other.lb) or
+                (self.text != other.text))
 
     # opposite of __str__. NOTE: only meant for storing data internally by
     # the program! NOT USABLE WITH EXTERNAL INPUT DUE TO COMPLETE LACK OF

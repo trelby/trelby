@@ -1298,11 +1298,6 @@ class MyCtrl(wx.Control):
             u.setAfter(self.sp)
             self.speedTestUndo.append(u)
 
-        def testUndoAnyDifference():
-            u = undo.AnyDifference(self.sp)
-            u.setAfter(self.sp)
-            self.speedTestUndo.append(u)
-
         def testReformatAll():
             self.sp.reformatAll()
 
