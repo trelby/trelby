@@ -145,9 +145,12 @@ class WatermarkDlg(wx.Dialog):
             else:
                 count += 1
 
-        wx.MessageBox("Generated %d files in directory %s." %
-                      (count, directory), "PDFs generated",
-                      wx.OK, self)
+        if count > 0:
+            wx.MessageBox("Generated %d files in directory %s." %
+                          (count, directory), "PDFs generated",
+                          wx.OK, self)
+        else:
+            wx.MessageBox("No watermarks specified.", "Error", wx.OK, self)
 
     def OnClose(self, event):
         self.EndModal(wx.OK)
