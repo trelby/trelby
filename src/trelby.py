@@ -1008,6 +1008,7 @@ class MyCtrl(wx.Control):
         wx.MessageBox(msg, "Results", wx.OK, mainFrame)
 
     def OnFind(self):
+        self.sp.clearMark()
         self.clearAutoComp()
 
         dlg = finddlg.FindDlg(mainFrame, self)
