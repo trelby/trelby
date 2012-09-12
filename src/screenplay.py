@@ -2617,7 +2617,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.lines = lsNew
 
         self.validatePos()
-        self.mark = None
+        self.clearMark()
         self.markChanged()
 
         if saveUndo:
@@ -3076,10 +3076,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             # new edit action while navigating undo history; throw away
             # any undo history after current point
 
-            # FIXME: improve this to emacs-like undo handling which pushes
-            # reverse operations to the undo history so that no history is
-            # ever lost
-
             if self.currentUndo.prev:
                 # not at beginning of undo history; cut off the rest
                 self.currentUndo.prev.next = None
@@ -3106,9 +3102,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         self.currentUndo = None
 
-        # FIXME: debug stuff, remove
-        #print "first %s, last %s" % (self.firstUndo, self.lastUndo)
-
     def undo(self):
         if not self.canUndo():
             return
@@ -3122,8 +3115,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         u.undo(self)
         self.currentUndo = u
 
-        # FIXME: debug stuff, remove
-        #print "undo: current %s" % self.currentUndo
 
     def redo(self):
         if not self.canRedo():
@@ -3132,8 +3123,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.currentUndo.redo(self)
         self.currentUndo = self.currentUndo.next
 
-        # FIXME: debug stuff, remove
-        #print "redo: current %s" % self.currentUndo
 
     # check script for internal consistency. raises an AssertionError on
     # errors. ONLY MEANT TO BE USED IN TEST CODE.
