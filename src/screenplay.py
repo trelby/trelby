@@ -423,6 +423,11 @@ class Screenplay:
         self.cfg.recalc()
         self.reformatAll()
         self.paginate()
+
+        self.firstUndo = None
+        self.lastUndo = None
+        self.currentUndo = None
+
         self.markChanged()
 
     # return script config as a string.
