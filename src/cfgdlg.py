@@ -220,14 +220,22 @@ class DisplayPanel(wx.Panel):
 
         for it in ["fontNormal", "fontBold", "fontItalic", "fontBoldItalic"]:
             self.fontsLb.Append("", it)
-        self.fontsLb.SetSelection(0)
-        self.updateFontLb()
 
         vsizer.Add(self.fontsLb, 0, wx.BOTTOM, 10)
 
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
         btn = wx.Button(self, -1, "Change")
+        wx.EVT_LISTBOX_DCLICK(self, self.fontsLb.GetId(),
+            self.OnChangeFont)
         wx.EVT_BUTTON(self, btn.GetId(), self.OnChangeFont)
-        vsizer.Add(btn, 0, wx.BOTTOM, 20)
+
+        self.errText = wx.StaticText(self, -1, "")
+        self.origColor = self.errText.GetForegroundColour()
+
+        hsizer.Add(btn)
+        hsizer.Add((20,-1))
+        hsizer.Add(self.errText, 0, wx.ALIGN_CENTER_VERTICAL)
+        vsizer.Add(hsizer, 0, wx.BOTTOM, 20)
 
         vsizer.Add(wx.StaticText(self, -1, "The settings below apply only"
                                 " to 'Draft' view mode."), 0, wx.BOTTOM, 15)
@@ -252,6 +260,9 @@ class DisplayPanel(wx.Panel):
             style = wx.RA_SPECIFY_COLS, majorDimension = 1,
             choices = [ "None", "Normal", "Normal + unadjusted   " ])
         vsizer.Add(self.pbRb)
+
+        self.fontsLb.SetSelection(0)
+        self.updateFontLb()
 
         self.cfg2gui()
 
@@ -298,7 +309,7 @@ class DisplayPanel(wx.Panel):
 
     def updateFontLb(self):
         names = ["Normal", "Bold", "Italic", "Bold-Italic"]
-
+        w = []
         for i in range(len(names)):
             nfi = wx.NativeFontInfo()
             nfi.FromString(getattr(self.cfg, self.fontsLb.GetClientData(i)))
@@ -307,6 +318,15 @@ class DisplayPanel(wx.Panel):
             s = nfi.GetFaceName()
 
             self.fontsLb.SetString(i, "%s: %s, %d" % (names[i], s, ps))
+            f = wx.FontFromNativeInfo(nfi)
+            wid, hei = util.getTextExtent(f, "iw")
+            w.append(wid)
+        if (w[0] != w[1]) or (w[0] != w[2]) or (w[0] != w[3]):
+            self.errText.SetLabel("Fonts have varying widths")
+            self.errText.SetForegroundColour((255,0,0))
+        else:
+            self.errText.SetLabel("Fonts OK")
+            self.errText.SetForegroundColour(self.origColor)
 
     def cfg2gui(self):
         self.spacingEntry.SetValue(self.cfg.fontYdelta)
