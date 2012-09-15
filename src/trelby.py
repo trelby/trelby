@@ -1060,7 +1060,6 @@ class MyCtrl(wx.Control):
         dlg.ShowModal()
 
         if dlg.didReplaces:
-            self.sp.reformatAll()
             self.makeLineVisible(self.sp.line)
 
         if dlg.changedGlobalDict:
@@ -1068,10 +1067,7 @@ class MyCtrl(wx.Control):
 
         dlg.Destroy()
 
-        self.searchLine = -1
-        self.searchColumn = -1
-        self.searchWidth = -1
-
+        self.sp.clearMark()
         self.updateScreen()
 
     def OnDeleteElements(self):
