@@ -12,7 +12,6 @@ class FindDlg(wx.Dialog):
                            style = wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS)
 
         self.ctrl = ctrl
-        self.didReplaces = False
 
         self.searchLine = -1
         self.searchColumn = -1
@@ -409,9 +408,6 @@ class FindDlg(wx.Dialog):
                     self.searchWidth = 0
                 else:
                     sp.column = len(ls[sp.line].text)
-
-        if diff != 0:
-            self.didReplaces = True
 
         sp.clearMark()
         sp.markChanged()

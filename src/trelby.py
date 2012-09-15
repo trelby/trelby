@@ -1015,13 +1015,10 @@ class MyCtrl(wx.Control):
         dlg = finddlg.FindDlg(mainFrame, self)
         dlg.ShowModal()
         dlg.saveState()
-
-        if dlg.didReplaces:
-            self.makeLineVisible(self.sp.line)
-
         dlg.Destroy()
 
         self.sp.clearMark()
+        self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
     def OnSpellCheckerDlg(self):
@@ -1056,15 +1053,13 @@ class MyCtrl(wx.Control):
         dlg = spellcheckdlg.SpellCheckDlg(mainFrame, self, sc, gd.scDict)
         dlg.ShowModal()
 
-        if dlg.didReplaces:
-            self.makeLineVisible(self.sp.line)
-
         if dlg.changedGlobalDict:
             gd.saveScDict()
 
         dlg.Destroy()
 
         self.sp.clearMark()
+        self.makeLineVisible(self.sp.line)
         self.updateScreen()
 
     def OnDeleteElements(self):

@@ -19,9 +19,6 @@ class SpellCheckDlg(wx.Dialog):
         # user's global spell checker dictionary
         self.gScDict = gScDict
 
-        # have we replaced any text in the script
-        self.didReplaces = False
-
         # have we added any words to global dictionary
         self.changedGlobalDict = False
 
@@ -132,8 +129,6 @@ class SpellCheckDlg(wx.Dialog):
         # location of it, and then advance past the just-changed word
         self.sc.line = sp.line
         self.sc.col = sp.column + len(word)
-
-        self.didReplaces = True
 
         sp.clearMark()
         sp.markChanged()
