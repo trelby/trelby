@@ -411,11 +411,8 @@
 
 	  <para>There are two overview modes, one showing each character as a
 	  single pixel, and one showing each character as 4 pixels. This is
-	  unsuitable for editing, so these modes are mainly useful for getting
-	  an overview of the page layouts, and even so, will only really
-	  become useful once production-oriented features are implemented,
-	  when it will show each page's revision by coloring it
-	  accordingly.</para>
+	  unsuitable for editing so these modes are mainly useful for getting
+	  an overview of the page layouts.</para>
 
 	</sect1>
 
