@@ -1028,6 +1028,7 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     def OnSpellCheckerDlg(self):
+        self.sp.clearMark()
         self.clearAutoComp()
 
         wasAtStart = self.sp.line == 0
