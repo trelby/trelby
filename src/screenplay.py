@@ -2583,7 +2583,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.column = col
 
         if mark and not self.mark:
-            self.mark = Mark(line, col)
+            self.setMark(line, col)
 
     # remove all lines whose element types are in tdict as keys.
     def removeElementTypes(self, tdict, saveUndo):
@@ -2624,6 +2624,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             u.setAfter(self)
             self.addUndo(u)
 
+    # set mark at given position
+    def setMark(self, line, column):
+        self.mark = Mark(line, column)
+
     # clear mark
     def clearMark(self):
         self.mark = None
@@ -2631,7 +2635,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # if doIt is True and mark is not yet set, set it at current position.
     def maybeMark(self, doIt):
         if doIt and not self.mark:
-            self.mark = Mark(self.line, self.column)
+            self.setMark(self.line, self.column)
 
     # make sure current line and column are within the valid bounds.
     def validatePos(self):
@@ -2873,7 +2877,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def selectSceneCmd(self, cs):
         l1, l2 = self.getSceneIndexes()
 
-        self.mark = Mark(l1, 0)
+        self.setMark(l1, 0)
 
         self.line = l2
         self.column = len(self.lines[l2].text)
@@ -2881,7 +2885,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # select all text of the screenplay. sets mark at beginning and moves
     # cursor to the end.
     def selectAllCmd(self, cs):
-        self.mark = Mark(0, 0)
+        self.setMark(0, 0)
 
         self.line = len(self.lines) - 1
         self.column = len(self.lines[self.line].text)
@@ -2902,7 +2906,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.splitElement(tcfg.newTypeEnter)
 
     def setMarkCmd(self, cs):
-        self.mark = Mark(self.line, self.column)
+        self.setMark(self.line, self.column)
 
     # either creates a new element or converts the current one to
     # nextTypeTab, depending on circumstances.
