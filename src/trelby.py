@@ -232,10 +232,6 @@ class MyCtrl(wx.Control):
     def clearVars(self):
         self.mouseSelectActive = False
 
-        self.searchLine = -1
-        self.searchColumn = -1
-        self.searchWidth = -1
-
         # find dialog stored settings
         self.findDlgFindText = ""
         self.findDlgReplaceText = ""
@@ -1542,12 +1538,6 @@ class MyCtrl(wx.Control):
                     dc.SetPen(cfgGui.cursorPen)
                     dc.SetBrush(cfgGui.cursorBrush)
                     dc.DrawRectangle(t.x + self.sp.column * fx, y, fx, fi.fy)
-
-                if i == self.searchLine:
-                    dc.SetPen(cfgGui.searchPen)
-                    dc.SetBrush(cfgGui.searchBrush)
-                    dc.DrawRectangle(t.x + self.searchColumn * fx, y,
-                                     self.searchWidth * fx, fi.fy)
 
             if len(t.text) != 0:
                 tl = texts.get(fi.font)

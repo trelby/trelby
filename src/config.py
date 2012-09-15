@@ -1029,7 +1029,6 @@ class ConfigGlobal:
         v.addColor("pageBorder", 202, 202, 202, "PageBorder", "Page border")
         v.addColor("pageShadow", 153, 153, 153, "PageShadow", "Page shadow")
         v.addColor("selected", 200, 200, 200, "Selected", "Selection")
-        v.addColor("search", 255, 127, 0, "SearchResult", "Search result")
         v.addColor("cursor", 135, 135, 253, "Cursor", "Cursor")
         v.addColor("autoCompFg", 0, 0, 0, "AutoCompletionFG",
                    "Auto-completion foreground")
@@ -1305,9 +1304,6 @@ class ConfigGui:
 
         self.selectedBrush = wx.Brush(self.selectedColor)
         self.selectedPen = wx.Pen(self.selectedColor)
-
-        self.searchBrush = wx.Brush(self.searchColor)
-        self.searchPen = wx.Pen(self.searchColor)
 
         self.cursorBrush = wx.Brush(self.cursorColor)
         self.cursorPen = wx.Pen(self.cursorColor)
