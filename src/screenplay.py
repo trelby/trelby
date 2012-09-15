@@ -1694,6 +1694,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         if selection:
             self.clearMark()
+
+            # FIXME: can't do reformatAll with undo history, must use
+            # reformatRange here
             self.reformatAll()
         else:
             self.rewrapElem(first)
