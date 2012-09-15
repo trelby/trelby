@@ -1010,21 +1010,18 @@ class MyCtrl(wx.Control):
     def OnFind(self):
         self.sp.clearMark()
         self.clearAutoComp()
+        self.updateScreen()
 
         dlg = finddlg.FindDlg(mainFrame, self)
         dlg.ShowModal()
         dlg.saveState()
 
         if dlg.didReplaces:
-            self.sp.reformatAll()
             self.makeLineVisible(self.sp.line)
 
         dlg.Destroy()
 
-        self.searchLine = -1
-        self.searchColumn = -1
-        self.searchWidth = -1
-
+        self.sp.clearMark()
         self.updateScreen()
 
     def OnSpellCheckerDlg(self):
