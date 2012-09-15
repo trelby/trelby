@@ -419,14 +419,14 @@ class Screenplay:
 
     # apply new config.
     def applyCfg(self, cfg):
+        self.firstUndo = None
+        self.lastUndo = None
+        self.currentUndo = None
+
         self.cfg = copy.deepcopy(cfg)
         self.cfg.recalc()
         self.reformatAll()
         self.paginate()
-
-        self.firstUndo = None
-        self.lastUndo = None
-        self.currentUndo = None
 
         self.markChanged()
 
@@ -1062,6 +1062,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self._topLine = util.clamp(line, 0, len(self.lines) - 1)
 
     def reformatAll(self):
+        # doing a reformatAll while we have undo history will completely
+        # break undo, so that can't be allowed.
+        assert not self.firstUndo
+
         #sfdlksjf = util.TimerDev("reformatAll")
 
         line = 0
