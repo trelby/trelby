@@ -3161,7 +3161,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         self.undoMemoryUsed += memoryUsedDiff
 
-    def undo(self):
+    def undoCmd(self, cs):
         if not self.canUndo():
             return
 
@@ -3175,10 +3175,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.currentUndo = u
 
         self.clearMark()
-        self.clearAutoComp()
         self.markChanged()
 
-    def redo(self):
+    def redoCmd(self, cs):
         if not self.canRedo():
             return
 
@@ -3186,7 +3185,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.currentUndo = self.currentUndo.next
 
         self.clearMark()
-        self.clearAutoComp()
         self.markChanged()
 
     # check script for internal consistency. raises an AssertionError on
