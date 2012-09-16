@@ -257,8 +257,7 @@
 
 		<para>After you've selected the desired text, you can use the
 		cut/copy/paste commands to move text around, delete it, etc. You
-		can also press Del or Backspace to simply delete it. Note that as of
- 		now this is not undoable in any way.</para>
+		can also press Del or Backspace to simply delete it.</para>
 
 		<para>You can unselect the selected text by pressing Esc., or simply
  		clicking the mouse on the screen.</para>
@@ -472,7 +471,37 @@
 	<sect1>
 	  <title>Edit/Undo,Redo</title>
 
-	  <para>FIXME: Document undo/redo and their limitations here.</para>
+	  <para>Every edit operation you do to the script is recorded and can
+	  be undone/redone. There is a limit to the amount of memory that
+	  &trelby; will use to store undo history, and different edit
+	  operations take different amounts of memory (adding a single new
+	  character takes very little memory, whereas doing a global
+	  Find&amp;Replace can take a lot of memory), but in normal usage you
+	  should be able to undo hundreds, or even thousands, of edit
+	  operations.</para>
+
+      <para>There are a few occasions when undo history is otherwise
+      trimmed that you should be aware of:</para>
+
+	  <itemizedlist>
+
+		<listitem>
+
+		  <para>Applying new script-specific settings clears all undo history.</para>
+
+		</listitem>
+
+		<listitem>
+
+		  <para>If you do a new edit operation while you are in the middle
+		  of the undo history (i.e., you have done one or more undo
+		  operations without having done follow-up redo operations to
+		  restore all your previously made changes), all recorded undo
+		  history after the current point in it will be discarded.</para>
+
+		</listitem>
+
+	  </itemizedlist>
 
 	</sect1>
 
@@ -567,9 +596,7 @@
 	  <title>Edit/Remove elements</title>
 
 	  <para>'Remove elements' opens a dialog allowing you to select one or
-	  more element styles to completely remove from the script. Be sure to
-	  only do this on copies of the script, because there is no way to get
-	  back the removed elements.</para>
+	  more element styles to completely remove from the script.</para>
 
 	  <para>You can use this for e.g. removing notes before sending out
 	  copies of the script, or if you want a version of the script with

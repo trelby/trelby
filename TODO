@@ -52,8 +52,6 @@ none?
 
 other:
 
-  -update manual (document undo, ...)
-
   -write unit tests
 
     -modify t_random.py to test that each operation can be undone/redone
