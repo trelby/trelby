@@ -1695,9 +1695,15 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if selection:
             self.clearMark()
 
-            # FIXME: can't do reformatAll with undo history, must use
-            # reformatRange here
-            self.reformatAll()
+            # this is moderately complex because we need to deal with
+            # forced linebreaks; reformatRange wants paragraph indexes but
+            # we are converting elements, so we must find the indexes of
+            # the a) first paragraph of the first selected element and b)
+            # last paragraph of the last selected element
+
+            self.reformatRange(
+                self.getElemFirstIndexFromLine(startSection),
+                self.getParaFirstIndexFromLine(self.getElemLastIndexFromLine(endSection)))
         else:
             self.rewrapElem(first)
 
