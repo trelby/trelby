@@ -2,6 +2,34 @@ import screenplay
 
 import zlib
 
+# Which command uses which undo object:
+#
+# command                type
+# -------                ------
+#
+# removeElementTypes     FullCopy
+# addChar                SinglePara (possibly merged)
+#   charmap
+#   namesDlg
+# spellCheck             SinglePara
+# findAndReplace         SinglePara
+# NewElement             ManyElems(1, 2)
+# Tab:
+#   (end of elem)        ManyElems(1, 2)
+#   (middle of elem)     ManyElems(1, 1)
+# TabPrev                ManyElems(1, 1)
+# insertForcedLineBreak  ManyElems(1, 1)
+# deleteForward:
+#   (not end of elem)    ManyElems(1, 1) (possibly merged)
+#   (end of elem)        ManyElems(2, 1)
+# deleteBackward:
+#   (not start of elem)  ManyElems(1, 1) (possibly merged)
+#   (start of elem)      ManyElems(2, 1)
+# convertTypeTo          ManyElems(N, N)
+# cut                    AnyDifference
+# paste                  AnyDifference
+
+
 # extremely rough estimate for the base memory usage of a single undo
 # object, WITHOUT counting the actual textual differences stored inside
 # it. so this figure accounts for the Python object overhead, member

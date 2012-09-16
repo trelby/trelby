@@ -18,43 +18,9 @@
 UNDO/REDO
 =========
 
-action                type
-------                ------
+-write unit tests
 
-done:
+  -modify t_random.py to test that each operation can be undone/redone
+   and script contents are exactly the same
 
-delete-elem-types      FullCopy
-addChar                SinglePara (possibly merged)
-  charmap
-  namesdlg
-spellcheckerdlg        SinglePara
-find-and-replace       SinglePara
-NewElement             ManyElems(1, 2)
-Tab:
-  (end of elem)        ManyElems(1, 2)
-  (middle of elem)     ManyElems(1, 1)
-TabPrev                ManyElems(1, 1)
-insertForcedLineBreak  ManyElems(1, 1)
-deleteForward:
-  (not end of elem)    ManyElems(1, 1) (possibly merged)
-  (end of elem)        ManyElems(2, 1)
-deleteBackward:
-  (not start of elem)  ManyElems(1, 1) (possibly merged)
-  (start of elem)      ManyElems(2, 1)
-convertTypeTo          ManyElems(N, N)
-cut                    AnyDifference
-paste                  AnyDifference
-
-remaining:
-
-none?
-
-
-other:
-
-  -write unit tests
-
-    -modify t_random.py to test that each operation can be undone/redone
-     and script contents are exactly the same
-
-    -randomly do undo/redo
+  -randomly do undo/redo
