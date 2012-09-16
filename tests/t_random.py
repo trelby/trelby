@@ -77,10 +77,13 @@ class Op:
         "moveSceneUp",
         "moveStart",
         "moveUp",
+        "redo",
+        "selectAll",
         "selectScene",
         "setMark",
         "splitElement",
         "tab",
+        "toActBreak",
         "toAction",
         "toCharacter",
         "toDialogue",
@@ -90,9 +93,13 @@ class Op:
         "toScene",
         "toShot",
         "toTransition",
+        "undo",
         ]
 
-    # FIXME: support other commands like getSelectedAsCD etc.
+    # FIXME: not tested editing commands:
+    #   -removeElementTypes
+    #   -cut (getSelectedAsCD(True))
+    #   -paste
 
     def __init__(self, name = None):
         # name of operation
