@@ -54,9 +54,6 @@ other:
 
   -update manual (document undo, ...)
 
-  -implement undo history trimming (estimate memory usage of each item,
-   and cap used memory at X)
-
   -write unit tests
 
     -modify t_random.py to test that each operation can be undone/redone

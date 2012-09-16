@@ -101,6 +101,9 @@ class Screenplay:
         #  anything else: None
         self.currentUndo = None
 
+        # estimated amount of memory used by undo objects, in bytes
+        self.undoMemoryUsed = 0
+
     def isModified(self):
         if not self.hasChanged:
             return False
@@ -422,6 +425,7 @@ class Screenplay:
         self.firstUndo = None
         self.lastUndo = None
         self.currentUndo = None
+        self.undoMemoryUsed = 0
 
         self.cfg = copy.deepcopy(cfg)
         self.cfg.recalc()
@@ -2826,9 +2830,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.rewrapElem()
 
         if u:
-            u.setAfter(self)
-
-            if not mergeUndo:
+            if mergeUndo:
+                self.addMergedUndo(u)
+            else:
+                u.setAfter(self)
                 self.addUndo(u)
 
     def deleteForwardCmd(self, cs):
@@ -2877,9 +2882,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         self.rewrapElem()
 
         if u:
-            u.setAfter(self)
-
-            if not mergeUndo:
+            if mergeUndo:
+                self.addMergedUndo(u)
+            else:
+                u.setAfter(self)
                 self.addUndo(u)
 
     # aborts stuff, like selection, auto-completion, etc
@@ -3038,9 +3044,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         cs.doAutoComp = cs.AC_REDO
 
-        u.setAfter(self)
-
-        if not mergeUndo:
+        if mergeUndo:
+            self.addMergedUndo(u)
+        else:
+            u.setAfter(self)
             self.addUndo(u)
 
     def toSceneCmd(self, cs):
@@ -3104,6 +3111,17 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             self.currentUndo = None
 
+            # we threw away an unknown number of undo items, so we must go
+            # through all of the remaining ones and recalculate how much
+            # memory is used
+            self.undoMemoryUsed = 0
+
+            tmp = self.firstUndo
+
+            while tmp:
+                self.undoMemoryUsed += tmp.memoryUsed()
+                tmp = tmp.next
+
         if not self.lastUndo:
             # no undo history at all yet
             self.firstUndo = u
@@ -3113,11 +3131,35 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             u.prev = self.lastUndo
             self.lastUndo = u
 
-        # FIXME: remove items beginning at self.firstUndo until undo history
-        # is small enough (whether in number of items, estimated memory
-        # consumption, or what, to be determined)
+        self.undoMemoryUsed += u.memoryUsed()
+
+        # trim undo history until the estimated memory usage is small
+        # enough
+        while ((self.firstUndo is not self.lastUndo) and
+               (self.undoMemoryUsed >= 5000000)):
+
+            tmp = self.firstUndo
+            tmp.next.prev = None
+            self.firstUndo = tmp.next
+
+            # it shouldn't be technically necessary to reset this, but it
+            # might make the GC's job easier, and helps detecting bugs if
+            # somebody somehow tries to access this later on
+            tmp.next = None
+
+            self.undoMemoryUsed -= tmp.memoryUsed()
 
         self.currentUndo = None
+
+    def addMergedUndo(self, u):
+        assert u is self.lastUndo
+
+        memoryUsedBefore = u.memoryUsed()
+        u.setAfter(self)
+        memoryUsedAfter = u.memoryUsed()
+        memoryUsedDiff = memoryUsedAfter - memoryUsedBefore
+
+        self.undoMemoryUsed += memoryUsedDiff
 
     def undo(self):
         if not self.canUndo():

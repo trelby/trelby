@@ -2,6 +2,13 @@ import screenplay
 
 import zlib
 
+# extremely rough estimate for the base memory usage of a single undo
+# object, WITHOUT counting the actual textual differences stored inside
+# it. so this figure accounts for the Python object overhead, member
+# variable overhead, memory allocation overhead, etc.
+#
+# this figure does not need to be very accurate.
+BASE_MEMORY_USAGE = 1500
 
 # possible command types. only used for possibly merging consecutive
 # edits.
@@ -55,6 +62,15 @@ def storage2lines(storage):
 
     return [screenplay.Line.fromStr(s) for s in linesStr.split("\n")]
 
+# how much memory is used by the given storage object
+def memoryUsed(storage):
+    # 16 is a rough estimate for the first two tuple members' memory usage
+
+    if storage[0] == 0:
+        return 16
+
+    return 16 + len(storage[2])
+
 # abstract base class for storing undo history. concrete subclasses
 # implement undo/redo for specific actions taken on a screenplay.
 class Base:
@@ -75,6 +91,12 @@ class Base:
 
     def getType(self):
         return self.cmdType
+
+    # rough estimate of how much memory is used by this undo object. can
+    # be overridden by subclasses that need something different.
+    def memoryUsed(self):
+        return (BASE_MEMORY_USAGE + memoryUsed(self.linesBefore) +
+                memoryUsed(self.linesAfter))
 
     # default implementation for undo. can be overridden by subclasses
     # that need something different.
@@ -197,6 +219,10 @@ class AnyDifference(Base):
         self.setEndPos(sp)
 
         del self.linesBefore
+
+    def memoryUsed(self):
+        return (BASE_MEMORY_USAGE + memoryUsed(self.removed) +
+                memoryUsed(self.inserted))
 
     def undo(self, sp):
         sp.line, sp.column = self.startPos.line, self.startPos.column
