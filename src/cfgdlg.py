@@ -233,7 +233,7 @@ class DisplayPanel(wx.Panel):
         self.origColor = self.errText.GetForegroundColour()
 
         hsizer.Add(btn)
-        hsizer.Add((20,-1))
+        hsizer.Add((20, -1))
         hsizer.Add(self.errText, 0, wx.ALIGN_CENTER_VERTICAL)
         vsizer.Add(hsizer, 0, wx.BOTTOM, 20)
 
@@ -309,7 +309,10 @@ class DisplayPanel(wx.Panel):
 
     def updateFontLb(self):
         names = ["Normal", "Bold", "Italic", "Bold-Italic"]
-        w = []
+
+        # keep track if all fonts have the same width
+        widths = set()
+
         for i in range(len(names)):
             nfi = wx.NativeFontInfo()
             nfi.FromString(getattr(self.cfg, self.fontsLb.GetClientData(i)))
@@ -318,14 +321,15 @@ class DisplayPanel(wx.Panel):
             s = nfi.GetFaceName()
 
             self.fontsLb.SetString(i, "%s: %s, %d" % (names[i], s, ps))
+
             f = wx.FontFromNativeInfo(nfi)
-            wid, hei = util.getTextExtent(f, "iw")
-            w.append(wid)
-        if (w[0] != w[1]) or (w[0] != w[2]) or (w[0] != w[3]):
-            self.errText.SetLabel("Fonts have varying widths")
-            self.errText.SetForegroundColour((255,0,0))
+            widths.add(util.getTextExtent(f, "iw")[0])
+
+        if len(widths) > 1:
+            self.errText.SetLabel("Fonts have different widths")
+            self.errText.SetForegroundColour((255, 0, 0))
         else:
-            self.errText.SetLabel("Fonts OK")
+            self.errText.SetLabel("Fonts have matching widths")
             self.errText.SetForegroundColour(self.origColor)
 
     def cfg2gui(self):
