@@ -20,7 +20,7 @@ RequestExecutionLevel admin
 
 ; HM NIS Edit Wizard helper defines
 !define PRODUCT_NAME "Trelby"
-!define PRODUCT_VERSION "2.2.0.0-dev"
+!define PRODUCT_VERSION "2.2.0.0"
 !define PRODUCT_PUBLISHER "Trelby.org"
 !define PRODUCT_WEB_SITE "http://www.trelby.org/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\trelby.exe"
