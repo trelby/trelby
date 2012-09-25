@@ -267,13 +267,13 @@
 	  <sect2>
 		<title>Auto-completion</title>
 
-		<para>Auto-completion saves typing in scene/character/transition
-		elements by showing a list of other elements from the script that
-		match the text in the current element. For example, if you've
-		written the characters "MO" in a new character element, you'll see
-		a list of all character elements that start with "MO" and if you
-		want, you can select one of them and that text will complete the
-		current element.</para>
+		<para>Auto-completion saves typing in scene / character /
+		transition / shot elements by showing a list of other elements
+		from the script that match the text in the current element. For
+		example, if you've written the characters "MO" in a new character
+		element, you'll see a list of all character elements that start
+		with "MO" and if you want, you can select one of them and that
+		text will complete the current element.</para>
 
 		<para>The auto-completion list only appears after you've written
 		at least one character. If you want to see a list of all possible

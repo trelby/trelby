@@ -32,6 +32,9 @@ class AutoCompletion:
             "TIME CUT:"
             ]
         self.types[t.ti.lt] = t
+        
+        t = Type(screenplay.SHOT)
+        self.types[t.ti.lt] = t
 
         self.refresh()
 
