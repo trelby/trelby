@@ -107,26 +107,6 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "X-Pos (mm):"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-        self.xEntry = wx.TextCtrl(self, -1)
-        hsizer.Add(self.xEntry, 0, wx.LEFT, 10)
-        wx.EVT_TEXT(self, self.xEntry.GetId(), self.OnMisc)
-
-        vsizer2.Add(hsizer, 0, wx.TOP, 5)
-
-        hsizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        hsizer.Add(wx.StaticText(self, -1, "Y-Pos (mm):"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-        self.yEntry = wx.TextCtrl(self, -1)
-        hsizer.Add(self.yEntry, 0, wx.LEFT, 10)
-        wx.EVT_TEXT(self, self.yEntry.GetId(), self.OnMisc)
-
-        vsizer2.Add(hsizer, 0, wx.TOP, 5)
-
-        hsizer = wx.BoxSizer(wx.HORIZONTAL)
-
         hsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0,
                    wx.ALIGN_CENTER_VERTICAL)
         self.alignCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
@@ -142,7 +122,20 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Font:"), 0,
+        hsizer.Add(wx.StaticText(self, -1, "X / Y Pos (mm):"), 0,
+                   wx.ALIGN_CENTER_VERTICAL)
+        self.xEntry = wx.TextCtrl(self, -1)
+        hsizer.Add(self.xEntry, 0, wx.LEFT, 10)
+        wx.EVT_TEXT(self, self.xEntry.GetId(), self.OnMisc)
+        self.yEntry = wx.TextCtrl(self, -1)
+        hsizer.Add(self.yEntry, 0, wx.LEFT, 10)
+        wx.EVT_TEXT(self, self.yEntry.GetId(), self.OnMisc)
+
+        vsizer2.Add(hsizer, 0, wx.TOP, 5)
+
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
+
+        hsizer.Add(wx.StaticText(self, -1, "Font / Size:"), 0,
                    wx.ALIGN_CENTER_VERTICAL)
         self.fontCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
 
@@ -153,20 +146,13 @@ class TitlesDlg(wx.Dialog):
         hsizer.Add(self.fontCombo, 0, wx.LEFT, 10)
         wx.EVT_COMBOBOX(self, self.fontCombo.GetId(), self.OnMisc)
 
-        vsizer2.Add(hsizer, 0, wx.TOP, 10)
-
-        hsizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        hsizer.Add(wx.StaticText(self, -1, "Size:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-
-        self.sizeEntry = wx.SpinCtrl(self, -1)
+        self.sizeEntry = wx.SpinCtrl(self, -1, size = (50, -1))
         self.sizeEntry.SetRange(4, 288)
         wx.EVT_SPINCTRL(self, self.sizeEntry.GetId(), self.OnMisc)
         wx.EVT_KILL_FOCUS(self.sizeEntry, self.OnKillFocus)
         hsizer.Add(self.sizeEntry, 0, wx.LEFT, 10)
 
-        vsizer2.Add(hsizer, 0, wx.TOP, 5)
+        vsizer2.Add(hsizer, 0, wx.TOP, 10)
 
         hsizerTop.Add(vsizer2)
 
