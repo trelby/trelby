@@ -1077,38 +1077,26 @@ class MiscPanel(wx.Panel):
 
         # wxGTK adds way more space by default than wxMSW between the
         # items, have to adjust for that
-        pad = 0
+        pad = 5
         if misc.isWindows:
             pad = 10
 
-        self.autoCapSentences = wx.CheckBox(self, -1,
-                                           "Auto-capitalize sentences")
-        wx.EVT_CHECKBOX(self, self.autoCapSentences.GetId(), self.OnMisc)
-        vsizer.Add(self.autoCapSentences, 0, wx.TOP | wx.BOTTOM, pad)
+        self.checkSettings = [
+            "Auto-capitalize sentences",
+            "Auto-capitalize i -> I",
+            "When opening a script, start at last saved position",
+            "Recenter screen on scrolling",
+            "Typing replaces selected text",
+            "Check script for errors before print, export or compare",
 
-        self.autoCapI = wx.CheckBox(self, -1, "Auto-capitalize i -> I")
-        wx.EVT_CHECKBOX(self, self.autoCapI.GetId(), self.OnMisc)
-        vsizer.Add(self.autoCapI, 0, wx.BOTTOM, pad)
+        ]
 
-        self.honorSavedPos = wx.CheckBox(self, -1,
-            "When opening a script, start at last saved position")
-        wx.EVT_CHECKBOX(self, self.honorSavedPos.GetId(), self.OnMisc)
-        vsizer.Add(self.honorSavedPos, 0, wx.BOTTOM, pad)
-
-        self.recenterOnScroll = wx.CheckBox(self, -1,
-            "Recenter screen on scrolling")
-        wx.EVT_CHECKBOX(self, self.recenterOnScroll.GetId(), self.OnMisc)
-        vsizer.Add(self.recenterOnScroll, 0, wx.BOTTOM, pad)
-
-        self.overwriteSelectionOnInsert = wx.CheckBox(self, -1,
-            "Typing replaces selected text")
-        wx.EVT_CHECKBOX(self, self.overwriteSelectionOnInsert.GetId(), self.OnMisc)
-        vsizer.Add(self.overwriteSelectionOnInsert, 0, wx.BOTTOM, pad)
-
-        self.checkErrorsCb = wx.CheckBox(self, -1,
-            "Check script for errors before print, export or compare")
-        wx.EVT_CHECKBOX(self, self.checkErrorsCb.GetId(), self.OnMisc)
-        vsizer.Add(self.checkErrorsCb, 0, wx.BOTTOM, 10)
+        self.checkList = wx.CheckListBox(self, -1, size = (-1, 120))
+        for i in range(len(self.checkSettings)):
+            self.checkList.Append(self.checkSettings[i])
+        vsizer.Add(self.checkList, 0, wx.TOP | wx.BOTTOM, pad)
+        wx.EVT_LISTBOX(self, self.checkList.GetId(), self.OnMisc)
+        wx.EVT_CHECKLISTBOX(self, self.checkList.GetId(), self.OnMisc)
 
         self.addSpin("splashTime", "Show splash screen for X seconds:\n"
                      " (0 = disable)", self, vsizer, "splashTime")
@@ -1154,12 +1142,15 @@ class MiscPanel(wx.Panel):
         self.cfg.scriptDir = self.scriptDirEntry.GetValue().rstrip("/\\")
         self.cfg.pdfViewerPath = self.progEntry.GetValue()
         self.cfg.pdfViewerArgs = misc.fromGUI(self.argsEntry.GetValue())
-        self.cfg.capitalize = self.autoCapSentences.GetValue()
-        self.cfg.capitalizeI = self.autoCapI.GetValue()
-        self.cfg.honorSavedPos = self.honorSavedPos.GetValue()
-        self.cfg.overwriteSelectionOnInsert = self.overwriteSelectionOnInsert.GetValue()
-        self.cfg.checkOnExport = self.checkErrorsCb.GetValue()
-        self.cfg.recenterOnScroll = self.recenterOnScroll.GetValue()
+
+        # set in same order as self.checkSettings above.
+        self.cfg.capitalize = bool(self.checkList.IsChecked(0))
+        self.cfg.capitalizeI = bool(self.checkList.IsChecked(1))
+        self.cfg.honorSavedPos = bool(self.checkList.IsChecked(2))
+        self.cfg.recenterOnScroll = bool(self.checkList.IsChecked(3))
+        self.cfg.overwriteSelectionOnInsert = bool(self.checkList.IsChecked(4))
+        self.cfg.checkOnExport = bool(self.checkList.IsChecked(5))
+
         self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
         self.cfg.splashTime = util.getSpinValue(self.splashTimeEntry)
@@ -1205,12 +1196,15 @@ class MiscPanel(wx.Panel):
         self.scriptDirEntry.SetValue(self.cfg.scriptDir)
         self.progEntry.SetValue(self.cfg.pdfViewerPath)
         self.argsEntry.SetValue(self.cfg.pdfViewerArgs)
-        self.autoCapSentences.SetValue(self.cfg.capitalize)
-        self.autoCapI.SetValue(self.cfg.capitalizeI)
-        self.honorSavedPos.SetValue(self.cfg.honorSavedPos)
-        self.overwriteSelectionOnInsert.SetValue(self.cfg.overwriteSelectionOnInsert)
-        self.checkErrorsCb.SetValue(self.cfg.checkOnExport)
-        self.recenterOnScroll.SetValue(self.cfg.recenterOnScroll)
+
+        # set these in order of self.checkSettings above
+        self.checkList.Check(0, self.cfg.capitalize)
+        self.checkList.Check(1, self.cfg.capitalizeI)
+        self.checkList.Check(2, self.cfg.honorSavedPos)
+        self.checkList.Check(3, self.cfg.recenterOnScroll)
+        self.checkList.Check(4, self.cfg.overwriteSelectionOnInsert)
+        self.checkList.Check(5, self.cfg.checkOnExport)
+
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
         self.splashTimeEntry.SetValue(self.cfg.splashTime)
