@@ -1030,6 +1030,21 @@ def getWindowsPDFViewer():
 
     return None
 
+# get a windows environment variable in its native unicode format, or None
+# if not found
+def getWindowsUnicodeEnvVar(name):
+    import ctypes
+
+    n = ctypes.windll.kernel32.GetEnvironmentVariableW(name, None, 0)
+
+    if n == 0:
+        return None
+
+    buf = ctypes.create_unicode_buffer(u"\0" * n)
+    ctypes.windll.kernel32.GetEnvironmentVariableW(name, buf, n)
+
+    return buf.value
+
 # show PDF file.
 def showPDF(filename, cfgGl, frame):
     def complain():

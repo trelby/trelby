@@ -44,20 +44,18 @@ def init(doWX = True):
     # opts (the doWX name is just for similarity with util)
     if not doWX or opts.isTest:
         progPath = u"."
-        confPath = ".trelby"
+        confPath = u".trelby"
     else:
         if isUnix:
             progPath = u"/opt/trelby"
-            confPath = os.environ["HOME"] + "/.trelby"
+            confPath = unicode(os.environ["HOME"], "UTF-8") + u"/.trelby"
         else:
             progPath = getPathFromRegistry()
 
-            confPath = os.environ["USERPROFILE"] + r"\Trelby\conf"
+            confPath = getWindowsUnicodeEnvVar("USERPROFILE") + ur"\Trelby\conf"
+
             if not os.path.exists(confPath):
                 os.makedirs(confPath)
-
-    # convert the path settings to Unicode
-    confPath = unicode(confPath, "UTF-8")
 
 def getPathFromRegistry():
     registryPath = r"Software\Microsoft\Windows\CurrentVersion\App Paths\trelby.exe"
