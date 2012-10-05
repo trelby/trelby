@@ -1081,20 +1081,22 @@ class MiscPanel(wx.Panel):
         if misc.isWindows:
             pad = 10
 
-        self.checkSettings = [
-            "Auto-capitalize sentences",
-            "Auto-capitalize i -> I",
-            "When opening a script, start at last saved position",
-            "Recenter screen on scrolling",
-            "Typing replaces selected text",
-            "Check script for errors before print, export or compare",
-
-        ]
+        self.checkListItems = [
+            ("capitalize", "Auto-capitalize sentences"),
+            ("capitalizeI", "Auto-capitalize i -> I"),
+            ("honorSavedPos", "When opening a script, start at last saved position"),
+            ("recenterOnScroll", "Recenter screen on scrolling"),
+            ("overwriteSelectionOnInsert", "Typing replaces selected text"),
+            ("checkOnExport", "Check script for errors before print, export or compare"),
+            ]
 
         self.checkList = wx.CheckListBox(self, -1, size = (-1, 120))
-        for i in range(len(self.checkSettings)):
-            self.checkList.Append(self.checkSettings[i])
+
+        for it in self.checkListItems:
+            self.checkList.Append(it[1])
+
         vsizer.Add(self.checkList, 0, wx.TOP | wx.BOTTOM, pad)
+
         wx.EVT_LISTBOX(self, self.checkList.GetId(), self.OnMisc)
         wx.EVT_CHECKLISTBOX(self, self.checkList.GetId(), self.OnMisc)
 
@@ -1143,13 +1145,8 @@ class MiscPanel(wx.Panel):
         self.cfg.pdfViewerPath = self.progEntry.GetValue()
         self.cfg.pdfViewerArgs = misc.fromGUI(self.argsEntry.GetValue())
 
-        # set in same order as self.checkSettings above.
-        self.cfg.capitalize = bool(self.checkList.IsChecked(0))
-        self.cfg.capitalizeI = bool(self.checkList.IsChecked(1))
-        self.cfg.honorSavedPos = bool(self.checkList.IsChecked(2))
-        self.cfg.recenterOnScroll = bool(self.checkList.IsChecked(3))
-        self.cfg.overwriteSelectionOnInsert = bool(self.checkList.IsChecked(4))
-        self.cfg.checkOnExport = bool(self.checkList.IsChecked(5))
+        for i, it in enumerate(self.checkListItems):
+            setattr(self.cfg, it[0], bool(self.checkList.IsChecked(i)))
 
         self.cfg.paginateInterval = util.getSpinValue(self.paginateEntry)
         self.cfg.mouseWheelLines = util.getSpinValue(self.wheelScrollEntry)
@@ -1197,13 +1194,8 @@ class MiscPanel(wx.Panel):
         self.progEntry.SetValue(self.cfg.pdfViewerPath)
         self.argsEntry.SetValue(self.cfg.pdfViewerArgs)
 
-        # set these in order of self.checkSettings above
-        self.checkList.Check(0, self.cfg.capitalize)
-        self.checkList.Check(1, self.cfg.capitalizeI)
-        self.checkList.Check(2, self.cfg.honorSavedPos)
-        self.checkList.Check(3, self.cfg.recenterOnScroll)
-        self.checkList.Check(4, self.cfg.overwriteSelectionOnInsert)
-        self.checkList.Check(5, self.cfg.checkOnExport)
+        for i, it in enumerate(self.checkListItems):
+            self.checkList.Check(i, getattr(self.cfg, it[0]))
 
         self.paginateEntry.SetValue(self.cfg.paginateInterval)
         self.wheelScrollEntry.SetValue(self.cfg.mouseWheelLines)
