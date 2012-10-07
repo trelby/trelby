@@ -194,7 +194,12 @@ def importFadein(fileName, frame):
                 lt = elemMap.get(styl[0].get("basestylename"), screenplay.ACTION)
             else:
                 lt = screenplay.ACTION
+
             items = sanitizeStr(txt[0].text)
+
+            if (lt == screenplay.PAREN) and items and (items[0][0] != "("):
+                items[0] = "(" + items[0]
+                items[-1] = items[-1] + ")"
         else:
             continue
 
