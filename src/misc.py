@@ -16,7 +16,7 @@ version = "2.3-dev"
 
 def init(doWX = True):
     global isWindows, isUnix, unicodeFS, wxIsUnicode, doDblBuf, \
-           progPath, confPath, tmpPrefix, version
+           progPath, confPath, tmpPrefix
 
     # prefix used for temp files
     tmpPrefix = "trelby-tmp-"

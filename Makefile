@@ -24,8 +24,3 @@ clean:
 
 install: dist
 	python setup.py install
-
-uninstall:
-	rm -f $(shell cat $(PREFIX)/share/trelby/installed-files.txt)
-	rm -f $(PREFIX)/share/trelby/installed-files.txt
-	rm -rf $(PREFIX)/share/trelby
