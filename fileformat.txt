@@ -26,7 +26,7 @@ list-size].
 
 The following config sections exists and appear in the file in this order:
 
- Auto-Completion/([Scene|Character|Transition]):
+ Auto-Completion/([Scene|Character|Transition|Shot]):
 
   Enabled (boolean): Whether auto-completion is on.
 
