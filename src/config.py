@@ -1207,6 +1207,7 @@ class ConfigGlobal:
                 (u"evince", ""),
                 (u"gpdf", ""),
                 (u"kpdf", ""),
+                (u"okular", ""),
                 ]
         elif misc.isWindows:
             # get value via registry if possible, or fallback to old method.
@@ -1219,6 +1220,8 @@ class ConfigGlobal:
                 return
 
             progs = [
+                (ur"C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe",
+                 ""),
                 (ur"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe",
                  ""),
                 (ur"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe",
