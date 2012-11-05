@@ -12,7 +12,7 @@ If you prefer to install Trelby e.g. to /usr/local, run
 
 sudo python setup.py install --prefix=/usr/local \
                              --install-lib=/usr/local/share/trelby \
-                             --install-data=/usr/local/share/trelby
+                             --install-data=/usr/local/share
 
 You can then run it by invoking "/usr/local/bin/trelby", or just by "trelby",
 if the installation path you chose has a "bin/" subdirectory that is part of

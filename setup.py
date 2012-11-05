@@ -1,6 +1,7 @@
 # setup.py
 from distutils.command.build_scripts import build_scripts as _build_scripts
 from distutils.command.bdist_rpm import bdist_rpm as _bdist_rpm
+from distutils.command.install_data import install_data as _install_data
 from distutils.core import setup
 from distutils.util import convert_path
 
@@ -45,8 +46,24 @@ class bdist_rpm(_bdist_rpm):
     def _make_spec_file(self):
         specFile = _bdist_rpm._make_spec_file(self)
         line = next(i for i, s in enumerate(specFile) if s.startswith("%install"))
-        specFile[line+1] += " --prefix=/usr --install-data=/usr/share/trelby --install-lib /usr/share/trelby"
+        specFile[line+1] += " --prefix=/usr --install-data=/usr/share --install-lib /usr/share/trelby"
         return specFile
+
+class install_data(_install_data):
+    """install_data command
+
+    This specific install_data command only really installs trelby.desktop
+    if the target path is either /usr or /usr/local.
+    """
+
+    def run(self):
+        dataDir = self.install_dir
+
+        if self.root:
+            dataDir = dataDir[len(self.root):]
+
+        if dataDir.rstrip("/") in ("/usr/share", "/usr/local/share"):
+            _install_data.run(self)
 
 sys.path.append(os.path.join(os.path.split(__file__)[0], "src"))
 import misc
@@ -80,20 +97,16 @@ else:
     platformOptions = {}
 
 dataFiles = [
-    ("resources", glob.glob(os.path.join("resources", "*.*"))),
-
-    ("", ["names.txt.gz",
-          "dict_en.dat.gz",
-          "sample.trelby",
-          "fileformat.txt",
-          "manual.html",
-          "README",
-          ]),
+    ("applications", ["trelby.desktop"]),
     ]
 
 setup(
     name = "Trelby",
-    cmdclass = {"build_scripts": build_scripts, "bdist_rpm": bdist_rpm},
+    cmdclass = {
+        "build_scripts": build_scripts,
+        "bdist_rpm": bdist_rpm,
+        "install_data": install_data,
+    },
     version = misc.version,
     description = "Free, multiplatform, feature-rich screenwriting program",
 
@@ -129,6 +142,14 @@ Features:
       url = "http://www.trelby.org/",
       license = "GPL",
       packages = ["src"],
+      package_data = {"src": ["../resources/*",
+          "../names.txt.gz",
+          "../dict_en.dat.gz",
+          "../sample.trelby",
+          "../fileformat.txt",
+          "../manual.html",
+          "../README",
+      ]},
       data_files = dataFiles,
       scripts = ["bin/trelby"],
       options = options,
