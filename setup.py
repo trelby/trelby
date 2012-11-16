@@ -2,11 +2,13 @@
 from distutils.command.build_scripts import build_scripts as _build_scripts
 from distutils.command.bdist_rpm import bdist_rpm as _bdist_rpm
 from distutils.command.install_data import install_data as _install_data
+from distutils.core import Command
 from distutils.core import setup
 from distutils.util import convert_path
 
 import fileinput
 import glob
+import subprocess
 import sys
 import os.path
 
@@ -66,6 +68,47 @@ class install_data(_install_data):
         if (dataDir.rstrip("/") in ("/usr/share", "/usr/local/share")) \
         or (sys.platform == "win32"):
             _install_data.run(self)
+
+class nsis(Command):
+    """ nsis command
+    Under Windows, call this command after the py2exe command to invoke NSIS
+    to produce a Windows installer.
+    """
+    description = "Invoke NSIS to produce a Windows installer."
+    user_options = [
+        ("nsis-file=", "f",
+         "NSIS file to process [default: install.nsi]"),
+    ]
+
+    def initialize_options(self):
+        self.nsis_file = "install.nsi"
+
+    def finalize_options(self):
+        pass
+
+    def executeNSIS(self, nsisCmd, nsisScript):
+        subProc = subprocess.Popen([nsisCmd, nsisScript], env=os.environ)
+        subProc.communicate()
+
+        retCode = subProc.returncode
+
+        if retCode:
+            raise RuntimeError("NSIS compilation return code: %d" % retCode)
+
+    def run(self):
+
+        try:
+            import _winreg
+            regPathKey = _winreg.OpenKey(_winreg.HKEY_LOCAL_MACHINE, r"Software\NSIS")
+            regPathValue, regPathType = _winreg.QueryValueEx(regPathKey, "")
+
+            if regPathType != _winreg.REG_SZ:
+                raise TypeError
+        except:
+            raise Exception("There was an error reading the registry key for NSIS.\n"
+                            "You may need to reinstall NSIS to fix this error.")
+
+        self.executeNSIS(os.path.join(regPathValue, "makensis.exe"), self.nsis_file)
 
 sys.path.append(os.path.join(os.path.split(__file__)[0], "src"))
 import misc
@@ -130,6 +173,7 @@ setup(
         "build_scripts": build_scripts,
         "bdist_rpm": bdist_rpm,
         "install_data": install_data,
+        "nsis": nsis,
     },
     version = misc.version,
     description = "Free, multiplatform, feature-rich screenwriting program",
