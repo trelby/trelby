@@ -165038,8 +165038,6 @@ MThami
 MWaffi
 MZinnediene
 NMuslim
-FA'dab
-FA'lia
 FA'mal
 FAa'ishah
 FAamina
@@ -165093,7 +165091,6 @@ MAbdul-Wadood
 MAbdul-Wahaab
 MAbed
 MAbedin
-FAbla'
 MAbu-Bakr
 MAbu-al-Khayr
 MAbul
@@ -165101,7 +165098,6 @@ MAbul-Khayr
 FAdilah
 MAesep
 MAfeef
-FAfra'
 FAfrah
 FAfrina
 FAfroze
@@ -165124,7 +165120,6 @@ MAreez
 MAs'ad
 FAsabe
 FAseeyah
-FAsma'
 MAtaa
 MAthar
 MAws
