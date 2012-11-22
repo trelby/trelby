@@ -3,7 +3,7 @@ Section: python
 Priority: extra
 Maintainer: Anil Gulecha <anil.verve@gmail.com>
 Build-Depends: debhelper (>= 8), python-all (>= 2.6.6-3~), xsltproc, docbook-xsl, devscripts, fakeroot
-Standards-Version: 3.9.3
+Standards-Version: 3.9.4
 Homepage: http://www.trelby.org/
 
 Package: trelby
