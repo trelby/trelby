@@ -55,7 +55,7 @@ def init(doWX = True):
         else:
             progPath = getPathFromRegistry()
 
-            confPath = util.getWindowsUnicodeEnvVar("USERPROFILE") + ur"\Trelby\conf"
+            confPath = util.getWindowsUnicodeEnvVar(u"USERPROFILE") + ur"\Trelby\conf"
 
             if not os.path.exists(confPath):
                 os.makedirs(confPath)
