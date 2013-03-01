@@ -179,6 +179,7 @@ Section Uninstall
   Delete "$INSTDIR\_socket.pyd"
   Delete "$INSTDIR\_ssl.pyd"
   Delete "$INSTDIR\_winreg.pyd"
+  Delete "$INSTDIR\_ctypes.pyd"
   Delete "$INSTDIR\manual.html"
   Delete "$INSTDIR\fileformat.txt"
   Delete "$INSTDIR\LICENSE"
