@@ -14,7 +14,7 @@ To build the manual, you will also need xsltproc.
 2. Preparing data files
 =======================
 
-Trelby needs special preparation for 3 of its data files. If you do not do
+Trelby needs special preparation for 4 of its data files. If you do not do
 this, that aspect of the program will not work.
 
  * Name list
@@ -29,7 +29,11 @@ this, that aspect of the program will not work.
 
   $ make manual.html
 
-You can run "make dist", which prepares all 3 and also generates a Linux
+ * Manpage
+
+  $ make trelby.1.gz
+
+You can run "make dist", which prepares all 4 and also generates a Linux
 distribution package which you can ignore.
 
 2.5. Preparing for a Windows build
