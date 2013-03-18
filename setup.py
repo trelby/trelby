@@ -53,7 +53,8 @@ class install_data(_install_data):
     """install_data command
 
     This specific install_data command only really installs trelby.desktop
-    and trelby's manpage if the target path is either /usr or /usr/local.
+    and trelby's manpage if the target path is either /usr or /usr/local,
+    or trelby's own data files if we're under Windows.
     """
 
     def run(self):
@@ -62,7 +63,8 @@ class install_data(_install_data):
         if self.root:
             dataDir = dataDir[len(self.root):]
 
-        if dataDir.rstrip("/") in ("/usr/share", "/usr/local/share"):
+        if (dataDir.rstrip("/") in ("/usr/share", "/usr/local/share")) \
+        or (sys.platform == "win32"):
             _install_data.run(self)
 
 sys.path.append(os.path.join(os.path.split(__file__)[0], "src"))
@@ -82,8 +84,30 @@ options = {
     }
 }
 
+
+packageData = {"src": ["../resources/*",
+      "../names.txt.gz",
+      "../dict_en.dat.gz",
+      "../sample.trelby",
+      "../fileformat.txt",
+      "../manual.html",
+      "../README",
+]}
+dataFiles = []
+
 if sys.platform == "win32":
     import py2exe
+
+    # Distutils' package_data argument doesn't work with py2exe.
+    # On the other hand, we don't need the data_files argument
+    # (which we're only using under Linux for stuff like our .desktop file and
+    # man page that go to system directories), so we'll just use it instead
+    # of package_data.
+    for path, files in packageData.iteritems():
+        for file in files:
+            dataFile = os.path.normpath(os.path.join(path, file))
+            dataFiles.append((os.path.dirname(dataFile),glob.glob(dataFile)))
+    packageData = {}
 
     platformOptions = dict(
         zipfile = "library.zip",
@@ -94,12 +118,11 @@ if sys.platform == "win32":
            }]
         )
 else:
+    dataFiles = [
+        ("applications", ["trelby.desktop"]),
+        ("man/man1", ["trelby.1.gz"]),
+        ]
     platformOptions = {}
-
-dataFiles = [
-    ("applications", ["trelby.desktop"]),
-    ("man/man1", ["trelby.1.gz"]),
-    ]
 
 setup(
     name = "Trelby",
@@ -143,14 +166,7 @@ Features:
       url = "http://www.trelby.org/",
       license = "GPL",
       packages = ["src"],
-      package_data = {"src": ["../resources/*",
-          "../names.txt.gz",
-          "../dict_en.dat.gz",
-          "../sample.trelby",
-          "../fileformat.txt",
-          "../manual.html",
-          "../README",
-      ]},
+      package_data = packageData,
       data_files = dataFiles,
       scripts = ["bin/trelby"],
       options = options,
