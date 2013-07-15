@@ -25,6 +25,7 @@ class AutoCompletion:
             "FADE IN:",
             "FADE OUT",
             "FADE TO BLACK",
+            "FLASHBACK TO:",
             "JUMP CUT TO:",
             "MATCH CUT TO:",
             "SLOW FADE TO BLACK",
