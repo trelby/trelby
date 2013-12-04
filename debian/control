@@ -2,7 +2,7 @@ Source: trelby
 Section: python
 Priority: extra
 Maintainer: Anil Gulecha <anil.verve@gmail.com>
-Build-Depends: debhelper (>= 8), python-all (>= 2.6.6-3~), xsltproc, docbook-xsl, devscripts, fakeroot
+Build-Depends: debhelper (>= 8), python-all (>= 2.7), xsltproc, docbook-xsl, devscripts, fakeroot
 Standards-Version: 3.9.4
 Homepage: http://www.trelby.org/
 
