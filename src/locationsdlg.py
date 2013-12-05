@@ -175,9 +175,7 @@ class LocationsDlg(wx.Dialog):
 
             self.locationsLb.Append(separator, None)
 
-        # PY2.4: use sorted
-        sceneNames = self.sp.getSceneNames().keys()
-        sceneNames.sort()
+        sceneNames = sorted(self.sp.getSceneNames().keys())
 
         for scene in sceneNames:
             if scene not in added:

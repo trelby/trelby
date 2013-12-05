@@ -116,9 +116,7 @@ def doTests(opts):
 
     # FIXME: allow specifying which files to test
 
-    # PY2.4: use "for fname in sorted(glob...)"
-    fnames = glob.glob("*.py")
-    fnames.sort()
+    fnames = sorted(glob.glob("*.py"))
 
     for fname in fnames:
         flags = getFlags(fname)

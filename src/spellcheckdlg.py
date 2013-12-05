@@ -176,7 +176,7 @@ class SpellCheckDlg(wx.Dialog):
         fifo = util.FIFO(5)
         wx.BeginBusyCursor()
 
-        for w in spellcheck.prefixDict[util.getWordPrefix(word)].iterkeys():
+        for w in spellcheck.prefixDict[util.getWordPrefix(word)]:
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
 
