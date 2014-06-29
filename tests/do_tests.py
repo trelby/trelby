@@ -25,9 +25,9 @@ def main():
     (opts, args) = parser.parse_args()
 
     if opts.file:
-        doTest(opts)
+        return doTest(opts)
     else:
-        doTests(opts)
+        return doTests(opts)
 
 # returns a list of all function names from the given file that start with
 # "test".
@@ -101,6 +101,8 @@ def doTest(opts):
         print "[Testing %s:%s]" % (name, f)
         getattr(mod, f)()
 
+    return 0
+
 # run all tests
 def doTests(opts):
     # FIXME
@@ -162,4 +164,6 @@ def doTests(opts):
     print "Tested %d %s, out of which %d failed, in %.2f seconds" % (
         cntTotal, s, cntFailed, t)
 
-main()
+    return 0 if (cntFailed == 0) else 1
+
+sys.exit(main())
