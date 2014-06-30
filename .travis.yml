@@ -1,12 +1,13 @@
-language: python
+# if we specify python as language, travis will use virtualenv with
+# --no-site-packages, which will mean the python-lxml library we need
+# will not be found, and the tests will fail. so pretend we're a C
+# language project instead to skip the virtualenv completely, which
+# we don't really need anyway.
 
-python:
-  - "2.7"
+language: c
 
-before_install:
+install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y python-dev python-lxml python-mock
-
-install: /bin/true
+  - sudo apt-get install -y python-lxml python-mock
 
 script: make test
