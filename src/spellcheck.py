@@ -1,8 +1,6 @@
 import mypickle
 import util
 
-import wx
-
 # words loaded from dict_en.dat.
 gdict = set()
 
