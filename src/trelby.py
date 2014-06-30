@@ -3,7 +3,6 @@
 from error import *
 import autocompletiondlg
 import cfgdlg
-import characterreport
 import charmapdlg
 import commandsdlg
 import config
@@ -11,7 +10,6 @@ import dialoguechart
 import finddlg
 import gutil
 import headersdlg
-import locationreport
 import locationsdlg
 import misc
 import myimport
@@ -19,12 +17,11 @@ import mypickle
 import namesdlg
 import opts
 import pml
-import scenereport
-import scriptreport
+import reports
 import screenplay
 import spellcheck
-import spellcheckdlg
 import spellcheckcfgdlg
+import spellcheckdlg
 import splash
 import titlesdlg
 import util
@@ -692,19 +689,19 @@ class MyCtrl(wx.Control):
 
     def OnReportCharacter(self):
         self.sp.paginate()
-        characterreport.genCharacterReport(mainFrame, self.sp)
+        reports.genCharacterReport(mainFrame, self.sp)
 
     def OnReportLocation(self):
         self.sp.paginate()
-        locationreport.genLocationReport(mainFrame, self.sp)
+        reports.genLocationReport(mainFrame, self.sp)
 
     def OnReportScene(self):
         self.sp.paginate()
-        scenereport.genSceneReport(mainFrame, self.sp)
+        reports.genSceneReport(mainFrame, self.sp)
 
     def OnReportScript(self):
         self.sp.paginate()
-        scriptreport.genScriptReport(mainFrame, self.sp)
+        reports.genScriptReport(mainFrame, self.sp)
 
     def OnCompareScripts(self):
         if mainFrame.tabCtrl.getPageCount() < 2:

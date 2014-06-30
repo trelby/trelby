@@ -1,17 +1,10 @@
 import characterreport
 import config
-import gutil
 import pdf
 import pml
 import scenereport
 import screenplay
 import util
-
-def genScriptReport(mainFrame, sp):
-    report = ScriptReport(sp)
-    data = report.generate()
-
-    gutil.showTempPDF(data, sp.cfgGl, mainFrame)
 
 class ScriptReport:
     def __init__(self, sp):

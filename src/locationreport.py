@@ -1,4 +1,3 @@
-import gutil
 import misc
 import pdf
 import pml
@@ -6,32 +5,9 @@ import scenereport
 import screenplay
 import util
 
-import wx
-
-def genLocationReport(mainFrame, sp):
-    report = LocationReport(scenereport.SceneReport(sp))
-
-    dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
-        "Information to include:", False)
-
-    ok = False
-    if dlg.ShowModal() == wx.ID_OK:
-        ok = True
-
-    dlg.Destroy()
-
-    if not ok:
-        return
-
-    data = report.generate()
-
-    gutil.showTempPDF(data, sp.cfgGl, mainFrame)
-
 class LocationReport:
     # sr = SceneReport
     def __init__(self, sr):
-        # TODO: have this construct SceneReport internally
-
         self.sp = sr.sp
 
         # key = scene name, value = LocationInfo. note that multiple keys

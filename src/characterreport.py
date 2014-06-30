@@ -1,44 +1,8 @@
-import gutil
 import misc
 import pdf
 import pml
 import screenplay
 import util
-
-import wx
-
-def genCharacterReport(mainFrame, sp):
-    report = CharacterReport(sp)
-
-    if not report.cinfo:
-        wx.MessageBox("No characters speaking found.",
-                      "Error", wx.OK, mainFrame)
-
-        return
-
-    charNames = []
-    for s in util.listify(report.cinfo, "name"):
-        charNames.append(misc.CheckBoxItem(s))
-
-    dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
-        "Information to include:", False, charNames,
-        "Characters to include:", True)
-
-    ok = False
-    if dlg.ShowModal() == wx.ID_OK:
-        ok = True
-
-        for i in range(len(report.cinfo)):
-            report.cinfo[i].include = charNames[i].selected
-
-    dlg.Destroy()
-
-    if not ok:
-        return
-
-    data = report.generate()
-
-    gutil.showTempPDF(data, sp.cfgGl, mainFrame)
 
 class CharacterReport:
     def __init__(self, sp):

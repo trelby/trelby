@@ -1,30 +1,8 @@
-import gutil
 import misc
 import pdf
 import pml
 import screenplay
 import util
-
-import wx
-
-def genSceneReport(mainFrame, sp):
-    report = SceneReport(sp)
-
-    dlg = misc.CheckBoxDlg(mainFrame, "Report type", report.inf,
-        "Information to include:", False)
-
-    ok = False
-    if dlg.ShowModal() == wx.ID_OK:
-        ok = True
-
-    dlg.Destroy()
-
-    if not ok:
-        return
-
-    data = report.generate()
-
-    gutil.showTempPDF(data, sp.cfgGl, mainFrame)
 
 class SceneReport:
     def __init__(self, sp):
