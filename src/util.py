@@ -13,8 +13,11 @@ import time
 
 import StringIO
 
-
-import wx
+if "TRELBY_TESTING" in os.environ:
+    import mock
+    wx = mock.Mock()
+else:
+    import wx
 
 # alignment values
 ALIGN_LEFT    = 0

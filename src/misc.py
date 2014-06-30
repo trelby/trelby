@@ -8,7 +8,11 @@ import os
 import os.path
 import sys
 
-import wx
+if "TRELBY_TESTING" in os.environ:
+    import mock
+    wx = mock.Mock()
+else:
+    import wx
 
 TAB_BAR_HEIGHT = 24
 
@@ -101,6 +105,8 @@ def getBitmap(filename):
 # example.
 def getFullPath(relative):
     return progPath + "/" + relative
+
+# TODO: move all GUI stuff to gutil
 
 class MyColorSample(wx.Window):
     def __init__(self, parent, id, size):

@@ -9,7 +9,13 @@ import screenplay
 import util
 
 import copy
-import wx
+import os
+
+if "TRELBY_TESTING" in os.environ:
+    import mock
+    wx = mock.Mock()
+else:
+    import wx
 
 # mapping from character to linebreak
 _char2lb = {
@@ -659,7 +665,7 @@ class ConfigGlobal:
         self.types[t.lt] = t
 
         # keyboard commands. these must be in alphabetical order.
-        self.commands = [
+        self.commands = [] if "TRELBY_TESTING" in os.environ else [
             Command("Abort", "Abort something, e.g. selection,"
                     " auto-completion, etc.", [wx.WXK_ESCAPE], isFixed = True),
 

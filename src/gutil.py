@@ -5,7 +5,11 @@ import util
 import os
 import tempfile
 
-import wx
+if "TRELBY_TESTING" in os.environ:
+    import mock
+    wx = mock.Mock()
+else:
+    import wx
 
 # this contains misc GUI-related functions
 
