@@ -5,7 +5,7 @@ python:
 
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y python-lxml python-mock
+  - sudo apt-get install -y python-dev python-lxml python-mock
 
 install: /bin/true
 
