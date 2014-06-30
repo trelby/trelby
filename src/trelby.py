@@ -2617,7 +2617,7 @@ class MyApp(wx.App):
                               "requirement for this program.", "Error", wx.OK)
                 sys.exit()
 
-        if not misc.wxIsUnicode:
+        if not "unicode" in wx.PlatformInfo:
             wx.MessageBox("You seem to be using a non-Unicode build of\n"
                           "wxWidgets. This is not supported.",
                           "Error", wx.OK)

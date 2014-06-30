@@ -15,8 +15,7 @@ TAB_BAR_HEIGHT = 24
 version = "2.3-dev"
 
 def init(doWX = True):
-    global isWindows, isUnix, unicodeFS, wxIsUnicode, doDblBuf, \
-           progPath, confPath, tmpPrefix
+    global isWindows, isUnix, unicodeFS, doDblBuf, progPath, confPath, tmpPrefix
 
     # prefix used for temp files
     tmpPrefix = "trelby-tmp-"
@@ -28,9 +27,6 @@ def init(doWX = True):
         isWindows = True
     else:
         isUnix = True
-
-    # are we using a Unicode build of wxWidgets
-    wxIsUnicode = "unicode" in wx.PlatformInfo
 
     # does this platform support using Python's unicode strings in various
     # filesystem calls; if not, we need to convert filenames to UTF-8
