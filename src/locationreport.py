@@ -5,6 +5,8 @@ import scenereport
 import screenplay
 import util
 
+import operator
+
 class LocationReport:
     # sr = SceneReport
     def __init__(self, sr):
@@ -70,13 +72,8 @@ class LocationReport:
             # DESC(lines_in_scene) ASC(scenename) order.
             tmp = [(scene, self.scenes[scene].lines) for scene in li.scenes]
 
-            # PY2.4: this should work (test it):
-            #  tmp.sort(key=itemgetter(0))
-            #  tmp.sort(key=itemgetter(1) reverse=True)
-            tmp.sort(lambda x, y: cmp(x[0], y[0]))
-            tmp.reverse()
-            tmp.sort(lambda x, y: cmp(x[1], y[1]))
-            tmp.reverse()
+            tmp.sort(key = operator.itemgetter(0))
+            tmp.sort(key = operator.itemgetter(1), reverse=True)
 
             for scene, lines in tmp:
                 if len(tmp) > 1:
