@@ -163,7 +163,7 @@ if sys.platform == "win32":
 else:
     dataFiles = [
         ("applications", ["trelby.desktop"]),
-        ("man/man1", ["trelby.1.gz"]),
+        ("man/man1", ["doc/trelby.1.gz"]),
         ]
     platformOptions = {}
 

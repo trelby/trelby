@@ -1,5 +1,5 @@
 XSLTPROC = xsltproc
-GZIP = gzip
+GZIP = gzip -n -9
 
 BOOK_HTML_TARGET = manual.html
 
