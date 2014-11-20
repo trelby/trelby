@@ -4,5 +4,5 @@ Comment=Screenwriting Application
 Exec=trelby
 Icon=/usr/share/trelby/resources/icon256.png
 Type=Application
-Categories=Utility;Publishing;
-
+Categories=Office;Publishing;
+Keywords=screenwriting editor;
