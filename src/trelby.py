@@ -2594,10 +2594,10 @@ class MyApp(wx.App):
     def OnInit(self):
         global cfgGl, mainFrame, gd
 
-        if (wx.MAJOR_VERSION != 2) or (wx.MINOR_VERSION != 8):
+        if (wx.MAJOR_VERSION != 3) or (wx.MINOR_VERSION != 0):
             wx.MessageBox("You seem to have an invalid version\n"
                           "(%s) of wxWidgets installed. This\n"
-                          "program needs version 2.8." %
+                          "program needs version 3.0." %
                           wx.VERSION_STRING, "Error", wx.OK)
             sys.exit()
 

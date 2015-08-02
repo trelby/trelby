@@ -1355,7 +1355,6 @@ class ConfigGui:
             if s:
                 nfi = wx.NativeFontInfo()
                 nfi.FromString(s)
-                nfi.SetEncoding(wx.FONTENCODING_ISO8859_1)
 
                 fi.font = wx.FontFromNativeInfo(nfi)
 
@@ -1363,9 +1362,6 @@ class ConfigGui:
                 # something equally silly, resulting in an
                 # invalid/non-existent font. on wxGTK2 and wxMSW we can
                 # detect this by checking the point size of the font.
-                # wxGTK1 chooses some weird chinese font and I can't find
-                # a way to detect that, but it's irrelevant since we'll
-                # rip out support for it in a few months.
                 if fi.font.GetPointSize() == 0:
                     fi.font = None
 

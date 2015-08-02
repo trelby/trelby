@@ -1224,7 +1224,7 @@ class ElementsGlobalPanel(wx.Panel):
 
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 10)
 
-        gsizer = wx.FlexGridSizer(2, 2, 5, 0)
+        gsizer = wx.FlexGridSizer(0, 2, 5, 0)
 
         self.addTypeCombo("newEnter", "Enter creates", self, gsizer)
         self.addTypeCombo("newTab", "Tab creates", self, gsizer)
