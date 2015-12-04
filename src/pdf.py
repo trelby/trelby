@@ -122,12 +122,13 @@ class PDFQuarterCircleOp(PDFDrawOp):
         sX = pmlOp.flipX and -1 or 1
         sY = pmlOp.flipY and -1 or 1
 
-        # the literature on how to emulate quarter circles with Bezier
-        # curves is sketchy, but the one thing that is clear is that the
-        # two control points have to be on (1, A) and (A, 1) (on a unit
-        # circle), and empirically choosing A to be half of the radius
-        # results in the best looking quarter circle.
-        A = pmlOp.radius * 0.5
+        # The traditional constant is: 0.552284749
+        # however, as described here:
+        # http://spencermortensen.com/articles/bezier-circle/,
+        # this has a maximum radial drift of 0.027253%.
+        # The constant calculated by Spencer Mortensen
+        # has a max. drift of 0.019608% which is 28% better.
+        A = pmlOp.radius * 0.551915024494
 
         output += "%f w\n"\
                   "%s m\n" % (pe.mm2points(pmlOp.width),
