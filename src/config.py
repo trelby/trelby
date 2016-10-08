@@ -956,12 +956,6 @@ class ConfigGlobal:
             Command("ViewModeLayout", "Change view mode to layout.",
                     isMenu = True),
 
-            Command("ViewModeOverviewLarge", "Change view mode to large"
-                    " overview.", isMenu = True),
-
-            Command("ViewModeOverviewSmall", "Change view mode to small"
-                    " overview.", isMenu = True),
-
             Command("ViewModeSideBySide", "Change view mode to side by"
                     " side.", isMenu = True),
 

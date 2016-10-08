@@ -405,16 +405,6 @@
 
 	</sect1>
 
-	<sect1>
-	  <title>Overviews</title>
-
-	  <para>There are two overview modes, one showing each character as a
-	  single pixel, and one showing each character as 4 pixels. This is
-	  unsuitable for editing so these modes are mainly useful for getting
-	  an overview of the page layouts.</para>
-
-	</sect1>
-
   </chapter>
 
   <chapter>

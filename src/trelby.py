@@ -52,9 +52,7 @@ KC_CTRL_V = 22
 VIEWMODE_DRAFT,\
 VIEWMODE_LAYOUT,\
 VIEWMODE_SIDE_BY_SIDE,\
-VIEWMODE_OVERVIEW_SMALL,\
-VIEWMODE_OVERVIEW_LARGE,\
-= range(5)
+= range(3)
 
 def refreshGuiConfig():
     global cfgGui
@@ -98,7 +96,7 @@ class GlobalData:
 
         v.addInt("height", 830, "Height", 300, 9999)
         v.addInt("viewMode", VIEWMODE_DRAFT, "ViewMode", VIEWMODE_DRAFT,
-                 VIEWMODE_OVERVIEW_LARGE)
+                 VIEWMODE_SIDE_BY_SIDE)
 
         v.addList("files", [], "Files",
                   mypickle.StrUnicodeVar("", u"", ""))
@@ -112,8 +110,6 @@ class GlobalData:
         self.vmDraft = viewmode.ViewModeDraft()
         self.vmLayout = viewmode.ViewModeLayout()
         self.vmSideBySide = viewmode.ViewModeSideBySide()
-        self.vmOverviewSmall = viewmode.ViewModeOverview(1)
-        self.vmOverviewLarge = viewmode.ViewModeOverview(2)
 
         self.setViewMode(self.viewMode)
 
@@ -140,10 +136,8 @@ class GlobalData:
             self.vm = self.vmLayout
         elif viewMode == VIEWMODE_SIDE_BY_SIDE:
             self.vm = self.vmSideBySide
-        elif viewMode == VIEWMODE_OVERVIEW_SMALL:
-            self.vm = self.vmOverviewSmall
         else:
-            self.vm = self.vmOverviewLarge
+            self.vm = self.vmDraft
 
     # load from string 's'. does not throw any exceptions and silently
     # ignores any errors.
@@ -590,10 +584,6 @@ class MyCtrl(wx.Control):
             self.OnLeftDown(event, mark = True)
 
     def OnRightDown(self, event):
-        # No popup in the overview modes.
-        if gd.viewMode in (VIEWMODE_OVERVIEW_SMALL, VIEWMODE_OVERVIEW_LARGE):
-            return
-
         pos = event.GetPosition()
         line, col = gd.vm.pos2linecol(self, pos.x, pos.y)
 
@@ -1741,21 +1731,13 @@ class MyFrame(wx.Frame):
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_DRAFT, "&Draft")
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_LAYOUT, "&Layout")
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_SIDE_BY_SIDE, "&Side by side")
-        viewMenu.AppendRadioItem(ID_VIEW_STYLE_OVERVIEW_SMALL,
-                                 "&Overview - Small")
-        viewMenu.AppendRadioItem(ID_VIEW_STYLE_OVERVIEW_LARGE,
-                                 "O&verview - Large")
 
         if gd.viewMode == VIEWMODE_DRAFT:
             viewMenu.Check(ID_VIEW_STYLE_DRAFT, True)
         elif gd.viewMode == VIEWMODE_LAYOUT:
             viewMenu.Check(ID_VIEW_STYLE_LAYOUT, True)
-        elif gd.viewMode == VIEWMODE_SIDE_BY_SIDE:
-            viewMenu.Check(ID_VIEW_STYLE_SIDE_BY_SIDE, True)
-        elif gd.viewMode == VIEWMODE_OVERVIEW_SMALL:
-            viewMenu.Check(ID_VIEW_STYLE_OVERVIEW_SMALL, True)
         else:
-            viewMenu.Check(ID_VIEW_STYLE_OVERVIEW_LARGE, True)
+            viewMenu.Check(ID_VIEW_STYLE_SIDE_BY_SIDE, True)
 
         viewMenu.AppendSeparator()
         viewMenu.AppendCheckItem(ID_VIEW_SHOW_FORMATTING, "&Show formatting")
@@ -1940,8 +1922,6 @@ class MyFrame(wx.Frame):
         wx.EVT_MENU(self, ID_VIEW_STYLE_DRAFT, self.OnViewModeChange)
         wx.EVT_MENU(self, ID_VIEW_STYLE_LAYOUT, self.OnViewModeChange)
         wx.EVT_MENU(self, ID_VIEW_STYLE_SIDE_BY_SIDE, self.OnViewModeChange)
-        wx.EVT_MENU(self, ID_VIEW_STYLE_OVERVIEW_SMALL, self.OnViewModeChange)
-        wx.EVT_MENU(self, ID_VIEW_STYLE_OVERVIEW_LARGE, self.OnViewModeChange)
         wx.EVT_MENU(self, ID_VIEW_SHOW_FORMATTING, self.OnShowFormatting)
         wx.EVT_MENU(self, ID_VIEW_FULL_SCREEN, self.ToggleFullscreen)
         wx.EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindNextError)
@@ -2063,8 +2043,6 @@ class MyFrame(wx.Frame):
             "ID_VIEW_SHOW_FORMATTING",
             "ID_VIEW_STYLE_DRAFT",
             "ID_VIEW_STYLE_LAYOUT",
-            "ID_VIEW_STYLE_OVERVIEW_LARGE",
-            "ID_VIEW_STYLE_OVERVIEW_SMALL",
             "ID_VIEW_STYLE_SIDE_BY_SIDE",
             "ID_TOOLBAR_SETTINGS",
             "ID_TOOLBAR_SCRIPTSETTINGS",
@@ -2410,25 +2388,13 @@ class MyFrame(wx.Frame):
         self.menuBar.Check(ID_VIEW_STYLE_SIDE_BY_SIDE, True)
         self.OnViewModeChange()
 
-    def OnViewModeOverviewSmall(self):
-        self.menuBar.Check(ID_VIEW_STYLE_OVERVIEW_SMALL, True)
-        self.OnViewModeChange()
-
-    def OnViewModeOverviewLarge(self):
-        self.menuBar.Check(ID_VIEW_STYLE_OVERVIEW_LARGE, True)
-        self.OnViewModeChange()
-
     def OnViewModeChange(self, event = None):
         if self.menuBar.IsChecked(ID_VIEW_STYLE_DRAFT):
             mode = VIEWMODE_DRAFT
         elif self.menuBar.IsChecked(ID_VIEW_STYLE_LAYOUT):
             mode = VIEWMODE_LAYOUT
-        elif self.menuBar.IsChecked(ID_VIEW_STYLE_SIDE_BY_SIDE):
-            mode = VIEWMODE_SIDE_BY_SIDE
-        elif self.menuBar.IsChecked(ID_VIEW_STYLE_OVERVIEW_SMALL):
-            mode = VIEWMODE_OVERVIEW_SMALL
         else:
-            mode = VIEWMODE_OVERVIEW_LARGE
+            mode = VIEWMODE_SIDE_BY_SIDE
 
         gd.setViewMode(mode)
 
