@@ -1321,9 +1321,6 @@ class MyCtrl(wx.Control):
     def OnKeyChar(self, ev):
         kc = ev.GetKeyCode()
 
-        #print "kc: %d, ctrl/alt/shift: %d, %d, %d" %\
-        #      (kc, ev.ControlDown(), ev.AltDown(), ev.ShiftDown())
-
         cs = screenplay.CommandState()
         cs.mark = bool(ev.ShiftDown())
         scrollDirection = config.SCROLL_CENTER
