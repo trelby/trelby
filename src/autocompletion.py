@@ -44,7 +44,7 @@ class AutoCompletion:
     def load(self, s):
         vals = mypickle.Vars.makeVals(s)
 
-        for t in self.types.itervalues():
+        for t in self.types.values():
             t.load(vals, "AutoCompletion/")
 
         self.refresh()
@@ -53,14 +53,14 @@ class AutoCompletion:
     def save(self):
         s = ""
 
-        for t in self.types.itervalues():
+        for t in self.types.values():
             s += t.save("AutoCompletion/")
 
         return s
 
     # fix up invalid values and uppercase everything.
     def refresh(self):
-        for t in self.types.itervalues():
+        for t in self.types.values():
             tmp = []
 
             for v in t.items:

@@ -166,7 +166,7 @@ def runRandomOps():
     cnt = 0
     while True:
         rounds = max(1, int(random.gauss(15000, 4000)))
-        print "Count %d (%d rounds)" % (cnt, rounds)
+        print("Count %d (%d rounds)" % (cnt, rounds))
 
         ops = Ops()
         failed = False
@@ -177,7 +177,7 @@ def runRandomOps():
         else:
             ops.add(Op("LOAD"))
 
-        for i in xrange(rounds):
+        for i in range(rounds):
             if i != 0:
                 ops.add(Op.getRandom())
 
@@ -188,7 +188,7 @@ def runRandomOps():
             except KeyboardInterrupt:
                 raise
             except:
-                print " Failed, saving..."
+                print(" Failed, saving...")
                 save(ops, cnt)
                 failed = True
 
@@ -202,7 +202,7 @@ def runRandomOps():
             except KeyboardInterrupt:
                 raise
             except:
-                print " Failed in save/load, saving..."
+                print(" Failed in save/load, saving...")
                 save(ops, cnt)
 
         cnt += 1

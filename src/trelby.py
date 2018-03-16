@@ -52,7 +52,7 @@ KC_CTRL_V = 22
 VIEWMODE_DRAFT,\
 VIEWMODE_LAYOUT,\
 VIEWMODE_SIDE_BY_SIDE,\
-= range(3)
+= list(range(3))
 
 def refreshGuiConfig():
     global cfgGui
@@ -99,7 +99,7 @@ class GlobalData:
                  VIEWMODE_SIDE_BY_SIDE)
 
         v.addList("files", [], "Files",
-                  mypickle.StrUnicodeVar("", u"", ""))
+                  mypickle.StrUnicodeVar("", "", ""))
 
         v.makeDicts()
         v.setDefaults(self)
@@ -120,8 +120,8 @@ class GlobalData:
 
         if makeDir:
             try:
-                os.mkdir(misc.toPath(misc.confPath), 0755)
-            except OSError, (errno, strerror):
+                os.mkdir(misc.toPath(misc.confPath), mode=0o755)
+            except OSError(errno, strerror):
                 wx.MessageBox("Error creating configuration directory\n"
                               "'%s': %s" % (misc.confPath, strerror),
                               "Error", wx.OK, None)
@@ -263,7 +263,7 @@ class MyCtrl(wx.Control):
 
         try:
             (sp, msg) = screenplay.Screenplay.load(s, cfgGl)
-        except TrelbyError, e:
+        except TrelbyError as e:
             wx.MessageBox("Error loading file:\n\n%s" % e, "Error",
                           wx.OK, mainFrame)
 
@@ -352,7 +352,7 @@ class MyCtrl(wx.Control):
         if fileName:
             self.setDisplayName(os.path.basename(fileName))
         else:
-            self.setDisplayName(u"untitled")
+            self.setDisplayName("untitled")
 
         self.setTabText()
         mainFrame.setTitle(self.fileNameDisplay)
@@ -1085,7 +1085,7 @@ class MyCtrl(wx.Control):
             dFile = os.path.basename(self.fileName)
         else:
             dDir = misc.scriptDir
-            dFile = u""
+            dFile = ""
 
         dlg = wx.FileDialog(mainFrame, "Filename to save as",
             defaultDir = dDir,
@@ -1290,26 +1290,26 @@ class MyCtrl(wx.Control):
         # contains (name, func) tuples
         tests = []
 
-        for name, var in locals().iteritems():
+        for name, var in locals().items():
             if callable(var):
                 tests.append((name, var))
 
         tests.sort()
         count = 100
 
-        print "-" * 20
+        print(("-" * 20))
 
         for name, func in tests:
             t = time.time()
 
-            for i in xrange(count):
+            for i in range(count):
                 func()
 
             t = time.time() - t
 
-            print "%.5f seconds per %s" % (t / count, name)
+            print("%.5f seconds per %s" % (t / count, name))
 
-        print "-" * 20
+        print("-" * 20)
 
         # it's annoying having the program ask if you want to save after
         # running these tests, so pretend the script hasn't changed
@@ -1344,7 +1344,7 @@ class MyCtrl(wx.Control):
                 cs.char = chr(kc)
 
                 if opts.isTest and (cs.char == "å"):
-                    self.loadFile(u"sample.trelby")
+                    self.loadFile("sample.trelby")
                 elif opts.isTest and (cs.char == "¤"):
                     self.cmdTest(cs)
                 elif opts.isTest and (cs.char == "½"):
@@ -1559,7 +1559,7 @@ class MyCtrl(wx.Control):
             for ul in ulinesHdr:
                 util.drawLine(dc, ul[0], ul[1], ul[2], 0)
 
-        for tl in texts.iteritems():
+        for tl in texts.items():
             gd.vm.drawTexts(self, dc, tl)
 
         if self.sp.acItems and (cursorY > 0):
@@ -2078,7 +2078,7 @@ class MyFrame(wx.Frame):
 
     def createNewPanel(self):
         newPanel = MyPanel(self.tabCtrl.getTabParent(), -1)
-        self.tabCtrl.addPage(newPanel, u"")
+        self.tabCtrl.addPage(newPanel, "")
         newPanel.ctrl.setTabText()
         newPanel.ctrl.SetFocus()
 

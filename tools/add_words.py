@@ -27,7 +27,7 @@ for it in lines:
 for arg in sys.argv[1:]:
     words[util.lower(arg)] = None
 
-words = words.keys()
+words = list(words.keys())
 words.sort()
 
 f = open("../dict_en.dat", "wb")

@@ -44,7 +44,7 @@ BASE_MEMORY_USAGE = 1500
  CMD_ADD_CHAR_SPACE,
  CMD_DEL_FORWARD,
  CMD_DEL_BACKWARD,
- CMD_MISC) = range(5)
+ CMD_MISC) = list(range(5))
 
 # convert a list of Screenplay.Line objects into an unspecified, but
 # compact, form of storage. storage2lines will convert this back to the

@@ -24,9 +24,9 @@ def init():
             isTest = True
         elif arg == "--conf":
             if (i + 1) < len(sys.argv):
-                conf = unicode(sys.argv[i + 1], "UTF-8", "ignore")
+                conf = str(sys.argv[i + 1], "UTF-8", "ignore")
                 i += 1
         else:
-            filenames.append(unicode(arg, "UTF-8", "ignore"))
+            filenames.append(str(arg, "UTF-8", "ignore"))
 
         i += 1

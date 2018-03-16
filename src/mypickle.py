@@ -78,7 +78,7 @@ class Vars:
         for it in self.cvars:
             if it.name2:
                 name = prefix + it.name2
-                if vals.has_key(name):
+                if name in vals:
                     res = it.fromStr(vals, vals[name], name)
                     setattr(obj, it.name, res)
                     del vals[name]
@@ -260,7 +260,7 @@ class ListVar(ConfVar):
         for i in range(1, count + 1):
             name = prefix + "/%d" % i
 
-            if vals.has_key(name):
+            if name in vals:
                 res = self.itemType.fromStr(vals, vals[name], name)
                 tmp.append(res)
                 del vals[name]

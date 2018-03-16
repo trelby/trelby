@@ -3,6 +3,7 @@ import pdf
 import pml
 import screenplay
 import util
+from functools import reduce
 
 class CharacterReport:
     def __init__(self, sp):
@@ -20,7 +21,7 @@ class CharacterReport:
         # how many lines processed for current speech
         curSpeechLines = 0
 
-        for i in xrange(len(ls)):
+        for i in range(len(ls)):
             line = ls[i]
 
             if (line.lt == screenplay.SCENE) and\
@@ -64,7 +65,7 @@ class CharacterReport:
 
         # list of CharInfo objects
         self.cinfo = []
-        for v in chars.values():
+        for v in list(chars.values()):
             self.cinfo.append(v)
 
         self.cinfo.sort(cmpLines)
@@ -75,7 +76,7 @@ class CharacterReport:
         self.totalWordCharCnt = self.sum("wordCharCnt")
 
         # information types and what to include
-        self.INF_BASIC, self.INF_PAGES, self.INF_LOCATIONS = range(3)
+        self.INF_BASIC, self.INF_PAGES, self.INF_LOCATIONS = list(range(3))
         self.inf = []
         for s in ["Basic information", "Page list", "Location list"]:
             self.inf.append(misc.CheckBoxItem(s))

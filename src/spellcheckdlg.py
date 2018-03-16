@@ -180,11 +180,11 @@ class SpellCheckDlg(wx.Dialog):
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
 
-        for w in self.gScDict.words.iterkeys():
+        for w in self.gScDict.words.keys():
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
 
-        for w in self.ctrl.sp.scDict.words.iterkeys():
+        for w in self.ctrl.sp.scDict.words.keys():
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
 

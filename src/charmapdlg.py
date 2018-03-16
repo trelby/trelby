@@ -35,7 +35,7 @@ class MyCharMap(wx.Window):
         # all valid characters
         self.chars = ""
 
-        for i in xrange(256):
+        for i in range(256):
             if util.isValidInputChar(i):
                 self.chars += chr(i)
 

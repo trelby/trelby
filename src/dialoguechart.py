@@ -66,7 +66,7 @@ class DialogueChart:
         # PageInfo's for each page, 0-indexed.
         self.pages = []
 
-        for i in xrange(len(sp.pages) - 1):
+        for i in range(len(sp.pages) - 1):
             self.pages.append(PageInfo())
 
         # map of CharInfo objects. key = name, value = CharInfo.
@@ -74,7 +74,7 @@ class DialogueChart:
 
         name = "UNKNOWN"
 
-        for i in xrange(len(ls)):
+        for i in range(len(ls)):
             pgNr = sp.line2page(i) -1
             pi = self.pages[pgNr]
             line = ls[i]
@@ -100,7 +100,7 @@ class DialogueChart:
 
         # CharInfo's.
         self.cinfo = []
-        for v in tmpCinfo.values():
+        for v in list(tmpCinfo.values()):
             if v.lineCnt >= minLines:
                 self.cinfo.append(v)
 
@@ -212,7 +212,7 @@ class DialogueChart:
         pg.add(pml.PDFOp("[2 2] 0 d"))
 
         # draw grid and page markers
-        for i in xrange(pageCnt):
+        for i in range(pageCnt):
             if (i == 0) or ((i + 1) % 10) == 0:
                 x = self.chartX + i * mmPerPage
                 pg.add(pml.TextOp("%d" % (i + 1), x, self.pageY,
@@ -240,7 +240,7 @@ class DialogueChart:
         self.drawLegend(pg, 3, 0.3, "Action", lw)
 
         # page content bars
-        for i in xrange(pageCnt):
+        for i in range(pageCnt):
             x = self.chartX + i * mmPerPage
             y = self.barY + self.barHeight
             pi = self.pages[i]
@@ -278,7 +278,7 @@ class DialogueChart:
             pg.add(pml.TextOp(ci.name, self.margin, y + self.charY / 2.0,
                 self.charFs, valign = util.VALIGN_CENTER))
 
-            for i in xrange(pageCnt):
+            for i in range(pageCnt):
                 pi = self.pages[i]
                 cnt = pi.getSpeakerLineCount(ci.name)
 
@@ -332,7 +332,7 @@ class PageInfo:
     # get total number of lines.
     def getTotalLineCount(self):
         if self.totalLineCount == -1:
-            self.totalLineCount = sum(self.lineCounts.itervalues(), 0)
+            self.totalLineCount = sum(iter(self.lineCounts.values()), 0)
 
         return self.totalLineCount
 

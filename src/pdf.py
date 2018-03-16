@@ -83,7 +83,7 @@ class PDFLineOp(PDFDrawOp):
         pc = len(p)
 
         if pc < 2:
-            print "LineOp contains only %d points" % pc
+            print("LineOp contains only %d points" % pc)
 
             return
 
@@ -115,7 +115,7 @@ class PDFRectOp(PDFDrawOp):
         elif pmlOp.fillType == pml.STROKE_FILL:
             output += "B\n"
         else:
-            print "Invalid fill type for RectOp"
+            print("Invalid fill type for RectOp")
 
 class PDFQuarterCircleOp(PDFDrawOp):
     def draw(self, pmlOp, pageNr, output, pe):
@@ -234,7 +234,7 @@ class PDFExporter:
             # each outline is a single PDF object
             self.outLineObjs = []
 
-            for i in xrange(len(doc.tocs)):
+            for i in range(len(doc.tocs)):
                 self.outLineObjs.append(self.addObj())
 
             self.outlinesObj.data = ("<< /Type /Outlines\n"
@@ -258,7 +258,7 @@ class PDFExporter:
         self.pageObjs = []
         self.pageContentObjs = []
 
-        for i in xrange(pages):
+        for i in range(pages):
             self.pageObjs.append(self.addObj("<< /Type /Page\n"
                                              "/Parent %d 0 R\n"
                                              "/Contents %d 0 R\n"
@@ -275,7 +275,7 @@ class PDFExporter:
                                 "%s"
                                 ">>" % (pagesObj.nr, outlinesStr))
 
-        for i in xrange(pages):
+        for i in range(pages):
             self.genPage(i)
 
         kids = util.String()
@@ -285,7 +285,7 @@ class PDFExporter:
         kids += "]"
 
         fontStr = ""
-        for fi in self.fonts.itervalues():
+        for fi in self.fonts.values():
             if fi.number != -1:
                 fontStr += "/F%d %d 0 R " % (fi.number, fi.pdfObj.nr)
 
@@ -299,7 +299,7 @@ class PDFExporter:
                                  self.mm2points(doc.h), fontStr))
 
         if doc.tocs:
-            for i in xrange(len(doc.tocs)):
+            for i in range(len(doc.tocs)):
                 self.genOutline(i)
 
         return self.genPDF()
@@ -444,7 +444,7 @@ class PDFExporter:
         fi = self.fonts.get(flags & 15)
 
         if not fi:
-            print "PDF.getfontNr: invalid flags %d" % flags
+            print("PDF.getfontNr: invalid flags %d" % flags)
 
             return 0
 

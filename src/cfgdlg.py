@@ -524,7 +524,7 @@ class ColorsPanel(wx.Panel):
 
         self.colorsLb = wx.ListBox(self, -1, size = (300, 250))
 
-        tmp = self.cfg.cvars.color.values()
+        tmp = list(self.cfg.cvars.color.values())
         tmp.sort(lambda c1, c2: cmp(c1.descr, c2.descr))
 
         for it in tmp:
@@ -618,7 +618,7 @@ class PaperPanel(wx.Panel):
 
         self.paperCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
 
-        for k, v in self.paperSizes.items():
+        for k, v in list(self.paperSizes.items()):
             self.paperCombo.Append(k, v)
 
         gsizer.Add(self.paperCombo)
@@ -671,7 +671,7 @@ class PaperPanel(wx.Panel):
         util.finishWindow(self, vsizer, center = False)
 
         ptype = "Custom"
-        for k, v in self.paperSizes.items():
+        for k, v in list(self.paperSizes.items()):
             if self.eqFloat(self.cfg.paperWidth, v[0]) and \
                self.eqFloat(self.cfg.paperHeight, v[1]):
                 ptype = k
@@ -1393,7 +1393,7 @@ class PDFFontsPanel(wx.Panel):
         self.blockEvents = True
 
         # last directory we chose a font from
-        self.lastDir = u""
+        self.lastDir = ""
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
@@ -1479,7 +1479,7 @@ class PDFFontsPanel(wx.Panel):
             dFile = os.path.basename(self.pf.filename)
         else:
             dDir = self.lastDir
-            dFile = u""
+            dFile = ""
 
         dlg = wx.FileDialog(cfgFrame, "Choose font file",
             defaultDir = dDir, defaultFile = dFile,

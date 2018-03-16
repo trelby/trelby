@@ -11,7 +11,7 @@ import re
 import tempfile
 import time
 
-import StringIO
+import io
 
 if "TRELBY_TESTING" in os.environ:
     import mock
@@ -65,12 +65,12 @@ _identity_tbl = ""
 # map some fancy unicode characters to their nearest ASCII/Latin-1
 # equivalents so when people import text it's not mangled to uselessness
 _fancy_unicode_map = {
-    ord(u"‘") : u"'",
-    ord(u"’") : u"'",
-    ord(u"“") : u'"',
-    ord(u"”") : u'"',
-    ord(u"—") : u"--",
-    ord(u"–") : u"-",
+#    ord('‘') : "'",
+#    ord('’') : "'",
+#    ord('“') : '"',
+#    ord('”') : '"',
+#    ord('—') : "--",
+#    ord('–') : "-",
     }
 
 # permanent memory DC to get text extents etc
@@ -88,7 +88,7 @@ def init(doWX = True):
         tmpUpper.append(i)
         tmpLower.append(i)
 
-    for k, v in _iso_8859_1_map.iteritems():
+    for k, v in _iso_8859_1_map.items():
         tmpUpper[k] = v
         tmpLower[v] = k
 
@@ -143,7 +143,7 @@ def toLatin1(s):
 # return 's', which must be a string of ISO-8859-1 characters, converted
 # to UTF-8.
 def toUTF8(s):
-    return unicode(s, "ISO-8859-1").encode("UTF-8")
+    return str(s, "ISO-8859-1").encode("UTF-8")
 
 # return 's', which must be a string of UTF-8 characters, converted to
 # ISO-8859-1, with characters not representable in ISO-8859-1 discarded
@@ -504,7 +504,7 @@ def isWordBoundary(c):
 
 # return True if c is an alphanumeric character
 def isAlnum(c):
-    return unicode(c, "ISO-8859-1").isalnum()
+    return str(c, "ISO-8859-1").isalnum()
 
 # make sure s (unicode) ends in suffix (case-insensitively) and return
 # that. suffix must already be lower-case.
@@ -568,7 +568,7 @@ def sortDict(d, sortFunc = None):
         sortFunc = tmpSortFunc
 
     tmp = []
-    for k, v in d.iteritems():
+    for k, v in d.items():
         tmp.append((k, v))
 
     tmp.sort(sortFunc)
@@ -588,14 +588,14 @@ class FIFO:
         self.arr[self.next] = obj
         self.next += 1
 
-        if self.next >= len(self.arr):
+        if self.__next__ >= len(self.arr):
             self.next = 0
 
     # get contents as a list, in LIFO order.
     def get(self):
         tmp = []
 
-        j = self.next - 1
+        j = self.__next__ - 1
 
         for i in range(len(self.arr)):
             if j < 0:
@@ -795,12 +795,12 @@ class Key:
     #        34:  Shift
 
     def toInt(self):
-        return (self.kc & 0xFFFFFFFFL) | (self.ctrl << 32L) | \
-               (self.alt << 33L) | (self.shift << 34L)
+        return (self.kc & 0xFFFFFFFF) | (self.ctrl << 32) | \
+               (self.alt << 33) | (self.shift << 34)
 
     @staticmethod
     def fromInt(val):
-        return Key(val & 0xFFFFFFFFL, (val >> 32) & 1, (val >> 33) & 1,
+        return Key(val & 0xFFFFFFFF, (val >> 32) & 1, (val >> 33) & 1,
                    (val >> 34) & 1)
 
     # construct from wx.KeyEvent
@@ -879,7 +879,8 @@ def loadFile(filename, frame, maxSize = -1):
         finally:
             f.close()
 
-    except IOError, (errno, strerror):
+    except IOError as xxx_todo_changeme:
+        (errno, strerror) = xxx_todo_changeme.args
         wx.MessageBox("Error loading file '%s': %s" % (
                 filename, strerror), "Error", wx.OK, frame)
         ret = None
@@ -902,7 +903,7 @@ def loadMaybeCompressedFile(filename, frame):
     if not doGz:
         return s
 
-    buf = StringIO.StringIO(s)
+    buf = io.StringIO(s)
 
     # python's gzip module throws almost arbitrary exceptions in various
     # error conditions, so the only safe thing to do is to catch
@@ -929,7 +930,8 @@ def writeToFile(filename, data, frame):
 
         return True
 
-    except IOError, (errno, strerror):
+    except IOError as xxx_todo_changeme1:
+        (errno, strerror) = xxx_todo_changeme1.args
         wx.MessageBox("Error writing file '%s': %s" % (
                 filename, strerror), "Error", wx.OK, frame)
 
@@ -958,8 +960,8 @@ def fileExists(filename):
 # filename, otherwise None.
 def findFile(filename, dirs):
     for d in dirs:
-        if d[-1] != u"/":
-            d += u"/"
+        if d[-1] != "/":
+            d += "/"
 
         path = d + filename
 
@@ -977,11 +979,11 @@ def findFileInPath(filename):
 
     # I have no idea how one should try to cope if PATH contains entries
     # with non-UTF8 characters, so just ignore any errors
-    dirs = unicode(dirs, "UTF-8", "ignore").split(u":")
+    dirs = str(dirs).split(":")
 
     # only accept absolute paths. this strips out things like "~/bin/"
     # etc.
-    dirs = [d for d in dirs if d and d[0] == u"/"]
+    dirs = [d for d in dirs if d and d[0] == "/"]
 
     return findFile(filename, dirs)
 
@@ -999,32 +1001,32 @@ class TimerDev:
     def __del__(self):
         self.t = time.time() - self.t
         self.__class__.nestingLevel -= 1
-        print "%s%s took %.5f seconds" % (" " * self.__class__.nestingLevel,
-                                          self.msg, self.t)
+        print("%s%s took %.5f seconds" % (" " * self.__class__.nestingLevel,
+                                          self.msg, self.t))
 
 # Get the Windows default PDF viewer path from registry and return that,
 # or None on errors.
 def getWindowsPDFViewer():
     try:
-        import _winreg
+        import winreg
 
         # HKCR/.pdf: gives the class of the PDF program.
         # Example : AcroRead.Document or FoxitReader.Document
 
-        key = _winreg.OpenKey(_winreg.HKEY_CLASSES_ROOT, ".pdf")
-        pdfClass = _winreg.QueryValue(key, "")
+        key = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, ".pdf")
+        pdfClass = winreg.QueryValue(key, "")
 
         # HKCR/<class>/shell/open/command: the path to the PDF viewer program
         # Example: "C:\Program Files\Acrobat 8.0\acroread.exe" "%1"
 
-        key2 = _winreg.OpenKey(
-            _winreg.HKEY_CLASSES_ROOT, pdfClass + r"\shell\open\command")
+        key2 = winreg.OpenKey(
+            winreg.HKEY_CLASSES_ROOT, pdfClass + r"\shell\open\command")
 
         # Almost every PDF program out there accepts passing the PDF path
         # as the argument, so we don't parse the arguments from the
         # registry, just get the program path.
 
-        path = _winreg.QueryValue(key2, "").split('"')[1]
+        path = winreg.QueryValue(key2, "").split('"')[1]
 
         if fileExists(path):
             return path
@@ -1043,7 +1045,7 @@ def getWindowsUnicodeEnvVar(name):
     if n == 0:
         return None
 
-    buf = ctypes.create_unicode_buffer(u"\0" * n)
+    buf = ctypes.create_unicode_buffer("\0" * n)
     ctypes.windll.kernel32.GetEnvironmentVariableW(name, buf, n)
 
     return buf.value

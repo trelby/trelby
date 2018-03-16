@@ -17,7 +17,7 @@ def readNames(frame):
         return True
 
     try:
-        data = util.loadMaybeCompressedFile(u"names.txt", frame)
+        data = util.loadMaybeCompressedFile("names.txt", frame)
         if not data:
             return False
 
@@ -41,7 +41,7 @@ def readNames(frame):
 
         return True
 
-    except Exception, e:
+    except Exception as e:
         wx.MessageBox("Error loading name database: %s" % str(e),
                       "Error", wx.OK, frame)
 
@@ -201,7 +201,7 @@ class NamesDlg(wx.Dialog):
         else:
             doTypes = True
 
-        for i in xrange(nameArr.count):
+        for i in range(nameArr.count):
             if (sex != 2) and (sex == nameArr.sex[i]):
                 continue
 

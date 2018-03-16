@@ -94,10 +94,10 @@ class SplashWindow(wx.Frame):
                 y = 260 - (len(self.quote.lines) - i - 1) * 17
 
                 if i == 0:
-                    dc.DrawText(u"“", x - 5, y)
+                    dc.DrawText("“", x - 5, y)
 
                 if i == (len(self.quote.lines) - 1):
-                    line = line + u"”"
+                    line = line + "”"
 
                 dc.DrawText(line, x, y)
 
@@ -132,10 +132,10 @@ class SplashWindow(wx.Frame):
             tmp = []
 
             for i,line in enumerate(lines):
-                if line.startswith(u"#") or not line.strip():
+                if line.startswith("#") or not line.strip():
                     continue
 
-                if line.startswith(u"  "):
+                if line.startswith("  "):
                     if not tmp:
                         raise Exception("No lines defined for quote at line %d" % (i + 1))
 
@@ -152,6 +152,6 @@ class SplashWindow(wx.Frame):
 
             SplashWindow.quotes = quotes
 
-        except Exception, e:
+        except Exception as e:
             wx.MessageBox("Error loading quotes: %s" % str(e),
                           "Error", wx.OK, parent)

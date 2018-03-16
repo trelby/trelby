@@ -192,11 +192,11 @@ class Screenplay:
         output += "#End-Spell-Checker-Dict \n"
 
         pgs = self.titles.pages
-        for pg in xrange(len(pgs)):
+        for pg in range(len(pgs)):
             if pg != 0:
                 output += "#Title-Page \n"
 
-            for i in xrange(len(pgs[pg])):
+            for i in range(len(pgs[pg])):
                 output += "#Title-String %s\n" % str(pgs[pg][i])
 
         for h in self.headers.hdrs:
@@ -206,7 +206,7 @@ class Screenplay:
 
         output += "#Start-Script \n"
 
-        for i in xrange(len(self.lines)):
+        for i in range(len(self.lines)):
             output += util.toUTF8(str(self.lines[i]) + "\n")
 
         return str(output)
@@ -280,7 +280,7 @@ class Screenplay:
         # files which didn't have it.
         startSeen = version < 3
 
-        for i in xrange(index, len(lines)):
+        for i in range(index, len(lines)):
             s = lines[i]
 
             if len(s) < 2:
@@ -445,7 +445,7 @@ class Screenplay:
 
         output = util.String()
 
-        for p in xrange(1, len(self.pages)):
+        for p in range(1, len(self.pages)):
             start, end = self.page2lines(p)
 
             if doPages and (p != 1):
@@ -453,7 +453,7 @@ class Screenplay:
                 s += "-" * (60 - len(s))
                 output += "\n%s\n\n" % s
 
-            for i in xrange(start, end + 1):
+            for i in range(start, end + 1):
                 line = ls[i]
                 tcfg = self.cfg.getType(line.lt)
 
@@ -524,7 +524,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 for s in ts.items:
                     para = etree.SubElement(content, "p")
                     para.set("class", "title")
-                    para.text = unicode(s, "ISO-8859-1")
+                    para.text = str(s, "ISO-8859-1")
 
             para = etree.SubElement(content, "p")
             para.set("class", "title")
@@ -558,7 +558,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             # and now the line text
             para = etree.SubElement(content, "pre")
             para.set("class", htmlMap[line.lt])
-            para.text = unicode(text, "ISO-8859-1")
+            para.text = str(text, "ISO-8859-1")
 
         bodyText = etree.tostring(content, encoding='UTF-8', pretty_print=True)
 
@@ -624,7 +624,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 para.set("Type", xmlMap[typ])
 
             paratxt = etree.SubElement(para, "Text")
-            paratxt.text = unicode(txt, "ISO-8859-1")
+            paratxt.text = str(txt, "ISO-8859-1")
 
         # FD does not recognize "New Act" by default. It needs an
         # ElementSettings element added.
@@ -814,7 +814,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             pager.doc.defPage = len(self.titles.pages) + \
                                 self.line2page(self.line) - 1
 
-        for i in xrange(1, len(self.pages)):
+        for i in range(1, len(self.pages)):
             pg = self.generatePMLPage(pager, i, True, True)
 
             if pg:
@@ -837,7 +837,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 # that logs errors to stderr / raises an exception /
                 # whatever.
 
-                if pf.filename != u"":
+                if pf.filename != "":
                     # we load at most 10 MB to avoid a denial-of-service
                     # attack by passing around scripts containing
                     # references to fonts with filenames like "/dev/zero"
@@ -933,7 +933,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
                 y += 10
 
-        for i in xrange(start, end + 1):
+        for i in range(start, end + 1):
             line = ls[i]
             tcfg = cfg.getType(line.lt)
 
@@ -1408,7 +1408,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         sc = SCENE
         scene = 0
 
-        for i in xrange(line + 1):
+        for i in range(line + 1):
             if (ls[i].lt == sc) and self.isFirstLineOfElem(i):
                 scene += 1
 
@@ -1838,7 +1838,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def getPageNumbers(self):
         pages = []
 
-        for p in xrange(1, len(self.pages)):
+        for p in range(1, len(self.pages)):
             pages.append(str(p))
 
         return pages
@@ -1853,7 +1853,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         scene = 0
         ret = []
 
-        for i in xrange(len(ls)):
+        for i in range(len(ls)):
             if (ls[i].lt == sc) and self.isFirstLineOfElem(i):
                 scene += 1
                 ret.append((str(scene), i))
@@ -2012,7 +2012,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if last:
             del matches[last]
 
-        mlist = matches.keys()
+        mlist = list(matches.keys())
         mlist.sort()
 
         if last:
@@ -2111,7 +2111,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         cd = ClipData()
 
-        for i in xrange(marked[0], marked[1] + 1):
+        for i in range(marked[0], marked[1] + 1):
             c1, c2 = self.getMarkedColumns(i, marked)
 
             ln = ls[i]
@@ -2126,11 +2126,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         u = undo.AnyDifference(self)
 
         # range of lines, inclusive, that we need to totally delete
-        del1 = sys.maxint
+        del1 = sys.maxsize
         del2 = -1
 
         # delete selected text from the lines
-        for i in xrange(marked[0], marked[1] + 1):
+        for i in range(marked[0], marked[1] + 1):
             c1, c2 = self.getMarkedColumns(i, marked)
 
             ln = ls[i]
@@ -2483,7 +2483,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         # now, generate changed-lines for single-line diffs
         dlt = []
-        for i in xrange(len(dltTmp)):
+        for i in range(len(dltTmp)):
             s = dltTmp[i]
 
             dlt.append(s)
@@ -2617,7 +2617,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         # (inclusive)
         cnt = 0
 
-        for i in xrange(len(lsOld)):
+        for i in range(len(lsOld)):
             l = lsOld[i]
 
             if l.lt not in tdict:
@@ -3120,7 +3120,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             while tmp:
                 self.undoMemoryUsed += tmp.memoryUsed()
-                tmp = tmp.next
+                tmp = tmp.__next__
 
         if not self.lastUndo:
             # no undo history at all yet
@@ -3140,7 +3140,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             tmp = self.firstUndo
             tmp.next.prev = None
-            self.firstUndo = tmp.next
+            self.firstUndo = tmp.__next__
 
             # it shouldn't be technically necessary to reset this, but it
             # might make the GC's job easier, and helps detecting bugs if
@@ -3182,7 +3182,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             return
 
         self.currentUndo.redo(self)
-        self.currentUndo = self.currentUndo.next
+        self.currentUndo = self.currentUndo.__next__
 
         self.clearMark()
         self.markChanged()
@@ -3274,7 +3274,7 @@ class ClipData:
 class CommandState:
 
     # what to do about auto-completion
-    AC_DEL, AC_REDO, AC_KEEP = range(3)
+    AC_DEL, AC_REDO, AC_KEEP = list(range(3))
 
     def __init__(self):
 
@@ -3312,7 +3312,7 @@ class PageList:
 
     # merge two PageLists
     def __iadd__(self, other):
-        for pg in other.pages.keys():
+        for pg in list(other.pages.keys()):
             self.addPage(pg)
 
         return self
@@ -3325,7 +3325,7 @@ class PageList:
         hasPage = []
 
         for p in self.allPages:
-            hasPage.append(p in self.pages.keys())
+            hasPage.append(p in list(self.pages.keys()))
 
         # finished string
         s = ""
@@ -3333,7 +3333,7 @@ class PageList:
         # start index of current range, or -1 if no range in progress
         rangeStart = -1
 
-        for i in xrange(len(self.allPages)):
+        for i in range(len(self.allPages)):
             if rangeStart != -1:
                 if not hasPage[i]:
 

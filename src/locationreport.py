@@ -36,7 +36,7 @@ class LocationReport:
 
         # remove empty LocationInfos, sort them and store to a list
         tmp = []
-        for li in locations.itervalues():
+        for li in locations.values():
             if (len(li.scenes) > 0) and (li not in tmp):
                 tmp.append(li)
 
@@ -54,7 +54,7 @@ class LocationReport:
 
         # information about what to include (and yes, the comma is needed
         # to unpack the list)
-        self.INF_SPEAKERS, = range(1)
+        self.INF_SPEAKERS, = list(range(1))
         self.inf = []
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
@@ -133,5 +133,5 @@ class LocationInfo:
         self.actionLines += si.actionLines
         self.pages += si.pages
 
-        for name, dlines in si.chars.iteritems():
+        for name, dlines in si.chars.items():
             self.chars[name] = self.chars.get(name, 0) + dlines

@@ -94,11 +94,11 @@ def doTest(opts):
         funcs = [opts.func]
 
     if not funcs:
-        print "[--- No tests found in %s ---]" % name
+        print("[--- No tests found in %s ---]" % name)
         sys.exit(1)
 
     for f in funcs:
-        print "[Testing %s:%s]" % (name, f)
+        print("[Testing %s:%s]" % (name, f))
         getattr(mod, f)()
 
     return 0
@@ -123,7 +123,7 @@ def doTests(opts):
     for fname in fnames:
         flags = getFlags(fname)
 
-        if flags.has_key("ignore"):
+        if "ignore" in flags:
             continue
 
         # strip .py suffix
@@ -141,7 +141,7 @@ def doTests(opts):
             funcs = getTestFuncs(fname)
 
             if not funcs:
-                print "[--- No tests found in %s ---]" % name
+                print("[--- No tests found in %s ---]" % name)
                 cntTotal += 1
                 cntFailed += 1
 
@@ -161,8 +161,8 @@ def doTests(opts):
     else:
         s = "tests"
 
-    print "Tested %d %s, out of which %d failed, in %.2f seconds" % (
-        cntTotal, s, cntFailed, t)
+    print("Tested %d %s, out of which %d failed, in %.2f seconds" % (
+        cntTotal, s, cntFailed, t))
 
     return 0 if (cntFailed == 0) else 1
 

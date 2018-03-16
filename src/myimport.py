@@ -7,7 +7,7 @@ import util
 from lxml import etree
 import wx
 
-import StringIO
+import io
 import re
 import zipfile
 
@@ -48,7 +48,7 @@ def importAstx(fileName, frame):
 
     try:
         root = etree.XML(data)
-    except etree.XMLSyntaxError, e:
+    except etree.XMLSyntaxError as e:
         wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
         return None
 
@@ -71,14 +71,14 @@ def importAstx(fileName, frame):
         lt = elemMap.get(para.get("element"), screenplay.ACTION)
 
         items = []
-        s = u""
+        s = ""
 
         for text in para:
             if text.tag == "textRun" and text.text:
                 s += text.text
             elif text.tag == "break":
                 items.append(s.rstrip())
-                s = u""
+                s = ""
 
         items.append(s.rstrip())
 
@@ -108,7 +108,7 @@ def importFadein(fileName, frame):
 
         return None
 
-    buf = StringIO.StringIO(data)
+    buf = io.StringIO(data)
 
     try:
         z = zipfile.ZipFile(buf)
@@ -135,7 +135,7 @@ def importFadein(fileName, frame):
 
     try:
         root = etree.XML(content)
-    except etree.XMLSyntaxError, e:
+    except etree.XMLSyntaxError as e:
         wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
         return None
 
@@ -161,7 +161,7 @@ def importFadein(fileName, frame):
            "</u>", "</font>", "</size>", "</bgcolor>"]
     def sanitizeStr(s):
         if s:
-            s = u"" + s
+            s = "" + s
             for r in re_rem:
                 s = re.sub(r, "", s)
             for r in rem:
@@ -170,20 +170,20 @@ def importFadein(fileName, frame):
             if s:
                 return s.split("<br>")
             else:
-                return [u""]
+                return [""]
         else:
-            return [u""]
+            return [""]
 
     for para in root.xpath("paragraphs/para"):
         # check for notes/synopsis, import as Note.
         if para.get("note"):
             lt = screenplay.NOTE
-            items = sanitizeStr(u"" + para.get("note"))
+            items = sanitizeStr("" + para.get("note"))
             addElem(lt, items)
 
         if para.get("synopsis"):
             lt = screenplay.NOTE
-            items = sanitizeStr(u"" + para.get("synopsis"))
+            items = sanitizeStr("" + para.get("synopsis"))
             addElem(lt, items)
 
         # look for the <style> and <text> tags. Bail if no <text> found.
@@ -228,7 +228,7 @@ def importCeltx(fileName, frame):
 
         return None
 
-    buf = StringIO.StringIO(data)
+    buf = io.StringIO(data)
 
     try:
         z = zipfile.ZipFile(buf)
@@ -265,7 +265,7 @@ def importCeltx(fileName, frame):
     try:
         parser = etree.HTMLParser()
         root = etree.XML(content, parser)
-    except etree.XMLSyntaxError, e:
+    except etree.XMLSyntaxError as e:
         wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
         return None
 
@@ -287,7 +287,7 @@ def importCeltx(fileName, frame):
     for para in root.xpath("/html/body/p"):
         items = []
         for line in para.itertext():
-            items.append(unicode(line.replace("\n", " ")))
+            items.append(str(line.replace("\n", " ")))
 
         lt = elemMap.get(para.get("class"), screenplay.ACTION)
 
@@ -348,7 +348,7 @@ def importFDX(fileName, frame):
             et = para.get("Type")
 
             # Check for script notes
-            s = u""
+            s = ""
             for notes in para.xpath("ScriptNote/Paragraph/Text"):
                 if notes.text:
                     s += notes.text
@@ -368,7 +368,7 @@ def importFDX(fileName, frame):
             if (et == "General") or (et is None):
                 continue
 
-            s = u""
+            s = ""
             for text in para.xpath("Text"):
                 # text.text is None for paragraphs with no text, and +=
                 # blows up trying to add a string object and None, so
@@ -388,7 +388,7 @@ def importFDX(fileName, frame):
 
         return lines
 
-    except etree.XMLSyntaxError, e:
+    except etree.XMLSyntaxError as e:
         wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
         return None
 
@@ -468,11 +468,11 @@ def importFountain(fileName, frame):
     data = util.fixNL(data)
     data = boneyard_re.sub('', data)
     prelines = data.split("\n")
-    for i in xrange(len(prelines)):
+    for i in range(len(prelines)):
         try:
             util.toLatin1(prelines[i])
         except:
-            prelines[i] = util.cleanInput(u"" + prelines[i].decode('UTF-8', "ignore"))
+            prelines[i] = util.cleanInput("" + prelines[i].decode('UTF-8', "ignore"))
     lines = []
 
     tabWidth = 4
@@ -500,7 +500,7 @@ def importFountain(fileName, frame):
             # these are title lines. Now do what the user requested.
             if importTitles:
                 # add TWOSPACE to all the title lines.
-                for i in xrange(c):
+                for i in range(c):
                     prelines[i] += TWOSPACE
             else:
                 #remove these lines
@@ -772,11 +772,11 @@ def importTextFile(fileName, frame):
             indDict[paren2Indent].lt = screenplay.PAREN
 
     # set line type to ACTION for any indents not recognized
-    for v in indDict.itervalues():
+    for v in indDict.values():
         if v.lt == -1:
             v.lt = screenplay.ACTION
 
-    dlg = ImportDlg(frame, indDict.values())
+    dlg = ImportDlg(frame, list(indDict.values()))
 
     if dlg.ShowModal() != wx.ID_OK:
         dlg.Destroy()
@@ -837,7 +837,7 @@ def setType(lt, indDict, func):
     maxCount = 0
     found = -1
 
-    for v in indDict.itervalues():
+    for v in indDict.values():
         # don't touch indents already set
         if v.lt != -1:
             continue
@@ -854,7 +854,7 @@ def setType(lt, indDict, func):
 # go through indents calling func(it, *vars) on each. return indent count
 # for the indent func returns True, or -1 if it returns False for each.
 def findIndent(indDict, func, *vars):
-    for v in indDict.itervalues():
+    for v in indDict.values():
         if func(v, *vars):
             return v.indent
 
