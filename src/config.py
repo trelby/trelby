@@ -804,11 +804,19 @@ class ConfigGlobal:
 
             Command("MoveLeft", "Move left.", [wx.WXK_LEFT], isMovement = True),
 
+            Command("MoveNextWord", "Move to start of next word.",
+                    [util.Key(wx.WXK_RIGHT, ctrl = True).toInt()],
+                    isMovement = True, isFixed = True),
+
             Command("MovePageDown", "Move one page down.",
                     [wx.WXK_PAGEDOWN], isMovement = True),
 
             Command("MovePageUp", "Move one page up.",
                     [wx.WXK_PAGEUP], isMovement = True),
+
+            Command("MovePrevWord", "Move to start of previous word.",
+                    [util.Key(wx.WXK_LEFT, ctrl = True).toInt()],
+                    isMovement = True, isFixed = True),
 
             Command("MoveRight", "Move right.", [wx.WXK_RIGHT],
                     isMovement = True),
