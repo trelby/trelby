@@ -122,7 +122,7 @@ def init(doWX = True):
         # dunno if the bitmap needs to be big enough to contain the text
         # we're measuring...
         permDc = wx.MemoryDC()
-        permDc.SelectObject(wx.EmptyBitmap(512, 32))
+        permDc.SelectObject(wx.Bitmap(512, 32))
 
 # like string.upper/lower/capitalize, but we do our own charset-handling
 # that doesn't need locales etc
@@ -162,7 +162,7 @@ def isValidInputChar(kc):
 # return s with all non-valid input characters converted to valid input
 # characters, except form feeds, which are just deleted.
 def toInputStr(s):
-    return s.translate(_input_tbl, "\f")
+    return s.replace("\f", "")
 
 # replace fancy unicode characters with their ASCII/Latin1 equivalents.
 def removeFancyUnicode(s):
@@ -179,7 +179,9 @@ def replace(s, new, start, width):
 
 # delete all characters in 'chars' (a string) from s and return that.
 def deleteChars(s, chars):
-    return s.translate(_identity_tbl, chars)
+    for char in chars:
+        s = s.replace(char, '')
+    return s
 
 # returns s with all possible different types of newlines converted to
 # unix newlines, i.e. a single "\n"

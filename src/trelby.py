@@ -105,7 +105,7 @@ class GlobalData:
         v.setDefaults(self)
 
         self.height = min(self.height,
-            wx.SystemSettings_GetMetric(wx.SYS_SCREEN_Y) - 50)
+            wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) - 50)
 
         self.vmDraft = viewmode.ViewModeDraft()
         self.vmLayout = viewmode.ViewModeLayout()
@@ -1971,12 +1971,12 @@ class MyFrame(wx.Frame):
         self.panel = self.createNewPanel()
 
     def mySetIcons(self):
-        wx.Image_AddHandler(wx.PNGHandler())
+        wx.Image.AddHandler(wx.PNGHandler())
 
         ib = wx.IconBundle()
 
         for sz in ("16", "32", "64", "128", "256"):
-            ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("resources/icon%s.png" % sz)))
+            ib.AddIcon(wx.Icon(misc.getBitmap("resources/icon%s.png" % sz)))
 
         self.SetIcons(ib)
 
@@ -2557,12 +2557,12 @@ class MyApp(wx.App):
     def OnInit(self):
         global cfgGl, mainFrame, gd
 
-        if (wx.MAJOR_VERSION != 3) or (wx.MINOR_VERSION != 0):
-            wx.MessageBox("You seem to have an invalid version\n"
-                          "(%s) of wxWidgets installed. This\n"
-                          "program needs version 3.0." %
-                          wx.VERSION_STRING, "Error", wx.OK)
-            sys.exit()
+        #if (wx.MAJOR_VERSION != 3) or (wx.MINOR_VERSION != 0):
+        #    wx.MessageBox("You seem to have an invalid version\n"
+        #                  "(%s) of wxWidgets installed. This\n"
+        #                  "program needs version 3.0." %
+        #                  wx.VERSION_STRING, "Error", wx.OK)
+        #    sys.exit()
 
         misc.init()
         util.init()
@@ -2582,10 +2582,6 @@ class MyApp(wx.App):
                           "wxWidgets. This is not supported.",
                           "Error", wx.OK)
             sys.exit()
-
-        # by setting this, we don't have to convert from 8-bit strings to
-        # Unicode ourselves everywhere when we pass them to wxWidgets.
-        wx.SetDefaultPyEncoding("ISO-8859-1")
 
         os.chdir(misc.progPath)
 

@@ -1350,7 +1350,7 @@ class ConfigGui:
                 nfi = wx.NativeFontInfo()
                 nfi.FromString(s)
 
-                fi.font = wx.FontFromNativeInfo(nfi)
+                fi.font = wx.Font(nfi)
 
                 # likewise, evil users can set the font name to "z" or
                 # something equally silly, resulting in an
