@@ -545,7 +545,7 @@ class MyCtrl(wx.Control):
         if misc.doDblBuf:
             size = self.GetClientSize()
 
-            sb = wx.BitMap(size.width, size.height)
+            sb = wx.Bitmap(size.width, size.height)
             old = getattr(self.__class__, "screenBuf", None)
 
             if (old == None) or (old.GetDepth() != sb.GetDepth()) or \

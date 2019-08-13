@@ -69,7 +69,7 @@ class MyCharMap(wx.Window):
 
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wx.BitMap(size.width, size.height)
+        self.screenBuf = wx.Bitmap(size.width, size.height)
 
     def OnLeftDown(self, event):
         pos = event.GetPosition()
