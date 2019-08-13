@@ -506,7 +506,7 @@ def isWordBoundary(c):
 
 # return True if c is an alphanumeric character
 def isAlnum(c):
-    return str(c, "ISO-8859-1").isalnum()
+    return str(c).isalnum()
 
 # make sure s (unicode) ends in suffix (case-insensitively) and return
 # that. suffix must already be lower-case.

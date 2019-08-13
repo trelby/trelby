@@ -1402,7 +1402,7 @@ class MyCtrl(wx.Control):
         acFi = None
 
         # key = font, value = ([text, ...], [(x, y), ...], [wx.Colour, ...])
-        texts = {}
+        texts = []
 
         # lists of underline-lines to draw, one for normal text and one
         # for header texts. list objects are (x, y, width) tuples.
@@ -1523,10 +1523,11 @@ class MyCtrl(wx.Control):
                     dc.DrawRectangle(t.x + self.sp.column * fx, y, fx, fi.fy)
 
             if len(t.text) != 0:
-                tl = texts.get(fi.font)
-                if tl == None:
+                #tl = texts.get(fi.font)
+                if fi.font not in texts:
+                #if tl == None:
                     tl = ([], [], [])
-                    texts[fi.font] = tl
+                    texts.append((fi.font, tl))
 
                 tl[0].append(t.text)
                 tl[1].append((t.x, y))
@@ -1559,7 +1560,7 @@ class MyCtrl(wx.Control):
             for ul in ulinesHdr:
                 util.drawLine(dc, ul[0], ul[1], ul[2], 0)
 
-        for tl in texts.items():
+        for tl in texts:
             gd.vm.drawTexts(self, dc, tl)
 
         if self.sp.acItems and (cursorY > 0):
@@ -1793,7 +1794,7 @@ class MyFrame(wx.Frame):
         self.toolBar = self.CreateToolBar(wx.TB_VERTICAL)
 
         def addTB(id, iconFilename, toolTip):
-            self.toolBar.AddLabelTool(
+            self.toolBar.AddTool(
                 id, "", misc.getBitmap("resources/%s" % iconFilename),
                 shortHelp=toolTip)
 
