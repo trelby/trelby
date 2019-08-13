@@ -143,7 +143,7 @@ def toLatin1(s):
 # return 's', which must be a string of ISO-8859-1 characters, converted
 # to UTF-8.
 def toUTF8(s):
-    return str(s, "ISO-8859-1").encode("UTF-8")
+    return str(s).encode("UTF-8")
 
 # return 's', which must be a string of UTF-8 characters, converted to
 # ISO-8859-1, with characters not representable in ISO-8859-1 discarded
@@ -926,7 +926,7 @@ def writeToFile(filename, data, frame):
         f = open(misc.toPath(filename), "wb")
 
         try:
-            f.write(data.encode("UTF-8"))
+            f.write(data)
         finally:
             f.close()
 

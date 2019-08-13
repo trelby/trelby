@@ -130,4 +130,4 @@ class HeaderString:
 
         s += ",,%s" % self.text
 
-        return util.toUTF8(s)
+        return s

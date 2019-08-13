@@ -197,4 +197,4 @@ class TitleString:
 
         s += ",,%s" % util.escapeStrings(self.items)
 
-        return util.toUTF8(s)
+        return s

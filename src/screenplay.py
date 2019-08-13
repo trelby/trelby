@@ -170,9 +170,9 @@ class Screenplay:
         self.cfg.cursorLine = self.line
         self.cfg.cursorColumn = self.column
 
-        output = util.String()
+        output = ''
 
-        output += codecs.BOM_UTF8
+        output += '\ufeff'
         output += "#Version 3\n"
 
         output += "#Begin-Auto-Completion \n"
@@ -207,9 +207,9 @@ class Screenplay:
         output += "#Start-Script \n"
 
         for i in range(len(self.lines)):
-            output += util.toUTF8(str(self.lines[i]) + "\n")
+            output += str(self.lines[i]) + "\n"
 
-        return str(output)
+        return output.encode("UTF-8")
 
     # load script from string s and return a (Screenplay, msg) tuple,
     # where msgs is string (possibly empty) of warnings about the loading

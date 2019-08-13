@@ -257,7 +257,7 @@ class MyCtrl(wx.Control):
         return cfgGui
 
     def loadFile(self, fileName):
-        s = util.loadFile(fileName, mainFrame)
+        s = str(util.loadFile(fileName, mainFrame))
         if s == None:
             return
 
@@ -1091,7 +1091,7 @@ class MyCtrl(wx.Control):
             defaultDir = dDir,
             defaultFile = dFile,
             wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
-            style = wx.SAVE | wx.OVERWRITE_PROMPT)
+            style = wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if dlg.ShowModal() == wx.ID_OK:
             self.saveFile(dlg.GetPath())
 
@@ -2222,7 +2222,7 @@ class MyFrame(wx.Frame):
         dlg = wx.FileDialog(self, "File to open",
             misc.scriptDir,
             wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
