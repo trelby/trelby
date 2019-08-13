@@ -71,7 +71,7 @@ def lines2storage(lines):
     # bytes"), always compress, but only use the compressed version if
     # it's shorter than the non-compressed one.
 
-    linesStrCompressed = zlib.compress(linesStr, 6)
+    linesStrCompressed = zlib.compress(linesStr.encode(), 6)
 
     if len(linesStrCompressed) < len(linesStr):
         return (len(lines), True, linesStrCompressed)

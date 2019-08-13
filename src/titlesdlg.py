@@ -438,7 +438,7 @@ class TitlesPreview(wx.Window):
         dc = wx.BufferedPaintDC(self, self.screenBuf)
 
         # widget size
-        ww, wh = self.GetClientSizeTuple()
+        ww, wh = self.GetClientSize()
 
         dc.SetBrush(wx.Brush(self.GetBackgroundColour()))
         dc.SetPen(wx.Pen(self.GetBackgroundColour()))

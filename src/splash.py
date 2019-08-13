@@ -75,7 +75,7 @@ class SplashWindow(wx.Frame):
         dc.SetFont(self.font)
         dc.SetTextForeground(self.textColor)
 
-        if self.pic.Ok():
+        if self.pic.IsOk():
             dc.DrawBitmap(self.pic, 0, 0, False)
 
         util.drawText(dc, "Version %s" % (misc.version),

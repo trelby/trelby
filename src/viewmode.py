@@ -274,7 +274,7 @@ class ViewModeLayout(ViewMode):
         texts = []
         dpages = []
 
-        width, height = ctrl.GetClientSizeTuple()
+        width, height = ctrl.GetClientSize()
 
         # gap between pages (pixels)
         pageGap = 10
@@ -412,7 +412,7 @@ class ViewModeSideBySide(ViewMode):
         texts = []
         dpages = []
 
-        width, height = ctrl.GetClientSizeTuple()
+        width, height = ctrl.GetClientSize()
 
         mm2p = ctrl.mm2p
 

@@ -926,7 +926,7 @@ def writeToFile(filename, data, frame):
         f = open(misc.toPath(filename), "wb")
 
         try:
-            f.write(data)
+            f.write(data.bytearray())
         finally:
             f.close()
 

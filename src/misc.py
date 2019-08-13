@@ -116,7 +116,7 @@ class MyColorSample(wx.Window):
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
 
-        w, h = self.GetClientSizeTuple()
+        w, h = self.GetClientSize()
         br = wx.Brush(self.GetBackgroundColour())
         dc.SetBrush(br)
         dc.DrawRectangle(0, 0, w, h)
@@ -137,7 +137,7 @@ class MyFSButton(wx.Window):
         cfgGui = self.getCfgGui()
         dc = wx.PaintDC(self)
 
-        w, h = self.GetClientSizeTuple()
+        w, h = self.GetClientSize()
 
         dc.SetBrush(cfgGui.tabNonActiveBgBrush)
         dc.SetPen(cfgGui.tabBorderPen)
@@ -183,7 +183,7 @@ class MyStatus(wx.Window):
         xoff = 5
 
         dc = wx.PaintDC(self)
-        w, h = self.GetClientSizeTuple()
+        w, h = self.GetClientSize()
 
         dc.SetBrush(cfgGui.tabBarBgBrush)
         dc.SetPen(cfgGui.tabBarBgPen)
@@ -399,7 +399,7 @@ class MyTabCtrl(wx.Window):
         if x < self.paddingX:
             return
 
-        w = self.GetClientSizeTuple()[0]
+        w = self.GetClientSize()[0]
 
         # start of left arrow
         lx = w - 1 - self.paddingX - self.arrowWidth - self.arrowSpacing \
@@ -447,7 +447,7 @@ class MyTabCtrl(wx.Window):
 
         cfgGui = self.getCfgGui()
 
-        w, h = self.GetClientSizeTuple()
+        w, h = self.GetClientSize()
 
         dc.SetBrush(cfgGui.tabBarBgBrush)
         dc.SetPen(cfgGui.tabBarBgPen)

@@ -2545,11 +2545,11 @@ class MyFrame(wx.Frame):
         self.Close(False)
 
     def OnMove(self, event):
-        gd.posX, gd.posY = self.GetPositionTuple()
+        gd.posX, gd.posY = self.GetPosition()
         event.Skip()
 
     def OnSize(self, event):
-        gd.width, gd.height = self.GetSizeTuple()
+        gd.width, gd.height = self.GetSize()
         event.Skip()
 
 class MyApp(wx.App):
