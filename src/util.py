@@ -926,7 +926,7 @@ def writeToFile(filename, data, frame):
         f = open(misc.toPath(filename), "wb")
 
         try:
-            f.write(data.bytearray())
+            f.write(data.encode("UTF-8"))
         finally:
             f.close()
 

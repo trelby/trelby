@@ -1,6 +1,7 @@
 import fontinfo
 import pml
 import util
+import zlib
 
 # PDF transform matrixes where key is the angle from x-axis
 # in counter-clockwise direction.
@@ -381,7 +382,7 @@ class PDFExporter:
 
         filterStr = " "
         if compress:
-            s = s.encode("zlib")
+            s = zlib.compress(s.encode("UTF-8"))
             filterStr = "/Filter /FlateDecode\n"
 
         return ("<< /Length %d\n%s%s>>\n"

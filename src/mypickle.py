@@ -55,7 +55,7 @@ class Vars:
     # load() to take.
     @staticmethod
     def makeVals(s):
-        tmp = util.fixNL(s).split("\n")
+        tmp = util.fixNL(str(s)).split("\n")
 
         vals = {}
         for it in tmp:
