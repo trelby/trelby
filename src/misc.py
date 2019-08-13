@@ -314,7 +314,7 @@ class MyTabCtrl(wx.Window):
         size = self.ctrl2.GetClientSize()
 
         for p in self.pages:
-            p[0].SetClientSizeWH(size.width, size.height)
+            p[0].SetClientSize(size.width, size.height)
 
     # select given page
     def selectPage(self, page):
@@ -350,7 +350,7 @@ class MyTabCtrl(wx.Window):
     # calculate the maximum number of tabs that we could show with our
     # current size.
     def calcMaxVisibleTabs(self):
-        w = self.GetClientSizeTuple()[0]
+        w = self.GetClientSize()[0]
 
         w -= self.paddingX * 2
         w -= self.arrowWidth * 2 + self.arrowSpacing

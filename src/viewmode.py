@@ -202,7 +202,7 @@ class ViewModeDraft(ViewMode):
         cfg = ctrl.sp.cfg
         cfgGui = ctrl.getCfgGui()
 
-        width, height = ctrl.GetClientSizeTuple()
+        width, height = ctrl.GetClientSize()
         ls = ctrl.sp.lines
         y = 15
         i = ctrl.sp.getTopLine()

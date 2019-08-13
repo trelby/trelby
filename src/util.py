@@ -483,7 +483,7 @@ def setWH(ctrl, w = -1, h = -1):
         size.height = h
 
     ctrl.SetMinSize(wx.Size(size.width, size.height))
-    ctrl.SetClientSizeWH(size.width, size.height)
+    ctrl.SetClientSize(size.width, size.height)
 
 # wxMSW doesn't respect the control's min/max values at all, so we have to
 # implement this ourselves

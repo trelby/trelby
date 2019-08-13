@@ -29,7 +29,7 @@ class SplashWindow(wx.Frame):
 
         if not SplashWindow.inited:
             SplashWindow.inited = True
-            wx.Image_AddHandler(wx.JPEGHandler())
+            wx.Image.AddHandler(wx.JPEGHandler())
 
             self.loadQuotes(parent)
 
@@ -37,7 +37,7 @@ class SplashWindow(wx.Frame):
 
         self.pic = misc.getBitmap("resources/logo.jpg")
 
-        if self.pic.Ok():
+        if self.pic.IsOk():
             w, h = (self.pic.GetWidth(), self.pic.GetHeight())
         else:
             w, h = (375, 300)
@@ -58,7 +58,7 @@ class SplashWindow(wx.Frame):
 
         if delay != -1:
             self.timer = wx.Timer(self)
-            wx.EVT_TIMER(self, -1, self.OnTimer)
+            wx.Timer()
             self.timer.Start(delay, True)
 
         wx.EVT_LEFT_DOWN(self, self.OnClick)
