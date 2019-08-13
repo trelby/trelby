@@ -545,7 +545,7 @@ class MyCtrl(wx.Control):
         if misc.doDblBuf:
             size = self.GetClientSize()
 
-            sb = wx.EmptyBitmap(size.width, size.height)
+            sb = wx.BitMap(size.width, size.height)
             old = getattr(self.__class__, "screenBuf", None)
 
             if (old == None) or (old.GetDepth() != sb.GetDepth()) or \
@@ -1658,7 +1658,7 @@ class MyFrame(wx.Frame):
         self.SetSizeHints(gd.cvars.getMin("width"),
                           gd.cvars.getMin("height"))
 
-        self.MoveXY(gd.posX, gd.posY)
+        self.Move(gd.posX, gd.posY)
         self.SetSize(wx.Size(gd.width, gd.height))
 
         util.removeTempFiles(misc.tmpPrefix)
@@ -1690,7 +1690,7 @@ class MyFrame(wx.Frame):
         tmp.Append(ID_SETTINGS_SC_DICT, "&Spell checker dictionary...")
         settingsMenu = tmp
 
-        fileMenu.AppendMenu(ID_FILE_SETTINGS, "Se&ttings", tmp)
+        fileMenu.Append(ID_FILE_SETTINGS, "Se&ttings", tmp)
 
         fileMenu.AppendSeparator()
         # "most recently used" list comes in here
@@ -1710,7 +1710,7 @@ class MyFrame(wx.Frame):
         tmp.Append(ID_EDIT_COPY_TO_CB, "&Unformatted")
         tmp.Append(ID_EDIT_COPY_TO_CB_FMT, "&Formatted")
 
-        editMenu.AppendMenu(ID_EDIT_COPY_SYSTEM, "C&opy (system)", tmp)
+        editMenu.Append(ID_EDIT_COPY_SYSTEM, "C&opy (system)", tmp)
         editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste (system)")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene")
@@ -1757,7 +1757,7 @@ class MyFrame(wx.Frame):
         tmp.AppendSeparator()
         tmp.Append(ID_SCRIPT_SETTINGS_LOAD, "&Load...")
         tmp.Append(ID_SCRIPT_SETTINGS_SAVE_AS, "&Save as...")
-        scriptMenu.AppendMenu(ID_SCRIPT_SETTINGS, "&Settings", tmp)
+        scriptMenu.Append(ID_SCRIPT_SETTINGS, "&Settings", tmp)
         scriptSettingsMenu = tmp
 
         reportsMenu = wx.Menu()
@@ -1835,7 +1835,7 @@ class MyFrame(wx.Frame):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.noFSBtn = misc.MyFSButton(self, -1, getCfgGui)
-        self.noFSBtn.SetToolTipString("Exit fullscreen")
+        self.noFSBtn.SetToolTip("Exit fullscreen")
         self.noFSBtn.Show(False)
         hsizer.Add(self.noFSBtn)
 

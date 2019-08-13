@@ -305,7 +305,7 @@ class MyTabCtrl(wx.Window):
 
         # the new page must be given the correct size and position
         self.setPageSizes()
-        page.MoveXY(0, 0)
+        page.Move(0, 0)
 
         self.selectPage(len(self.pages) - 1)
 
@@ -437,7 +437,7 @@ class MyTabCtrl(wx.Window):
 
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wx.EmptyBitmap(size.width, size.height)
+        self.screenBuf = wx.BitMap(size.width, size.height)
 
     def OnEraseBackground(self, event):
         pass
