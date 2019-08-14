@@ -199,7 +199,7 @@ class StrUnicodeVar(ConfVar):
         return "%s:%s\n" % (prefix, val.encode("UTF-8"))
 
     def fromStr(self, vals, val, prefix):
-        return val.decode("UTF-8", "ignore")
+        return val
 
 # binary string, can contain anything. characters outside of printable
 # ASCII (and \ itself) are encoded as \XX, where XX is the hex code of the

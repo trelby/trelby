@@ -217,10 +217,7 @@ class Screenplay:
     # that this is a static function.
     @staticmethod
     def load(s, cfgGl):
-        if s[0:3] != codecs.BOM_UTF8:
-            raise error.MiscError("File is not a Trelby screenplay.")
-
-        lines = s[3:].splitlines()
+        lines = s.splitlines()
 
         sp = Screenplay(cfgGl)
 
@@ -413,8 +410,8 @@ class Screenplay:
     # format, (None, None) is returned.
     @staticmethod
     def parseConfigLine(s):
-        m = re.match("#([a-zA-Z0-9\-]+) (.*)", s)
-
+        pattern = re.compile("#([a-zA-Z0-9\-]+) (.*)")
+        m = pattern.search(s)
         if m:
             return (m.group(1), m.group(2))
         else:

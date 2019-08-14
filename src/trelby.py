@@ -1110,7 +1110,7 @@ class MyCtrl(wx.Control):
                        "HTML|*.html|"
                        "Fountain|*.fountain|"
                        "Formatted text|*.txt",
-            style = wx.SAVE | wx.OVERWRITE_PROMPT)
+            style = wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()

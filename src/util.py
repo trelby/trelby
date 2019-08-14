@@ -149,7 +149,7 @@ def toUTF8(s):
 # ISO-8859-1, with characters not representable in ISO-8859-1 discarded
 # and any invalid UTF-8 sequences ignored.
 def fromUTF8(s):
-    return s.decode("UTF-8", "ignore").encode("ISO-8859-1", "ignore")
+    return s
 
 # returns True if kc (key-code) is a valid character to add to the script.
 def isValidInputChar(kc):
@@ -874,7 +874,7 @@ def loadFile(filename, frame, maxSize = -1):
     ret = None
 
     try:
-        f = open(misc.toPath(filename), "rb")
+        f = open(misc.toPath(filename), "r")
 
         try:
             ret = f.read(maxSize)
@@ -926,7 +926,7 @@ def writeToFile(filename, data, frame):
         f = open(misc.toPath(filename), "wb")
 
         try:
-            f.write(data)
+            f.write(data.encode("UTF-8"))
         finally:
             f.close()
 

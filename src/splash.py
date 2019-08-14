@@ -123,7 +123,7 @@ class SplashWindow(wx.Frame):
             if data is None:
                 return
 
-            data = data.decode("utf-8")
+            #data = data.decode("utf-8")
             lines = data.splitlines()
 
             quotes = []
