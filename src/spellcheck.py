@@ -127,7 +127,7 @@ class Dict:
         if len(word) == 0:
             return ""
 
-        return word[0]
+        return word[0].lstrip("b'").rstrip("'")
 
 # spell check a script
 class SpellChecker:

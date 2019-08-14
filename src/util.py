@@ -594,14 +594,14 @@ class FIFO:
         self.arr[self.next] = obj
         self.next += 1
 
-        if self.__next__ >= len(self.arr):
+        if self.next >= len(self.arr):
             self.next = 0
 
     # get contents as a list, in LIFO order.
     def get(self):
         tmp = []
 
-        j = self.__next__ - 1
+        j = self.next - 1
 
         for i in range(len(self.arr)):
             if j < 0:
