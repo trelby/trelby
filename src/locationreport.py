@@ -41,16 +41,16 @@ class LocationReport:
             if (len(li.scenes) > 0) and (li not in tmp):
                 tmp.append(li)
 
-        def tmpfunc(a, b):
+        def cmpfunc(a, b):
             return ((a > b) - (a < b)) or ((a > b) - (a < a))
 
         def sortFunc(o1, o2):
-            ret = tmpfunc(o2.lines, o1.lines)
+            ret = cmpfunc(o2.lines, o1.lines)
 
             if ret != 0:
                 return ret
             else:
-                return tmpfunc(o1.scenes[0], o2.scenes[0])
+                return cmpfunc(o1.scenes[0], o2.scenes[0])
 
         sorted(tmp, key=functools.cmp_to_key(sortFunc))
 

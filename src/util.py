@@ -555,7 +555,7 @@ def multiFind(s, seq):
 
     return False
 
-def tmpfunc(a, b):
+def cmpfunc(a, b):
     return ((a > b) - (a < b)) or ((a > b) - (a < a))
 
 # put everything from dictionary d into a list as (key, value) tuples,
@@ -563,12 +563,12 @@ def tmpfunc(a, b):
 # asc(key)", but a custom sort function can be given
 def sortDict(d, sortFunc = None):
     def tmpSortFunc(o1, o2):
-        ret = tmpfunc(o2[1], o1[1])
+        ret = cmpfunc(o2[1], o1[1])
 
         if ret != 0:
             return ret
         else:
-            return tmpfunc(o1[0], o2[0])
+            return cmpfunc(o1[0], o2[0])
 
     if sortFunc == None:
         sortFunc = tmpSortFunc

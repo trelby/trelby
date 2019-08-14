@@ -4,6 +4,7 @@ import pdf
 import pml
 import screenplay
 import util
+import functools
 
 import wx
 
@@ -176,7 +177,7 @@ class DialogueChart:
 
         for it in cbil:
             if it.selected:
-                self.cinfo.sort(it.cdata)
+                sorted(self.cinfo, key=functools.cmp_to_key(it.cdata))
                 doc.add(self.generatePage(it.text, doc))
 
         return pdf.generate(doc)
@@ -361,8 +362,11 @@ class CharInfo:
         self.lastPage = page
         self.lineCnt += 1
 
+def cmpfunc(a, b):
+    return ((a > b) - (a < b)) or ((a > b) - (a < a))
+
 def cmpCount(c1, c2):
-    ret = cmp(c2.lineCnt, c1.lineCnt)
+    ret = cmpfunc(c2.lineCnt, c1.lineCnt)
 
     if ret != 0:
         return ret
@@ -370,7 +374,7 @@ def cmpCount(c1, c2):
         return cmpFirst(c1, c2)
 
 def cmpCountThenName(c1, c2):
-    ret = cmp(c2.lineCnt, c1.lineCnt)
+    ret = cmpfunc(c2.lineCnt, c1.lineCnt)
 
     if ret != 0:
         return ret
@@ -378,7 +382,7 @@ def cmpCountThenName(c1, c2):
         return cmpName(c1, c2)
 
 def cmpFirst(c1, c2):
-    ret = cmp(c1.firstPage, c2.firstPage)
+    ret = cmpfunc(c1.firstPage, c2.firstPage)
 
     if ret != 0:
         return ret
@@ -386,7 +390,7 @@ def cmpFirst(c1, c2):
         return cmpLastRev(c1, c2)
 
 def cmpLast(c1, c2):
-    ret = cmp(c1.lastPage, c2.lastPage)
+    ret = cmpfunc(c1.lastPage, c2.lastPage)
 
     if ret != 0:
         return ret
@@ -394,7 +398,7 @@ def cmpLast(c1, c2):
         return cmpName(c1, c2)
 
 def cmpLastRev(c1, c2):
-    ret = cmp(c2.lastPage, c1.lastPage)
+    ret = cmpfunc(c2.lastPage, c1.lastPage)
 
     if ret != 0:
         return ret
@@ -402,4 +406,4 @@ def cmpLastRev(c1, c2):
         return cmpCountThenName(c1, c2)
 
 def cmpName(c1, c2):
-    return cmp(c1.name, c2.name)
+    return cmpfunc(c1.name, c2.name)

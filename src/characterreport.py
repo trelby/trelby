@@ -136,14 +136,14 @@ class CharInfo:
         self.include = True
         self.pages = screenplay.PageList(sp.getPageNumbers())
 
-def tmpfunc(a, b):
+def cmpfunc(a, b):
     return ((a > b) - (a < b)) or ((a > b) - (a < a))
 
 
 def cmpLines(c1, c2):
-    ret = tmpfunc(c2.lineCnt, c1.lineCnt)
+    ret = cmpfunc(c2.lineCnt, c1.lineCnt)
 
     if ret != 0:
         return ret
     else:
-        return tmpfunc(c1.name, c2.name)
+        return cmpfunc(c1.name, c2.name)
