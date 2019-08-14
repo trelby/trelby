@@ -4,6 +4,7 @@ import pml
 import scenereport
 import screenplay
 import util
+import functools
 
 import operator
 
@@ -40,15 +41,18 @@ class LocationReport:
             if (len(li.scenes) > 0) and (li not in tmp):
                 tmp.append(li)
 
+        def tmpfunc(a, b):
+            return ((a > b) - (a < b)) or ((a > b) - (a < a))
+
         def sortFunc(o1, o2):
-            ret = cmp(o2.lines, o1.lines)
+            ret = tmpfunc(o2.lines, o1.lines)
 
             if ret != 0:
                 return ret
             else:
-                return cmp(o1.scenes[0], o2.scenes[0])
+                return tmpfunc(o1.scenes[0], o2.scenes[0])
 
-        tmp.sort(sortFunc)
+        sorted(tmp, key=functools.cmp_to_key(sortFunc))
 
         self.locations = tmp
 

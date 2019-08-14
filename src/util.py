@@ -10,6 +10,7 @@ import os
 import re
 import tempfile
 import time
+import functools
 
 import io
 
@@ -554,17 +555,20 @@ def multiFind(s, seq):
 
     return False
 
+def tmpfunc(a, b):
+    return ((a > b) - (a < b)) or ((a > b) - (a < a))
+
 # put everything from dictionary d into a list as (key, value) tuples,
 # then sort the list and return that. by default sorts by "desc(value)
 # asc(key)", but a custom sort function can be given
 def sortDict(d, sortFunc = None):
     def tmpSortFunc(o1, o2):
-        ret = cmp(o2[1], o1[1])
+        ret = tmpfunc(o2[1], o1[1])
 
         if ret != 0:
             return ret
         else:
-            return cmp(o1[0], o2[0])
+            return tmpfunc(o1[0], o2[0])
 
     if sortFunc == None:
         sortFunc = tmpSortFunc
@@ -573,7 +577,7 @@ def sortDict(d, sortFunc = None):
     for k, v in d.items():
         tmp.append((k, v))
 
-    tmp.sort(sortFunc)
+    sorted(tmp, key=functools.cmp_to_key(sortFunc))
 
     return tmp
 
