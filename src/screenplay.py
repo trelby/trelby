@@ -621,7 +621,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 para.set("Type", xmlMap[typ])
 
             paratxt = etree.SubElement(para, "Text")
-            paratxt.text = str(txt, "ISO-8859-1")
+            paratxt.text = str(txt)
 
         # FD does not recognize "New Act" by default. It needs an
         # ElementSettings element added.

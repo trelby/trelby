@@ -1166,7 +1166,7 @@ class MiscPanel(wx.Panel):
         dlg = wx.FileDialog(
             cfgFrame, "Choose program",
             os.path.dirname(self.cfg.pdfViewerPath),
-            self.cfg.pdfViewerPath, style = wx.OPEN)
+            self.cfg.pdfViewerPath, style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             self.progEntry.SetValue(dlg.GetPath())
@@ -1484,7 +1484,7 @@ class PDFFontsPanel(wx.Panel):
         dlg = wx.FileDialog(cfgFrame, "Choose font file",
             defaultDir = dDir, defaultFile = dFile,
             wildcard = "TrueType fonts (*.ttf;*.TTF)|*.ttf;*.TTF|All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             self.fileEntry.SetValue(dlg.GetPath())

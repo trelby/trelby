@@ -162,7 +162,7 @@ def isValidInputChar(kc):
 # return s with all non-valid input characters converted to valid input
 # characters, except form feeds, which are just deleted.
 def toInputStr(s):
-    return s.replace("\f", "")
+    return str(s).replace("\f", "")
 
 # replace fancy unicode characters with their ASCII/Latin1 equivalents.
 def removeFancyUnicode(s):

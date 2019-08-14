@@ -2248,7 +2248,7 @@ class MyFrame(wx.Frame):
                        "Fountain files (*.fountain)|*.fountain|" +
                        "Fadein files (*.fadein)|*.fadein|" +
                        "All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
@@ -2289,7 +2289,7 @@ class MyFrame(wx.Frame):
             defaultDir = os.path.dirname(gd.confFilename),
             defaultFile = os.path.basename(gd.confFilename),
             wildcard = "Setting files (*.conf)|*.conf|All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             s = util.loadFile(dlg.GetPath(), self)
@@ -2446,7 +2446,7 @@ class MyFrame(wx.Frame):
         dlg = wx.FileDialog(self, "File to open",
             defaultDir = gd.scriptSettingsPath,
             wildcard = "Script setting files (*.sconf)|*.sconf|All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             s = util.loadFile(dlg.GetPath(), self)
