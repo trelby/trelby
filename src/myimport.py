@@ -325,7 +325,7 @@ def importFDX(fileName, frame):
         return None
 
     try:
-        root = etree.XML(data)
+        root = etree.XML(data.encode("UTF-8"))
         lines = []
 
         def addElem(eleType, eleText):
@@ -386,6 +386,8 @@ def importFDX(fileName, frame):
             wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
             return None
 
+        for line in lines:
+            line.text = line.text.lstrip("b'").rstrip("'")
         return lines
 
     except etree.XMLSyntaxError as e:
