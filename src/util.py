@@ -127,10 +127,10 @@ def init(doWX = True):
 # like string.upper/lower/capitalize, but we do our own charset-handling
 # that doesn't need locales etc
 def upper(s):
-    return s.translate(_to_upper)
+    return s.upper()
 
 def lower(s):
-    return s.translate(_to_lower)
+    return s.lower()
 
 def capitalize(s):
     return upper(s[:1]) + s[1:]
