@@ -18,7 +18,7 @@ def init():
 
     i = 1
     while i < len(sys.argv):
-        arg = sys.argv[i]
+        arg = str(sys.argv[i])
 
         if arg == "--test":
             isTest = True

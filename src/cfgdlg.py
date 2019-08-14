@@ -46,7 +46,7 @@ class MyListBook(wx.ListBox):
     # set all page sizes
     def SetPageSizes(self, w, h):
         for page in self.GetPages():
-            page.SetClientSizeWH(w, h)
+            page.SetClientSize(w, h)
 
     def OnPageChange(self, event = None):
         for page in self.GetPages():
