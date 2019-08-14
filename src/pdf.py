@@ -371,7 +371,7 @@ class PDFExporter:
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
     def genStream(self, s, isFontStream = False):
-        compress = True
+        compress = False
 
         # embedded TrueType font program streams for some reason need a
         # Length1 entry that records the uncompressed length of the stream
@@ -382,7 +382,7 @@ class PDFExporter:
 
         filterStr = " "
         if compress:
-            s = zlib.compress(s.encode("UTF-8"))
+            s = s.encode("zlib")
             filterStr = "/Filter /FlateDecode\n"
 
         return ("<< /Length %d\n%s%s>>\n"
