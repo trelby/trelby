@@ -926,7 +926,10 @@ def writeToFile(filename, data, frame):
         f = open(misc.toPath(filename), "wb")
 
         try:
-            f.write(data.encode("UTF-8"))
+            if isinstance(data, str):
+                f.write(data.encode("UTF-8"))
+            else:
+                f.write(data)
         finally:
             f.close()
 
