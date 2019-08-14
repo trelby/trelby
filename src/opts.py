@@ -27,6 +27,6 @@ def init():
                 conf = str(sys.argv[i + 1], "UTF-8", "ignore")
                 i += 1
         else:
-            filenames.append(str(arg, "UTF-8", "ignore"))
+            filenames.append(arg)
 
         i += 1
