@@ -4,6 +4,7 @@ import pml
 import screenplay
 import util
 from functools import reduce
+import functools
 
 class CharacterReport:
     def __init__(self, sp):
@@ -68,7 +69,7 @@ class CharacterReport:
         for v in list(chars.values()):
             self.cinfo.append(v)
 
-        self.cinfo.sort(cmpLines)
+        sorted(self.cinfo, key=functools.cmp_to_key(cmpLines))
 
         self.totalSpeechCnt = self.sum("speechCnt")
         self.totalLineCnt = self.sum("lineCnt")
@@ -135,10 +136,14 @@ class CharInfo:
         self.include = True
         self.pages = screenplay.PageList(sp.getPageNumbers())
 
+def tmpfunc(a, b):
+    return ((a > b) - (a < b)) or ((a > b) - (a < a))
+
+
 def cmpLines(c1, c2):
-    ret = cmp(c2.lineCnt, c1.lineCnt)
+    ret = tmpfunc(c2.lineCnt, c1.lineCnt)
 
     if ret != 0:
         return ret
     else:
-        return cmp(c1.name, c2.name)
+        return tmpfunc(c1.name, c2.name)
