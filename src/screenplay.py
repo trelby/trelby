@@ -555,9 +555,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             # and now the line text
             para = etree.SubElement(content, "pre")
             para.set("class", htmlMap[line.lt])
-            para.text = str(text, "ISO-8859-1")
+            para.text = str(text)
 
-        bodyText = etree.tostring(content, encoding='UTF-8', pretty_print=True)
+        bodyText = etree.tostring(content, encoding='UTF-8', pretty_print=True).decode()
 
         return htmlHeader + bodyText + htmlFooter
 
