@@ -53,7 +53,7 @@ class Titles:
             return ((a.y > b.y) - (a.y < b.y)) or ((a.x > b.x) - (a.x < a.y))
 
         for page in self.pages:
-            sorted(page, key=functools.cmp_to_key(cmpfunc))
+            page = sorted(page, key=functools.cmp_to_key(cmpfunc))
 
 # a single string displayed on a title page
 class TitleString:

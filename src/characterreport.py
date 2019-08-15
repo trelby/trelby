@@ -69,7 +69,7 @@ class CharacterReport:
         for v in list(chars.values()):
             self.cinfo.append(v)
 
-        sorted(self.cinfo, key=functools.cmp_to_key(cmpLines))
+        self.cinfo = sorted(self.cinfo, key=functools.cmp_to_key(cmpLines))
 
         self.totalSpeechCnt = self.sum("speechCnt")
         self.totalLineCnt = self.sum("lineCnt")
@@ -137,8 +137,7 @@ class CharInfo:
         self.pages = screenplay.PageList(sp.getPageNumbers())
 
 def cmpfunc(a, b):
-    return ((a > b) - (a < b)) or ((a > b) - (a < a))
-
+    return (a > b) - (a < b)
 
 def cmpLines(c1, c2):
     ret = cmpfunc(c2.lineCnt, c1.lineCnt)

@@ -177,7 +177,7 @@ class DialogueChart:
 
         for it in cbil:
             if it.selected:
-                sorted(self.cinfo, key=functools.cmp_to_key(it.cdata))
+                self.cinfo = sorted(self.cinfo, key=functools.cmp_to_key(it.cdata))
                 doc.add(self.generatePage(it.text, doc))
 
         return pdf.generate(doc)
@@ -363,7 +363,7 @@ class CharInfo:
         self.lineCnt += 1
 
 def cmpfunc(a, b):
-    return ((a > b) - (a < b)) or ((a > b) - (a < a))
+    return (a > b) - (a < b)
 
 def cmpCount(c1, c2):
     ret = cmpfunc(c2.lineCnt, c1.lineCnt)

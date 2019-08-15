@@ -42,7 +42,7 @@ class LocationReport:
                 tmp.append(li)
 
         def cmpfunc(a, b):
-            return ((a > b) - (a < b)) or ((a > b) - (a < a))
+            return (a > b) - (a < b)
 
         def sortFunc(o1, o2):
             ret = cmpfunc(o2.lines, o1.lines)
@@ -52,7 +52,7 @@ class LocationReport:
             else:
                 return cmpfunc(o1.scenes[0], o2.scenes[0])
 
-        sorted(tmp, key=functools.cmp_to_key(sortFunc))
+        tmp = sorted(tmp, key=functools.cmp_to_key(sortFunc))
 
         self.locations = tmp
 

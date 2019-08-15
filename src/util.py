@@ -556,7 +556,7 @@ def multiFind(s, seq):
     return False
 
 def cmpfunc(a, b):
-    return ((a > b) - (a < b)) or ((a > b) - (a < a))
+    return (a > b) - (a < b)
 
 # put everything from dictionary d into a list as (key, value) tuples,
 # then sort the list and return that. by default sorts by "desc(value)
@@ -577,7 +577,7 @@ def sortDict(d, sortFunc = None):
     for k, v in d.items():
         tmp.append((k, v))
 
-    sorted(tmp, key=functools.cmp_to_key(sortFunc))
+    tmp = sorted(tmp, key=functools.cmp_to_key(sortFunc))
 
     return tmp
 
