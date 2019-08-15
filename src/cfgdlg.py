@@ -4,6 +4,7 @@ import misc
 import screenplay
 import truetype
 import util
+import functools
 
 import os.path
 
@@ -322,7 +323,7 @@ class DisplayPanel(wx.Panel):
 
             self.fontsLb.SetString(i, "%s: %s, %d" % (names[i], s, ps))
 
-            f = wx.FontFromNativeInfo(nfi)
+            f = wx.Font(nfi)
             widths.add(util.getTextExtent(f, "iw")[0])
 
         if len(widths) > 1:
@@ -525,7 +526,7 @@ class ColorsPanel(wx.Panel):
         self.colorsLb = wx.ListBox(self, -1, size = (300, 250))
 
         tmp = list(self.cfg.cvars.color.values())
-        tmp.sort(lambda c1, c2: cmp(c1.descr, c2.descr))
+        tmp = sorted(tmp, key=functools.cmp_to_key(lambda c1, c2: cmpfunc(c1.descr, c2.descr)))
 
         for it in tmp:
             self.colorsLb.Append(it.descr, it.name)
@@ -1540,3 +1541,6 @@ class PDFFontsPanel(wx.Panel):
                           "Error", wx.OK, cfgFrame)
 
         return f.getPostscriptName()
+
+def cmpfunc(a, b):
+    return (a > b) - (a < b)
