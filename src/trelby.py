@@ -283,7 +283,7 @@ class MyCtrl(wx.Control):
 
     # save script to given filename. returns True on success.
     def saveFile(self, fileName):
-        fileName = util.ensureEndsIn(fileName, ".trelby")
+        fileName = str(util.ensureEndsIn(fileName, ".trelby")).lstrip("b'").rstrip("'")
 
         if util.writeToFile(fileName, self.sp.save(), mainFrame):
             self.setFile(fileName)

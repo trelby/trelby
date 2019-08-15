@@ -993,7 +993,7 @@ class MRUFiles:
         for i in range(self.getCount()):
             self.menu.Insert(self.menuPos + i, self.firstId + i,
                              "&%d %s" % (
-                i + 1, os.path.basename(self.get(i))))
+                i + 1, os.path.basename(str(self.get(i)).lstrip("b'").rstrip("'"))))
 
     # return number of items.
     def getCount(self):
@@ -1001,4 +1001,4 @@ class MRUFiles:
 
     # get item number 'i'.
     def get(self, i):
-        return self.items[i]
+        return str(self.items[i]).lstrip("b'").rstrip("'")
