@@ -34,7 +34,7 @@ def main():
 def getTestFuncs(filename):
     funcs = {}
 
-    f = open(filename, "r")
+    f = open(filename, "r", encoding="ISO-8859-1")
 
     for line in f:
         mo = re.match("def (test[a-zA-Z0-9_]*)\(", line)
@@ -54,7 +54,7 @@ def getTestFuncs(filename):
 # results in a dictionary which is returned. a missing '=val' part is
 # indicated by None as the key's value.
 def getFlags(filename):
-    fp = open(filename, "r")
+    fp = open(filename, "r", encoding="ISO-8859-1")
 
     ret = {}
     while 1:
