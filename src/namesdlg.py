@@ -158,8 +158,11 @@ class NamesDlg(wx.Dialog):
     def CmpFreq(self, i1, i2):
         return nameArr.typeNamesCnt[nameArr.typeNamesById[i2]] - nameArr.typeNamesCnt[nameArr.typeNamesById[i1]]
 
+    def cmpfunc(a, b):
+        return (a > b) - (a < b)
+
     def CmpType(self, i1, i2):
-        return cmp(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
+        return cmpfunc(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
 
     def OnInsertName(self, event):
         item = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL,
@@ -180,10 +183,9 @@ class NamesDlg(wx.Dialog):
 
         wx.BeginBusyCursor()
 
-        s = util.lower(misc.fromGUI(self.searchEntry.GetValue()))
+        s = str(util.lower(misc.fromGUI(self.searchEntry.GetValue()))).lstrip("b'").rstrip("'")
         sex = self.sexRb.GetSelection()
         nt = self.nameRb.GetSelection()
-
         selTypes = {}
         item = -1
 
