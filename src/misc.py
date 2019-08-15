@@ -983,7 +983,7 @@ class MRUFiles:
             pass
 
         # add item to top of list
-        self.items.insert(0, s)
+        self.items.insert(0, str(s).lstrip("b'").rstrip("'"))
 
         # prune overlong list
         if self.getCount() > self.maxCount:
