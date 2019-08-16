@@ -5,7 +5,7 @@ to inspect/modify the code.
 1. Requirements
 ===============
 
-You will need Python 2.7 and wxWidgets (2.8) and its Python bindings to
+You will need Python 3.x and wxWidgets (3.x) and its Python bindings to
 run Trelby. You also need the lxml Python library (http://lxml.de/) and
 the mock library (https://pypi.python.org/pypi/mock).
 
