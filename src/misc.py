@@ -82,7 +82,7 @@ def getPathFromRegistry():
 # convert s, which is returned from the wxWidgets GUI and is an Unicode
 # string, to a normal string.
 def fromGUI(s):
-    return s.encode("ISO-8859-1", "ignore")
+    return s
 
 # convert s, which is an Unicode string, to an object suitable for passing
 # to Python's file APIs. this is either the Unicode string itself, if the
