@@ -3,7 +3,7 @@ PREFIX = $(DESTDIR)/usr
 .PHONY : clean dist deb
 
 dist: names.txt.gz dict_en.dat.gz manual.html trelby.1.gz
-	python3 setup.py sdist
+	python3 setup.py sdist && cp trelby.1.gz doc/
 
 deb: dist
 	debuild -us -uc -b
