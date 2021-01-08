@@ -1,3 +1,9 @@
+trelby (2.4) unstable; urgency=low
+
+  * Python 3 port.
+
+ -- Gwyn Ciesla <gwync@protonmail.com>  Fri, 08 Jan 2021 15:28:00 +0000
+
 trelby (2.3-dev) unstable; urgency=low
 
   * New upstream release.
