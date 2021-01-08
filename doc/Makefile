@@ -11,7 +11,7 @@ MANPAGE_SOURCE = refentry.xml
 MANPAGE = trelby.1
 MANPAGE_GZIP_TARGET = $(MANPAGE).gz
 
-XSL_MANPAGE = /usr/share/sgml/docbook/xsl-stylesheets/xhtml/docbook.xsl
+XSL_MANPAGE = /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
 XSL_HTML = html-stylesheet.xsl
 
 # Book xsltproc options for HTML output
