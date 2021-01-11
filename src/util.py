@@ -144,7 +144,7 @@ def toLatin1(s):
 # return 's', which must be a string of ISO-8859-1 characters, converted
 # to UTF-8.
 def toUTF8(s):
-    return str(s).encode("UTF-8")
+    return s
 
 # return 's', which must be a string of UTF-8 characters, converted to
 # ISO-8859-1, with characters not representable in ISO-8859-1 discarded
@@ -163,7 +163,7 @@ def isValidInputChar(kc):
 # return s with all non-valid input characters converted to valid input
 # characters, except form feeds, which are just deleted.
 def toInputStr(s):
-    return str(s).replace("\f", "")
+    return str(s).replace("\f", "").replace("\t", "|")
 
 # replace fancy unicode characters with their ASCII/Latin1 equivalents.
 def removeFancyUnicode(s):
