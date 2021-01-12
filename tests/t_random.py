@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ut:ignore
 
 # runs random operations on a Screenplay as a way of trying to find bugs.

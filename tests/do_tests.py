@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # ut:ignore
 
 # FIXME: handle KeyboardInterrupt so testing can be aborted
