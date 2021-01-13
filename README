@@ -1,2 +1,6 @@
 Trelby is a screenplay writing program. See http://www.trelby.org/ for
 more details.
+
+This is a fork of the original codebase from https://github.com/trelby/trelby, which as of this writing appears to be dormant.
+
+The major difference of this fork is conversion to Python 3.
