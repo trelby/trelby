@@ -27,6 +27,7 @@ import titlesdlg
 import util
 import viewmode
 import watermarkdlg
+import webbrowser
 
 import copy
 import datetime
@@ -2517,7 +2518,7 @@ class MyFrame(wx.Frame):
         dlg.Show()
 
     def OnHelpManual(self, event = None):
-        wx.LaunchDefaultBrowser("file://" + misc.getFullPath("manual.html"))
+        webbrowser.open("file://" + misc.getFullPath("manual.html"))
 
     def OnAbout(self, event = None):
         win = splash.SplashWindow(self, -1)
