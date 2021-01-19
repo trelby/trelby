@@ -32,12 +32,13 @@ class build_scripts(_build_scripts):
             script = convert_path("bin/trelby")
             outfile = os.path.join(self.build_dir, os.path.basename(script))
 
-            # abuse fileinput to replace a line in bin/trelby
-            for line in fileinput.input(outfile, inplace = 1):
-                if """sys.path.insert(0, "src")""" in line:
-                    line = """sys.path.insert(0, "%s/src")""" % libDir
-
-                print(line, end=' ')
+            in_file = open(script, "rt")
+            text = in_file.read()
+            text = text.replace('src', libDir + 'src')
+            in_file.close()
+            out_file = open(outfile, "wt")
+            out_file.write(text)
+            out_file.close()
 
 class bdist_rpm(_bdist_rpm):
     """bdist_rpm command
