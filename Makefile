@@ -24,7 +24,7 @@ rpm: dist
 	python3 setup.py bdist_rpm
 
 clean:
-	rm -f bin/*.pyc src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html MANIFEST trelby.1.gz
+	rm -f bin/*.pyc src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html MANIFEST trelby.1.gz doc/trelby.1.gz
 	rm -rf build dist
 	dh_clean
 
