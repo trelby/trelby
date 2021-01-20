@@ -111,7 +111,7 @@ class MyColorSample(wx.Window):
     def __init__(self, parent, id, size):
         wx.Window.__init__(self, parent, id, size = size)
 
-        wx.EVT_PAINT(self, self.OnPaint)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
 
     def OnPaint(self, event):
         dc = wx.PaintDC(self)
@@ -588,8 +588,8 @@ class ScriptChooserDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
         okBtn.SetFocus()
 
@@ -697,15 +697,15 @@ class CheckBoxDlg(wx.Dialog):
 
             tmp = wx.Button(parent, -1, "Set")
             hsizer.Add(tmp)
-            wx.EVT_BUTTON(self, tmp.GetId(), funcs[0])
+            self.Bind(wx.EVT_BUTTON, funcs[0], id=tmp.GetId())
 
             tmp = wx.Button(parent, -1, "Clear")
             hsizer.Add(tmp, 0, wx.LEFT, 10)
-            wx.EVT_BUTTON(self, tmp.GetId(), funcs[1])
+            self.Bind(wx.EVT_BUTTON, funcs[1], id=tmp.GetId())
 
             tmp = wx.Button(parent, -1, "Toggle")
             hsizer.Add(tmp, 0, wx.LEFT, 10)
-            wx.EVT_BUTTON(self, tmp.GetId(), funcs[2])
+            self.Bind(wx.EVT_BUTTON, funcs[2], id=tmp.GetId())
 
             sizer.Add(hsizer, 0, wx.TOP | wx.BOTTOM, 5)
 
@@ -807,7 +807,7 @@ class TextDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
         okBtn.SetFocus()
 
@@ -853,14 +853,14 @@ class TextInputDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
-        wx.EVT_TEXT_ENTER(self, self.tc.GetId(), self.OnOK)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnOK, id=self.tc.GetId())
 
-        wx.EVT_CHAR(self.tc, self.OnCharEntry)
-        wx.EVT_CHAR(cancelBtn, self.OnCharButton)
-        wx.EVT_CHAR(okBtn, self.OnCharButton)
+        self.tc.Bind(wx.EVT_CHAR, self.OnCharEntry)
+        cancelBtn.Bind(wx.EVT_CHAR, self.OnCharButton)
+        okBtn.Bind(wx.EVT_CHAR, self.OnCharButton)
 
         self.tc.SetFocus()
 
@@ -922,7 +922,7 @@ class KeyDlgWidget(wx.Window):
         wx.Window.__init__(self, parent, id, size = size,
                            style = wx.WANTS_CHARS)
 
-        wx.EVT_CHAR(self, self.OnKeyChar)
+        self.Bind(wx.EVT_CHAR, self.OnKeyChar)
 
     def OnKeyChar(self, ev):
         p = self.GetParent()
