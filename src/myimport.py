@@ -943,11 +943,11 @@ class ImportDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_COMBOBOX(self, self.styleCombo.GetId(), self.OnStyleCombo)
-        wx.EVT_LISTBOX(self, self.inputLb.GetId(), self.OnInputLb)
+        self.Bind(wx.EVT_COMBOBOX, self.OnStyleCombo, id=self.styleCombo.GetId())
+        self.Bind(wx.EVT_LISTBOX, self.OnInputLb, id=self.inputLb.GetId())
 
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
         self.inputLb.SetSelection(0)
         self.OnInputLb()

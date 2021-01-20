@@ -66,7 +66,7 @@ def createStockButton(parent, label):
 # click event to the same callback function on the buggy platforms.
 def btnDblClick(btn, func):
     if misc.isUnix:
-        wx.EVT_LEFT_DCLICK(btn, func)
+        btn.Bind(wx.EVT_LEFT_DCLICK, func)
 
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF

@@ -70,11 +70,11 @@ R                      Replace
         mb.Append(menu, "&File")
         self.SetMenuBar(mb)
 
-        wx.EVT_MENU(self, id, self.OnSave)
+        self.Bind(wx.EVT_MENU, self.OnSave, id=id)
 
         self.Layout()
 
-        wx.EVT_CLOSE(self, self.OnCloseWindow)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
     def OnCloseWindow(self, event):
         self.Destroy()
