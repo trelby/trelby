@@ -24,7 +24,7 @@ class WatermarkDlg(wx.Dialog):
         hsizer.Add(self.dirEntry, 1, wx.EXPAND)
 
         btn = wx.Button(self, -1, "Browse")
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowse, id=btn.GetId())
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
@@ -61,8 +61,8 @@ class WatermarkDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_BUTTON(self, closeBtn.GetId(), self.OnClose)
-        wx.EVT_BUTTON(self, generateBtn.GetId(), self.OnGenerate)
+        self.Bind(wx.EVT_BUTTON, self.OnClose, id=closeBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnGenerate, id=generateBtn.GetId())
 
         self.dirEntry.SetFocus()
 

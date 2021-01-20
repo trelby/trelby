@@ -99,14 +99,14 @@ class NamesDlg(wx.Dialog):
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
         searchBtn = wx.Button(self, -1, "Search")
-        wx.EVT_BUTTON(self, searchBtn.GetId(), self.OnSearch)
+        self.Bind(wx.EVT_BUTTON, self.OnSearch, id=searchBtn.GetId())
         vsizer2.Add(searchBtn, 0, wx.BOTTOM | wx.TOP, 10)
 
         self.searchEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
         vsizer2.Add(self.searchEntry, 0, wx.EXPAND)
 
         tmp = wx.Button(self, -1, "Insert")
-        wx.EVT_BUTTON(self, tmp.GetId(), self.OnInsertName)
+        self.Bind(wx.EVT_BUTTON, self.OnInsertName, id=tmp.GetId())
         vsizer2.Add(tmp, 0, wx.BOTTOM | wx.TOP, 10)
 
         hsizer2.Add(vsizer2, 1, wx.RIGHT, 10)
@@ -135,9 +135,9 @@ class NamesDlg(wx.Dialog):
 
         hsizer.Add(vsizer, 20, wx.EXPAND | wx.LEFT, 10)
 
-        wx.EVT_TEXT_ENTER(self, self.searchEntry.GetId(), self.OnSearch)
-        wx.EVT_BUTTON(self, selectAllBtn.GetId(), self.selectAllTypes)
-        wx.EVT_LIST_COL_CLICK(self, self.typeList.GetId(), self.OnHeaderClick)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnSearch, id=self.searchEntry.GetId())
+        self.Bind(wx.EVT_BUTTON, self.selectAllTypes, id=selectAllBtn.GetId())
+        self.Bind(wx.EVT_LIST_COL_CLICK, self.OnHeaderClick, id=self.typeList.GetId())
 
         util.finishWindow(self, hsizer)
 
