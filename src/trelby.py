@@ -1840,7 +1840,7 @@ class MyFrame(wx.Frame):
         self.noFSBtn.Show(False)
         hsizer.Add(self.noFSBtn)
 
-        wx.EVT_BUTTON(self, self.noFSBtn.GetId(), self.ToggleFullscreen)
+        self.Bind(wx.EVT_BUTTON, self.ToggleFullscreen, id=self.noFSBtn.GetId())
 
         self.tabCtrl = misc.MyTabCtrl(self, -1, getCfgGui)
         hsizer.Add(self.tabCtrl, 1, wx.EXPAND)
@@ -1947,14 +1947,12 @@ class MyFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnAbout, id=ID_HELP_ABOUT)
 
 
-        wx.EVT_MENU_RANGE(self, gd.mru.getIds()[0], gd.mru.getIds()[1],
-                          self.OnMRUFile)
+        self.Bind(wx.EVT_MENU_RANGE, self.OnMRUFile, id=gd.mru.getIds()[0], id2=gd.mru.getIds()[1])
 
-        wx.EVT_MENU_RANGE(self, ID_ELEM_TO_ACTION, ID_ELEM_TO_TRANSITION,
-                          self.OnChangeType)
+        self.Bind(wx.EVT_MENU_RANGE, self.OnChangeType, id=ID_ELEM_TO_ACTION, id2=ID_ELEM_TO_TRANSITION)
 
         def addTBMenu(id, menu):
-            wx.EVT_MENU(self, id, partial(self.OnToolBarMenu, menu=menu))
+            self.Bind(wx.EVT_MENU, partial(self.OnToolBarMenu, menu=menu), id=id)
 
         addTBMenu(ID_TOOLBAR_SETTINGS, settingsMenu)
         addTBMenu(ID_TOOLBAR_SCRIPTSETTINGS, scriptSettingsMenu)
