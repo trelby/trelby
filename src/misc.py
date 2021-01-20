@@ -130,8 +130,8 @@ class MyFSButton(wx.Window):
         self.getCfgGui = getCfgGui
         self.fsImage = getBitmap("resources/fullscreen.png")
 
-        wx.EVT_PAINT(self, self.OnPaint)
-        wx.EVT_LEFT_DOWN(self, self.OnMouseDown)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnMouseDown)
 
     def OnPaint(self, event):
         cfgGui = self.getCfgGui()
@@ -174,7 +174,7 @@ class MyStatus(wx.Window):
         self.font = util.createPixelFont(
             TAB_BAR_HEIGHT // 2 + 2, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL)
 
-        wx.EVT_PAINT(self, self.OnPaint)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
 
     def OnPaint(self, event):
         cfgGui = self.getCfgGui()
@@ -273,11 +273,11 @@ class MyTabCtrl(wx.Window):
                     self.tabWidth + 5,
                 TAB_BAR_HEIGHT))
 
-        wx.EVT_LEFT_DOWN(self, self.OnLeftDown)
-        wx.EVT_LEFT_DCLICK(self, self.OnLeftDown)
-        wx.EVT_SIZE(self, self.OnSize)
-        wx.EVT_PAINT(self, self.OnPaint)
-        wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
+        self.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDown)
+        self.Bind(wx.EVT_SIZE, self.OnSize)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
 
     # get the ctrl that the tabbed windows should use as a parent
     def getTabParent(self):
@@ -537,9 +537,9 @@ class MyTabCtrl2(wx.Window):
 
         self.tabCtrl.add2(self)
 
-        wx.EVT_PAINT(self, self.OnPaint)
-        wx.EVT_SIZE(self, self.OnSize)
-        wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_SIZE, self.OnSize)
+        self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
 
     def OnEraseBackground(self, event):
         pass

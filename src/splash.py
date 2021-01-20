@@ -61,10 +61,10 @@ class SplashWindow(wx.Frame):
             wx.Timer()
             self.timer.Start(delay, True)
 
-        wx.EVT_LEFT_DOWN(self, self.OnClick)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnClick)
 
-        wx.EVT_PAINT(self, self.OnPaint)
-        wx.EVT_CLOSE(self, self.OnCloseWindow)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
     def OnClick(self, event):
         self.Close()
