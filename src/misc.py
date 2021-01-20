@@ -679,8 +679,8 @@ class CheckBoxDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
         okBtn.SetFocus()
 
