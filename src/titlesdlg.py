@@ -129,7 +129,7 @@ class TitlesDlg(wx.Dialog):
         self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.xEntry.GetId())
         self.yEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.yEntry, 0, wx.LEFT, 10)
-        self.Bind(wx.EVT_TEXT, self.OnMIsc, id=self.yEntry.GetId())
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.yEntry.GetId())
 
         vsizer2.Add(hsizer, 0, wx.TOP, 5)
 
@@ -148,7 +148,7 @@ class TitlesDlg(wx.Dialog):
 
         self.sizeEntry = wx.SpinCtrl(self, -1, size = (50, -1))
         self.sizeEntry.SetRange(4, 288)
-        self.Bind(wx.EVT_SPINCTRL, self.OnMIsc, id=self.sizeEntry.GetId())
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.sizeEntry.GetId())
         self.sizeEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         hsizer.Add(self.sizeEntry, 0, wx.LEFT, 10)
 

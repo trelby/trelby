@@ -19,7 +19,7 @@ class MyListBook(wx.ListBox):
     def __init__(self, parent):
         wx.ListBox.__init__(self, parent, -1)
 
-        wx.EVT_LISTBOX(self, self.GetId(), self.OnPageChange)
+        self.Bind(wx.EVT_LISTBOX, self.OnPageChange, id=self.GetId())
 
     # get a list of all the pages
     def GetPages(self):
@@ -143,9 +143,9 @@ class CfgDlg(wx.Dialog):
         self.Layout()
         self.Center()
 
-        wx.EVT_BUTTON(self, applyBtn.GetId(), self.OnApply)
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnApply, id=applyBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
     def AddPage(self, classObj, name):
         p = classObj(self.panel, -1, self.cfg)
@@ -226,9 +226,8 @@ class DisplayPanel(wx.Panel):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
         btn = wx.Button(self, -1, "Change")
-        wx.EVT_LISTBOX_DCLICK(self, self.fontsLb.GetId(),
-            self.OnChangeFont)
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnChangeFont)
+        self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnChangeFont, id=self.fontsLb.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnChangeFont, id=btn.GetId())
 
         self.errText = wx.StaticText(self, -1, "")
         self.origColor = self.errText.GetForegroundColour()
@@ -248,8 +247,8 @@ class DisplayPanel(wx.Panel):
 
         self.spacingEntry = wx.SpinCtrl(self, -1)
         self.spacingEntry.SetRange(*self.cfg.cvars.getMinMax("fontYdelta"))
-        wx.EVT_SPINCTRL(self, self.spacingEntry.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(self.spacingEntry, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.spacingEntry.GetId())
+        self.spacingEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         hsizer.Add(self.spacingEntry, 0)
 
         hsizer.Add(wx.StaticText(self, -1, "pixels"), 0,
@@ -269,7 +268,7 @@ class DisplayPanel(wx.Panel):
 
         util.finishWindow(self, vsizer, center = False)
 
-        wx.EVT_RADIOBOX(self, self.pbRb.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_RADIOBOX, self.OnMisc, id=self.pbRb.GetId())
 
     def OnKillFocus(self, event):
         self.OnMisc()
@@ -375,8 +374,8 @@ class ElementsPanel(wx.Panel):
         tmp = wx.SpinCtrl(self, -1)
         tmp.SetRange(*self.cfg.getType(screenplay.ACTION).cvars.getMinMax(
             "beforeSpacing"))
-        wx.EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(tmp, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=tmp.GetId())
+        tmp.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(tmp)
         self.beforeSpacingEntry = tmp
 
@@ -386,8 +385,8 @@ class ElementsPanel(wx.Panel):
         tmp = wx.SpinCtrl(self, -1)
         tmp.SetRange(*self.cfg.getType(screenplay.ACTION).cvars.getMinMax(
             "intraSpacing"))
-        wx.EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(tmp, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=tmp.GetId())
+        tmp.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(tmp)
         self.intraSpacingEntry = tmp
 
@@ -401,8 +400,8 @@ class ElementsPanel(wx.Panel):
         self.indentEntry = wx.SpinCtrl(self, -1)
         self.indentEntry.SetRange(
             *self.cfg.getType(screenplay.ACTION).cvars.getMinMax("indent"))
-        wx.EVT_SPINCTRL(self, self.indentEntry.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(self.indentEntry, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.indentEntry.GetId())
+        self.indentEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(self.indentEntry, 0)
 
         gsizer.Add(wx.StaticText(self, -1, "characters (10 characters"
@@ -414,8 +413,8 @@ class ElementsPanel(wx.Panel):
         self.widthEntry = wx.SpinCtrl(self, -1)
         self.widthEntry.SetRange(
             *self.cfg.getType(screenplay.ACTION).cvars.getMinMax("width"))
-        wx.EVT_SPINCTRL(self, self.widthEntry.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(self.widthEntry, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.widthEntry.GetId())
+        self.widthEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(self.widthEntry, 0)
 
         gsizer.Add(wx.StaticText(self, -1, "characters (10 characters"
@@ -425,7 +424,7 @@ class ElementsPanel(wx.Panel):
 
         util.finishWindow(self, vsizer, center = False)
 
-        wx.EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
+        self.Bind(wx.EVT_COMBOBOX, self.OnElementCombo, id=self.elementsCombo.GetId())
 
         self.elementsCombo.SetSelection(0)
         self.OnElementCombo()
@@ -453,7 +452,7 @@ class ElementsPanel(wx.Panel):
 
     def addCheckBox(self, name, prefix, parent, sizer, pad):
         cb = wx.CheckBox(parent, -1, name)
-        wx.EVT_CHECKBOX(self, cb.GetId(), self.OnStyleCb)
+        self.Bind(wx.EVT_CHECKBOX, self.OnStyleCb, id=cb.GetId())
         sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, prefix + name + "Cb", cb)
 
@@ -540,11 +539,11 @@ class ColorsPanel(wx.Panel):
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
         btn = wx.Button(self, -1, "Change")
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnChangeColor)
+        self.Bind(wx.EVT_BUTTON, self.OnChangeColor, id=btn.GetId())
         vsizer2.Add(btn, 0, wx.BOTTOM, 10)
 
         btn = wx.Button(self, -1, "Restore default")
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnDefaultColor)
+        self.Bind(wx.EVT_BUTTON, self.OnDefaultColor, id=btn.GetId())
         vsizer2.Add(btn)
 
         hsizer.Add(vsizer2, 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
@@ -557,12 +556,12 @@ class ColorsPanel(wx.Panel):
 
         self.useCustomElemColors = wx.CheckBox(
             self, -1, "Use per-element-type colors")
-        wx.EVT_CHECKBOX(self, self.useCustomElemColors.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.useCustomElemColors.GetId())
         vsizer.Add(self.useCustomElemColors)
 
         util.finishWindow(self, vsizer, center = False)
 
-        wx.EVT_LISTBOX(self, self.colorsLb.GetId(), self.OnColorLb)
+        self.Bind(wx.EVT_LISTBOX, self.OnColorLb, id=self.colorsLb.GetId())
         self.colorsLb.SetSelection(0)
         self.OnColorLb()
 
@@ -681,11 +680,11 @@ class PaperPanel(wx.Panel):
         if idx != -1:
             self.paperCombo.SetSelection(idx)
 
-        wx.EVT_COMBOBOX(self, self.paperCombo.GetId(), self.OnPaperCombo)
+        self.Bind(wx.EVT_COMBOBOX, self.OnPaperCombo, id=self.paperCombo.GetId())
         self.OnPaperCombo(None)
 
-        wx.EVT_TEXT(self, self.widthEntry.GetId(), self.OnMisc)
-        wx.EVT_TEXT(self, self.heightEntry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.widthEntry.GetId())
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.heightEntry.GetId())
 
         self.cfg2mm()
         self.cfg2inch()
@@ -712,8 +711,8 @@ class PaperPanel(wx.Panel):
         setattr(self, name.lower() + "EntryMm", entry)
         setattr(self, name.lower() + "EntryInch", entry2)
 
-        wx.EVT_TEXT(self, entry.GetId(), self.OnMarginMm)
-        wx.EVT_TEXT(self, entry2.GetId(), self.OnMarginInch)
+        self.Bind(wx.EVT_TEXT, self.OnMarginMm, id=entry.GetId())
+        self.Bind(wx.EVT_TEXT, self.OnMarginInch, id=entry2.GetId())
 
     def doForcedUpdate(self):
         self.setLines()
@@ -827,7 +826,7 @@ class FormattingPanel(wx.Panel):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
         self.sceneContinuedsCb = wx.CheckBox(self, -1, "Include,")
-        wx.EVT_CHECKBOX(self, self.sceneContinuedsCb.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.sceneContinuedsCb.GetId())
         hsizer.Add(self.sceneContinuedsCb, 0,
                    wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
@@ -838,7 +837,7 @@ class FormattingPanel(wx.Panel):
         vsizer.Add(hsizer, 0, wx.LEFT, 5)
 
         self.scenesCb = wx.CheckBox(self, -1, "Include scene numbers")
-        wx.EVT_CHECKBOX(self, self.scenesCb.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.scenesCb.GetId())
         vsizer.Add(self.scenesCb, 0, wx.TOP, 10)
 
         # wxGTK adds way more space by default than wxMSW between the
@@ -848,7 +847,7 @@ class FormattingPanel(wx.Panel):
             pad = 10
 
         self.lineNumbersCb = wx.CheckBox(self, -1, "Show line numbers (debug)")
-        wx.EVT_CHECKBOX(self, self.lineNumbersCb.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.lineNumbersCb.GetId())
         vsizer.Add(self.lineNumbersCb, 0, wx.TOP, pad)
 
         self.cfg2gui()
@@ -861,8 +860,8 @@ class FormattingPanel(wx.Panel):
 
         entry = wx.SpinCtrl(parent, -1)
         entry.SetRange(*self.cfg.cvars.getMinMax(cfgName))
-        wx.EVT_SPINCTRL(self, entry.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(entry, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=entry.GetId())
+        entry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         sizer.Add(entry, 0)
 
         setattr(self, name + "Entry", entry)
@@ -929,12 +928,12 @@ class KeyboardPanel(wx.Panel):
         vsizer2.Add(self.keysLb, 1, wx.BOTTOM, 10)
 
         btn = wx.Button(self, -1, "Add")
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnAdd)
+        self.Bind(wx.EVT_BUTTON, self.OnAdd, id=btn.GetId())
         vsizer2.Add(btn, 0, wx.ALIGN_CENTER | wx.BOTTOM, 10)
         self.addBtn = btn
 
         btn = wx.Button(self, -1, "Delete")
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnDelete)
+        self.Bind(wx.EVT_BUTTON, self.OnDelete, id=btn.GetId())
         vsizer2.Add(btn, 0, wx.ALIGN_CENTER | wx.BOTTOM, 10)
         self.deleteBtn = btn
 
@@ -956,7 +955,7 @@ class KeyboardPanel(wx.Panel):
 
         util.finishWindow(self, vsizer, center = False)
 
-        wx.EVT_LISTBOX(self, self.commandsLb.GetId(), self.OnCommandLb)
+        self.Bind(wx.EVT_LISTBOX, self.OnCommandLb, id=self.commandsLb.GetId())
         self.commandsLb.SetSelection(0)
         self.OnCommandLb()
 
@@ -1036,7 +1035,7 @@ class MiscPanel(wx.Panel):
                    wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
         btn = wx.Button(self, -1, "Browse")
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowse, id=btn.GetId())
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
         bsizer.Add(hsizer, 1, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
@@ -1055,11 +1054,11 @@ class MiscPanel(wx.Panel):
         hsizer.Add(self.progEntry, 1, wx.ALIGN_CENTER_VERTICAL)
 
         btn = wx.Button(self, -1, "Browse")
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnBrowsePDF)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowsePDF, id=btn.GetId())
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
         btn = wx.Button(self, -1, "Guess")
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnGuessPDF)
+        self.Bind(wx.EVT_BUTTON, self.OnGuessPDF, id=btn.GetId())
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
         bsizer.Add(hsizer, 1, wx.EXPAND)
@@ -1098,8 +1097,8 @@ class MiscPanel(wx.Panel):
 
         vsizer.Add(self.checkList, 0, wx.TOP | wx.BOTTOM, pad)
 
-        wx.EVT_LISTBOX(self, self.checkList.GetId(), self.OnMisc)
-        wx.EVT_CHECKLISTBOX(self, self.checkList.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_LISTBOX, self.OnMisc, id=self.checkList.GetId())
+        self.Bind(wx.EVT_CHECKLISTBOX, self.OnMisc, id=self.checkList.GetId())
 
         self.addSpin("splashTime", "Show splash screen for X seconds:\n"
                      " (0 = disable)", self, vsizer, "splashTime")
@@ -1114,9 +1113,9 @@ class MiscPanel(wx.Panel):
 
         util.finishWindow(self, vsizer, center = False)
 
-        wx.EVT_TEXT(self, self.scriptDirEntry.GetId(), self.OnMisc)
-        wx.EVT_TEXT(self, self.progEntry.GetId(), self.OnMisc)
-        wx.EVT_TEXT(self, self.argsEntry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.scriptDirEntry.GetId())
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.progEntry.GetId())
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.argsEntry.GetId())
 
     def addSpin(self, name, descr, parent, sizer, cfgName):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -1126,8 +1125,8 @@ class MiscPanel(wx.Panel):
 
         tmp = wx.SpinCtrl(parent, -1)
         tmp.SetRange(*self.cfg.cvars.getMinMax(cfgName))
-        wx.EVT_SPINCTRL(self, tmp.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(tmp, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=tmp.GetId())
+        tmp.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         hsizer.Add(tmp)
 
         sizer.Add(hsizer, 0, wx.BOTTOM, 10)
@@ -1236,7 +1235,7 @@ class ElementsGlobalPanel(wx.Panel):
 
         util.finishWindow(self, vsizer, center = False)
 
-        wx.EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
+        self.Bind(wx.EVT_COMBOBOX, self.OnElementCombo, id=self.elementsCombo.GetId())
 
         self.elementsCombo.SetSelection(0)
         self.OnElementCombo()
@@ -1252,7 +1251,7 @@ class ElementsGlobalPanel(wx.Panel):
 
         sizer.Add(combo)
 
-        wx.EVT_COMBOBOX(self, combo.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_COMBOBOX, self.OnMisc, id=combo.GetId())
 
         setattr(self, name + "Combo", combo)
 
@@ -1308,7 +1307,7 @@ class StringsPanel(wx.Panel):
         util.finishWindow(self, vsizer, center = False)
 
         for it in self.items:
-            wx.EVT_TEXT(self, getattr(self, it).GetId(), self.OnMisc)
+            self.Bind(wx.EVT_TEXT, self.OnMisc, id=getattr(self, it).GetId())
 
     def addEntry(self, name, descr, parent, sizer):
         sizer.Add(wx.StaticText(parent, -1, descr), 0,
@@ -1363,7 +1362,7 @@ class PDFPanel(wx.Panel):
 
     def addCb(self, descr, sizer, pad):
         ctrl = wx.CheckBox(self, -1, descr)
-        wx.EVT_CHECKBOX(self, ctrl.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=ctrl.GetId())
         sizer.Add(ctrl, 0, wx.TOP, pad)
 
         return ctrl
@@ -1435,13 +1434,13 @@ class PDFFontsPanel(wx.Panel):
         btn = wx.Button(self, -1, "Browse")
         gsizer.Add(btn)
 
-        wx.EVT_BUTTON(self, btn.GetId(), self.OnBrowse)
+        self.Bind(wx.EVT_BUTTON, self.OnBrowse, id=btn.GetId())
 
         vsizer.Add(gsizer, 0, wx.EXPAND)
 
         util.finishWindow(self, vsizer, center = False)
 
-        wx.EVT_COMBOBOX(self, self.typeCombo.GetId(), self.OnTypeCombo)
+        self.Bind(wx.EVT_COMBOBOX, self.OnTypeCombo, id=self.typeCombo.GetId())
 
         self.typeCombo.SetSelection(0)
         self.OnTypeCombo()
@@ -1465,7 +1464,7 @@ class PDFFontsPanel(wx.Panel):
 
         setattr(self, name, entry)
 
-        wx.EVT_TEXT(self, entry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=entry.GetId())
 
     def OnMisc(self, event):
         if self.blockEvents:

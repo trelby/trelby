@@ -97,7 +97,7 @@ class FindDlg(wx.Dialog):
 
         self.Bind(wx.EVT_BUTTON, self.OnFind, id=find.GetId())
         self.Bind(wx.EVT_BUTTON, self.OnReplace, id=replace.GetId())
-        self.Bind(wx.EVT_BUTTON, self.OnReplaceAll, id=self.replaceAll.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnReplaceAll, id=replaceAll.GetId())
         self.Bind(wx.EVT_BUTTON, self.OnMore, id=self.moreButton.GetId())
 
         gutil.btnDblClick(find, self.OnFind)
@@ -108,12 +108,12 @@ class FindDlg(wx.Dialog):
         self.Bind(wx.EVT_TEXT_ENTER, self.OnFind, id=self.findEntry.GetId())
         self.Bind(wx.EVT_TEXT_ENTER, self.OnFind, id=self.replaceEntry.GetId())
 
-        self.Bind(wx.EVT_CHAR(self, self.OnCharMisc)
+        self.Bind(wx.EVT_CHAR, self.OnCharMisc)
         self.findEntry.Bind(wx.EVT_CHAR, self.OnCharEntry)
         self.replaceEntry.Bind(wx.EVT_CHAR, self.OnCharEntry)
-        self.find.Bind(wx.EVT_CHAR, self.OnCharButton)
-        self.replace.Bind(wx.EVT_CHAR, self.OnCharButton)
-        self.replaceAll.Bind(wx.EVT_CHAR, self.OnCharButton)
+        find.Bind(wx.EVT_CHAR, self.OnCharButton)
+        replace.Bind(wx.EVT_CHAR, self.OnCharButton)
+        replaceAll.Bind(wx.EVT_CHAR, self.OnCharButton)
         self.moreButton.Bind(wx.EVT_CHAR, self.OnCharButton)
         self.matchWholeCb.Bind(wx.EVT_CHAR, self.OnCharMisc)
         self.matchCaseCb.Bind(wx.EVT_CHAR, self.OnCharMisc)
