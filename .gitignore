@@ -3,3 +3,4 @@
 *.pyo
 .trelby/
 *.trelby
+.tox/

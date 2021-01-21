@@ -1,3 +1,4 @@
 setuptools
 wxPython
 lxml
+mock
