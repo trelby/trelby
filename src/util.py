@@ -878,7 +878,7 @@ def loadFile(filename, frame, maxSize = -1):
     ret = None
 
     try:
-        f = open(misc.toPath(filename), "r")
+        f = open(misc.toPath(filename), "r", encoding='UTF-8')
 
         try:
             ret = f.read(maxSize)
@@ -902,25 +902,16 @@ def loadMaybeCompressedFile(filename, frame):
         filename += ".gz"
         doGz = True
 
-    s = loadFile(filename, frame)
-    if s is None:
-        return None
-
     if not doGz:
+        s = loadFile(filename, frame)
         return s
 
-    buf = io.StringIO(s)
-
-    # python's gzip module throws almost arbitrary exceptions in various
-    # error conditions, so the only safe thing to do is to catch
-    # everything.
     try:
-        f = gzip.GzipFile(mode = "r", fileobj = buf)
-        return f.read()
+        f = gzip.open(filename, 'r')
+        return f.read().decode('utf-8')
     except:
         wx.MessageBox("Error loading file '%s': Decompression failed" % \
                           filename, "Error", wx.OK, frame)
-
         return None
 
 # write 'data' to 'filename', popping up a messagebox using 'frame' as
