@@ -148,7 +148,7 @@ class TitlesDlg(wx.Dialog):
 
         self.sizeEntry = wx.SpinCtrl(self, -1, size = (50, -1))
         self.sizeEntry.SetRange(4, 288)
-        self.Bind(wx.EVT_SPINCTRL, self.OnMIsc, id=self.sizeEntry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMIsc, id=self.sizeEntry.GetId())
         self.sizeEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         hsizer.Add(self.sizeEntry, 0, wx.LEFT, 10)
 
