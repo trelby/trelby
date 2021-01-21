@@ -63,11 +63,11 @@ class SpellCheckDlg(wx.Dialog):
 
         self.Bind(wx.EVT_CHAR, self.OnChar)
         self.replaceEntry.Bind(wx.EVT_CHAR, self.OnChar)
-        self.replaceBtn.Bind(wx.EVT_CHAR, self.OnChar)
-        self.addScriptBtn.Bind(wx.EVT_CHAR, self.OnChar)
-        self.skipBtn.Bind(wx.EVT_CHAR, self.OnChar)
-        self.addGlobalBtn.Bind(wx.EVT_CHAR, self.OnChar)
-        self.suggestBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        replaceBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        addScriptBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        skipBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        addGlobalBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        suggestBtn.Bind(wx.EVT_CHAR, self.OnChar)
 
         util.finishWindow(self, vsizer)
 
