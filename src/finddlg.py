@@ -95,30 +95,30 @@ class FindDlg(wx.Dialog):
 
         hsizer.Add(vsizer, 0, wx.EXPAND | wx.LEFT, 30)
 
-        wx.EVT_BUTTON(self, find.GetId(), self.OnFind)
-        wx.EVT_BUTTON(self, replace.GetId(), self.OnReplace)
-        wx.EVT_BUTTON(self, replaceAll.GetId(), self.OnReplaceAll)
-        wx.EVT_BUTTON(self, self.moreButton.GetId(), self.OnMore)
+        self.Bind(wx.EVT_BUTTON, self.OnFind, id=find.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnReplace, id=replace.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnReplaceAll, id=self.replaceAll.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnMore, id=self.moreButton.GetId())
 
         gutil.btnDblClick(find, self.OnFind)
         gutil.btnDblClick(replace, self.OnReplace)
 
-        wx.EVT_TEXT(self, self.findEntry.GetId(), self.OnText)
+        self.Bind(wx.EVT_TEXT, self.OnText, id=self.findEntry.GetId())
 
-        wx.EVT_TEXT_ENTER(self, self.findEntry.GetId(), self.OnFind)
-        wx.EVT_TEXT_ENTER(self, self.replaceEntry.GetId(), self.OnFind)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnFind, id=self.findEntry.GetId())
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnFind, id=self.replaceEntry.GetId())
 
-        wx.EVT_CHAR(self, self.OnCharMisc)
-        wx.EVT_CHAR(self.findEntry, self.OnCharEntry)
-        wx.EVT_CHAR(self.replaceEntry, self.OnCharEntry)
-        wx.EVT_CHAR(find, self.OnCharButton)
-        wx.EVT_CHAR(replace, self.OnCharButton)
-        wx.EVT_CHAR(replaceAll, self.OnCharButton)
-        wx.EVT_CHAR(self.moreButton, self.OnCharButton)
-        wx.EVT_CHAR(self.matchWholeCb, self.OnCharMisc)
-        wx.EVT_CHAR(self.matchCaseCb, self.OnCharMisc)
-        wx.EVT_CHAR(self.direction, self.OnCharMisc)
-        wx.EVT_CHAR(self.elements, self.OnCharMisc)
+        self.Bind(wx.EVT_CHAR(self, self.OnCharMisc)
+        self.findEntry.Bind(wx.EVT_CHAR, self.OnCharEntry)
+        self.replaceEntry.Bind(wx.EVT_CHAR, self.OnCharEntry)
+        self.find.Bind(wx.EVT_CHAR, self.OnCharButton)
+        self.replace.Bind(wx.EVT_CHAR, self.OnCharButton)
+        self.replaceAll.Bind(wx.EVT_CHAR, self.OnCharButton)
+        self.moreButton.Bind(wx.EVT_CHAR, self.OnCharButton)
+        self.matchWholeCb.Bind(wx.EVT_CHAR, self.OnCharMisc)
+        self.matchCaseCb.Bind(wx.EVT_CHAR, self.OnCharMisc)
+        self.direction.Bind(wx.EVT_CHAR, self.OnCharMisc)
+        self.elements.Bind(wx.EVT_CHAR, self.OnCharMisc)
 
         util.finishWindow(self, hsizer, center = False)
 
