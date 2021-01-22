@@ -551,7 +551,7 @@ class MyTabCtrl2(wx.Window):
     # trying to make sure that in the cases when this does get called, as
     # little (useless) work as possible is done.
     def OnPaint(self, event):
-        dc = wx.PaintDC(self)
+        wx.PaintDC(self)
 
 # dialog that shows two lists of script names, allowing user to choose one
 # from both. stores indexes of selections in members named 'sel1' and

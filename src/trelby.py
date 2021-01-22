@@ -1,6 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
-from error import *
+from error import TrelbyError
 import autocompletiondlg
 import cfgdlg
 import charmapdlg
@@ -32,6 +32,7 @@ import webbrowser
 import copy
 import os
 import os.path
+import os
 import signal
 import sys
 import time
@@ -121,9 +122,9 @@ class GlobalData:
         if makeDir:
             try:
                 os.mkdir(misc.toPath(misc.confPath), mode=0o755)
-            except OSError(errno, strerror):
+            except OSError(os.errno, os.strerror):
                 wx.MessageBox("Error creating configuration directory\n"
-                              "'%s': %s" % (misc.confPath, strerror),
+                              "'%s': %s" % (misc.confPath, os.strerror),
                               "Error", wx.OK, None)
 
     # set viewmode, the parameter is one of the VIEWMODE_ defines.

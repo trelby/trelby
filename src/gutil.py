@@ -1,4 +1,4 @@
-from error import *
+from error import MiscError,TrelbyError
 import misc
 import util
 
@@ -31,7 +31,7 @@ def listBoxSelect(lb, index):
 # cmp(cdata1, cdata2).
 def listBoxAdd(lb, name, cdata):
     for i in range(lb.GetCount()):
-        if cmp(cdata, lb.GetClientData(i)) < 0:
+        if util.cmpfunc(cdata, lb.GetClientData(i)) < 0:
             lb.InsertItems([name], i)
             lb.SetClientData(i, cdata)
 

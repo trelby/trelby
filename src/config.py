@@ -1,7 +1,7 @@
 # see fileformat.txt for more detailed information about the various
 # defines found here.
 
-from error import *
+from error import ConfigError
 import misc
 import mypickle
 import pml

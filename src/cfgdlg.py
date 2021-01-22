@@ -284,7 +284,7 @@ class DisplayPanel(wx.Panel):
         fd = wx.FontData()
         nfi = wx.NativeFontInfo()
         nfi.FromString(nfont)
-        font = wx.FontFromNativeInfo(nfi)
+        font = wx.Font(nfi)
         fd.SetInitialFont(font)
 
         dlg = wx.FontDialog(self, fd)

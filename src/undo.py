@@ -290,13 +290,12 @@ def mySequenceMatcher(l1, l2):
     i = 0
     a = b = 0
 
-    m1found = m2found = False
+    m1found = False
 
     while a < smallLen:
         if not m1found and (bigger[a] != smaller[a]):
             b = a
             m1found = True
-
             break
 
         a += 1
@@ -314,8 +313,6 @@ def mySequenceMatcher(l1, l2):
         d = smallLen - i + 1
 
         if bigger[-i] != smaller[-i]:
-            m2found = True
-
             break
 
         i += 1
