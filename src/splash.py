@@ -4,7 +4,6 @@ import misc
 import util
 
 import random
-import sys
 
 import wx
 

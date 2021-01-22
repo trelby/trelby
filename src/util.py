@@ -1,8 +1,5 @@
 # -*- coding: utf-8 -*-
 
-from error import *
-
-import datetime
 import glob
 import gzip
 import misc
@@ -11,8 +8,6 @@ import re
 import tempfile
 import time
 import functools
-
-import io
 
 if "TRELBY_TESTING" in os.environ:
     import mock

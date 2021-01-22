@@ -326,10 +326,6 @@ class PageInfo:
     def addLine(self, lt):
         self.lineCounts[lt] = self.getLineCount(lt) + 1
 
-    # get number of lines of given type.
-    def getLineCount(self, lt):
-        return self.lineCounts.get(lt, 0)
-
     # get total number of lines.
     def getTotalLineCount(self):
         if self.totalLineCount == -1:

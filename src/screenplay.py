@@ -36,7 +36,6 @@ import titles
 import undo
 import util
 
-import codecs
 import copy
 import difflib
 import re
@@ -146,7 +145,7 @@ class Screenplay:
     # │ Intel Core Duo T2050 1.6GHz │  0.173s │ 0.020s │
     # │ Intel i5-2400 3.1GHz        │  0.076s │ 0.007s │
     # ╰─────────────────────────────┴─────────┴────────╯
-    def __deepcopy__(self, memo):
+    def __deepcopy__(self):
         sp = Screenplay(self.cfgGl)
         sp.cfg = copy.deepcopy(self.cfg)
 

@@ -1,7 +1,6 @@
 import fontinfo
 import pml
 import util
-import zlib
 
 # PDF transform matrixes where key is the angle from x-axis
 # in counter-clockwise direction.

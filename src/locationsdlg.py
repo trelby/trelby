@@ -1,5 +1,4 @@
 import gutil
-import locations
 import util
 
 import wx

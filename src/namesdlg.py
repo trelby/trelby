@@ -70,8 +70,8 @@ class NamesDlg(wx.Dialog):
         for i in range(len(nameArr.typeNamesById)):
             typeName = nameArr.typeNamesById[i]
 
-            self.typeList.InsertStringItem(i, str(nameArr.typeNamesCnt[typeName]))
-            self.typeList.SetStringItem(i, 1, typeName)
+            self.typeList.InsertItem(i, str(nameArr.typeNamesCnt[typeName]))
+            self.typeList.SetItem(i, 1, typeName)
             self.typeList.SetItemData(i, i)
 
         self.typeList.SetColumnWidth(0, wx.LIST_AUTOSIZE)
@@ -162,7 +162,7 @@ class NamesDlg(wx.Dialog):
         return (a > b) - (a < b)
 
     def CmpType(self, i1, i2):
-        return cmpfunc(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
+        return util.cmpfunc(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
 
     def OnInsertName(self, event):
         item = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL,
@@ -227,7 +227,8 @@ class NamesDlg(wx.Dialog):
 
         self.list.items = l
         self.list.SetItemCount(len(l))
-        self.list.EnsureVisible(0)
+        if self.list.GetItemCount() > 0:
+            self.list.EnsureVisible(0)
 
         wx.EndBusyCursor()
 

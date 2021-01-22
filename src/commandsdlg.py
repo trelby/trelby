@@ -1,4 +1,3 @@
-import misc
 import util
 
 import xml.sax.saxutils as xss

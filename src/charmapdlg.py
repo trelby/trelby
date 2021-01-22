@@ -1,5 +1,4 @@
 import gutil
-import misc
 import util
 
 import wx

@@ -30,7 +30,6 @@ import watermarkdlg
 import webbrowser
 
 import copy
-import datetime
 import os
 import os.path
 import signal

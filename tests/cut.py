@@ -1,5 +1,4 @@
 import screenplay as scr
-import config
 import u
 
 # tests deleting selected areas of text

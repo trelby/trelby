@@ -1,4 +1,3 @@
-import config
 import misc
 import spellcheck
 import undo
