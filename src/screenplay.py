@@ -3117,7 +3117,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             while tmp:
                 self.undoMemoryUsed += tmp.memoryUsed()
-                tmp = tmp.__next__
+                tmp = tmp.next
 
         if not self.lastUndo:
             # no undo history at all yet
@@ -3137,7 +3137,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             tmp = self.firstUndo
             tmp.next.prev = None
-            self.firstUndo = tmp.__next__
+            self.firstUndo = tmp.next
 
             # it shouldn't be technically necessary to reset this, but it
             # might make the GC's job easier, and helps detecting bugs if
@@ -3179,7 +3179,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             return
 
         self.currentUndo.redo(self)
-        self.currentUndo = self.currentUndo.__next__
+        self.currentUndo = self.currentUndo.next
 
         self.clearMark()
         self.markChanged()
