@@ -1,6 +1,5 @@
-#!/usr/bin/make -f
-# -*- makefile -*-
-
+export PYBUILD_NAME=trelby
+export PYBUILD_INSTALL_ARGS="--install-lib=/usr/share/trelby/ --install-scripts=/usr/bin"
 %:
 	dh $@ --with python3 --buildsystem=pybuild
 

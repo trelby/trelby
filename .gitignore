@@ -5,3 +5,4 @@
 *.trelby
 .tox/
 MANIFEST
+.pybuild/
