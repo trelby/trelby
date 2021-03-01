@@ -167,7 +167,7 @@ def removeFancyUnicode(s):
 # transform external input (unicode) into a form suitable for having in a
 # script
 def cleanInput(s):
-    return toInputStr(toLatin1(removeFancyUnicode(s)))
+    return s
 
 # replace s[start:start + width] with toInputStr(new) and return s
 def replace(s, new, start, width):
