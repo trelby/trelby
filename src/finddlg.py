@@ -304,7 +304,7 @@ class FindDlg(wx.Dialog):
 
                 if self.typeIncluded(ls[line].lt):
                     text = ls[line].text
-                    value = str(value).lstrip("b'").rstrip("'")
+                    value = str(value)
                     if not self.matchCase:
                         text = util.upper(text)
 
@@ -376,7 +376,7 @@ class FindDlg(wx.Dialog):
         if self.searchLine == -1:
             return False
 
-        value = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue())).lstrip("b'").rstrip("'")
+        value = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue()))
         ls = self.ctrl.sp.lines
 
         sp = self.ctrl.sp
