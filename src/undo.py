@@ -76,7 +76,7 @@ def lines2storage(lines):
     if len(linesStrCompressed) < len(linesStr):
         return (len(lines), True, linesStrCompressed)
     else:
-        return (len(lines), False, linesStr)
+        return (len(lines), False, linesStr.encode())
 
 # see lines2storage.
 def storage2lines(storage):
@@ -84,9 +84,9 @@ def storage2lines(storage):
         return []
 
     if storage[1]:
-        linesStr = zlib.decompress(storage[2])
+        linesStr = zlib.decompress(storage[2]).decode()
     else:
-        linesStr = storage[2]
+        linesStr = storage[2].decode()
 
     return [screenplay.Line.fromStr(s) for s in linesStr.split("\n")]
 
