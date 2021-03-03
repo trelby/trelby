@@ -386,8 +386,6 @@ def importFDX(fileName, frame):
             wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
             return None
 
-        for line in lines:
-            line.text = line.text.lstrip("b'").rstrip("'")
         return lines
 
     except etree.XMLSyntaxError as e:

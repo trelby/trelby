@@ -113,7 +113,7 @@ class SpellCheckDlg(wx.Dialog):
         sp = self.ctrl.sp
         u = undo.SinglePara(sp, undo.CMD_MISC, self.sc.line)
 
-        word = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue())).lstrip("b'").rstrip("'")
+        word = util.toInputStr(misc.fromGUI(self.replaceEntry.GetValue()))
         ls = sp.lines
 
         sp.gotoPos(self.sc.line, self.sc.col)

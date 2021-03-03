@@ -196,7 +196,7 @@ class StrUnicodeVar(ConfVar):
         ConfVar.__init__(self, name, defVal, name2)
 
     def toStr(self, val, prefix):
-        return "%s:%s\n" % (prefix, str(val).lstrip("b'").rstrip("'"))
+        return "%s:%s\n" % (prefix, str(val))
 
     def fromStr(self, vals, val, prefix):
         return val

@@ -118,13 +118,13 @@ class WatermarkDlg(wx.Dialog):
 
             if common:
                 wm = pml.TextOp(
-                    util.cleanInput(common).lstrip("b'").rstrip("'"),
+                    util.cleanInput(common),
                     self.sp.cfg.marginLeft + 20, self.sp.cfg.paperHeight * 0.45,
                     fontsize, pml.BOLD, angle = 45)
                 ops.append(wm)
 
             wm = pml.TextOp(
-                util.cleanInput(s).lstrip("b'").rstrip("'"),
+                util.cleanInput(s),
                 self.sp.cfg.marginLeft + 20, self.sp.cfg.paperHeight * 0.6,
                 fontsize, pml.BOLD, angle = 45)
             ops.append(wm)
