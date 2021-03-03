@@ -183,7 +183,7 @@ class NamesDlg(wx.Dialog):
 
         wx.BeginBusyCursor()
 
-        s = str(util.lower(misc.fromGUI(self.searchEntry.GetValue()))).lstrip("b'").rstrip("'")
+        s = str(util.lower(misc.fromGUI(self.searchEntry.GetValue())))
         sex = self.sexRb.GetSelection()
         nt = self.nameRb.GetSelection()
         selTypes = {}

@@ -983,7 +983,7 @@ class MRUFiles:
             pass
 
         # add item to top of list
-        self.items.insert(0, str(s).lstrip("b'").rstrip("'"))
+        self.items.insert(0, str(s))
 
         # prune overlong list
         if self.getCount() > self.maxCount:
@@ -993,7 +993,7 @@ class MRUFiles:
         for i in range(self.getCount()):
             self.menu.Insert(self.menuPos + i, self.firstId + i,
                              "&%d %s" % (
-                i + 1, os.path.basename(str(self.get(i)).lstrip("b'").rstrip("'"))))
+                i + 1, os.path.basename(str(self.get(i)))))
 
     # return number of items.
     def getCount(self):
@@ -1001,4 +1001,4 @@ class MRUFiles:
 
     # get item number 'i'.
     def get(self, i):
-        return str(self.items[i]).lstrip("b'").rstrip("'")
+        return str(self.items[i])
