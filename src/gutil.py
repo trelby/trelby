@@ -6,7 +6,7 @@ import os
 import tempfile
 
 if "TRELBY_TESTING" in os.environ:
-    import mock
+    import unittest.mock as mock
     wx = mock.Mock()
 else:
     import wx
