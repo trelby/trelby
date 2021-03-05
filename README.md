@@ -32,11 +32,11 @@ Download and install the .deb file
 
 #### Fedora
 
-Download and install the .rpm file
+Download and install the .rpm file for your Fedora release.
 
 - or -
 
-COMING SOON: sudo dnf install trelby
+sudo dnf install trelby --enablerepo=updates-testing
 
 #### Windows
 
