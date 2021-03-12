@@ -36,7 +36,7 @@ Download and install the .rpm file for your Fedora release.
 
 - or -
 
-sudo dnf install trelby --enablerepo=updates-testing
+sudo dnf install trelby
 
 #### Windows
 
