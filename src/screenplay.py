@@ -520,7 +520,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 for s in ts.items:
                     para = etree.SubElement(content, "p")
                     para.set("class", "title")
-                    para.text = str(s, "ISO-8859-1")
+                    para.text = s
 
             para = etree.SubElement(content, "p")
             para.set("class", "title")
