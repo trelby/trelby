@@ -888,7 +888,7 @@ class ImportDlg(wx.Dialog):
         wx.Dialog.__init__(self, parent, -1, "Adjust styles",
                            style = wx.DEFAULT_DIALOG_STYLE)
 
-        indents.sort(lambda i1, i2: -util.cmpfunc(len(i1.lines), len(i2.lines)))
+        indents.sort(key=lambda indent: indent.lines)
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
