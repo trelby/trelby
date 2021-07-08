@@ -1,3 +1,9 @@
+trelby (2.4.3) unstable; urgency=low
+
+  * Import/export fixes.
+
+ -- Gwyn Ciesla <gwync@protonmail.com>  Tue, 02 Mar 2021 11:39:00 +0000
+
 trelby (2.4.2) unstable; urgency=low
 
   * Dictionary fix, deprecate mock.
