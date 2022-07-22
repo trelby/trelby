@@ -295,6 +295,7 @@ class MyCtrl(wx.Control):
             return False
 
     def importFile(self, fileName):
+        titlePages = False
         if fileName.endswith("fdx"):
             lines = myimport.importFDX(fileName, mainFrame)
         elif fileName.endswith("celtx"):
@@ -302,7 +303,7 @@ class MyCtrl(wx.Control):
         elif fileName.endswith("astx"):
             lines = myimport.importAstx(fileName, mainFrame)
         elif fileName.endswith("fountain"):
-            lines = myimport.importFountain(fileName, mainFrame)
+            lines, titlePages = myimport.importFountain(fileName, mainFrame, self.sp.titles.pages)
         elif fileName.endswith("fadein"):
             lines = myimport.importFadein(fileName, mainFrame)
         else:
@@ -314,6 +315,8 @@ class MyCtrl(wx.Control):
         self.createEmptySp()
 
         self.sp.lines = lines
+        if titlePages:
+            self.sp.titles.pages = titlePages
         self.sp.reformatAll()
         self.sp.paginate()
         self.sp.markChanged(True)

@@ -641,7 +641,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         TWOSPACE = "  "
         sceneStartsList = ("INT", "EXT", "EST", "INT./EXT", "INT/EXT", "I/E", "I./E")
 
-
         # does s look like a fountain scene line:
         def looksLikeScene(s):
             s = s.upper()
@@ -651,6 +650,35 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                     looksGood = True
                     break
             return looksGood
+
+        # Generate Title Page
+        def generateTitleString(keyword,titleLine,startAt,linePrefix, lineSuffix):
+            if (len(titleLine)-startAt)>1:
+                # multi-line
+                flines.append(keyword)
+                for part in titleLine:
+                    if startAt > 0:
+                        startAt -= 1
+                        continue
+                    flines.append('    '+linePrefix+part+lineSuffix)
+            elif len(titleLine) == 1 and keyword == titleLine[0]:
+                flines.append(keyword)
+            else:
+                flines.append(keyword+' '+titleLine[startAt])
+
+        titleNeeded=True
+        kwPattern = re.compile(r'^([A-za-z][^:]+:)')
+        for page in self.titles.pages:
+            for titleLine in page:
+                if titleNeeded and titleLine.isBold and titleLine.isCentered:
+                    generateTitleString('Title:',titleLine.items,0,'_**','**_')
+                    titleNeeded = False
+                elif titleLine.items[0]=='by':
+                    generateTitleString('Author:',titleLine.items,2,'','')
+                elif kwPattern.match(titleLine.items[0]):
+                    generateTitleString(titleLine.items[0],titleLine.items,0,'','')
+                else:
+                    generateTitleString('Contact:',titleLine.items,0,'','')
 
         for ele in eleList:
             typ, txt = ele
