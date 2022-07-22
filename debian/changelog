@@ -1,3 +1,9 @@
+trelby (2.4.4) unstable; urgency=low
+
+  * Fix Fountain import
+
+ -- Gwyn Ciesla <gwync@protonmail.com>  Fri, 22 Jul 2022 08:43:00 +0000
+
 trelby (2.4.3) unstable; urgency=low
 
   * Import/export fixes.
