@@ -479,7 +479,7 @@ class MyTabCtrl(wx.Window):
                 points=((0,tabH),(4,2),(6,1),(tabW-8,1),(tabW-6,2),(tabW-2,tabH))
                 dc.SetBrush(cfgGui.workspaceBrush)
             else:
-                points=((0,tabH-separatorLineThickness),(3,3),(5,2),(tabW-8,2),(tabW-6,3),(tabW-2,tabH-separatorLineThickness))
+                points=((0,tabH-separatorLineThickness),(3,3),(5,2),(tabW-8,2),(tabW-6,3),(tabW-2,tabH-separatorLineThickness)) # subtract its thickness to not cover the separator line
                 dc.SetBrush(cfgGui.tabNonActiveBgBrush)
 
             dc.DestroyClippingRegion()
