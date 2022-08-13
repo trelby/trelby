@@ -442,7 +442,7 @@ class MyTabCtrl(wx.Window):
         pass
 
     def OnPaint(self, event):
-        dc = wx.BufferedPaintDC(self)
+        dc = wx.AutoBufferedPaintDCFactory(self)
 
         cfgGui = self.getCfgGui()
 
