@@ -1,3 +1,4 @@
 setuptools
 wxPython
 lxml
+pytest>=7.0
