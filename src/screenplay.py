@@ -215,7 +215,7 @@ class Screenplay:
     # process. fatal errors are indicated by raising a MiscError. note
     # that this is a static function.
     @staticmethod
-    def load(s, cfgGl):
+    def load(s: str, cfgGl):
         lines = s.splitlines()
 
         sp = Screenplay(cfgGl)
@@ -408,7 +408,7 @@ class Screenplay:
     # already. returns a (key, value) tuple. if line doesn't match the
     # format, (None, None) is returned.
     @staticmethod
-    def parseConfigLine(s):
+    def parseConfigLine(s: str)->tuple[str,str]:
         pattern = re.compile("#([a-zA-Z0-9\-]+) (.*)")
         m = pattern.search(s)
         if m:

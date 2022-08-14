@@ -34,7 +34,7 @@ def load(filename = "test.trelby"):
                                       config.ConfigGlobal())[0]
 
 # load script from given string
-def loadString(s):
+def loadString(s: str):
     init()
 
     return screenplay.Screenplay.load(s, config.ConfigGlobal())[0]
