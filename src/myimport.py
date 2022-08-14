@@ -1,3 +1,5 @@
+from typing import Optional
+
 import config
 import gutil
 import misc
@@ -753,7 +755,7 @@ def importFountain(fileName, frame, titlePages):
 # import text file from fileName, return list of Line objects for the
 # screenplay or None if something went wrong. returned list always
 # contains at least one line.
-def importTextFile(fileName, frame):
+def importTextFile(fileName: str, frame: wx.Frame)->Optional[list[screenplay.Line]]:
 
     # the 1 MB limit is arbitrary, we just want to avoid getting a
     # MemoryError exception for /dev/zero etc.
