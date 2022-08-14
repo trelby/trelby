@@ -164,8 +164,8 @@ class Screenplay:
 
         return sp
 
-    # save script to a string and return that
-    def save(self):
+    # save script to a utf-8 encoded string and return that
+    def save(self)->bytes:
         self.cfg.cursorLine = self.line
         self.cfg.cursorColumn = self.column
 
