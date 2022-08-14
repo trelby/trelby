@@ -1,4 +1,5 @@
 # ut:ignore
+import os
 
 import config
 import misc
@@ -22,9 +23,12 @@ def new():
 
     return screenplay.Screenplay(config.ConfigGlobal())
 
-# load script from the given file
+# load script from the given file, relative to the current script directory
 def load(filename = "test.trelby"):
     init()
+
+    location = os.path.dirname(__file__)
+    filename = os.path.join(location, filename)
 
     return screenplay.Screenplay.load(open(filename, "r").read(),
                                       config.ConfigGlobal())[0]
