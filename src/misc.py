@@ -453,7 +453,8 @@ class MyTabCtrl(wx.Window):
         dc.DrawRectangle(0, 0, w, h)
 
         dc.SetPen(cfgGui.tabBorderPen)
-        dc.DrawLine(0,h-1,w,h-1)
+        separatorLineThickness = cfgGui.tabBorderPen.GetWidth()
+        dc.DrawLine(0,h-separatorLineThickness,w,h-separatorLineThickness)
 
         xpos = self.paddingX
 
@@ -474,18 +475,24 @@ class MyTabCtrl(wx.Window):
             dc.SetFont(self.font)
             p = self.pages[i]
 
-            dc.DestroyClippingRegion()
-            dc.SetClippingRegion(xpos, tabY, tabW, tabH)
-            dc.SetPen(cfgGui.tabBorderPen)
-
             if i == self.selected:
-                points=((6,1),(tabW-8,1),(tabW-6,2),(tabW-2,tabH),(0,tabH),(4,2))
+                points=((0,tabH),(4,2),(6,1),(tabW-8,1),(tabW-6,2),(tabW-2,tabH))
                 dc.SetBrush(cfgGui.workspaceBrush)
             else:
-                points=((5,2),(tabW-8,2),(tabW-6,3),(tabW-2,tabH-1),(0,tabH-1),(3,3))
+                points=((0,tabH-separatorLineThickness),(3,3),(5,2),(tabW-8,2),(tabW-6,3),(tabW-2,tabH-separatorLineThickness)) # subtract its thickness to not cover the separator line
                 dc.SetBrush(cfgGui.tabNonActiveBgBrush)
 
+            dc.DestroyClippingRegion()
+
+            # draw tab background
+            dc.SetClippingRegion(xpos, tabY, tabW, tabH)
+            dc.SetPen(wx.Pen(wx.NullPen))
             dc.DrawPolygon(points,xpos,tabY)
+
+            # draw tab borders
+            dc.SetClippingRegion(xpos, tabY, tabW, tabH-separatorLineThickness) # tab borders should never cross the seperator line
+            dc.SetPen(cfgGui.tabBorderPen)
+            dc.DrawLines(points,xpos,tabY)
 
             # clip the text to fit within the tabs
             dc.DestroyClippingRegion()
