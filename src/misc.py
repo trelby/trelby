@@ -437,13 +437,12 @@ class MyTabCtrl(wx.Window):
 
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wx.Bitmap(size.width, size.height)
 
     def OnEraseBackground(self, event):
         pass
 
     def OnPaint(self, event):
-        dc = wx.BufferedPaintDC(self, self.screenBuf)
+        dc = wx.AutoBufferedPaintDCFactory(self)
 
         cfgGui = self.getCfgGui()
 
