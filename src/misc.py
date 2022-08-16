@@ -275,7 +275,6 @@ class MyTabCtrl(wx.Window):
 
         self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
         self.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDown)
-        self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
 
@@ -434,9 +433,6 @@ class MyTabCtrl(wx.Window):
             if (x >= rx) and (x < (rx + self.arrowWidth)) and \
                    (self.getLastVisibleTab() < (len(self.pages) - 1)):
                 self.scroll(1)
-
-    def OnSize(self, event):
-        size = self.GetClientSize()
 
     def OnEraseBackground(self, event):
         pass
