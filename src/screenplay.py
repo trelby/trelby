@@ -3269,6 +3269,8 @@ class Line:
     def __ne__(self, other):
         return ((self.lt != other.lt) or (self.lb != other.lb) or
                 (self.text != other.text))
+    def __eq__(self, other):
+        return not self.__ne__(other)
 
     # opposite of __str__. NOTE: only meant for storing data internally by
     # the program! NOT USABLE WITH EXTERNAL INPUT DUE TO COMPLETE LACK OF
