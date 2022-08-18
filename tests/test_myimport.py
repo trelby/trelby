@@ -1,5 +1,7 @@
 import sys
 import os
+
+import screenplay
 import u
 
 from unittest import mock
@@ -12,8 +14,6 @@ sys.modules['wx'] = wxMock
 
 import myimport
 
-
-
 def testImportTextFile()->None:
     u.init()
     location = os.path.dirname(__file__)
@@ -23,4 +23,29 @@ def testImportTextFile()->None:
 
     expectedScreenplay = u.load()
     for line, expectedLine in zip(lines, expectedScreenplay.lines):
-        assert line == expectedLine
+        assert TextImportMatcher(line) == TextImportMatcher(expectedLine)
+
+class TextImportMatcher:
+    line: screenplay.Line
+    def __init__(self, line: screenplay.Line):
+        self.line = line
+
+    def __eq__(self, other):
+        """
+        The text import has some known limitations:
+            - depending on the export config, some lines are all caps, so it can't reliably preserve case
+            - it can't reliably detect linebreak types
+            - sometimes, it can't distinguish ACTION from SCENE types
+        That's why this implementation is not so hard on it, and only compares the text case-insensitively, doesn't
+        compare linebreak types at all and only compares the line type if it's not ACTION or SCENE
+        """
+        if not isinstance(other, TextImportMatcher):
+            return NotImplemented
+        if self.line.text.lower() != other.line.text.lower():
+            return False
+        if self.line.lt != screenplay.ACTION and self.line.lt != screenplay.SCENE and self.line.lt != other.line.lt:
+            return False
+        return True
+
+    def __repr__(self):
+        return self.line.__str__()
