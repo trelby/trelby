@@ -18,7 +18,7 @@ import myimport
 def testImportTextFile()->None:
     u.init()
     location = os.path.dirname(__file__)
-    pathToTestScriptTxt = os.path.join(location, "fixtures/test-script.txt")
+    pathToTestScriptTxt = os.path.join(location, "test-script.txt")
 
     lines = myimport.importTextFile(pathToTestScriptTxt,mock.Mock())
 
@@ -31,7 +31,7 @@ class TextImportMatcher:
     def __init__(self, line: screenplay.Line):
         self.line = line
 
-    def __eq__(self, other)->Union[bool,NotImplemented]:
+    def __eq__(self, other):
         """
         The text import has some known limitations:
             - depending on the export config, some lines are all caps, so it can't reliably preserve case
