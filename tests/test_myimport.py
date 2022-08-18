@@ -1,5 +1,6 @@
 import sys
 import os
+from typing import Union
 
 import screenplay
 import u
@@ -30,7 +31,7 @@ class TextImportMatcher:
     def __init__(self, line: screenplay.Line):
         self.line = line
 
-    def __eq__(self, other):
+    def __eq__(self, other)->Union[bool,NotImplemented]:
         """
         The text import has some known limitations:
             - depending on the export config, some lines are all caps, so it can't reliably preserve case
@@ -47,5 +48,5 @@ class TextImportMatcher:
             return False
         return True
 
-    def __repr__(self):
+    def __repr__(self)->str:
         return self.line.__str__()
