@@ -3,6 +3,7 @@
 *.pyo
 .trelby/
 *.trelby
+!tests/fixtures/*.trelby
 .tox/
 MANIFEST
 .pybuild/
