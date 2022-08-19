@@ -18,7 +18,7 @@ import myimport
 def testImportTextFile()->None:
     u.init()
     location = os.path.dirname(__file__)
-    pathToTestScriptTxt = os.path.join(location, "test-script.txt")
+    pathToTestScriptTxt = os.path.join(location, "fixtures/test.txt")
 
     lines = myimport.importTextFile(pathToTestScriptTxt,mock.Mock())
 
