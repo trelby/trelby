@@ -27,7 +27,7 @@ def new():
 def load(filename = "test.trelby"):
     init()
 
-    location = os.path.dirname(__file__)
+    location = os.path.dirname(__file__)+'/fixtures/'
     filename = os.path.join(location, filename)
 
     return screenplay.Screenplay.load(open(filename, "r").read(),
