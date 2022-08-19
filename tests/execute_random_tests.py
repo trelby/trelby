@@ -10,13 +10,21 @@ import sys
 import traceback
 
 # FIXME
-sys.path.insert(0, "../src")
+from typing import Optional
+
+import os
+location = os.path.dirname(__file__)
+sys.path.append(os.path.join(location, "../src"))
+
+from screenplay import Screenplay
+
 
 import u
 
 # generates, stores, saves, loads, and runs operations against a
 # Screenplay object.
 class Ops:
+    sp: Optional[Screenplay]
     def __init__(self):
         # a list of Op objects
         self.ops = []
@@ -40,7 +48,7 @@ class Ops:
         self.ops.append(op)
 
     # return self.ops as a text string
-    def save(self):
+    def save(self)->str:
         s = ""
 
         for op in self.ops:
@@ -198,7 +206,7 @@ def runRandomOps():
             try:
                 ops.sp._validate()
                 s = ops.sp.save()
-                u.loadString(s)
+                u.loadString(s.decode())
             except KeyboardInterrupt:
                 raise
             except:
@@ -225,7 +233,7 @@ def runOpsFromFile(filename):
             break
 
 # save information about failed ops.
-def save(ops, cnt):
+def save(ops: Ops, cnt: int):
     f = open("%d.ops" % cnt, "w")
 
     tbLines = traceback.format_exception(*sys.exc_info())
@@ -239,7 +247,7 @@ def save(ops, cnt):
     f.write(ops.save())
     f.close()
 
-    f = open("%d.trelby" % cnt, "w")
+    f = open("%d.trelby" % cnt, "wb")
     f.write(ops.sp.save())
     f.close()
 
