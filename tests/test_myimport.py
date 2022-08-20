@@ -15,6 +15,19 @@ sys.modules['wx'] = wxMock
 
 import myimport
 
+def testImportCeltx()->None:
+    u.init()
+    location = os.path.dirname(__file__)
+    pathToTestScriptCeltx = os.path.join(location, "fixtures/test.celtx")
+
+    lines = myimport.importCeltx(pathToTestScriptCeltx,mock.Mock())
+
+    assert lines is not None
+
+    expectedScreenplay = u.load()
+    for line, expectedLine in zip(lines, expectedScreenplay.lines):
+        assert TextImportMatcher(line) == TextImportMatcher(expectedLine)
+
 def testImportTextFile()->None:
     u.init()
     location = os.path.dirname(__file__)
