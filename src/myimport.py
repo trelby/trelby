@@ -275,7 +275,9 @@ def importCeltx(fileName, frame):
     for para in root.xpath("/html/body/p"):
         items = []
         for line in para.itertext():
-            items.append(str(line.replace("\n", " ")))
+            text = str(line.replace("\n", " "))
+            if text.strip() != '':
+                items.append(text)
 
         lt = elemMap.get(para.get("class"), screenplay.ACTION)
 
