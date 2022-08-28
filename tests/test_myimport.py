@@ -20,12 +20,18 @@ def testImportCeltx()->None:
     location = os.path.dirname(__file__)
     pathToTestScriptCeltx = os.path.join(location, "fixtures/test.celtx")
 
-    lines = myimport.importCeltx(pathToTestScriptCeltx,mock.Mock())
+    importedLines = myimport.importCeltx(pathToTestScriptCeltx,mock.Mock())
 
-    assert lines is not None
+    assert importedLines is not None
+
+    # in order to compare the screenplays, we need to reformat it with the same configuration as the loaded one
+    importedScreenplay = u.new()
+    importedScreenplay.lines = importedLines
+    importedScreenplay.reformatAll()
 
     expectedScreenplay = u.load()
-    for line, expectedLine in zip(lines, expectedScreenplay.lines):
+
+    for line, expectedLine in zip(importedScreenplay.lines, expectedScreenplay.lines):
         assert TextImportMatcher(line) == TextImportMatcher(expectedLine)
 
 def testImportTextFile()->None:
