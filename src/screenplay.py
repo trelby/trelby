@@ -3266,6 +3266,9 @@ class Line:
         return config.lb2char(self.lb) + config.lt2char(self.lt)\
                + self.text
 
+    def __repr__(self)->str:
+        return self.__str__()
+
     def __ne__(self, other):
         return ((self.lt != other.lt) or (self.lb != other.lb) or
                 (self.text != other.text))
