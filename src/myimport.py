@@ -218,23 +218,8 @@ def importFadein(fileName, frame):
 def importCeltx(fileName, frame):
     # Celtx files are zipfiles, and the script content is within a file
     # called "script-xxx.html", where xxx can be random.
-
-    # the 5 MB limit is arbitrary, we just want to avoid getting a
-    # MemoryError exception for /dev/zero etc.
-    data = util.loadFile(fileName, frame, 5000000)
-
-    if data == None:
-        return None
-
-    if len(data) == 0:
-        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
-
-        return None
-
-    buf = io.StringIO(data)
-
     try:
-        z = zipfile.ZipFile(buf)
+        z = zipfile.ZipFile(fileName)
     except:
         wx.MessageBox("File is not a valid Celtx script file.", "Error", wx.OK, frame)
         return None
@@ -290,7 +275,9 @@ def importCeltx(fileName, frame):
     for para in root.xpath("/html/body/p"):
         items = []
         for line in para.itertext():
-            items.append(str(line.replace("\n", " ")))
+            text = line.replace("\n", " ").strip()
+            if text != '':
+                items.append(text)
 
         lt = elemMap.get(para.get("class"), screenplay.ACTION)
 

@@ -15,6 +15,25 @@ sys.modules['wx'] = wxMock
 
 import myimport
 
+def testImportCeltx()->None:
+    u.init()
+    location = os.path.dirname(__file__)
+    pathToTestScriptCeltx = os.path.join(location, "fixtures/test.celtx")
+
+    importedLines = myimport.importCeltx(pathToTestScriptCeltx,mock.Mock())
+
+    assert importedLines is not None
+
+    # in order to compare the screenplays, we need to reformat it with the same configuration as the loaded one
+    importedScreenplay = u.new()
+    importedScreenplay.lines = importedLines
+    importedScreenplay.reformatAll()
+
+    expectedScreenplay = u.load()
+
+    for line, expectedLine in zip(importedScreenplay.lines, expectedScreenplay.lines):
+        assert line == expectedLine
+
 def testImportTextFile()->None:
     u.init()
     location = os.path.dirname(__file__)
