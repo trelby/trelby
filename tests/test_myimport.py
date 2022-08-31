@@ -32,7 +32,7 @@ def testImportCeltx()->None:
     expectedScreenplay = u.load()
 
     for line, expectedLine in zip(importedScreenplay.lines, expectedScreenplay.lines):
-        assert TextImportMatcher(line) == TextImportMatcher(expectedLine)
+        assert line == expectedLine
 
 def testImportTextFile()->None:
     u.init()
