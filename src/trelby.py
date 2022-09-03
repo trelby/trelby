@@ -167,15 +167,15 @@ class MyPanel(wx.Panel):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.scrollBar = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
+        self.scrollBarVertical = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
         self.ctrl = MyCtrl(self, -1)
 
         hsizer.Add(self.ctrl, 1, wx.EXPAND)
-        hsizer.Add(self.scrollBar, 0, wx.EXPAND)
+        hsizer.Add(self.scrollBarVertical, 0, wx.EXPAND)
 
-        self.scrollBar.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
+        self.scrollBarVertical.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
 
-        self.scrollBar.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
+        self.scrollBarVertical.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
 
         self.SetSizer(hsizer)
 
@@ -417,8 +417,8 @@ class MyCtrl(wx.Control):
         # about draft / layout mode differences.
         approx = int(((height / self.mm2p) / self.chY) / 1.3)
 
-        self.panel.scrollBar.SetScrollbar(self.sp.getTopLine(), approx,
-            len(self.sp.lines) + approx - 1, approx)
+        self.panel.scrollBarVertical.SetScrollbar(self.sp.getTopLine(), approx,
+                                                  len(self.sp.lines) + approx - 1, approx)
 
     def clearAutoComp(self):
         if self.sp.clearAutoComp():
@@ -611,7 +611,7 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     def OnScroll(self, event):
-        pos = self.panel.scrollBar.GetThumbPosition()
+        pos = self.panel.scrollBarVertical.GetThumbPosition()
         self.sp.setTopLine(pos)
         self.sp.clearAutoComp()
         self.updateScreen()
