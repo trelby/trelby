@@ -23,6 +23,8 @@ SHOT = 7
 NOTE = 8
 ACTBREAK = 9
 
+from typing import tuple
+
 import autocompletion
 import config
 import error
