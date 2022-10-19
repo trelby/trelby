@@ -22,7 +22,9 @@ The major difference of this fork is conversion to Python 3.  I also have a list
 
 #### Debian and variants
 
-Download and install the .deb file
+Download and install the .deb file for Ubuntu, Debian, or Raspian here:
+
+https://software.opensuse.org//download.html?project=home%3Agwync&package=trelby
 
 - or -
 
@@ -31,10 +33,6 @@ Download and install the .deb file
 2. Install the resulting .deb file.
 
 #### Fedora
-
-Download and install the .rpm file for your Fedora release.
-
-- or -
 
 sudo dnf install trelby
 
