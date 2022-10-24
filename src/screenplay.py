@@ -23,6 +23,8 @@ SHOT = 7
 NOTE = 8
 ACTBREAK = 9
 
+from typing import Tuple
+
 import autocompletion
 import config
 import error
@@ -408,7 +410,7 @@ class Screenplay:
     # already. returns a (key, value) tuple. if line doesn't match the
     # format, (None, None) is returned.
     @staticmethod
-    def parseConfigLine(s: str)->tuple[str,str]:
+    def parseConfigLine(s: str)->Tuple[str,str]:
         pattern = re.compile("#([a-zA-Z0-9\-]+) (.*)")
         m = pattern.search(s)
         if m:
