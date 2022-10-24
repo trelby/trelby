@@ -21,6 +21,6 @@ jobs:
         dnf_install: python3-wxpython4 python3-lxml gtk3-devel which
     strategy:
       matrix:
-        tox_env: [py39]
+        tox_env: [py310, py39, py38]
 
     runs-on: ubuntu-latest
