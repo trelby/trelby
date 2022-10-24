@@ -1,4 +1,4 @@
-trelby (2.4.6-1) unstable; urgency=low
+trelby (2.4.6) unstable; urgency=low
 
   * Fix Celtx import, et. el.
 
