@@ -16,7 +16,7 @@ The major difference of this fork is conversion to Python 3.  I also have a list
 
 2. cd trelby
 
-3. pip3 install requirements.txt
+3. pip3 install -r requirements.txt
 
 4. ./bin/trelby
 
