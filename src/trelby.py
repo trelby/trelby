@@ -1346,11 +1346,11 @@ class MyCtrl(wx.Control):
             if addChar:
                 cs.char = chr(kc)
 
-                if opts.isTest and (cs.char == "å"):
+                if opts.isTest and (cs.char == "ï¿½"):
                     self.loadFile("sample.trelby")
-                elif opts.isTest and (cs.char == "¤"):
+                elif opts.isTest and (cs.char == "ï¿½"):
                     self.cmdTest(cs)
-                elif opts.isTest and (cs.char == "½"):
+                elif opts.isTest and (cs.char == "ï¿½"):
                     self.cmdSpeedTest(cs)
                 else:
                     self.sp.addCharCmd(cs)
@@ -2530,9 +2530,12 @@ class MyFrame(wx.Frame):
     def OnCloseWindow(self, event):
         doExit = True
         if event.CanVeto() and self.isModifications():
-            if wx.MessageBox("You have unsaved changes. Are\n"
-                             "you sure you want to exit?", "Confirm",
-                             wx.YES_NO | wx.NO_DEFAULT, self) == wx.NO:
+            close_msg_box = wx.MessageDialog(self, "You have unsaved changes. Do\nyou want to save your changes?", "Save Changes", wx.YES_NO | wx.CANCEL | wx.YES_DEFAULT)
+            close_msg_box.SetYesNoLabels(wx.ID_SAVE, "&Don't save")
+            response = close_msg_box.ShowModal();
+            if response == wx.ID_YES:
+                self.OnSave()
+            elif response == wx.ID_CANCEL:
                 doExit = False
 
         if doExit:
