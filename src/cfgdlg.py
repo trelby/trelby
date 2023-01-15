@@ -141,7 +141,7 @@ class CfgDlg(wx.Dialog):
 
         self.SetSizerAndFit(vsizer)
         self.Layout()
-        self.Center()
+        # self.Center()
 
         self.Bind(wx.EVT_BUTTON, self.OnApply, id=applyBtn.GetId())
         self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
