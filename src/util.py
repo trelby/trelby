@@ -637,7 +637,7 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
 # create pad sizer for given window whose controls are in topSizer, with
 # 'pad' pixels of padding on each side, resize window to correct size, and
 # optionally center it.
-def finishWindow(window, topSizer, pad = 10, center = True):
+def finishWindow(window, topSizer, pad = 10, center = False):
     padSizer = wx.BoxSizer(wx.VERTICAL)
     padSizer.Add(topSizer, 1, wx.EXPAND | wx.ALL, pad)
     window.SetSizerAndFit(padSizer)
