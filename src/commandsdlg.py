@@ -9,7 +9,7 @@ class CommandsDlg(wx.Frame):
         wx.Frame.__init__(self, None, -1, "Commands",
                           size = (650, 600), style = wx.DEFAULT_FRAME_STYLE)
 
-        self.Center()
+        # self.Center()
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(vsizer)
