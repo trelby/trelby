@@ -16,7 +16,7 @@ else:
 
 TAB_BAR_HEIGHT = 24
 
-version = "2.4.7"
+version = "2.4.8"
 
 def init(doWX = True):
     global isWindows, isUnix, unicodeFS, doDblBuf, progPath, confPath, tmpPrefix

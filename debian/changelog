@@ -1,3 +1,9 @@
+trelby (2.4.8) unstable; urgency=low
+
+  * Fixes to diaglog placement, screenplay comparison.
+
+ -- Gwyn Ciesla <gwync@protonmail.com>  Mon, 24 Oct 2022 14:11:00 +0000
+
 trelby (2.4.7) unstable; urgency=low
 
   * Fix Python < 3.9 compatibility.
