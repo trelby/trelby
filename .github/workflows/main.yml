@@ -10,6 +10,7 @@ jobs:
   tests:
       runs-on: ubuntu-latest
       strategy:
+        fail-fast: false
         matrix:
           python-version: [ "3.8", "3.9", "3.10", "3.11" ]
 
@@ -19,10 +20,15 @@ jobs:
           uses: actions/setup-python@v4
           with:
             python-version: ${{ matrix.python-version }}
-        - name: Install dependencies
+        - name: Install Linux dependencies
+          run: |
+            sudo apt-get install libsdl2-2.0 libwxgtk3.0-gtk3-dev
+        - name: Install Python dependencies
           run: |
             python -m pip install --upgrade pip
-            pip install -r requirements.txt
+            pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04 -r requirements.txt
         - name: Test with pytest
+          env:
+            PYTHONPATH: /opt/trelby
           run: |
-            pytest
+            /opt/trelby/bin/pytest
