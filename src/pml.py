@@ -98,9 +98,6 @@ class TOCItem:
         # correct positioning information)
         self.op: TextOp = op
 
-        # the PDF object number of the page we point to
-        self.pageObjNr: int = -1
-
 # information about one PDF font
 class PDFFontInfo:
     def __init__(self, name: str, fontProgram: Optional[AnyStr]):

@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional, List, Tuple, Dict, AnyStr
 
 from reportlab.pdfgen.canvas import Canvas
@@ -30,9 +31,6 @@ class PDFTextOp(PDFDrawOp):
     def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
         if not isinstance(pmlOp, pml.TextOp):
             raise Exception("PDFTextOp is only compatible with pml.TextOp, got "+type(pmlOp).__name__)
-
-        if pmlOp.toc:
-            pmlOp.toc.pageObjNr = pe.pageObjs[pageNr].nr
 
         # we need to adjust y position since PDF uses baseline of text as
         # the y pos, but pml uses top of the text as y pos. The Adobe
@@ -236,37 +234,11 @@ class PDFExporter:
 
         pages: int = len(doc.pages)
 
-        self.catalogObj: PDFObject = self.addObj()
         self.infoObj: PDFObject = self.createInfoObj()
         pagesObj: PDFObject = self.addObj()
 
         # we only create this when needed, in genWidths
         self.widthsObj: Optional[PDFObject] = None
-
-        if doc.tocs:
-            self.outlinesObj: PDFObject = self.addObj()
-
-            # each outline is a single PDF object
-            self.outLineObjs: List[PDFObject] = []
-
-            for i in range(len(doc.tocs)):
-                self.outLineObjs.append(self.addObj())
-
-            self.outlinesObj.data = ("<< /Type /Outlines\n"
-                                     "/Count %d\n"
-                                     "/First %d 0 R\n"
-                                     "/Last %d 0 R\n"
-                                     ">>" % (len(doc.tocs),
-                                             self.outLineObjs[0].nr,
-                                             self.outLineObjs[-1].nr))
-
-            outlinesStr = "/Outlines %d 0 R\n" % self.outlinesObj.nr
-
-            if doc.showTOC:
-                outlinesStr += "/PageMode /UseOutlines\n"
-
-        else:
-            outlinesStr = ""
 
         # each page has two PDF objects: 1) a /Page object that links to
         # 2) a stream object that has the actual page contents.
@@ -282,13 +254,8 @@ class PDFExporter:
             self.pageContentObjs.append(self.addObj())
 
         if doc.defPage != -1:
-            outlinesStr += "/OpenAction [%d 0 R /XYZ null null 0]\n" % (
-                self.pageObjs[0].nr + doc.defPage * 2)
-
-        self.catalogObj.data = ("<< /Type /Catalog\n"
-                                "/Pages %d 0 R\n"
-                                "%s"
-                                ">>" % (pagesObj.nr, outlinesStr))
+            canvas.addLiteral("/OpenAction [%d 0 R /XYZ null null 0]\n" % (
+                self.pageObjs[0].nr + doc.defPage * 2)) # TODO: This probably doesn't work any more/couldn't be tested, as creating new pages doesn't work yet (and the output prints everything one one page)
 
         for i in range(pages):
             self.genPage(i)
@@ -314,8 +281,12 @@ class PDFExporter:
                                  self.mm2points(doc.h), fontStr))
 
         if doc.tocs:
-            for i in range(len(doc.tocs)):
-                self.genOutline(i)
+            for toc in doc.tocs:
+                bookmarkKey = uuid.uuid4().hex  # we need a unique key to link the bookmark in toc – TODO: generate a more speaking one
+                canvas.bookmarkHorizontal(bookmarkKey, self.x(toc.op.x), self.y(toc.op.y))
+                canvas.addOutlineEntry(toc.text, bookmarkKey)
+            if doc.showTOC:
+                canvas.showOutline()
 
         self.genPDF(canvas)
 
@@ -360,31 +331,6 @@ class PDFExporter:
             op.pdfOp.draw(op, pageNr, cont, self)
 
         self.pageContentObjs[pageNr].data = self.genStream(str(cont))
-
-    # generate outline number 'i'
-    def genOutline(self, i) -> None:
-        toc = self.doc.tocs[i]
-        obj = self.outLineObjs[i]
-
-        if i != (len(self.doc.tocs) - 1):
-            nextStr = "/Next %d 0 R\n" % (obj.nr + 1)
-        else:
-            nextStr = ""
-
-        if i != 0:
-            prevStr = "/Prev %d 0 R\n" % (obj.nr - 1)
-        else:
-            prevStr = ""
-
-        obj.data = ("<< /Parent %d 0 R\n"
-                    "/Dest [%d 0 R /XYZ %f %f 0]\n"
-                    "/Title (%s)\n"
-                    "%s"
-                    "%s"
-                    ">>" % (
-            self.outlinesObj.nr, toc.pageObjNr, self.x(toc.op.x),
-            self.y(toc.op.y), self.escapeStr(toc.text),
-            prevStr, nextStr))
 
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
