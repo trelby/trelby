@@ -205,6 +205,13 @@ class PDFExporter:
             pagesize=(self.mm2points(doc.w), self.mm2points(doc.h)),
         )
 
+        # set PDF info
+        version = self.escapeStr(self.doc.version)
+        canvas.setCreator('Trelby '+version)
+        canvas.setProducer('Trelby '+version)
+        if self.doc.uniqueId:
+            canvas.setKeywords(self.doc.uniqueId)
+
         # fast lookup of font information
         self.fonts: Dict[int, FontInfo] = {
             pml.COURIER : FontInfo("Courier"),
@@ -235,8 +242,6 @@ class PDFExporter:
         # PDF object count. it starts at 1 because the 'f' thingy in the
         # xref table is an object of some kind or something...
         self.objectCnt: int = 1
-
-        self.infoObj: PDFObject = self.createInfoObj()
 
         # we only create this when needed, in genWidths
         self.widthsObj: Optional[PDFObject] = None
@@ -283,19 +288,6 @@ class PDFExporter:
         data = canvas.getpdfdata()
 
         return data
-
-    def createInfoObj(self) -> PDFObject:
-        version = self.escapeStr(self.doc.version)
-
-        if self.doc.uniqueId:
-            extra = "/Keywords (%s)\n" % self.doc.uniqueId
-        else:
-            extra = ""
-
-        return self.addObj("<< /Creator (Trelby %s)\n"
-                           "/Producer (Trelby %s)\n"
-                           "%s"
-                           ">>" % (version, version, extra))
 
     # create a PDF object containing a 256-entry array for the widths of a
     # font, with all widths being 600
