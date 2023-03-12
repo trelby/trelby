@@ -160,7 +160,7 @@ class PDFArbitraryOp(PDFDrawOp):
         if not isinstance(pmlOp, pml.PDFOp):
             raise Exception("PDFArbitraryOp is only compatible with pml.PDFOp, got "+type(pmlOp).__name__)
 
-        output += "%s\n" % pmlOp.cmds
+        canvas.addLiteral("%s\n" % pmlOp.cmds)
 
 # used for keeping track of used fonts
 class FontInfo:
