@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple
+from typing import Optional, List, Tuple, Dict
 
 import fontinfo
 import pml
@@ -205,7 +205,7 @@ class PDFExporter:
         doc = self.doc
 
         # fast lookup of font information
-        self.fonts = {
+        self.fonts: Dict[int, FontInfo] = {
             pml.COURIER : FontInfo("Courier"),
             pml.COURIER | pml.BOLD: FontInfo("Courier-Bold"),
             pml.COURIER | pml.ITALIC: FontInfo("Courier-Oblique"),
@@ -237,18 +237,18 @@ class PDFExporter:
 
         pages: int = len(doc.pages)
 
-        self.catalogObj = self.addObj()
-        self.infoObj = self.createInfoObj()
-        pagesObj = self.addObj()
+        self.catalogObj: PDFObject = self.addObj()
+        self.infoObj: PDFObject = self.createInfoObj()
+        pagesObj: PDFObject = self.addObj()
 
         # we only create this when needed, in genWidths
-        self.widthsObj = None
+        self.widthsObj: Optional[PDFObject] = None
 
         if doc.tocs:
-            self.outlinesObj = self.addObj()
+            self.outlinesObj: PDFObject = self.addObj()
 
             # each outline is a single PDF object
-            self.outLineObjs = []
+            self.outLineObjs: List[PDFObject] = []
 
             for i in range(len(doc.tocs)):
                 self.outLineObjs.append(self.addObj())
@@ -271,8 +271,8 @@ class PDFExporter:
 
         # each page has two PDF objects: 1) a /Page object that links to
         # 2) a stream object that has the actual page contents.
-        self.pageObjs = []
-        self.pageContentObjs = []
+        self.pageObjs: List[PDFObject] = []
+        self.pageContentObjs: List[PDFObject] = []
 
         for i in range(pages):
             self.pageObjs.append(self.addObj("<< /Type /Page\n"
@@ -351,7 +351,7 @@ class PDFExporter:
         # content stream
         cont = util.String()
 
-        self.currentFont = ""
+        self.currentFont: str = ""
 
         for op in pg.ops:
             op.pdfOp.draw(op, pageNr, cont, self)
