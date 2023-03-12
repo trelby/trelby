@@ -24,11 +24,11 @@ class PDFDrawOp:
 
     # write PDF drawing operations corresponding to the PML object pmlOp
     # to output (util.String). pe = PDFExporter.
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas: Canvas) -> None:
         raise Exception("draw not implemented")
 
 class PDFTextOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas) -> None:
         if not isinstance(pmlOp, pml.TextOp):
             raise Exception("PDFTextOp is only compatible with pml.TextOp, got "+type(pmlOp).__name__)
 
@@ -82,7 +82,7 @@ class PDFTextOp(PDFDrawOp):
                       "S\n" % (0.05 * pmlOp.size, x, undY, x + undLen, undY)
 
 class PDFLineOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter'):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas):
         if not isinstance(pmlOp, pml.LineOp):
             raise Exception("PDFLineOp is only compatible with pml.LineOp, got "+type(pmlOp).__name__)
 
@@ -107,7 +107,7 @@ class PDFLineOp(PDFDrawOp):
             output += "S\n"
 
 class PDFRectOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas) -> None:
         if not isinstance(pmlOp, pml.RectOp):
             raise Exception("PDFRectOp is only compatible with pml.RectOp, got "+type(pmlOp).__name__)
 
@@ -129,7 +129,7 @@ class PDFRectOp(PDFDrawOp):
             print("Invalid fill type for RectOp")
 
 class PDFQuarterCircleOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas) -> None:
         if not isinstance(pmlOp, pml.QuarterCircleOp):
             raise Exception("PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "+type(pmlOp).__name__)
 
@@ -156,7 +156,7 @@ class PDFQuarterCircleOp(PDFDrawOp):
         output += "S\n"
 
 class PDFArbitraryOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas) -> None:
         if not isinstance(pmlOp, pml.PDFOp):
             raise Exception("PDFArbitraryOp is only compatible with pml.PDFOp, got "+type(pmlOp).__name__)
 
@@ -260,7 +260,7 @@ class PDFExporter:
             cont = util.String()
             self.currentFont: str = ""
             for op in pg.ops:
-                op.pdfOp.draw(op, i, cont, self)
+                op.pdfOp.draw(op, i, cont, self, canvas)
 
                 # create bookmark for table of contents if applicable TODO: move into pdfOp.draw()
                 if isinstance(op, pml.TextOp) and op.toc:
