@@ -184,10 +184,6 @@ class PDFObject:
         # all data between 'obj/endobj' tags, excluding newlines
         self.data: str = data
 
-        # start position of object, stored in the xref table. initialized
-        # when the object is written out (by the caller of write).
-        self.xrefPos: int = -1
-
     # write object to canvas.
     def write(self, canvas: Canvas) -> None:
         code = "%d 0 obj\n" % self.nr
@@ -423,20 +419,7 @@ class PDFExporter:
 
     # write out object to 'canvas'
     def writeObj(self, canvas: Canvas, obj: PDFObject) -> None:
-        obj.xrefPos = self.getPdfCodeLength(canvas._code)
         obj.write(canvas)
-
-    def getPdfCodeLength(self, canvasCodeList: List[str]):
-        length = 0
-        for string in canvasCodeList:
-            length += len(string)
-
-        return length
-
-    # write a xref table entry to 'output', using position
-    # 'pos, generation 'gen' and type 'typ'.
-    def writeXref(self, canvas: Canvas, pos: int, gen: int = 0, typ: str = "n") -> None:
-        canvas.addLiteral("%010d %05d %s \n" % (pos, gen, typ))
 
     # generate PDF file and return it as a string
     def genPDF(self, canvas: Canvas) -> None:
@@ -444,24 +427,6 @@ class PDFExporter:
 
         for obj in self.objects:
             self.writeObj(canvas, obj)
-
-        xrefStartPos = self.getPdfCodeLength(canvas._code)
-
-        canvas.addLiteral("xref\n0 %d\n" % self.objectCnt)
-        self.writeXref(canvas, 0, 65535, "f")
-
-        for obj in self.objects:
-            self.writeXref(canvas, obj.xrefPos)
-
-        canvas.addLiteral("\n")
-
-        canvas.addLiteral(("trailer\n"
-                 "<< /Size %d\n"
-                 "/Root %d 0 R\n"
-                 "/Info %d 0 R\n>>\n" % (
-            self.objectCnt, self.catalogObj.nr, self.infoObj.nr)))
-
-        canvas.addLiteral("startxref\n%d\n%%%%EOF\n" % xrefStartPos)
 
     # get font number to use for given flags. also creates the PDF object
     # for the font if it does not yet exist.
