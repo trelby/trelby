@@ -86,25 +86,24 @@ class PDFLineOp(PDFDrawOp):
         if not isinstance(pmlOp, pml.LineOp):
             raise Exception("PDFLineOp is only compatible with pml.LineOp, got "+type(pmlOp).__name__)
 
-        p = pmlOp.points
+        points = pmlOp.points
+        numberOfPoints = len(points)
 
-        pc = len(p)
-
-        if pc < 2:
-            print("LineOp contains only %d points" % pc)
+        if numberOfPoints < 2:
+            print("LineOp contains only %d points" % numberOfPoints)
 
             return
 
-        output += "%f w\n"\
-                  "%s m\n" % (pe.mm2points(pmlOp.width), pe.xy(p[0]))
+        canvas.setLineWidth(pe.mm2points(pmlOp.width))
 
-        for i in range(1, pc):
-            output += "%s l\n" % (pe.xy(p[i]))
+        lines = []
+        for i in range(0, numberOfPoints - 1):
+            lines.append(pe.xy(points[i]) + pe.xy(points[i+1]))
 
         if pmlOp.isClosed:
-            output += "s\n"
-        else:
-            output += "S\n"
+            lines.append(pe.xy(points[i+1]) + pe.xy(points[0]))
+
+        canvas.lines(lines)
 
 class PDFRectOp(PDFDrawOp):
     def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas) -> None:
@@ -432,10 +431,9 @@ class PDFExporter:
     def y(self, y: float) -> float:
         return self.mm2points(self.doc.h - y)
 
-    # convert xy, which is (x, y) pair, into PDF coordinates, and format
-    # it as "%f %f", and return that.
-    def xy(self, xy: Tuple[float, float]) -> str:
+    # convert xy, which is (x, y) pair, into PDF coordinates
+    def xy(self, xy: Tuple[float, float]) -> Tuple[float, float]:
         x = self.x(xy[0])
         y = self.y(xy[1])
 
-        return "%f %f" % (x, y)
+        return (x, y)
