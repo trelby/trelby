@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+from typing import Optional, AnyStr
+
 import glob
 import gzip
 import misc
@@ -173,8 +175,8 @@ def cleanInput(s):
 def replace(s, new, start, width):
     return s[0 : start] + toInputStr(new) + s[start + width:]
 
-# delete all characters in 'chars' (a string) from s and return that.
-def deleteChars(s, chars):
+# delete all characters in 'chars' from s and return that.
+def deleteChars(s: str, chars: str) -> str:
     for char in chars:
         s = s.replace(char, '')
     return s
@@ -869,7 +871,7 @@ class String:
 # load at most maxSize (all if -1) bytes from 'filename', returning the
 # data as a string or None on errors. pops up message boxes with 'frame'
 # as parent on errors.
-def loadFile(filename, frame, maxSize = -1):
+def loadFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1) -> Optional[AnyStr]:
     ret = None
 
     try:

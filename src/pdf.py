@@ -1,3 +1,5 @@
+from typing import Optional, List, Tuple
+
 import fontinfo
 import pml
 import util
@@ -19,11 +21,14 @@ class PDFDrawOp:
 
     # write PDF drawing operations corresponding to the PML object pmlOp
     # to output (util.String). pe = PDFExporter.
-    def draw(self, pmlOp, pageNr, output, pe):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
         raise Exception("draw not implemented")
 
 class PDFTextOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+        if not isinstance(pmlOp, pml.TextOp):
+            raise Exception("PDFTextOp is only compatible with pml.TextOp, got "+type(pmlOp).__name__)
+
         if pmlOp.toc:
             pmlOp.toc.pageObjNr = pe.pageObjs[pageNr].nr
 
@@ -77,7 +82,10 @@ class PDFTextOp(PDFDrawOp):
                       "S\n" % (0.05 * pmlOp.size, x, undY, x + undLen, undY)
 
 class PDFLineOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter'):
+        if not isinstance(pmlOp, pml.LineOp):
+            raise Exception("PDFLineOp is only compatible with pml.LineOp, got "+type(pmlOp).__name__)
+
         p = pmlOp.points
 
         pc = len(p)
@@ -99,7 +107,10 @@ class PDFLineOp(PDFDrawOp):
             output += "S\n"
 
 class PDFRectOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+        if not isinstance(pmlOp, pml.RectOp):
+            raise Exception("PDFRectOp is only compatible with pml.RectOp, got "+type(pmlOp).__name__)
+
         if pmlOp.lw != -1:
             output += "%f w\n" % pe.mm2points(pmlOp.lw)
 
@@ -118,7 +129,10 @@ class PDFRectOp(PDFDrawOp):
             print("Invalid fill type for RectOp")
 
 class PDFQuarterCircleOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+        if not isinstance(pmlOp, pml.QuarterCircleOp):
+            raise Exception("PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "+type(pmlOp).__name__)
+
         sX = pmlOp.flipX and -1 or 1
         sY = pmlOp.flipY and -1 or 1
 
@@ -142,49 +156,51 @@ class PDFQuarterCircleOp(PDFDrawOp):
         output += "S\n"
 
 class PDFArbitraryOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe:'PDFExporter') -> None:
+        if not isinstance(pmlOp, pml.PDFOp):
+            raise Exception("PDFArbitraryOp is only compatible with pml.PDFOp, got "+type(pmlOp).__name__)
+
         output += "%s\n" % pmlOp.cmds
 
 # used for keeping track of used fonts
 class FontInfo:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, name: str):
+        self.name: str = name
 
         # font number (the name in the /F PDF command), or -1 if not used
-        self.number = -1
+        self.number: int = -1
 
         # PDFObject that contains the /Font object for this font, or None
-        self.pdfObj = None
+        self.pdfObj: Optional[PDFObject] = None
 
 # one object in a PDF file
 class PDFObject:
-    def __init__(self, nr, data = ""):
+    def __init__(self, nr: int, data: str = ""):
         # PDF object number
-        self.nr = nr
+        self.nr: int = nr
 
         # all data between 'obj/endobj' tags, excluding newlines
-        self.data = data
+        self.data: str = data
 
         # start position of object, stored in the xref table. initialized
         # when the object is written out (by the caller of write).
-        self.xrefPos = -1
+        self.xrefPos: int = -1
 
-    # write object to output (util.String).
-    def write(self, output):
+    # write object to output.
+    def write(self, output: 'util.String') -> None:
         output += "%d 0 obj\n" % self.nr
         output += self.data
         output += "\nendobj\n"
 
 class PDFExporter:
     # see genWidths
-    _widthsStr = None
+    _widthsStr: Optional[str] = None
 
-    def __init__(self, doc):
-        # pml.Document
-        self.doc = doc
+    def __init__(self, doc: 'pml.Document'):
+        self.doc: pml.Document = doc
 
     # generate PDF document and return it as a string
-    def generate(self):
+    def generate(self) -> str:
         #lsdjflksj = util.TimerDev("generate")
         doc = self.doc
 
@@ -210,16 +226,16 @@ class PDFExporter:
             }
 
         # list of PDFObjects
-        self.objects = []
+        self.objects: List[PDFObject] = []
 
         # number of fonts used
-        self.fontCnt = 0
+        self.fontCnt: int = 0
 
         # PDF object count. it starts at 1 because the 'f' thingy in the
         # xref table is an object of some kind or something...
-        self.objectCnt = 1
+        self.objectCnt: int = 1
 
-        pages = len(doc.pages)
+        pages: int = len(doc.pages)
 
         self.catalogObj = self.addObj()
         self.infoObj = self.createInfoObj()
@@ -304,7 +320,7 @@ class PDFExporter:
 
         return self.genPDF()
 
-    def createInfoObj(self):
+    def createInfoObj(self) -> PDFObject:
         version = self.escapeStr(self.doc.version)
 
         if self.doc.uniqueId:
@@ -319,7 +335,7 @@ class PDFExporter:
 
     # create a PDF object containing a 256-entry array for the widths of a
     # font, with all widths being 600
-    def genWidths(self):
+    def genWidths(self) -> None:
         if self.widthsObj:
             return
 
@@ -329,7 +345,7 @@ class PDFExporter:
         self.widthsObj = self.addObj(self.__class__._widthsStr)
 
     # generate a single page
-    def genPage(self, pageNr):
+    def genPage(self, pageNr) -> None:
         pg = self.doc.pages[pageNr]
 
         # content stream
@@ -343,7 +359,7 @@ class PDFExporter:
         self.pageContentObjs[pageNr].data = self.genStream(str(cont))
 
     # generate outline number 'i'
-    def genOutline(self, i):
+    def genOutline(self, i) -> None:
         toc = self.doc.tocs[i]
         obj = self.outLineObjs[i]
 
@@ -369,7 +385,7 @@ class PDFExporter:
 
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
-    def genStream(self, s, isFontStream = False):
+    def genStream(self, s, isFontStream = False) -> str:
         compress = False
 
         # embedded TrueType font program streams for some reason need a
@@ -391,25 +407,25 @@ class PDFExporter:
 
     # add a new object and return it. 'data' is all data between
     # 'obj/endobj' tags, excluding newlines.
-    def addObj(self, data = ""):
+    def addObj(self, data: str = "") -> PDFObject:
         obj = PDFObject(self.objectCnt, data)
         self.objects.append(obj)
         self.objectCnt += 1
 
         return obj
 
-    # write out object to 'output' (util.String)
-    def writeObj(self, output, obj):
+    # write out object to 'output'
+    def writeObj(self, output: 'util.String', obj: PDFObject) -> None:
         obj.xrefPos = len(output)
         obj.write(output)
 
-    # write a xref table entry to 'output' (util.String), using position
+    # write a xref table entry to 'output', using position
     # 'pos, generation 'gen' and type 'typ'.
-    def writeXref(self, output, pos, gen = 0, typ = "n"):
+    def writeXref(self, output: 'util.String', pos: int, gen: int = 0, typ: str = "n") -> None:
         output += "%010d %05d %s \n" % (pos, gen, typ)
 
     # generate PDF file and return it as a string
-    def genPDF(self):
+    def genPDF(self) -> str:
         data = util.String()
 
         data += "%PDF-1.5\n"
@@ -439,7 +455,7 @@ class PDFExporter:
 
     # get font number to use for given flags. also creates the PDF object
     # for the font if it does not yet exist.
-    def getFontNr(self, flags):
+    def getFontNr(self, flags: int) -> int:
         # the "& 15" gets rid of the underline flag
         fi = self.fonts.get(flags & 15)
 
@@ -518,25 +534,25 @@ class PDFExporter:
         return fi.number
 
     # escape string
-    def escapeStr(self, s):
+    def escapeStr(self, s: str) -> str:
         return s.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
 
     # convert mm to points (1/72 inch).
-    def mm2points(self, mm):
+    def mm2points(self, mm: float) -> float:
         # 2.834 = 72 / 25.4
         return mm * 2.83464567
 
     # convert x coordinate
-    def x(self, x):
+    def x(self, x: float) -> float:
         return self.mm2points(x)
 
     # convert y coordinate
-    def y(self, y):
+    def y(self, y: float) -> float:
         return self.mm2points(self.doc.h - y)
 
     # convert xy, which is (x, y) pair, into PDF coordinates, and format
     # it as "%f %f", and return that.
-    def xy(self, xy):
+    def xy(self, xy: Tuple[float, float]) -> str:
         x = self.x(xy[0])
         y = self.y(xy[1])
 

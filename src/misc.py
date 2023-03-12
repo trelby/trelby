@@ -1,4 +1,5 @@
 # -*- coding: iso-8859-1 -*-
+from typing import AnyStr
 
 import gutil
 import opts
@@ -88,7 +89,7 @@ def fromGUI(s):
 # to Python's file APIs. this is either the Unicode string itself, if the
 # platform supports Unicode-based APIs (and Python has implemented support
 # for it), or the Unicode string converted to UTF-8 on other platforms.
-def toPath(s):
+def toPath(s: str) -> AnyStr:
     if unicodeFS:
         return s
     else:
