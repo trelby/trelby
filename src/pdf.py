@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple, Dict
+from typing import Optional, List, Tuple, Dict, AnyStr
 
 from reportlab.pdfgen.canvas import Canvas
 
@@ -14,7 +14,7 @@ TRANSFORM_MATRIX = {
 }
 
 # users should only use this.
-def generate(doc: 'pml.Document') -> str:
+def generate(doc: 'pml.Document') -> AnyStr:
     tmp = PDFExporter(doc)
     return tmp.generate()
 
@@ -188,11 +188,12 @@ class PDFObject:
         # when the object is written out (by the caller of write).
         self.xrefPos: int = -1
 
-    # write object to output.
-    def write(self, output: 'util.String') -> None:
-        output += "%d 0 obj\n" % self.nr
-        output += self.data
-        output += "\nendobj\n"
+    # write object to canvas.
+    def write(self, canvas: Canvas) -> None:
+        code = "%d 0 obj\n" % self.nr
+        code += self.data
+        code += "\nendobj\n"
+        canvas.addLiteral(code)
 
 class PDFExporter:
     # see genWidths
@@ -202,7 +203,7 @@ class PDFExporter:
         self.doc: pml.Document = doc
 
     # generate PDF document and return it as a string
-    def generate(self) -> str:
+    def generate(self) -> AnyStr:
         canvas = Canvas('')
         doc = self.doc
 
@@ -320,7 +321,11 @@ class PDFExporter:
             for i in range(len(doc.tocs)):
                 self.genOutline(i)
 
-        return self.genPDF()
+        self.genPDF(canvas)
+
+        data = canvas.getpdfdata()
+
+        return data
 
     def createInfoObj(self) -> PDFObject:
         version = self.escapeStr(self.doc.version)
@@ -416,44 +421,47 @@ class PDFExporter:
 
         return obj
 
-    # write out object to 'output'
-    def writeObj(self, output: 'util.String', obj: PDFObject) -> None:
-        obj.xrefPos = len(output)
-        obj.write(output)
+    # write out object to 'canvas'
+    def writeObj(self, canvas: Canvas, obj: PDFObject) -> None:
+        obj.xrefPos = self.getPdfCodeLength(canvas._code)
+        obj.write(canvas)
+
+    def getPdfCodeLength(self, canvasCodeList: List[str]):
+        length = 0
+        for string in canvasCodeList:
+            length += len(string)
+
+        return length
 
     # write a xref table entry to 'output', using position
     # 'pos, generation 'gen' and type 'typ'.
-    def writeXref(self, output: 'util.String', pos: int, gen: int = 0, typ: str = "n") -> None:
-        output += "%010d %05d %s \n" % (pos, gen, typ)
+    def writeXref(self, canvas: Canvas, pos: int, gen: int = 0, typ: str = "n") -> None:
+        canvas.addLiteral("%010d %05d %s \n" % (pos, gen, typ))
 
     # generate PDF file and return it as a string
-    def genPDF(self) -> str:
-        data = util.String()
-
-        data += "%PDF-1.5\n"
+    def genPDF(self, canvas: Canvas) -> None:
+        canvas.addLiteral("%PDF-1.5\n")
 
         for obj in self.objects:
-            self.writeObj(data, obj)
+            self.writeObj(canvas, obj)
 
-        xrefStartPos = len(data)
+        xrefStartPos = self.getPdfCodeLength(canvas._code)
 
-        data += "xref\n0 %d\n" % self.objectCnt
-        self.writeXref(data, 0, 65535, "f")
+        canvas.addLiteral("xref\n0 %d\n" % self.objectCnt)
+        self.writeXref(canvas, 0, 65535, "f")
 
         for obj in self.objects:
-            self.writeXref(data, obj.xrefPos)
+            self.writeXref(canvas, obj.xrefPos)
 
-        data += "\n"
+        canvas.addLiteral("\n")
 
-        data += ("trailer\n"
+        canvas.addLiteral(("trailer\n"
                  "<< /Size %d\n"
                  "/Root %d 0 R\n"
                  "/Info %d 0 R\n>>\n" % (
-            self.objectCnt, self.catalogObj.nr, self.infoObj.nr))
+            self.objectCnt, self.catalogObj.nr, self.infoObj.nr)))
 
-        data += "startxref\n%d\n%%%%EOF\n" % xrefStartPos
-
-        return str(data)
+        canvas.addLiteral("startxref\n%d\n%%%%EOF\n" % xrefStartPos)
 
     # get font number to use for given flags. also creates the PDF object
     # for the font if it does not yet exist.
