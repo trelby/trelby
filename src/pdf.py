@@ -200,7 +200,7 @@ class PDFExporter:
 
     # generate PDF document and return it as a string
     def generate(self) -> AnyStr:
-        canvas = Canvas('')
+        canvas = Canvas('', pdfVersion=(1, 5))
         doc = self.doc
 
         # fast lookup of font information
@@ -423,8 +423,6 @@ class PDFExporter:
 
     # generate PDF file and return it as a string
     def genPDF(self, canvas: Canvas) -> None:
-        canvas.addLiteral("%PDF-1.5\n")
-
         for obj in self.objects:
             self.writeObj(canvas, obj)
 
