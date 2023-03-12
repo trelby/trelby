@@ -1,3 +1,5 @@
+from typing import AnyStr
+
 import misc
 import pdf
 import pml
@@ -36,7 +38,7 @@ class SceneReport:
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
-    def generate(self) -> str:
+    def generate(self) -> AnyStr:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
 

@@ -23,7 +23,7 @@ SHOT = 7
 NOTE = 8
 ACTBREAK = 9
 
-from typing import Tuple
+from typing import Tuple, AnyStr
 
 import autocompletion
 import config
@@ -826,7 +826,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # 100% correct for the screenplay. isExport is True if this is an
     # "export to file" operation, False if we're just going to launch a
     # PDF viewer with the data.
-    def generatePDF(self, isExport: bool) -> str:
+    def generatePDF(self, isExport: bool) -> AnyStr:
         return pdf.generate(self.generatePML(isExport))
 
     # Same arguments as generatePDF, but returns a PML document.
