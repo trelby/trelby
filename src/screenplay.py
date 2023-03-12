@@ -1037,7 +1037,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                         s = text
 
                     to.toc = pml.TOCItem(s, to)
-                    pager.doc.addTOC(to.toc)
 
             if doExtra and cfg.pdfShowLineNumbers:
                 pg.add(pml.TextOp("%02d" % (i - start + 1),

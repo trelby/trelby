@@ -198,8 +198,12 @@ class PDFExporter:
 
     # generate PDF document and return it as a string
     def generate(self) -> AnyStr:
-        canvas = Canvas('', pdfVersion=(1, 5))
         doc = self.doc
+        canvas = Canvas(
+            '',
+            pdfVersion=(1, 5),
+            pagesize=(self.mm2points(doc.w), self.mm2points(doc.h)),
+        )
 
         # fast lookup of font information
         self.fonts: Dict[int, FontInfo] = {
@@ -232,61 +236,47 @@ class PDFExporter:
         # xref table is an object of some kind or something...
         self.objectCnt: int = 1
 
-        pages: int = len(doc.pages)
-
         self.infoObj: PDFObject = self.createInfoObj()
-        pagesObj: PDFObject = self.addObj()
 
         # we only create this when needed, in genWidths
         self.widthsObj: Optional[PDFObject] = None
 
-        # each page has two PDF objects: 1) a /Page object that links to
-        # 2) a stream object that has the actual page contents.
-        self.pageObjs: List[PDFObject] = []
-        self.pageContentObjs: List[PDFObject] = []
-
-        for i in range(pages):
-            self.pageObjs.append(self.addObj("<< /Type /Page\n"
-                                             "/Parent %d 0 R\n"
-                                             "/Contents %d 0 R\n"
-                                             ">>" % (pagesObj.nr,
-                                                     self.objectCnt + 1)))
-            self.pageContentObjs.append(self.addObj())
-
         if doc.defPage != -1:
-            canvas.addLiteral("/OpenAction [%d 0 R /XYZ null null 0]\n" % (
-                self.pageObjs[0].nr + doc.defPage * 2)) # TODO: This probably doesn't work any more/couldn't be tested, as creating new pages doesn't work yet (and the output prints everything one one page)
+            # canvas.addLiteral("/OpenAction [%d 0 R /XYZ null null 0]\n" % (self.pageObjs[0].nr + doc.defPage * 2)) # this should make the PDF reader open the PDF at the desired page
+            # TODO: This doesn't seem to be easily doable with reportlab. /OpenAction is considered a security threat by some (as it allows executing JavaScript), so I think it's unlikely they'll add support. Also, this feature didn't work with many PDF viewers anyway; I tested Evince, Okular and pdf.js in Firefox, and they all didn't support it. So maybe, we should remove this feature entirely?
+            pass
 
-        for i in range(pages):
-            self.genPage(i)
+        numberOfPages: int = len(doc.pages)
 
-        kids = util.String()
-        kids += "["
-        for obj in self.pageObjs:
-            kids += "%d 0 R\n" % obj.nr
-        kids += "]"
+        # draw pages
+        for i in range(numberOfPages):
+            pg = self.doc.pages[i]
+            # content stream
+            cont = util.String()
+            self.currentFont: str = ""
+            for op in pg.ops:
+                op.pdfOp.draw(op, i, cont, self)
+
+                # create bookmark for table of contents if applicable TODO: move into pdfOp.draw()
+                if isinstance(op, pml.TextOp) and op.toc:
+                    bookmarkKey = uuid.uuid4().hex  # we need a unique key to link the bookmark in toc – TODO: generate a more speaking one
+                    canvas.bookmarkHorizontal(bookmarkKey, self.x(op.x), self.y(op.y))
+                    canvas.addOutlineEntry(op.toc.text, bookmarkKey)
+
+            canvas.addLiteral(self.genStream(str(cont)))
+
+            if i < numberOfPages - 1:
+                canvas.showPage()
+
+        if doc.showTOC:
+            canvas.showOutline()
 
         fontStr = ""
         for fi in self.fonts.values():
             if fi.number != -1:
                 fontStr += "/F%d %d 0 R " % (fi.number, fi.pdfObj.nr)
-
-        pagesObj.data = ("<< /Type /Pages\n"
-                         "/Kids %s\n"
-                         "/Count %d\n"
-                         "/MediaBox [0 0 %f %f]\n"
-                         "/Resources << /Font <<\n"
-                         "%s >> >>\n"
-                         ">>" % (str(kids), pages, self.mm2points(doc.w),
-                                 self.mm2points(doc.h), fontStr))
-
-        if doc.tocs:
-            for toc in doc.tocs:
-                bookmarkKey = uuid.uuid4().hex  # we need a unique key to link the bookmark in toc – TODO: generate a more speaking one
-                canvas.bookmarkHorizontal(bookmarkKey, self.x(toc.op.x), self.y(toc.op.y))
-                canvas.addOutlineEntry(toc.text, bookmarkKey)
-            if doc.showTOC:
-                canvas.showOutline()
+                # The font string had been inserted into the /Pages object under "/Resources << /Font<<\n %s >> >>\n>>"
+                # TODO: find a new place for this information on the reportlab canvas
 
         self.genPDF(canvas)
 
@@ -317,20 +307,6 @@ class PDFExporter:
             self.__class__._widthsStr = "[%s]" % ("600 " * 256).rstrip()
 
         self.widthsObj = self.addObj(self.__class__._widthsStr)
-
-    # generate a single page
-    def genPage(self, pageNr) -> None:
-        pg = self.doc.pages[pageNr]
-
-        # content stream
-        cont = util.String()
-
-        self.currentFont: str = ""
-
-        for op in pg.ops:
-            op.pdfOp.draw(op, pageNr, cont, self)
-
-        self.pageContentObjs[pageNr].data = self.genStream(str(cont))
 
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.

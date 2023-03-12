@@ -44,8 +44,6 @@ class Document:
 
         self.pages: List[Page] = []
 
-        self.tocs: List[TOCItem] = []
-
         # user-specified fonts, if any. key = 2 lowest bits of
         # TextOp.flags, value = pml.PDFFontInfo
         self.fonts: Dict[int, 'PDFFontInfo'] = {}
@@ -66,9 +64,6 @@ class Document:
 
     def add(self, page: 'Page') -> None:
         self.pages.append(page)
-
-    def addTOC(self, toc: 'TOCItem') -> None:
-        self.tocs.append(toc)
 
     def addFont(self, style: int, pfi: 'PDFFontInfo') -> None:
         self.fonts[style] = pfi
