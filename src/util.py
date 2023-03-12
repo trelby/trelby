@@ -1050,7 +1050,7 @@ def getWindowsUnicodeEnvVar(name):
     return buf.value
 
 # show PDF file.
-def showPDF(filename: str, cfgGl: config.ConfigGlobal, frame: wx.TopLevelWindow) -> None:
+def showPDF(filename: str, cfgGl: 'config.ConfigGlobal', frame: wx.TopLevelWindow) -> None:
     def complain():
         wx.MessageBox("PDF viewer application not found.\n\n"
                       "You can change your PDF viewer\n"
