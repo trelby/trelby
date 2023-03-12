@@ -1,5 +1,7 @@
 from typing import Optional, List, Tuple, Dict
 
+from reportlab.pdfgen.canvas import Canvas
+
 import fontinfo
 import pml
 import util
@@ -201,7 +203,7 @@ class PDFExporter:
 
     # generate PDF document and return it as a string
     def generate(self) -> str:
-        #lsdjflksj = util.TimerDev("generate")
+        canvas = Canvas('')
         doc = self.doc
 
         # fast lookup of font information
