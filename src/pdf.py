@@ -112,21 +112,16 @@ class PDFRectOp(PDFDrawOp):
             raise Exception("PDFRectOp is only compatible with pml.RectOp, got "+type(pmlOp).__name__)
 
         if pmlOp.lw != -1:
-            output += "%f w\n" % pe.mm2points(pmlOp.lw)
+            canvas.setLineWidth(pe.mm2points(pmlOp.lw))
 
-        output += "%f %f %f %f re\n" % (
+        canvas.rect(
             pe.x(pmlOp.x),
             pe.y(pmlOp.y) - pe.mm2points(pmlOp.height),
-            pe.mm2points(pmlOp.width), pe.mm2points(pmlOp.height))
-
-        if pmlOp.fillType == pml.NO_FILL:
-            output += "S\n"
-        elif pmlOp.fillType == pml.FILL:
-            output += "f\n"
-        elif pmlOp.fillType == pml.STROKE_FILL:
-            output += "B\n"
-        else:
-            print("Invalid fill type for RectOp")
+            pe.mm2points(pmlOp.width),
+            pe.mm2points(pmlOp.height),
+            pmlOp.fillType == pml.NO_FILL or pmlOp.fillType == pml.STROKE_FILL,
+            pmlOp.fillType == pml.FILL or pmlOp.fillType == pml.STROKE_FILL
+        )
 
 class PDFQuarterCircleOp(PDFDrawOp):
     def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas) -> None:
