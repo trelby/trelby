@@ -144,16 +144,16 @@ class PDFQuarterCircleOp(PDFDrawOp):
         # has a max. drift of 0.019608% which is 28% better.
         A = pmlOp.radius * 0.551915024494
 
-        output += "%f w\n"\
-                  "%s m\n" % (pe.mm2points(pmlOp.width),
-                              pe.xy((pmlOp.x - pmlOp.radius * sX, pmlOp.y)))
-
-        output += "%f %f %f %f %f %f c\n" % (
-            pe.x(pmlOp.x - pmlOp.radius * sX), pe.y(pmlOp.y - A * sY),
-            pe.x(pmlOp.x - A * sX), pe.y(pmlOp.y - pmlOp.radius * sY),
-            pe.x(pmlOp.x), pe.y(pmlOp.y - pmlOp.radius * sY))
-
-        output += "S\n"
+        canvas.setLineWidth(pe.mm2points(pmlOp.width))
+        canvas.bezier(
+            pe.x(pmlOp.x - pmlOp.radius * sX),
+            pe.y(pmlOp.y),
+            pe.x(pmlOp.x - pmlOp.radius * sX),
+            pe.y(pmlOp.y - A * sY),
+            pe.x(pmlOp.x - A * sX),
+            pe.y(pmlOp.y - pmlOp.radius * sY),
+            pe.x(pmlOp.x), pe.y(pmlOp.y - pmlOp.radius * sY)
+        )
 
 class PDFArbitraryOp(PDFDrawOp):
     def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas) -> None:
