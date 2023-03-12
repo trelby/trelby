@@ -36,7 +36,7 @@ class SceneReport:
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
-    def generate(self):
+    def generate(self) -> str:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
 

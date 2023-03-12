@@ -1,3 +1,5 @@
+from typing import List
+
 import gutil
 import misc
 import pdf
@@ -171,7 +173,7 @@ class DialogueChart:
         # spacing from one legend item to next
         self.legendSize = 4.0
 
-    def generate(self, cbil):
+    def generate(self, cbil: List[misc.CheckBoxItem]) -> str:
         doc = pml.Document(self.sp.cfg.paperHeight,
                            self.sp.cfg.paperWidth)
 

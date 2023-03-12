@@ -4,6 +4,8 @@ from typing import Optional, AnyStr
 
 import glob
 import gzip
+
+import config
 import misc
 import os
 import re
@@ -913,7 +915,7 @@ def loadMaybeCompressedFile(filename, frame):
 
 # write 'data' to 'filename', popping up a messagebox using 'frame' as
 # parent on errors. returns True on success.
-def writeToFile(filename, data, frame):
+def writeToFile(filename: str, data: AnyStr, frame: wx.TopLevelWindow) -> bool:
     try:
         f = open(misc.toPath(filename), "wb")
 
@@ -1048,7 +1050,7 @@ def getWindowsUnicodeEnvVar(name):
     return buf.value
 
 # show PDF file.
-def showPDF(filename, cfgGl, frame):
+def showPDF(filename: str, cfgGl: config.ConfigGlobal, frame: wx.TopLevelWindow) -> None:
     def complain():
         wx.MessageBox("PDF viewer application not found.\n\n"
                       "You can change your PDF viewer\n"

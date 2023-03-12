@@ -12,7 +12,7 @@ TRANSFORM_MATRIX = {
 }
 
 # users should only use this.
-def generate(doc):
+def generate(doc: 'pml.Document') -> str:
     tmp = PDFExporter(doc)
     return tmp.generate()
 
