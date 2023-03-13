@@ -193,7 +193,7 @@ class PDFExporter:
         )
 
         # set PDF info
-        version = self.escapeStr(self.doc.version)
+        version = self.doc.version
         canvas.setCreator('Trelby '+version)
         canvas.setProducer('Trelby '+version)
         if self.doc.uniqueId:
