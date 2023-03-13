@@ -74,6 +74,12 @@ class PDFTextOp(PDFDrawOp):
 
             canvas.line(x, undY, x + undLen, undY)
 
+        # create bookmark for table of contents if applicable
+        if pmlOp.toc:
+            bookmarkKey = uuid.uuid4().hex  # we need a unique key to link the bookmark in toc – TODO: generate a more speaking one
+            canvas.bookmarkHorizontal(bookmarkKey, pe.x(pmlOp.x), pe.y(pmlOp.y))
+            canvas.addOutlineEntry(pmlOp.toc.text, bookmarkKey)
+
 class PDFLineOp(PDFDrawOp):
     def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas):
         if not isinstance(pmlOp, pml.LineOp):
@@ -232,12 +238,6 @@ class PDFExporter:
             pg = self.doc.pages[i]
             for op in pg.ops:
                 op.pdfOp.draw(op, i, self, canvas)
-
-                # create bookmark for table of contents if applicable TODO: move into pdfOp.draw()
-                if isinstance(op, pml.TextOp) and op.toc:
-                    bookmarkKey = uuid.uuid4().hex  # we need a unique key to link the bookmark in toc – TODO: generate a more speaking one
-                    canvas.bookmarkHorizontal(bookmarkKey, self.x(op.x), self.y(op.y))
-                    canvas.addOutlineEntry(op.toc.text, bookmarkKey)
 
             if i < numberOfPages - 1:
                 canvas.showPage()
