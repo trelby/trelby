@@ -245,9 +245,7 @@ class PDFExporter:
         if doc.showTOC:
             canvas.showOutline()
 
-        data = canvas.getpdfdata()
-
-        return data
+        return canvas.getpdfdata()
 
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
