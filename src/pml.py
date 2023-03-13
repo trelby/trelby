@@ -95,14 +95,14 @@ class TOCItem:
 
 # information about one PDF font
 class PDFFontInfo:
-    def __init__(self, name: str, fontProgram: Optional[AnyStr]):
+    def __init__(self, name: str, fontFileName: Optional[str]):
         # name to use in generated PDF file ("CourierNew", "MyFontBold",
         # etc.). if empty, use the default PDF font.
         self.name: str = name
 
         # the font program (in practise, the contents of the .ttf file for
         # the font), or None, in which case the font is not embedded.
-        self.fontProgram: Optional[AnyStr] = fontProgram
+        self.fontFileName: Optional[str] = fontFileName
 
 # An abstract base class for all drawing operations.
 class DrawOp:

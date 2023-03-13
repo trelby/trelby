@@ -1,9 +1,10 @@
 import uuid
-from typing import Optional, List, Tuple, Dict, AnyStr
+from typing import Optional, Tuple, Dict, AnyStr
 
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
 
-import fontinfo
 import pml
 import util
 
@@ -44,42 +45,34 @@ class PDFTextOp(PDFDrawOp):
         x = pe.x(pmlOp.x)
         y = pe.y(pmlOp.y) - 0.843 * pmlOp.size
 
-        newFont = "F%d %d" % (pe.getFontNr(pmlOp.flags), pmlOp.size)
-        if newFont != pe.currentFont:
-            output += "/%s Tf\n" % newFont
-            pe.currentFont = newFont
+        newFont = pe.getFontForFlags(pmlOp.flags)
+        canvas.setFont(newFont, pmlOp.size)
 
         if pmlOp.angle is not None:
             matrix = TRANSFORM_MATRIX.get(pmlOp.angle)
 
             if matrix:
-                output += "BT\n"\
+                canvas.addLiteral("BT\n"\
                     "%f %f %f %f %f %f Tm\n"\
                     "(%s) Tj\n"\
                     "ET\n" % (matrix[0], matrix[1], matrix[2], matrix[3],
-                              x, y, pe.escapeStr(pmlOp.text))
+                              x, y, pe.escapeStr(pmlOp.text))) # TODO: Doing this with addLiteral, non-latin characters won't work in watermarks. There must be a better way to do this with reportlab, that we do it this way is for historical reasons and because no one took the time to change it
             else:
                 # unsupported angle, don't print it.
                 pass
         else:
-            output += "BT\n"\
-                "%f %f Td\n"\
-                "(%s) Tj\n"\
-                "ET\n" % (x, y, pe.escapeStr(pmlOp.text))
+            canvas.drawString(x, y, pmlOp.text)
 
         if pmlOp.flags & pml.UNDERLINED:
 
-            undLen = fontinfo.getMetrics(pmlOp.flags).getTextWidth(
-                pmlOp.text, pmlOp.size)
+            undLen = canvas.stringWidth(pmlOp.text, newFont, pmlOp.size)
 
             # all standard PDF fonts have the underline line 100 units
             # below baseline with a thickness of 50
             undY = y - 0.1 * pmlOp.size
+            canvas.setLineWidth(0.05 * pmlOp.size)
 
-            output += "%f w\n"\
-                      "%f %f m\n"\
-                      "%f %f l\n"\
-                      "S\n" % (0.05 * pmlOp.size, x, undY, x + undLen, undY)
+            canvas.line(x, undY, x + undLen, undY)
 
 class PDFLineOp(PDFDrawOp):
     def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, output: 'util.String', pe: 'PDFExporter', canvas):
@@ -227,19 +220,6 @@ class PDFExporter:
               FontInfo("Times-BoldItalic"),
             }
 
-        # list of PDFObjects
-        self.objects: List[PDFObject] = []
-
-        # number of fonts used
-        self.fontCnt: int = 0
-
-        # PDF object count. it starts at 1 because the 'f' thingy in the
-        # xref table is an object of some kind or something...
-        self.objectCnt: int = 1
-
-        # we only create this when needed, in genWidths
-        self.widthsObj: Optional[PDFObject] = None
-
         if doc.defPage != -1:
             # canvas.addLiteral("/OpenAction [%d 0 R /XYZ null null 0]\n" % (self.pageObjs[0].nr + doc.defPage * 2)) # this should make the PDF reader open the PDF at the desired page
             # TODO: This doesn't seem to be easily doable with reportlab. /OpenAction is considered a security threat by some (as it allows executing JavaScript), so I think it's unlikely they'll add support. Also, this feature didn't work with many PDF viewers anyway; I tested Evince, Okular and pdf.js in Firefox, and they all didn't support it. So maybe, we should remove this feature entirely?
@@ -252,7 +232,6 @@ class PDFExporter:
             pg = self.doc.pages[i]
             # content stream
             cont = util.String()
-            self.currentFont: str = ""
             for op in pg.ops:
                 op.pdfOp.draw(op, i, cont, self, canvas)
 
@@ -270,29 +249,9 @@ class PDFExporter:
         if doc.showTOC:
             canvas.showOutline()
 
-        fontStr = ""
-        for fi in self.fonts.values():
-            if fi.number != -1:
-                fontStr += "/F%d %d 0 R " % (fi.number, fi.pdfObj.nr)
-                # The font string had been inserted into the /Pages object under "/Resources << /Font<<\n %s >> >>\n>>"
-                # TODO: find a new place for this information on the reportlab canvas
-
-        self.genPDF(canvas)
-
         data = canvas.getpdfdata()
 
         return data
-
-    # create a PDF object containing a 256-entry array for the widths of a
-    # font, with all widths being 600
-    def genWidths(self) -> None:
-        if self.widthsObj:
-            return
-
-        if not self.__class__._widthsStr:
-            self.__class__._widthsStr = "[%s]" % ("600 " * 256).rstrip()
-
-        self.widthsObj = self.addObj(self.__class__._widthsStr)
 
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
@@ -316,103 +275,28 @@ class PDFExporter:
                 "%s\n"
                 "endstream" % (len(s), lenStr, filterStr, s))
 
-    # add a new object and return it. 'data' is all data between
-    # 'obj/endobj' tags, excluding newlines.
-    def addObj(self, data: str = "") -> PDFObject:
-        obj = PDFObject(self.objectCnt, data)
-        self.objects.append(obj)
-        self.objectCnt += 1
 
-        return obj
-
-    # write out object to 'canvas'
-    def writeObj(self, canvas: Canvas, obj: PDFObject) -> None:
-        obj.write(canvas)
-
-    # generate PDF file and return it as a string
-    def genPDF(self, canvas: Canvas) -> None:
-        for obj in self.objects:
-            self.writeObj(canvas, obj)
-
-    # get font number to use for given flags. also creates the PDF object
-    # for the font if it does not yet exist.
-    def getFontNr(self, flags: int) -> int:
+    # get font name to use for given flags. also registers the font in reportlabs if it does not yet exist.
+    def getFontForFlags(self, flags: int) -> str:
         # the "& 15" gets rid of the underline flag
-        fi = self.fonts.get(flags & 15)
+        fontInfo = self.fonts.get(flags & 15)
 
-        if not fi:
-            print("PDF.getfontNr: invalid flags %d" % flags)
+        if not fontInfo:
+            raise Exception("PDF.getfontNr: invalid flags %d" % flags)
 
-            return 0
+        # the "& 15" gets rid of the underline flag
+        customFontInfo = self.doc.fonts.get(flags & 15)
 
-        if fi.number == -1:
-            fi.number = self.fontCnt
-            self.fontCnt += 1
+        if not customFontInfo:
+            return fontInfo.name
 
-            # the "& 15" gets rid of the underline flag
-            pfi = self.doc.fonts.get(flags & 15)
+        # Sadly, I don't know if this works, as setting custom fonts is broken currently and I couldn't test this
+        if not customFontInfo.name in pdfmetrics.getRegisteredFontNames():
+            if not customFontInfo.fontFileName:
+                raise Exception('Font name %s is not known and no font file name provided' % customFontInfo.name)
+            pdfmetrics.registerFont(TTFont(customFontInfo.name, customFontInfo.fontFileName))
 
-            if not pfi:
-                fi.pdfObj = self.addObj("<< /Type /Font\n"
-                                        "/Subtype /Type1\n"
-                                        "/BaseFont /%s\n"
-                                        "/Encoding /WinAnsiEncoding\n"
-                                        ">>" % fi.name)
-            else:
-                self.genWidths()
-
-                fi.pdfObj = self.addObj("<< /Type /Font\n"
-                                        "/Subtype /TrueType\n"
-                                        "/BaseFont /%s\n"
-                                        "/Encoding /WinAnsiEncoding\n"
-                                        "/FirstChar 0\n"
-                                        "/LastChar 255\n"
-                                        "/Widths %d 0 R\n"
-                                        "/FontDescriptor %d 0 R\n"
-                                        ">>" % (pfi.name, self.widthsObj.nr,
-                                                self.objectCnt + 1))
-
-                fm = fontinfo.getMetrics(flags)
-
-                if pfi.fontProgram:
-                    fpStr = "/FontFile2 %d 0 R\n" % (self.objectCnt + 1)
-                else:
-                    fpStr = ""
-
-                # we use a %s format specifier for the italic angle since
-                # it sometimes contains integers, sometimes floating point
-                # values.
-                self.addObj("<< /Type /FontDescriptor\n"
-                            "/FontName /%s\n"
-                            "/FontWeight %d\n"
-                            "/Flags %d\n"
-                            "/FontBBox [%d %d %d %d]\n"
-                            "/ItalicAngle %s\n"
-                            "/Ascent %s\n"
-                            "/Descent %s\n"
-                            "/CapHeight %s\n"
-                            "/StemV %s\n"
-                            "/StemH %s\n"
-                            "/XHeight %d\n"
-                            "%s"
-                            ">>" % (pfi.name,
-                                    fm.fontWeight,
-                                    fm.flags,
-                                    fm.bbox[0], fm.bbox[1],
-                                    fm.bbox[2], fm.bbox[3],
-                                    fm.italicAngle,
-                                    fm.ascent,
-                                    fm.descent,
-                                    fm.capHeight,
-                                    fm.stemV,
-                                    fm.stemH,
-                                    fm.xHeight,
-                                    fpStr))
-
-                if pfi.fontProgram:
-                    self.addObj(self.genStream(pfi.fontProgram, True))
-
-        return fi.number
+        return customFontInfo.name
 
     # escape string
     def escapeStr(self, s: str) -> str:

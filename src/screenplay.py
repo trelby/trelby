@@ -852,30 +852,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             pf = self.cfg.getPDFFont(pfi)
 
             if pf.pdfName:
-                # TODO: it's nasty calling loadFile from here since it
-                # uses wxMessageBox. dialog stacking order is also wrong
-                # since we don't know the frame to give. so, we should
-                # remove references to wxMessageBox from util and instead
-                # pass in an ErrorHandlerObject to all functions that need
-                # it. then the GUI program can use a subclass of that that
-                # stores the frame pointer inside it, and testing
-                # framework / other non-interactive uses can use a version
-                # that logs errors to stderr / raises an exception /
-                # whatever.
 
                 if pf.filename != "":
-                    # we load at most 10 MB to avoid a denial-of-service
-                    # attack by passing around scripts containing
-                    # references to fonts with filenames like "/dev/zero"
-                    # etc. no real font that I know of is this big so it
-                    # shouldn't hurt.
-                    fontProgram = util.loadFile(pf.filename, None,
-                                                10 * 1024 * 1024)
+                    fontFilename = pf.filename
                 else:
-                    fontProgram = None
+                    fontFilename = None
 
                 pager.doc.addFont(pf.style,
-                                  pml.PDFFontInfo(pf.pdfName, fontProgram))
+                                  pml.PDFFontInfo(pf.pdfName, fontFilename))
 
         return pager.doc
 
