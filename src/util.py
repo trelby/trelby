@@ -1,7 +1,11 @@
 # -*- coding: utf-8 -*-
 
+from typing import Optional, AnyStr
+
 import glob
 import gzip
+
+import config
 import misc
 import os
 import re
@@ -173,8 +177,8 @@ def cleanInput(s):
 def replace(s, new, start, width):
     return s[0 : start] + toInputStr(new) + s[start + width:]
 
-# delete all characters in 'chars' (a string) from s and return that.
-def deleteChars(s, chars):
+# delete all characters in 'chars' from s and return that.
+def deleteChars(s: str, chars: str) -> str:
     for char in chars:
         s = s.replace(char, '')
     return s
@@ -869,7 +873,7 @@ class String:
 # load at most maxSize (all if -1) bytes from 'filename', returning the
 # data as a string or None on errors. pops up message boxes with 'frame'
 # as parent on errors.
-def loadFile(filename, frame, maxSize = -1):
+def loadFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1) -> Optional[AnyStr]:
     ret = None
 
     try:
@@ -911,7 +915,7 @@ def loadMaybeCompressedFile(filename, frame):
 
 # write 'data' to 'filename', popping up a messagebox using 'frame' as
 # parent on errors. returns True on success.
-def writeToFile(filename, data, frame):
+def writeToFile(filename: str, data: AnyStr, frame: wx.TopLevelWindow) -> bool:
     try:
         f = open(misc.toPath(filename), "wb")
 
@@ -1046,7 +1050,7 @@ def getWindowsUnicodeEnvVar(name):
     return buf.value
 
 # show PDF file.
-def showPDF(filename, cfgGl, frame):
+def showPDF(filename: str, cfgGl: 'config.ConfigGlobal', frame: wx.TopLevelWindow) -> None:
     def complain():
         wx.MessageBox("PDF viewer application not found.\n\n"
                       "You can change your PDF viewer\n"
