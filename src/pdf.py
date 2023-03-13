@@ -188,6 +188,26 @@ class PDFExporter:
 
     def __init__(self, doc: 'pml.Document'):
         self.doc: pml.Document = doc
+        # fast lookup of font information
+        self.fonts: Dict[int, FontInfo] = {
+            pml.COURIER: FontInfo("Courier"),
+            pml.COURIER | pml.BOLD: FontInfo("Courier-Bold"),
+            pml.COURIER | pml.ITALIC: FontInfo("Courier-Oblique"),
+            pml.COURIER | pml.BOLD | pml.ITALIC:
+                FontInfo("Courier-BoldOblique"),
+
+            pml.HELVETICA: FontInfo("Helvetica"),
+            pml.HELVETICA | pml.BOLD: FontInfo("Helvetica-Bold"),
+            pml.HELVETICA | pml.ITALIC: FontInfo("Helvetica-Oblique"),
+            pml.HELVETICA | pml.BOLD | pml.ITALIC:
+                FontInfo("Helvetica-BoldOblique"),
+
+            pml.TIMES_ROMAN: FontInfo("Times-Roman"),
+            pml.TIMES_ROMAN | pml.BOLD: FontInfo("Times-Bold"),
+            pml.TIMES_ROMAN | pml.ITALIC: FontInfo("Times-Italic"),
+            pml.TIMES_ROMAN | pml.BOLD | pml.ITALIC:
+                FontInfo("Times-BoldItalic"),
+        }
 
     # generate PDF document and return it as a string
     def generate(self) -> AnyStr:
@@ -196,6 +216,7 @@ class PDFExporter:
             '',
             pdfVersion=(1, 5),
             pagesize=(self.mm2points(doc.w), self.mm2points(doc.h)),
+            initialFontName=self.getFontForFlags(pml.NORMAL),
         )
 
         # set PDF info
@@ -205,26 +226,6 @@ class PDFExporter:
         if self.doc.uniqueId:
             canvas.setKeywords(self.doc.uniqueId)
 
-        # fast lookup of font information
-        self.fonts: Dict[int, FontInfo] = {
-            pml.COURIER : FontInfo("Courier"),
-            pml.COURIER | pml.BOLD: FontInfo("Courier-Bold"),
-            pml.COURIER | pml.ITALIC: FontInfo("Courier-Oblique"),
-            pml.COURIER | pml.BOLD | pml.ITALIC:
-              FontInfo("Courier-BoldOblique"),
-
-            pml.HELVETICA : FontInfo("Helvetica"),
-            pml.HELVETICA | pml.BOLD: FontInfo("Helvetica-Bold"),
-            pml.HELVETICA | pml.ITALIC: FontInfo("Helvetica-Oblique"),
-            pml.HELVETICA | pml.BOLD | pml.ITALIC:
-              FontInfo("Helvetica-BoldOblique"),
-
-            pml.TIMES_ROMAN : FontInfo("Times-Roman"),
-            pml.TIMES_ROMAN | pml.BOLD: FontInfo("Times-Bold"),
-            pml.TIMES_ROMAN | pml.ITALIC: FontInfo("Times-Italic"),
-            pml.TIMES_ROMAN | pml.BOLD | pml.ITALIC:
-              FontInfo("Times-BoldItalic"),
-            }
 
         if doc.defPage != -1:
             # canvas.addLiteral("/OpenAction [%d 0 R /XYZ null null 0]\n" % (self.pageObjs[0].nr + doc.defPage * 2)) # this should make the PDF reader open the PDF at the desired page
