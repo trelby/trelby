@@ -302,7 +302,7 @@ class PDFExporter:
             for i in range(len(doc.tocs)):
                 self.genOutline(i)
 
-        return self.genPDF()
+        return util.toLatin1(self.genPDF())
 
     def createInfoObj(self):
         version = self.escapeStr(self.doc.version)
