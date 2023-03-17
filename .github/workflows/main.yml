@@ -27,8 +27,9 @@ jobs:
           run: |
             python -m pip install --upgrade pip
             pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04 -r requirements.txt
+        - name: Ensure pytest is available on PATH
+          run: echo "/opt/trelby/bin" >> "$GITHUB_PATH"
         - name: Test with pytest
           env:
             PYTHONPATH: /opt/trelby
-          run: |
-            /opt/trelby/bin/pytest
+          run: pytest
