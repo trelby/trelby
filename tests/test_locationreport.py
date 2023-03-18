@@ -1,6 +1,7 @@
 import locationreport
 import scenereport
 import u
+import util
 
 # tests location report (just that it runs without exceptions, for now)
 
@@ -12,4 +13,4 @@ def testBasic():
     # try to catch cases where generate returns something other than a PDF
     # document
     assert len(data) > 200
-    assert data[:8] == "%PDF-1.5"
+    assert data[:8] == util.toLatin1("%PDF-1.5")
