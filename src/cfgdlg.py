@@ -1517,7 +1517,7 @@ class PDFFontsPanel(wx.Panel):
         # passing around scripts containing references to fonts with
         # filenames like "/dev/zero" etc. no real font that I know of is
         # this big so it shouldn't hurt.
-        fontProgram = util.loadFile(filename, cfgFrame, 10 * 1024 * 1024)
+        fontProgram = util.loadFile(filename, cfgFrame, 10 * 1024 * 1024, True)
 
         if fontProgram is None:
             return ""
