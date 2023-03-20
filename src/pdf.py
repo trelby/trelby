@@ -1,4 +1,4 @@
-from typing import Optional, List, Tuple, Dict
+from typing import Optional, List, Tuple, Dict, AnyStr
 
 import fontinfo
 import pml
@@ -12,7 +12,7 @@ TRANSFORM_MATRIX = {
 }
 
 # users should only use this.
-def generate(doc: 'pml.Document') -> str:
+def generate(doc: 'pml.Document') -> AnyStr:
     tmp = PDFExporter(doc)
     return tmp.generate()
 
@@ -200,7 +200,7 @@ class PDFExporter:
         self.doc: pml.Document = doc
 
     # generate PDF document and return it as a string
-    def generate(self) -> str:
+    def generate(self) -> AnyStr:
         #lsdjflksj = util.TimerDev("generate")
         doc = self.doc
 

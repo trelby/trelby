@@ -1,3 +1,5 @@
+from typing import AnyStr
+
 import characterreport
 import config
 import pdf
@@ -12,7 +14,7 @@ class ScriptReport:
         self.sr = scenereport.SceneReport(sp)
         self.cr = characterreport.CharacterReport(sp)
 
-    def generate(self) -> str:
+    def generate(self) -> AnyStr:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
 

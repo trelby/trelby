@@ -1,3 +1,5 @@
+from typing import AnyStr
+
 import misc
 import pdf
 import pml
@@ -86,7 +88,7 @@ class CharacterReport:
     def sum(self, name):
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
 
-    def generate(self) -> str:
+    def generate(self) -> AnyStr:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 20.0, 12)
 
