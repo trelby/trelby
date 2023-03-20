@@ -23,12 +23,15 @@ def new():
 
     return screenplay.Screenplay(config.ConfigGlobal())
 
+def fixtureFilePath(filePathRelativeToFixturesDir: str) -> str:
+    location = os.path.dirname(__file__)+'/fixtures/'
+
+    return os.path.join(location, filePathRelativeToFixturesDir)
+
 # load script from the given file, relative to the current script directory
 def load(filename = "test.trelby"):
     init()
-
-    location = os.path.dirname(__file__)+'/fixtures/'
-    filename = os.path.join(location, filename)
+    filename = fixtureFilePath(filename)
 
     return screenplay.Screenplay.load(open(filename, "r").read(),
                                       config.ConfigGlobal())[0]
