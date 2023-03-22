@@ -14,7 +14,7 @@ class ScriptReport:
         self.sr = scenereport.SceneReport(sp)
         self.cr = characterreport.CharacterReport(sp)
 
-    def generate(self) -> AnyStr:
+    def generate(self) -> bytes:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
 
