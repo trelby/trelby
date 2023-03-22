@@ -826,7 +826,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # 100% correct for the screenplay. isExport is True if this is an
     # "export to file" operation, False if we're just going to launch a
     # PDF viewer with the data.
-    def generatePDF(self, isExport: bool) -> AnyStr:
+    def generatePDF(self, isExport: bool) -> bytes:
         return pdf.generate(self.generatePML(isExport))
 
     # Same arguments as generatePDF, but returns a PML document.
@@ -2482,7 +2482,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     # compare this script to sp2 (Screenplay), return a PDF file (as a
     # string) of the differences, or None if the scripts are identical.
-    def compareScripts(self, sp2) -> str:
+    def compareScripts(self, sp2) -> bytes:
         s1 = self.generateText(False).split("\n")
         s2 = sp2.generateText(False).split("\n")
 
