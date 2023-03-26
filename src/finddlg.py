@@ -146,7 +146,6 @@ class FindDlg(wx.Dialog):
             self.elements.Check(i, tmp[i])
 
         self.showExtra(self.ctrl.findDlgUseExtra)
-        self.Center()
 
     def saveState(self):
         self.getParams()

@@ -1,4 +1,4 @@
-from typing import List, AnyStr
+from typing import List
 
 import gutil
 import misc
@@ -173,7 +173,7 @@ class DialogueChart:
         # spacing from one legend item to next
         self.legendSize = 4.0
 
-    def generate(self, cbil: List[misc.CheckBoxItem]) -> AnyStr:
+    def generate(self, cbil: List[misc.CheckBoxItem]) -> bytes:
         doc = pml.Document(self.sp.cfg.paperHeight,
                            self.sp.cfg.paperWidth)
 

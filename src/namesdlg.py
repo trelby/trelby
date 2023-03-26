@@ -122,7 +122,7 @@ class NamesDlg(wx.Dialog):
         self.sexRb.SetSelection(2)
         hsizer2.Add(self.sexRb, 0, wx.LEFT, 5)
 
-        vsizer.Add(hsizer2, 0, wx.EXPAND | wx.ALIGN_CENTER)
+        vsizer.Add(hsizer2, 0, wx.EXPAND)
 
         vsizer.Add(wx.StaticText(self, -1, "Results:"))
 

@@ -1,5 +1,3 @@
-from typing import AnyStr
-
 import config
 from error import MiscError,TrelbyError
 import misc
@@ -75,7 +73,7 @@ def btnDblClick(btn, func):
 # temporary file, first deleting all old temporary files, then opens PDF
 # viewer application. 'mainFrame' is used as a parent for message boxes in
 # case there are any errors.
-def showTempPDF(pdfData: AnyStr, cfgGl: 'config.ConfigGlobal', mainFrame: wx.TopLevelWindow) -> None:
+def showTempPDF(pdfData: bytes, cfgGl: 'config.ConfigGlobal', mainFrame: wx.TopLevelWindow) -> None:
     try:
         try:
             util.removeTempFiles(misc.tmpPrefix)
@@ -85,7 +83,7 @@ def showTempPDF(pdfData: AnyStr, cfgGl: 'config.ConfigGlobal', mainFrame: wx.Top
 
             try:
                 if isinstance(pdfData, str):
-                    os.write(fd, pdfData.encode("UTF-8"))
+                    os.write(fd, pdfData)
                 else:
                     os.write(fd, pdfData)
             finally:

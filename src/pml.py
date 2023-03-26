@@ -75,12 +75,12 @@ class Page:
         self.doc: Document = doc
 
         # a collection of Operation objects
-        self.ops: list['DrawOp'] = []
+        self.ops: List['DrawOp'] = []
 
     def add(self, op: 'DrawOp') -> None:
         self.ops.append(op)
 
-    def addOpsToFront(self, opsList: list['DrawOp']) -> None:
+    def addOpsToFront(self, opsList: List['DrawOp']) -> None:
         self.ops = opsList + self.ops
 
 # Table of content item (Outline item, in PDF lingo)

@@ -4,21 +4,55 @@ on:
     - main
   pull_request:
 
-name: Run Tox tests
+name: Tests
 
 jobs:
-  tox_test:
-    name: Tox test
-    steps:
-    - uses: actions/checkout@v2
-    - name: Run Tox tests
-      id: test
-      uses: fedora-python/tox-github-action@master
-      with:
-        tox_env: ${{ matrix.tox_env }}
-        dnf_install: python3-wxpython4 python3-lxml gtk3-devel which
-    strategy:
-      matrix:
-        tox_env: [py311, py310, py39, py38]
+  tests:
+      runs-on: ubuntu-latest
+      strategy:
+        fail-fast: false
+        matrix:
+          python-version: [ "3.8", "3.9", "3.10", "3.11" ]
 
-    runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v3
+
+        - name: Set up Python ${{ matrix.python-version }}
+          uses: actions/setup-python@v4
+          with:
+            python-version: ${{ matrix.python-version }}
+
+        - uses: actions/cache/restore@v3
+          id: restore-cache
+          with:
+            path: ${{ env.pythonLocation }}
+            key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+
+        - name: Install Linux dependencies
+          run: |
+            sudo apt-get install libgtk-3-dev libsdl2-2.0 libwxgtk3.0-gtk3-dev
+
+        - name: Install Python dependencies
+          run: |
+            python -m pip install --upgrade pip wheel
+            # Install attrdict3 to support the installation of wxPython from source.
+            # In most cases, wxPython can be installed from wheels, but if those are not available,
+            # attrdict3 is a prerequisite for installing from source.
+            # This is currently a requirement for installing wxPython for Python 3.11.
+            python -m pip install attrdict3
+            pip install -f https://extras.wxpython.org/wxPython4/extras/linux/gtk3/ubuntu-22.04 -r requirements.txt
+
+
+        - uses: actions/cache/save@v3
+          if: steps.restore-cache.outputs.cache-hit != 'true'
+          with:
+            path: ${{ env.pythonLocation }}
+            key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
+
+        - name: Ensure pytest is available on PATH
+          run: echo "/opt/trelby/bin" >> "$GITHUB_PATH"
+
+        - name: Test with pytest
+          env:
+            PYTHONPATH: /opt/trelby
+          run: pytest

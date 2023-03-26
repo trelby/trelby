@@ -16,7 +16,7 @@ TRANSFORM_MATRIX = {
 }
 
 # users should only use this.
-def generate(doc: 'pml.Document') -> AnyStr:
+def generate(doc: 'pml.Document') -> bytes:
     tmp = PDFExporter(doc)
     return tmp.generate()
 
@@ -210,7 +210,7 @@ class PDFExporter:
         }
 
     # generate PDF document and return it as a string
-    def generate(self) -> AnyStr:
+    def generate(self) -> bytes:
         doc = self.doc
         canvas = Canvas(
             '',

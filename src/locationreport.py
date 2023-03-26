@@ -1,5 +1,3 @@
-from typing import AnyStr
-
 import misc
 import pdf
 import pml
@@ -64,7 +62,7 @@ class LocationReport:
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
-    def generate(self) -> AnyStr:
+    def generate(self) -> bytes:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
 

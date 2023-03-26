@@ -641,7 +641,7 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
 # create pad sizer for given window whose controls are in topSizer, with
 # 'pad' pixels of padding on each side, resize window to correct size, and
 # optionally center it.
-def finishWindow(window, topSizer, pad = 10, center = True):
+def finishWindow(window, topSizer, pad = 10, center = False):
     padSizer = wx.BoxSizer(wx.VERTICAL)
     padSizer.Add(topSizer, 1, wx.EXPAND | wx.ALL, pad)
     window.SetSizerAndFit(padSizer)
@@ -873,11 +873,12 @@ class String:
 # load at most maxSize (all if -1) bytes from 'filename', returning the
 # data as a string or None on errors. pops up message boxes with 'frame'
 # as parent on errors.
-def loadFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1) -> Optional[AnyStr]:
-    ret = None
-
+def loadFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1, binary: bool = False) -> Optional[AnyStr]:
     try:
-        f = open(misc.toPath(filename), "r", encoding='UTF-8')
+        if binary:
+            f = open(misc.toPath(filename), "rb")
+        else:
+            f = open(misc.toPath(filename), "r", encoding='UTF-8')
 
         try:
             ret = f.read(maxSize)
@@ -891,6 +892,9 @@ def loadFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1) -> Opt
         ret = None
 
     return ret
+
+def loadLatin1EncodedFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1) -> Optional[AnyStr]:
+    return loadFile(filename, frame, maxSize, 'ISO-8859-1')
 
 # like loadFile, but if file doesn't exist, tries to load a .gz compressed
 # version of it.

@@ -23,7 +23,7 @@ SHOT = 7
 NOTE = 8
 ACTBREAK = 9
 
-from typing import Tuple, AnyStr
+from typing import Tuple
 
 import autocompletion
 import config
@@ -147,7 +147,7 @@ class Screenplay:
     # │ Intel Core Duo T2050 1.6GHz │  0.173s │ 0.020s │
     # │ Intel i5-2400 3.1GHz        │  0.076s │ 0.007s │
     # ╰─────────────────────────────┴─────────┴────────╯
-    def __deepcopy__(self):
+    def __deepcopy__(self, memo):
         sp = Screenplay(self.cfgGl)
         sp.cfg = copy.deepcopy(self.cfg)
 
@@ -826,7 +826,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # 100% correct for the screenplay. isExport is True if this is an
     # "export to file" operation, False if we're just going to launch a
     # PDF viewer with the data.
-    def generatePDF(self, isExport: bool) -> AnyStr:
+    def generatePDF(self, isExport: bool) -> bytes:
         return pdf.generate(self.generatePML(isExport))
 
     # Same arguments as generatePDF, but returns a PML document.
@@ -2465,7 +2465,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     # compare this script to sp2 (Screenplay), return a PDF file (as a
     # string) of the differences, or None if the scripts are identical.
-    def compareScripts(self, sp2) -> str:
+    def compareScripts(self, sp2) -> bytes:
         s1 = self.generateText(False).split("\n")
         s2 = sp2.generateText(False).split("\n")
 
