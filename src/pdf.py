@@ -288,7 +288,7 @@ class PDFExporter:
         # Sadly, I don't know if this works, as setting custom fonts is broken currently and I couldn't test this
         if not customFontInfo.name in pdfmetrics.getRegisteredFontNames():
             if not customFontInfo.fontFileName:
-                raise Exception('Font name %s is not known and no font file name provided' % customFontInfo.name)
+                raise Exception('Font name "%s" is not known and no font file name provided. Please provide a file name for this font in the settings or use the default font.' % customFontInfo.name)
             pdfmetrics.registerFont(TTFont(customFontInfo.name, customFontInfo.fontFileName))
 
         return customFontInfo.name
