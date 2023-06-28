@@ -135,7 +135,7 @@ packageData = {"src": ["../resources/*",
       "../sample.trelby",
       "../fileformat.txt",
       "../manual.html",
-      "../README",
+      "../README.md",
 ]}
 dataFiles = []
 
