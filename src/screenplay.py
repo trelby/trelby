@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import wx
 
 # linebreak types
 
@@ -848,18 +849,19 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             else:
                 break
 
+        userHasSetFontNameWithoutFile = False
+
         for pfi in self.cfg.getPDFFontIds():
             pf = self.cfg.getPDFFont(pfi)
 
-            if pf.pdfName:
-
-                if pf.filename != "":
-                    fontFilename = pf.filename
-                else:
-                    fontFilename = None
-
+            if pf.pdfName and pf.filename != "":
                 pager.doc.addFont(pf.style,
-                                  pml.PDFFontInfo(pf.pdfName, fontFilename))
+                                  pml.PDFFontInfo(pf.pdfName, pf.filename))
+            elif pf.pdfName:
+                userHasSetFontNameWithoutFile = True
+
+        if userHasSetFontNameWithoutFile:
+            wx.MessageBox('Setting a font name without a font file is not possible in Trelby any more. Please adjust your settings in Script > Settings > Change > PDF/Fonts. Trelby will fall back to the default font for now.')
 
         return pager.doc
 
