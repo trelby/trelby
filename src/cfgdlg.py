@@ -1401,10 +1401,8 @@ class PDFFontsPanel(wx.Panel):
             "Leave all the fields empty to use the default PDF Courier\n"
             "fonts. This is highly recommended.\n"
             "\n"
-            "Otherwise, fill in the font name (e.g. AndaleMono) to use\n"
-            "the specified TrueType font. If you want to embed the font\n"
-            "in the generated PDF files, fill in the font filename as well.\n"
-            "\n"
+            "Otherwise, fill in the the font filename to use\n"
+            "the specified TrueType font. \n"
             "See the manual for the full details.\n"))
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -1449,11 +1447,21 @@ class PDFFontsPanel(wx.Panel):
 
     # check that all embedded TrueType fonts are OK
     def checkForErrors(self):
+        userHasSetFontNameWithoutFile = False
+
         for pfi in self.cfg.getPDFFontIds():
             pf = self.cfg.getPDFFont(pfi)
 
+            if pf.name and not pf.filename:
+                userHasSetFontNameWithoutFile = True
+
             if pf.filename:
                 self.getFontPostscriptName(pf.filename)
+
+        if userHasSetFontNameWithoutFile:
+            wx.MessageBox(
+                'You need to select a file when specifying a custom font. Select a file or remove the font name you provided.',
+                'Error', wx.OK, cfgFrame)
 
     def addEntry(self, name, descr, parent, sizer):
         sizer.Add(wx.StaticText(parent, -1, descr), 0,
