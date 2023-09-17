@@ -1,16 +1,26 @@
 # setup.py
 from distutils.command.build_scripts import build_scripts as _build_scripts
+from setuptools.command.easy_install import easy_install as _easy_install
 from distutils.command.bdist_rpm import bdist_rpm as _bdist_rpm
 from distutils.command.install_data import install_data as _install_data
 from distutils.core import Command
 from distutils.core import setup
 from distutils.util import convert_path
 
-import fileinput
 import glob
 import subprocess
 import sys
 import os.path
+
+
+def modify_import_path_in_trelby_bin(path_to_trelby_bin: str, src_path_in_final_installation: str):
+    in_file = open(path_to_trelby_bin, "rt")
+    text = in_file.read()
+    text = text.replace('src', src_path_in_final_installation)
+    in_file.close()
+    out_file = open(path_to_trelby_bin, "wt")
+    out_file.write(text)
+    out_file.close()
 
 class build_scripts(_build_scripts):
     """build_scripts command
@@ -23,22 +33,29 @@ class build_scripts(_build_scripts):
         _build_scripts.copy_scripts(self)
 
         if "install" in self.distribution.command_obj:
+            if "bdist_egg" in self.distribution.command_obj:
+                # When creating an egg, the paths here don't match the final paths, as the egg is going to get moved
+                # later on by the easy_install command. The easy_install command is going to take care of modifying the
+                # import path then.
+                return
+
             iobj = self.distribution.command_obj["install"]
             libDir = iobj.install_lib
 
             if iobj.root:
                 libDir = libDir[len(iobj.root):]
 
-            script = convert_path("bin/trelby")
-            outfile = os.path.join(self.build_dir, os.path.basename(script))
+            path_to_trelby_bin = os.path.join(self.build_dir, os.path.basename(convert_path("bin/trelby")))
 
-            in_file = open(script, "rt")
-            text = in_file.read()
-            text = text.replace('src', libDir + 'src')
-            in_file.close()
-            out_file = open(outfile, "wt")
-            out_file.write(text)
-            out_file.close()
+            modify_import_path_in_trelby_bin(path_to_trelby_bin, os.path.join(libDir, 'src'))
+
+class easy_install(_easy_install):
+    def install_egg(self, egg_path, tmpdir):
+        egg_distribution = super().install_egg(egg_path, tmpdir)
+
+        modify_import_path_in_trelby_bin(os.path.join(egg_distribution.egg_info, 'scripts/trelby'), os.path.join(egg_distribution.location, 'src'))
+
+        return egg_distribution
 
 class bdist_rpm(_bdist_rpm):
     """bdist_rpm command
@@ -135,7 +152,7 @@ packageData = {"src": ["../resources/*",
       "../sample.trelby",
       "../fileformat.txt",
       "../manual.html",
-      "../README",
+      "../README.md",
 ]}
 dataFiles = []
 
@@ -174,6 +191,7 @@ setup(
         "build_scripts": build_scripts,
         "bdist_rpm": bdist_rpm,
         "install_data": install_data,
+        "easy_install": easy_install,
         "nsis": nsis,
     },
     version = misc.version,
