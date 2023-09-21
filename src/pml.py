@@ -44,8 +44,6 @@ class Document:
 
         self.pages: List[Page] = []
 
-        self.tocs: List[TOCItem] = []
-
         # user-specified fonts, if any. key = 2 lowest bits of
         # TextOp.flags, value = pml.PDFFontInfo
         self.fonts: Dict[int, 'PDFFontInfo'] = {}
@@ -66,9 +64,6 @@ class Document:
 
     def add(self, page: 'Page') -> None:
         self.pages.append(page)
-
-    def addTOC(self, toc: 'TOCItem') -> None:
-        self.tocs.append(toc)
 
     def addFont(self, style: int, pfi: 'PDFFontInfo') -> None:
         self.fonts[style] = pfi
@@ -98,19 +93,16 @@ class TOCItem:
         # correct positioning information)
         self.op: TextOp = op
 
-        # the PDF object number of the page we point to
-        self.pageObjNr: int = -1
-
 # information about one PDF font
 class PDFFontInfo:
-    def __init__(self, name: str, fontProgram: Optional[AnyStr]):
+    def __init__(self, name: str, fontFileName: Optional[str]):
         # name to use in generated PDF file ("CourierNew", "MyFontBold",
         # etc.). if empty, use the default PDF font.
         self.name: str = name
 
         # the font program (in practise, the contents of the .ttf file for
         # the font), or None, in which case the font is not embedded.
-        self.fontProgram: Optional[AnyStr] = fontProgram
+        self.fontFileName: Optional[str] = fontFileName
 
 # An abstract base class for all drawing operations.
 class DrawOp:

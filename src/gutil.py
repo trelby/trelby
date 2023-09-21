@@ -1,5 +1,3 @@
-from typing import AnyStr
-
 import config
 from error import MiscError,TrelbyError
 import misc
@@ -84,7 +82,10 @@ def showTempPDF(pdfData: bytes, cfgGl: 'config.ConfigGlobal', mainFrame: wx.TopL
                                             suffix = ".pdf")
 
             try:
-                os.write(fd, pdfData)
+                if isinstance(pdfData, str):
+                    os.write(fd, pdfData)
+                else:
+                    os.write(fd, pdfData)
             finally:
                 os.close(fd)
 

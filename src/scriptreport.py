@@ -1,5 +1,3 @@
-from typing import AnyStr
-
 import characterreport
 import config
 import pdf

@@ -1,5 +1,3 @@
-from typing import AnyStr
-
 import misc
 import pdf
 import pml
