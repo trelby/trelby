@@ -16,7 +16,8 @@ The major difference of this fork is conversion to Python 3.  I also have a list
 
 2. cd trelby
 
-3. pip3 install -r requirements.txt
+3. pip3 install -r requirements.txt  
+   *Depending on your python version, you might run into https://github.com/wxWidgets/Phoenix/issues/2296. We recommend executing `pip3 install attrdict3` before installing the requirements in that case. If that still doesn't work, we recommend upgrading your python version.*
 
 4. ./bin/trelby
 
