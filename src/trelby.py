@@ -156,30 +156,46 @@ class GlobalData:
     def saveScDict(self):
         util.writeToFile(self.scDictFilename, self.scDict.save(), mainFrame)
 
-class MyPanel(wx.ScrolledWindow):
+class MyPanel(wx.Panel):
 
     def __init__(self, parent, id):
-        wx.ScrolledWindow.__init__(
+        wx.Panel.__init__(
             self, parent, id,
             # wxMSW/Windows does not seem to support
             # wx.NO_BORDER, which sucks
-            style = wx.WANTS_CHARS | wx.NO_BORDER | wx.HSCROLL)
+            style = wx.WANTS_CHARS | wx.NO_BORDER)
 
-        hsizer = wx.BoxSizer(wx.HORIZONTAL)
-
+        # Vertical scrolling is achieved using a scroll bar that is connected to the Screenplay object. It changes
+        # the sp.line property when scrolled, which causes the rendering code to render starting from a different line.
+        # The reasons for this architectural decision are unknown as of 2023, but it has the advantage that only the
+        # part of the screenplay that gets displayed given the current scrolling position will be rendered.
         self.scrollBarVertical = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
-        self.ctrl = MyCtrl(self, -1, self.scrollBarVertical)
 
-        hsizer.Add(self.ctrl, 1, wx.EXPAND)
+        # Horizontal scrolling is achieved by putting the MyControl instance into a ScrolledWindow. The MyControl
+        # content will always be rendered at full width, but if the available size is less than the rendered size, a
+        # scroll bar will automatically appear an allow scrolling.
+        scrolledWindowForCtrl = wx.ScrolledWindow(self, id, style = wx.HSCROLL)
+
+        # scrollBarVertical and the (horizontally scrollable) scrolledWindowForCtrl need to be created before
+        self.ctrl = MyCtrl(scrolledWindowForCtrl, -1, self.scrollBarVertical)
+
+        scrolledWindowForCtrl.SetScrollRate(int(self.ctrl.chX), int(self.ctrl.chY))
+        scrolledWindowForCtrl.EnableScrolling(True, False)
+
+        sizer = wx.BoxSizer(wx.VERTICAL) # we need this sizer only to make the MyCtrl expand to the size of the ScrolledWindow
+        sizer.Add(self.ctrl, 1, wx.EXPAND)
+        scrolledWindowForCtrl.SetSizer(sizer)
+
+        # the vertical scroll bar will be placed next to the (horizontally scrollable) ScrolledWindow that contains the
+        # MyCtrl instance
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
+        hsizer.Add(scrolledWindowForCtrl, 1, wx.EXPAND)
         hsizer.Add(self.scrollBarVertical, 0, wx.EXPAND)
 
         self.scrollBarVertical.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
-
         self.scrollBarVertical.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
 
         self.SetSizer(hsizer)
-        self.SetScrollRate(int(self.ctrl.chX), int(self.ctrl.chY))
-        self.EnableScrolling(True, False)
 
     # we never want the scrollbar to get the keyboard focus, pass it on to
     # the main widget
@@ -193,7 +209,7 @@ class MyCtrl(wx.Control):
         wx.Control.__init__(self, parent, id, style = style)
 
         self.scrollBarVertical = scrollBarVertical
-        self.panel = parent
+        self.panel = parent.GetParent()
 
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
