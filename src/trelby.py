@@ -165,17 +165,34 @@ class MyPanel(wx.Panel):
             # wx.NO_BORDER, which sucks
             style = wx.WANTS_CHARS | wx.NO_BORDER)
 
+        # Vertical scrolling is achieved using a scroll bar that is connected to the Screenplay object. It changes
+        # the sp.line property when scrolled, which causes the rendering code to render starting from a different line.
+        # The reasons for this architectural decision are unknown as of 2023, but it has the advantage that only the
+        # part of the screenplay that gets displayed given the current scrolling position will be rendered.
+        self.scrollBarVertical = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
+
+        # Horizontal scrolling is achieved by putting the MyControl instance into a ScrolledWindow. The MyControl
+        # content will always be rendered at full width, but if the available size is less than the rendered size, a
+        # scroll bar will automatically appear an allow scrolling.
+        scrolledWindowForCtrl = wx.ScrolledWindow(self, id, style = wx.HSCROLL)
+
+        self.ctrl = MyCtrl(scrolledWindowForCtrl, -1, self.scrollBarVertical)
+
+        scrolledWindowForCtrl.SetScrollRate(int(self.ctrl.chX), int(self.ctrl.chY))
+        scrolledWindowForCtrl.EnableScrolling(True, False)
+
+        sizer = wx.BoxSizer(wx.VERTICAL) # we need this sizer only to make the MyCtrl expand to the size of the ScrolledWindow
+        sizer.Add(self.ctrl, 1, wx.EXPAND)
+        scrolledWindowForCtrl.SetSizer(sizer)
+
+        # the vertical scroll bar will be placed next to the (horizontally scrollable) ScrolledWindow that contains the
+        # MyCtrl instance
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
+        hsizer.Add(scrolledWindowForCtrl, 1, wx.EXPAND)
+        hsizer.Add(self.scrollBarVertical, 0, wx.EXPAND)
 
-        self.scrollBar = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
-        self.ctrl = MyCtrl(self, -1)
-
-        hsizer.Add(self.ctrl, 1, wx.EXPAND)
-        hsizer.Add(self.scrollBar, 0, wx.EXPAND)
-
-        self.scrollBar.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
-
-        self.scrollBar.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
+        self.scrollBarVertical.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
+        self.scrollBarVertical.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
 
         self.SetSizer(hsizer)
 
@@ -186,11 +203,12 @@ class MyPanel(wx.Panel):
 
 class MyCtrl(wx.Control):
 
-    def __init__(self, parent, id):
+    def __init__(self, parent, id, scrollBarVertical: wx.ScrollBar):
         style = wx.WANTS_CHARS | wx.FULL_REPAINT_ON_RESIZE | wx.NO_BORDER
         wx.Control.__init__(self, parent, id, style = style)
 
-        self.panel = parent
+        self.scrollBarVertical = scrollBarVertical
+        self.panel = parent.GetParent()
 
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
@@ -417,8 +435,8 @@ class MyCtrl(wx.Control):
         # about draft / layout mode differences.
         approx = int(((height / self.mm2p) / self.chY) / 1.3)
 
-        self.panel.scrollBar.SetScrollbar(self.sp.getTopLine(), approx,
-            len(self.sp.lines) + approx - 1, approx)
+        self.scrollBarVertical.SetScrollbar(self.sp.getTopLine(), approx,
+                                                  len(self.sp.lines) + approx - 1, approx)
 
     def clearAutoComp(self):
         if self.sp.clearAutoComp():
@@ -435,6 +453,8 @@ class MyCtrl(wx.Control):
 
     def updateScreen(self, redraw = True, setCommon = True):
         self.adjustScrollBar()
+        self.SetMinSize(wx.Size(int(self.pageW), 10)) # the vertical min size is irrelevant currently, as vertical scrolling is still self-implemented
+        self.PostSizeEventToParent()
 
         if setCommon:
             self.updateCommon()
@@ -611,7 +631,7 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     def OnScroll(self, event):
-        pos = self.panel.scrollBar.GetThumbPosition()
+        pos = self.scrollBarVertical.GetThumbPosition()
         self.sp.setTopLine(pos)
         self.sp.clearAutoComp()
         self.updateScreen()
