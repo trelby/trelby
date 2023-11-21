@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import wx
 
 # linebreak types
 
@@ -23,6 +24,8 @@ SHOT = 7
 NOTE = 8
 ACTBREAK = 9
 
+from typing import Tuple
+
 import autocompletion
 import config
 import error
@@ -36,7 +39,6 @@ import titles
 import undo
 import util
 
-import codecs
 import copy
 import difflib
 import re
@@ -165,14 +167,14 @@ class Screenplay:
 
         return sp
 
-    # save script to a string and return that
-    def save(self):
+    # save script to a utf-8 encoded string and return that
+    def save(self)->bytes:
         self.cfg.cursorLine = self.line
         self.cfg.cursorColumn = self.column
 
-        output = util.String()
+        output = ''
 
-        output += codecs.BOM_UTF8
+        output += '\ufeff'
         output += "#Version 3\n"
 
         output += "#Begin-Auto-Completion \n"
@@ -192,11 +194,11 @@ class Screenplay:
         output += "#End-Spell-Checker-Dict \n"
 
         pgs = self.titles.pages
-        for pg in xrange(len(pgs)):
+        for pg in range(len(pgs)):
             if pg != 0:
                 output += "#Title-Page \n"
 
-            for i in xrange(len(pgs[pg])):
+            for i in range(len(pgs[pg])):
                 output += "#Title-String %s\n" % str(pgs[pg][i])
 
         for h in self.headers.hdrs:
@@ -206,21 +208,18 @@ class Screenplay:
 
         output += "#Start-Script \n"
 
-        for i in xrange(len(self.lines)):
-            output += util.toUTF8(str(self.lines[i]) + "\n")
+        for i in range(len(self.lines)):
+            output += str(self.lines[i]) + "\n"
 
-        return str(output)
+        return output.encode("UTF-8")
 
     # load script from string s and return a (Screenplay, msg) tuple,
     # where msgs is string (possibly empty) of warnings about the loading
     # process. fatal errors are indicated by raising a MiscError. note
     # that this is a static function.
     @staticmethod
-    def load(s, cfgGl):
-        if s[0:3] != codecs.BOM_UTF8:
-            raise error.MiscError("File is not a Trelby screenplay.")
-
-        lines = s[3:].splitlines()
+    def load(s: str, cfgGl):
+        lines = s.splitlines()
 
         sp = Screenplay(cfgGl)
 
@@ -280,7 +279,7 @@ class Screenplay:
         # files which didn't have it.
         startSeen = version < 3
 
-        for i in xrange(index, len(lines)):
+        for i in range(index, len(lines)):
             s = lines[i]
 
             if len(s) < 2:
@@ -412,9 +411,9 @@ class Screenplay:
     # already. returns a (key, value) tuple. if line doesn't match the
     # format, (None, None) is returned.
     @staticmethod
-    def parseConfigLine(s):
-        m = re.match("#([a-zA-Z0-9\-]+) (.*)", s)
-
+    def parseConfigLine(s: str)->Tuple[str,str]:
+        pattern = re.compile("#([a-zA-Z0-9\-]+) (.*)")
+        m = pattern.search(s)
         if m:
             return (m.group(1), m.group(2))
         else:
@@ -445,7 +444,7 @@ class Screenplay:
 
         output = util.String()
 
-        for p in xrange(1, len(self.pages)):
+        for p in range(1, len(self.pages)):
             start, end = self.page2lines(p)
 
             if doPages and (p != 1):
@@ -453,7 +452,7 @@ class Screenplay:
                 s += "-" * (60 - len(s))
                 output += "\n%s\n\n" % s
 
-            for i in xrange(start, end + 1):
+            for i in range(start, end + 1):
                 line = ls[i]
                 tcfg = self.cfg.getType(line.lt)
 
@@ -524,7 +523,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 for s in ts.items:
                     para = etree.SubElement(content, "p")
                     para.set("class", "title")
-                    para.text = unicode(s, "ISO-8859-1")
+                    para.text = s
 
             para = etree.SubElement(content, "p")
             para.set("class", "title")
@@ -558,9 +557,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             # and now the line text
             para = etree.SubElement(content, "pre")
             para.set("class", htmlMap[line.lt])
-            para.text = unicode(text, "ISO-8859-1")
+            para.text = str(text)
 
-        bodyText = etree.tostring(content, encoding='UTF-8', pretty_print=True)
+        bodyText = etree.tostring(content, encoding='UTF-8', pretty_print=True).decode()
 
         return htmlHeader + bodyText + htmlFooter
 
@@ -624,7 +623,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 para.set("Type", xmlMap[typ])
 
             paratxt = etree.SubElement(para, "Text")
-            paratxt.text = unicode(txt, "ISO-8859-1")
+            paratxt.text = str(txt)
 
         # FD does not recognize "New Act" by default. It needs an
         # ElementSettings element added.
@@ -645,7 +644,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         TWOSPACE = "  "
         sceneStartsList = ("INT", "EXT", "EST", "INT./EXT", "INT/EXT", "I/E", "I./E")
 
-
         # does s look like a fountain scene line:
         def looksLikeScene(s):
             s = s.upper()
@@ -655,6 +653,35 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                     looksGood = True
                     break
             return looksGood
+
+        # Generate Title Page
+        def generateTitleString(keyword,titleLine,startAt,linePrefix, lineSuffix):
+            if (len(titleLine)-startAt)>1:
+                # multi-line
+                flines.append(keyword)
+                for part in titleLine:
+                    if startAt > 0:
+                        startAt -= 1
+                        continue
+                    flines.append('    '+linePrefix+part+lineSuffix)
+            elif len(titleLine) == 1 and keyword == titleLine[0]:
+                flines.append(keyword)
+            else:
+                flines.append(keyword+' '+titleLine[startAt])
+
+        titleNeeded=True
+        kwPattern = re.compile(r'^([A-za-z][^:]+:)')
+        for page in self.titles.pages:
+            for titleLine in page:
+                if titleNeeded and titleLine.isBold and titleLine.isCentered:
+                    generateTitleString('Title:',titleLine.items,0,'_**','**_')
+                    titleNeeded = False
+                elif titleLine.items[0]=='by':
+                    generateTitleString('Author:',titleLine.items,2,'','')
+                elif kwPattern.match(titleLine.items[0]):
+                    generateTitleString(titleLine.items[0],titleLine.items,0,'','')
+                else:
+                    generateTitleString('Contact:',titleLine.items,0,'','')
 
         for ele in eleList:
             typ, txt = ele
@@ -800,11 +827,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # 100% correct for the screenplay. isExport is True if this is an
     # "export to file" operation, False if we're just going to launch a
     # PDF viewer with the data.
-    def generatePDF(self, isExport):
+    def generatePDF(self, isExport: bool) -> bytes:
         return pdf.generate(self.generatePML(isExport))
 
     # Same arguments as generatePDF, but returns a PML document.
-    def generatePML(self, isExport):
+    def generatePML(self, isExport: bool) -> pml.Document:
         pager = mypager.Pager(self.cfg)
         self.titles.generatePages(pager.doc)
 
@@ -814,7 +841,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             pager.doc.defPage = len(self.titles.pages) + \
                                 self.line2page(self.line) - 1
 
-        for i in xrange(1, len(self.pages)):
+        for i in range(1, len(self.pages)):
             pg = self.generatePMLPage(pager, i, True, True)
 
             if pg:
@@ -822,34 +849,19 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             else:
                 break
 
+        userHasSetFontNameWithoutFile = False
+
         for pfi in self.cfg.getPDFFontIds():
             pf = self.cfg.getPDFFont(pfi)
 
-            if pf.pdfName:
-                # TODO: it's nasty calling loadFile from here since it
-                # uses wxMessageBox. dialog stacking order is also wrong
-                # since we don't know the frame to give. so, we should
-                # remove references to wxMessageBox from util and instead
-                # pass in an ErrorHandlerObject to all functions that need
-                # it. then the GUI program can use a subclass of that that
-                # stores the frame pointer inside it, and testing
-                # framework / other non-interactive uses can use a version
-                # that logs errors to stderr / raises an exception /
-                # whatever.
-
-                if pf.filename != u"":
-                    # we load at most 10 MB to avoid a denial-of-service
-                    # attack by passing around scripts containing
-                    # references to fonts with filenames like "/dev/zero"
-                    # etc. no real font that I know of is this big so it
-                    # shouldn't hurt.
-                    fontProgram = util.loadFile(pf.filename, None,
-                                                10 * 1024 * 1024)
-                else:
-                    fontProgram = None
-
+            if pf.pdfName and pf.filename != "":
                 pager.doc.addFont(pf.style,
-                                  pml.PDFFontInfo(pf.pdfName, fontProgram))
+                                  pml.PDFFontInfo(pf.pdfName, pf.filename))
+            elif pf.pdfName:
+                userHasSetFontNameWithoutFile = True
+
+        if userHasSetFontNameWithoutFile:
+            wx.MessageBox('Setting a font name without a font file is not possible in Trelby any more. Please adjust your settings in Script > Settings > Change > PDF/Fonts. Trelby will fall back to the default font for now.')
 
         return pager.doc
 
@@ -933,7 +945,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
                 y += 10
 
-        for i in xrange(start, end + 1):
+        for i in range(start, end + 1):
             line = ls[i]
             tcfg = cfg.getType(line.lt)
 
@@ -1011,7 +1023,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                         s = text
 
                     to.toc = pml.TOCItem(s, to)
-                    pager.doc.addTOC(to.toc)
 
             if doExtra and cfg.pdfShowLineNumbers:
                 pg.add(pml.TextOp("%02d" % (i - start + 1),
@@ -1408,7 +1419,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         sc = SCENE
         scene = 0
 
-        for i in xrange(line + 1):
+        for i in range(line + 1):
             if (ls[i].lt == sc) and self.isFirstLineOfElem(i):
                 scene += 1
 
@@ -1838,7 +1849,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def getPageNumbers(self):
         pages = []
 
-        for p in xrange(1, len(self.pages)):
+        for p in range(1, len(self.pages)):
             pages.append(str(p))
 
         return pages
@@ -1853,7 +1864,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         scene = 0
         ret = []
 
-        for i in xrange(len(ls)):
+        for i in range(len(ls)):
             if (ls[i].lt == sc) and self.isFirstLineOfElem(i):
                 scene += 1
                 ret.append((str(scene), i))
@@ -2012,7 +2023,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if last:
             del matches[last]
 
-        mlist = matches.keys()
+        mlist = list(matches.keys())
         mlist.sort()
 
         if last:
@@ -2111,7 +2122,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         cd = ClipData()
 
-        for i in xrange(marked[0], marked[1] + 1):
+        for i in range(marked[0], marked[1] + 1):
             c1, c2 = self.getMarkedColumns(i, marked)
 
             ln = ls[i]
@@ -2126,11 +2137,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         u = undo.AnyDifference(self)
 
         # range of lines, inclusive, that we need to totally delete
-        del1 = sys.maxint
+        del1 = sys.maxsize
         del2 = -1
 
         # delete selected text from the lines
-        for i in xrange(marked[0], marked[1] + 1):
+        for i in range(marked[0], marked[1] + 1):
             c1, c2 = self.getMarkedColumns(i, marked)
 
             ln = ls[i]
@@ -2456,7 +2467,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     # compare this script to sp2 (Screenplay), return a PDF file (as a
     # string) of the differences, or None if the scripts are identical.
-    def compareScripts(self, sp2):
+    def compareScripts(self, sp2) -> bytes:
         s1 = self.generateText(False).split("\n")
         s2 = sp2.generateText(False).split("\n")
 
@@ -2483,7 +2494,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         # now, generate changed-lines for single-line diffs
         dlt = []
-        for i in xrange(len(dltTmp)):
+        for i in range(len(dltTmp)):
             s = dltTmp[i]
 
             dlt.append(s)
@@ -2617,7 +2628,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         # (inclusive)
         cnt = 0
 
-        for i in xrange(len(lsOld)):
+        for i in range(len(lsOld)):
             l = lsOld[i]
 
             if l.lt not in tdict:
@@ -3242,9 +3253,14 @@ class Line:
         return config.lb2char(self.lb) + config.lt2char(self.lt)\
                + self.text
 
+    def __repr__(self)->str:
+        return self.__str__()
+
     def __ne__(self, other):
         return ((self.lt != other.lt) or (self.lb != other.lb) or
                 (self.text != other.text))
+    def __eq__(self, other):
+        return not self.__ne__(other)
 
     # opposite of __str__. NOTE: only meant for storing data internally by
     # the program! NOT USABLE WITH EXTERNAL INPUT DUE TO COMPLETE LACK OF
@@ -3274,7 +3290,7 @@ class ClipData:
 class CommandState:
 
     # what to do about auto-completion
-    AC_DEL, AC_REDO, AC_KEEP = range(3)
+    AC_DEL, AC_REDO, AC_KEEP = list(range(3))
 
     def __init__(self):
 
@@ -3312,7 +3328,7 @@ class PageList:
 
     # merge two PageLists
     def __iadd__(self, other):
-        for pg in other.pages.keys():
+        for pg in list(other.pages.keys()):
             self.addPage(pg)
 
         return self
@@ -3325,7 +3341,7 @@ class PageList:
         hasPage = []
 
         for p in self.allPages:
-            hasPage.append(p in self.pages.keys())
+            hasPage.append(p in list(self.pages.keys()))
 
         # finished string
         s = ""
@@ -3333,7 +3349,7 @@ class PageList:
         # start index of current range, or -1 if no range in progress
         rangeStart = -1
 
-        for i in xrange(len(self.allPages)):
+        for i in range(len(self.allPages)):
             if rangeStart != -1:
                 if not hasPage[i]:
 

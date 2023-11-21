@@ -44,7 +44,7 @@ BASE_MEMORY_USAGE = 1500
  CMD_ADD_CHAR_SPACE,
  CMD_DEL_FORWARD,
  CMD_DEL_BACKWARD,
- CMD_MISC) = range(5)
+ CMD_MISC) = list(range(5))
 
 # convert a list of Screenplay.Line objects into an unspecified, but
 # compact, form of storage. storage2lines will convert this back to the
@@ -71,12 +71,12 @@ def lines2storage(lines):
     # bytes"), always compress, but only use the compressed version if
     # it's shorter than the non-compressed one.
 
-    linesStrCompressed = zlib.compress(linesStr, 6)
+    linesStrCompressed = zlib.compress(linesStr.encode(), 6)
 
     if len(linesStrCompressed) < len(linesStr):
         return (len(lines), True, linesStrCompressed)
     else:
-        return (len(lines), False, linesStr)
+        return (len(lines), False, linesStr.encode())
 
 # see lines2storage.
 def storage2lines(storage):
@@ -84,9 +84,9 @@ def storage2lines(storage):
         return []
 
     if storage[1]:
-        linesStr = zlib.decompress(storage[2])
+        linesStr = zlib.decompress(storage[2]).decode()
     else:
-        linesStr = storage[2]
+        linesStr = storage[2].decode()
 
     return [screenplay.Line.fromStr(s) for s in linesStr.split("\n")]
 
@@ -290,13 +290,12 @@ def mySequenceMatcher(l1, l2):
     i = 0
     a = b = 0
 
-    m1found = m2found = False
+    m1found = False
 
     while a < smallLen:
         if not m1found and (bigger[a] != smaller[a]):
             b = a
             m1found = True
-
             break
 
         a += 1
@@ -314,8 +313,6 @@ def mySequenceMatcher(l1, l2):
         d = smallLen - i + 1
 
         if bigger[-i] != smaller[-i]:
-            m2found = True
-
             break
 
         i += 1

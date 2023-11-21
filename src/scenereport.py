@@ -31,12 +31,12 @@ class SceneReport:
 
         # information about what to include (and yes, the comma is needed
         # to unpack the list)
-        self.INF_SPEAKERS, = range(1)
+        self.INF_SPEAKERS, = list(range(1))
         self.inf = []
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
-    def generate(self):
+    def generate(self) -> bytes:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
 

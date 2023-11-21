@@ -1,6 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
-from error import *
+from error import TrelbyError
 import autocompletiondlg
 import cfgdlg
 import charmapdlg
@@ -27,11 +27,12 @@ import titlesdlg
 import util
 import viewmode
 import watermarkdlg
+import webbrowser
 
 import copy
-import datetime
 import os
 import os.path
+import os
 import signal
 import sys
 import time
@@ -52,7 +53,7 @@ KC_CTRL_V = 22
 VIEWMODE_DRAFT,\
 VIEWMODE_LAYOUT,\
 VIEWMODE_SIDE_BY_SIDE,\
-= range(3)
+= list(range(3))
 
 def refreshGuiConfig():
     global cfgGui
@@ -99,13 +100,13 @@ class GlobalData:
                  VIEWMODE_SIDE_BY_SIDE)
 
         v.addList("files", [], "Files",
-                  mypickle.StrUnicodeVar("", u"", ""))
+                  mypickle.StrUnicodeVar("", "", ""))
 
         v.makeDicts()
         v.setDefaults(self)
 
         self.height = min(self.height,
-            wx.SystemSettings_GetMetric(wx.SYS_SCREEN_Y) - 50)
+            wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) - 50)
 
         self.vmDraft = viewmode.ViewModeDraft()
         self.vmLayout = viewmode.ViewModeLayout()
@@ -120,10 +121,10 @@ class GlobalData:
 
         if makeDir:
             try:
-                os.mkdir(misc.toPath(misc.confPath), 0755)
-            except OSError, (errno, strerror):
+                os.mkdir(misc.toPath(misc.confPath), mode=0o755)
+            except OSError(os.errno, os.strerror):
                 wx.MessageBox("Error creating configuration directory\n"
-                              "'%s': %s" % (misc.confPath, strerror),
+                              "'%s': %s" % (misc.confPath, os.strerror),
                               "Error", wx.OK, None)
 
     # set viewmode, the parameter is one of the VIEWMODE_ defines.
@@ -164,18 +165,34 @@ class MyPanel(wx.Panel):
             # wx.NO_BORDER, which sucks
             style = wx.WANTS_CHARS | wx.NO_BORDER)
 
+        # Vertical scrolling is achieved using a scroll bar that is connected to the Screenplay object. It changes
+        # the sp.line property when scrolled, which causes the rendering code to render starting from a different line.
+        # The reasons for this architectural decision are unknown as of 2023, but it has the advantage that only the
+        # part of the screenplay that gets displayed given the current scrolling position will be rendered.
+        self.scrollBarVertical = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
+
+        # Horizontal scrolling is achieved by putting the MyControl instance into a ScrolledWindow. The MyControl
+        # content will always be rendered at full width, but if the available size is less than the rendered size, a
+        # scroll bar will automatically appear an allow scrolling.
+        scrolledWindowForCtrl = wx.ScrolledWindow(self, id, style = wx.HSCROLL)
+
+        self.ctrl = MyCtrl(scrolledWindowForCtrl, -1, self.scrollBarVertical)
+
+        scrolledWindowForCtrl.SetScrollRate(int(self.ctrl.chX), int(self.ctrl.chY))
+        scrolledWindowForCtrl.EnableScrolling(True, False)
+
+        sizer = wx.BoxSizer(wx.VERTICAL) # we need this sizer only to make the MyCtrl expand to the size of the ScrolledWindow
+        sizer.Add(self.ctrl, 1, wx.EXPAND)
+        scrolledWindowForCtrl.SetSizer(sizer)
+
+        # the vertical scroll bar will be placed next to the (horizontally scrollable) ScrolledWindow that contains the
+        # MyCtrl instance
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
+        hsizer.Add(scrolledWindowForCtrl, 1, wx.EXPAND)
+        hsizer.Add(self.scrollBarVertical, 0, wx.EXPAND)
 
-        self.scrollBar = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
-        self.ctrl = MyCtrl(self, -1)
-
-        hsizer.Add(self.ctrl, 1, wx.EXPAND)
-        hsizer.Add(self.scrollBar, 0, wx.EXPAND)
-
-        wx.EVT_COMMAND_SCROLL(self, self.scrollBar.GetId(),
-                              self.ctrl.OnScroll)
-
-        wx.EVT_SET_FOCUS(self.scrollBar, self.OnScrollbarFocus)
+        self.scrollBarVertical.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
+        self.scrollBarVertical.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
 
         self.SetSizer(hsizer)
 
@@ -186,22 +203,23 @@ class MyPanel(wx.Panel):
 
 class MyCtrl(wx.Control):
 
-    def __init__(self, parent, id):
+    def __init__(self, parent, id, scrollBarVertical: wx.ScrollBar):
         style = wx.WANTS_CHARS | wx.FULL_REPAINT_ON_RESIZE | wx.NO_BORDER
         wx.Control.__init__(self, parent, id, style = style)
 
-        self.panel = parent
+        self.scrollBarVertical = scrollBarVertical
+        self.panel = parent.GetParent()
 
-        wx.EVT_SIZE(self, self.OnSize)
-        wx.EVT_PAINT(self, self.OnPaint)
-        wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
-        wx.EVT_LEFT_DOWN(self, self.OnLeftDown)
-        wx.EVT_LEFT_UP(self, self.OnLeftUp)
-        wx.EVT_LEFT_DCLICK(self, self.OnLeftDown)
-        wx.EVT_RIGHT_DOWN(self, self.OnRightDown)
-        wx.EVT_MOTION(self, self.OnMotion)
-        wx.EVT_MOUSEWHEEL(self, self.OnMouseWheel)
-        wx.EVT_CHAR(self, self.OnKeyChar)
+        self.Bind(wx.EVT_SIZE, self.OnSize)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
+        self.Bind(wx.EVT_LEFT_UP, self.OnLeftUp)
+        self.Bind(wx.EVT_LEFT_DCLICK, self.OnLeftDown)
+        self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
+        self.Bind(wx.EVT_MOTION, self.OnMotion)
+        self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
+        self.Bind(wx.EVT_CHAR, self.OnKeyChar)
 
         self.createEmptySp()
         self.updateScreen(redraw = False)
@@ -257,13 +275,13 @@ class MyCtrl(wx.Control):
         return cfgGui
 
     def loadFile(self, fileName):
-        s = util.loadFile(fileName, mainFrame)
+        s = str(util.loadFile(fileName, mainFrame))
         if s == None:
             return
 
         try:
             (sp, msg) = screenplay.Screenplay.load(s, cfgGl)
-        except TrelbyError, e:
+        except TrelbyError as e:
             wx.MessageBox("Error loading file:\n\n%s" % e, "Error",
                           wx.OK, mainFrame)
 
@@ -283,7 +301,7 @@ class MyCtrl(wx.Control):
 
     # save script to given filename. returns True on success.
     def saveFile(self, fileName):
-        fileName = util.ensureEndsIn(fileName, ".trelby")
+        fileName = str(util.ensureEndsIn(fileName, ".trelby"))
 
         if util.writeToFile(fileName, self.sp.save(), mainFrame):
             self.setFile(fileName)
@@ -295,6 +313,7 @@ class MyCtrl(wx.Control):
             return False
 
     def importFile(self, fileName):
+        titlePages = False
         if fileName.endswith("fdx"):
             lines = myimport.importFDX(fileName, mainFrame)
         elif fileName.endswith("celtx"):
@@ -302,7 +321,7 @@ class MyCtrl(wx.Control):
         elif fileName.endswith("astx"):
             lines = myimport.importAstx(fileName, mainFrame)
         elif fileName.endswith("fountain"):
-            lines = myimport.importFountain(fileName, mainFrame)
+            lines, titlePages = myimport.importFountain(fileName, mainFrame, self.sp.titles.pages)
         elif fileName.endswith("fadein"):
             lines = myimport.importFadein(fileName, mainFrame)
         else:
@@ -314,6 +333,8 @@ class MyCtrl(wx.Control):
         self.createEmptySp()
 
         self.sp.lines = lines
+        if titlePages:
+            self.sp.titles.pages = titlePages
         self.sp.reformatAll()
         self.sp.paginate()
         self.sp.markChanged(True)
@@ -352,7 +373,7 @@ class MyCtrl(wx.Control):
         if fileName:
             self.setDisplayName(os.path.basename(fileName))
         else:
-            self.setDisplayName(u"untitled")
+            self.setDisplayName("untitled")
 
         self.setTabText()
         mainFrame.setTitle(self.fileNameDisplay)
@@ -414,8 +435,8 @@ class MyCtrl(wx.Control):
         # about draft / layout mode differences.
         approx = int(((height / self.mm2p) / self.chY) / 1.3)
 
-        self.panel.scrollBar.SetScrollbar(self.sp.getTopLine(), approx,
-            len(self.sp.lines) + approx - 1, approx)
+        self.scrollBarVertical.SetScrollbar(self.sp.getTopLine(), approx,
+                                                  len(self.sp.lines) + approx - 1, approx)
 
     def clearAutoComp(self):
         if self.sp.clearAutoComp():
@@ -432,6 +453,8 @@ class MyCtrl(wx.Control):
 
     def updateScreen(self, redraw = True, setCommon = True):
         self.adjustScrollBar()
+        self.SetMinSize(wx.Size(int(self.pageW), 10)) # the vertical min size is irrelevant currently, as vertical scrolling is still self-implemented
+        self.PostSizeEventToParent()
 
         if setCommon:
             self.updateCommon()
@@ -545,7 +568,7 @@ class MyCtrl(wx.Control):
         if misc.doDblBuf:
             size = self.GetClientSize()
 
-            sb = wx.EmptyBitmap(size.width, size.height)
+            sb = wx.Bitmap(size.width, size.height)
             old = getattr(self.__class__, "screenBuf", None)
 
             if (old == None) or (old.GetDepth() != sb.GetDepth()) or \
@@ -608,7 +631,7 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     def OnScroll(self, event):
-        pos = self.panel.scrollBar.GetThumbPosition()
+        pos = self.scrollBarVertical.GetThumbPosition()
         self.sp.setTopLine(pos)
         self.sp.clearAutoComp()
         self.updateScreen()
@@ -1085,13 +1108,13 @@ class MyCtrl(wx.Control):
             dFile = os.path.basename(self.fileName)
         else:
             dDir = misc.scriptDir
-            dFile = u""
+            dFile = ""
 
         dlg = wx.FileDialog(mainFrame, "Filename to save as",
             defaultDir = dDir,
             defaultFile = dFile,
             wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
-            style = wx.SAVE | wx.OVERWRITE_PROMPT)
+            style = wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
         if dlg.ShowModal() == wx.ID_OK:
             self.saveFile(dlg.GetPath())
 
@@ -1110,7 +1133,7 @@ class MyCtrl(wx.Control):
                        "HTML|*.html|"
                        "Fountain|*.fountain|"
                        "Formatted text|*.txt",
-            style = wx.SAVE | wx.OVERWRITE_PROMPT)
+            style = wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
@@ -1290,26 +1313,26 @@ class MyCtrl(wx.Control):
         # contains (name, func) tuples
         tests = []
 
-        for name, var in locals().iteritems():
+        for name, var in locals().items():
             if callable(var):
                 tests.append((name, var))
 
         tests.sort()
         count = 100
 
-        print "-" * 20
+        print(("-" * 20))
 
         for name, func in tests:
             t = time.time()
 
-            for i in xrange(count):
+            for i in range(count):
                 func()
 
             t = time.time() - t
 
-            print "%.5f seconds per %s" % (t / count, name)
+            print("%.5f seconds per %s" % (t / count, name))
 
-        print "-" * 20
+        print("-" * 20)
 
         # it's annoying having the program ask if you want to save after
         # running these tests, so pretend the script hasn't changed
@@ -1343,11 +1366,11 @@ class MyCtrl(wx.Control):
             if addChar:
                 cs.char = chr(kc)
 
-                if opts.isTest and (cs.char == "å"):
-                    self.loadFile(u"sample.trelby")
-                elif opts.isTest and (cs.char == "¤"):
+                if opts.isTest and (cs.char == "ï¿½"):
+                    self.loadFile("sample.trelby")
+                elif opts.isTest and (cs.char == "ï¿½"):
                     self.cmdTest(cs)
-                elif opts.isTest and (cs.char == "½"):
+                elif opts.isTest and (cs.char == "ï¿½"):
                     self.cmdSpeedTest(cs)
                 else:
                     self.sp.addCharCmd(cs)
@@ -1402,7 +1425,7 @@ class MyCtrl(wx.Control):
         acFi = None
 
         # key = font, value = ([text, ...], [(x, y), ...], [wx.Colour, ...])
-        texts = {}
+        texts = []
 
         # lists of underline-lines to draw, one for normal text and one
         # for header texts. list objects are (x, y, width) tuples.
@@ -1523,10 +1546,11 @@ class MyCtrl(wx.Control):
                     dc.DrawRectangle(t.x + self.sp.column * fx, y, fx, fi.fy)
 
             if len(t.text) != 0:
-                tl = texts.get(fi.font)
-                if tl == None:
+                #tl = texts.get(fi.font)
+                if fi.font not in texts:
+                #if tl == None:
                     tl = ([], [], [])
-                    texts[fi.font] = tl
+                    texts.append((fi.font, tl))
 
                 tl[0].append(t.text)
                 tl[1].append((t.x, y))
@@ -1559,7 +1583,7 @@ class MyCtrl(wx.Control):
             for ul in ulinesHdr:
                 util.drawLine(dc, ul[0], ul[1], ul[2], 0)
 
-        for tl in texts.iteritems():
+        for tl in texts:
             gd.vm.drawTexts(self, dc, tl)
 
         if self.sp.acItems and (cursorY > 0):
@@ -1658,7 +1682,7 @@ class MyFrame(wx.Frame):
         self.SetSizeHints(gd.cvars.getMin("width"),
                           gd.cvars.getMin("height"))
 
-        self.MoveXY(gd.posX, gd.posY)
+        self.Move(gd.posX, gd.posY)
         self.SetSize(wx.Size(gd.width, gd.height))
 
         util.removeTempFiles(misc.tmpPrefix)
@@ -1690,7 +1714,7 @@ class MyFrame(wx.Frame):
         tmp.Append(ID_SETTINGS_SC_DICT, "&Spell checker dictionary...")
         settingsMenu = tmp
 
-        fileMenu.AppendMenu(ID_FILE_SETTINGS, "Se&ttings", tmp)
+        fileMenu.Append(ID_FILE_SETTINGS, "Se&ttings", tmp)
 
         fileMenu.AppendSeparator()
         # "most recently used" list comes in here
@@ -1710,7 +1734,7 @@ class MyFrame(wx.Frame):
         tmp.Append(ID_EDIT_COPY_TO_CB, "&Unformatted")
         tmp.Append(ID_EDIT_COPY_TO_CB_FMT, "&Formatted")
 
-        editMenu.AppendMenu(ID_EDIT_COPY_SYSTEM, "C&opy (system)", tmp)
+        editMenu.Append(ID_EDIT_COPY_SYSTEM, "C&opy (system)", tmp)
         editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste (system)")
         editMenu.AppendSeparator()
         editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene")
@@ -1757,7 +1781,7 @@ class MyFrame(wx.Frame):
         tmp.AppendSeparator()
         tmp.Append(ID_SCRIPT_SETTINGS_LOAD, "&Load...")
         tmp.Append(ID_SCRIPT_SETTINGS_SAVE_AS, "&Save as...")
-        scriptMenu.AppendMenu(ID_SCRIPT_SETTINGS, "&Settings", tmp)
+        scriptMenu.Append(ID_SCRIPT_SETTINGS, "&Settings", tmp)
         scriptSettingsMenu = tmp
 
         reportsMenu = wx.Menu()
@@ -1793,7 +1817,7 @@ class MyFrame(wx.Frame):
         self.toolBar = self.CreateToolBar(wx.TB_VERTICAL)
 
         def addTB(id, iconFilename, toolTip):
-            self.toolBar.AddLabelTool(
+            self.toolBar.AddTool(
                 id, "", misc.getBitmap("resources/%s" % iconFilename),
                 shortHelp=toolTip)
 
@@ -1826,8 +1850,8 @@ class MyFrame(wx.Frame):
         self.toolBar.SetBackgroundColour(cfgGui.tabBarBgColor)
         self.toolBar.Realize()
 
-        wx.EVT_MOVE(self, self.OnMove)
-        wx.EVT_SIZE(self, self.OnSize)
+        self.Bind(wx.EVT_MOVE, self.OnMove)
+        self.Bind(wx.EVT_SIZE, self.OnSize)
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(vsizer)
@@ -1835,11 +1859,11 @@ class MyFrame(wx.Frame):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.noFSBtn = misc.MyFSButton(self, -1, getCfgGui)
-        self.noFSBtn.SetToolTipString("Exit fullscreen")
+        self.noFSBtn.SetToolTip("Exit fullscreen")
         self.noFSBtn.Show(False)
         hsizer.Add(self.noFSBtn)
 
-        wx.EVT_BUTTON(self, self.noFSBtn.GetId(), self.ToggleFullscreen)
+        self.Bind(wx.EVT_BUTTON, self.ToggleFullscreen, id=self.noFSBtn.GetId())
 
         self.tabCtrl = misc.MyTabCtrl(self, -1, getCfgGui)
         hsizer.Add(self.tabCtrl, 1, wx.EXPAND)
@@ -1857,7 +1881,7 @@ class MyFrame(wx.Frame):
 
         gd.mru.useMenu(fileMenu, 14)
 
-        wx.EVT_MENU_HIGHLIGHT_ALL(self, self.OnMenuHighlight)
+        self.Bind(wx.EVT_MENU_HIGHLIGHT_ALL, self.OnMenuHighlight)
 
         self.tabCtrl.setPageChangedFunc(self.OnPageChange)
 
@@ -1887,73 +1911,71 @@ class MyFrame(wx.Frame):
 
             m.Append(ID_EDIT_PASTE, "Paste")
 
-        wx.EVT_MENU(self, ID_FILE_NEW, self.OnNewScript)
-        wx.EVT_MENU(self, ID_FILE_OPEN, self.OnOpen)
-        wx.EVT_MENU(self, ID_FILE_SAVE, self.OnSave)
-        wx.EVT_MENU(self, ID_FILE_SAVE_AS, self.OnSaveScriptAs)
-        wx.EVT_MENU(self, ID_FILE_IMPORT, self.OnImportScript)
-        wx.EVT_MENU(self, ID_FILE_EXPORT, self.OnExportScript)
-        wx.EVT_MENU(self, ID_FILE_CLOSE, self.OnCloseScript)
-        wx.EVT_MENU(self, ID_FILE_REVERT, self.OnRevertScript)
-        wx.EVT_MENU(self, ID_FILE_PRINT, self.OnPrint)
-        wx.EVT_MENU(self, ID_SETTINGS_CHANGE, self.OnSettings)
-        wx.EVT_MENU(self, ID_SETTINGS_LOAD, self.OnLoadSettings)
-        wx.EVT_MENU(self, ID_SETTINGS_SAVE_AS, self.OnSaveSettingsAs)
-        wx.EVT_MENU(self, ID_SETTINGS_SC_DICT, self.OnSpellCheckerDictionaryDlg)
-        wx.EVT_MENU(self, ID_FILE_EXIT, self.OnExit)
-        wx.EVT_MENU(self, ID_EDIT_UNDO, self.OnUndo)
-        wx.EVT_MENU(self, ID_EDIT_REDO, self.OnRedo)
-        wx.EVT_MENU(self, ID_EDIT_CUT, self.OnCut)
-        wx.EVT_MENU(self, ID_EDIT_COPY, self.OnCopy)
-        wx.EVT_MENU(self, ID_EDIT_PASTE, self.OnPaste)
-        wx.EVT_MENU(self, ID_EDIT_COPY_TO_CB, self.OnCopySystemCb)
-        wx.EVT_MENU(self, ID_EDIT_COPY_TO_CB_FMT, self.OnCopySystemCbFormatted)
-        wx.EVT_MENU(self, ID_EDIT_PASTE_FROM_CB, self.OnPasteSystemCb)
-        wx.EVT_MENU(self, ID_EDIT_SELECT_SCENE, self.OnSelectScene)
-        wx.EVT_MENU(self, ID_EDIT_SELECT_ALL, self.OnSelectAll)
-        wx.EVT_MENU(self, ID_EDIT_GOTO_PAGE, self.OnGotoPage)
-        wx.EVT_MENU(self, ID_EDIT_GOTO_SCENE, self.OnGotoScene)
-        wx.EVT_MENU(self, ID_EDIT_INSERT_NBSP, self.OnInsertNbsp)
-        wx.EVT_MENU(self, ID_EDIT_FIND, self.OnFind)
-        wx.EVT_MENU(self, ID_EDIT_DELETE_ELEMENTS, self.OnDeleteElements)
-        wx.EVT_MENU(self, ID_VIEW_STYLE_DRAFT, self.OnViewModeChange)
-        wx.EVT_MENU(self, ID_VIEW_STYLE_LAYOUT, self.OnViewModeChange)
-        wx.EVT_MENU(self, ID_VIEW_STYLE_SIDE_BY_SIDE, self.OnViewModeChange)
-        wx.EVT_MENU(self, ID_VIEW_SHOW_FORMATTING, self.OnShowFormatting)
-        wx.EVT_MENU(self, ID_VIEW_FULL_SCREEN, self.ToggleFullscreen)
-        wx.EVT_MENU(self, ID_SCRIPT_FIND_ERROR, self.OnFindNextError)
-        wx.EVT_MENU(self, ID_SCRIPT_PAGINATE, self.OnPaginate)
-        wx.EVT_MENU(self, ID_SCRIPT_AUTO_COMPLETION, self.OnAutoCompletionDlg)
-        wx.EVT_MENU(self, ID_SCRIPT_HEADERS, self.OnHeadersDlg)
-        wx.EVT_MENU(self, ID_SCRIPT_LOCATIONS, self.OnLocationsDlg)
-        wx.EVT_MENU(self, ID_SCRIPT_TITLES, self.OnTitlesDlg)
-        wx.EVT_MENU(self, ID_SCRIPT_SC_DICT,
-                    self.OnSpellCheckerScriptDictionaryDlg)
-        wx.EVT_MENU(self, ID_SCRIPT_SETTINGS_CHANGE, self.OnScriptSettings)
-        wx.EVT_MENU(self, ID_SCRIPT_SETTINGS_LOAD, self.OnLoadScriptSettings)
-        wx.EVT_MENU(self, ID_SCRIPT_SETTINGS_SAVE_AS, self.OnSaveScriptSettingsAs)
-        wx.EVT_MENU(self, ID_REPORTS_DIALOGUE_CHART, self.OnReportDialogueChart)
-        wx.EVT_MENU(self, ID_REPORTS_CHARACTER_REP, self.OnReportCharacter)
-        wx.EVT_MENU(self, ID_REPORTS_SCRIPT_REP, self.OnReportScript)
-        wx.EVT_MENU(self, ID_REPORTS_LOCATION_REP, self.OnReportLocation)
-        wx.EVT_MENU(self, ID_REPORTS_SCENE_REP, self.OnReportScene)
-        wx.EVT_MENU(self, ID_TOOLS_SPELL_CHECK, self.OnSpellCheckerDlg)
-        wx.EVT_MENU(self, ID_TOOLS_NAME_DB, self.OnNameDatabase)
-        wx.EVT_MENU(self, ID_TOOLS_CHARMAP, self.OnCharacterMap)
-        wx.EVT_MENU(self, ID_TOOLS_COMPARE_SCRIPTS, self.OnCompareScripts)
-        wx.EVT_MENU(self, ID_TOOLS_WATERMARK, self.OnWatermark)
-        wx.EVT_MENU(self, ID_HELP_COMMANDS, self.OnHelpCommands)
-        wx.EVT_MENU(self, ID_HELP_MANUAL, self.OnHelpManual)
-        wx.EVT_MENU(self, ID_HELP_ABOUT, self.OnAbout)
+            self.Bind(wx.EVT_MENU, self.OnNewScript, id=ID_FILE_NEW)
+            self.Bind(wx.EVT_MENU, self.OnOpen, id=ID_FILE_OPEN)
+            self.Bind(wx.EVT_MENU, self.OnSave, id=ID_FILE_SAVE)
+            self.Bind(wx.EVT_MENU, self.OnSaveScriptAs, id=ID_FILE_SAVE_AS)
+            self.Bind(wx.EVT_MENU, self.OnImportScript, id=ID_FILE_IMPORT)
+            self.Bind(wx.EVT_MENU, self.OnExportScript, id=ID_FILE_EXPORT)
+            self.Bind(wx.EVT_MENU, self.OnCloseScript, id=ID_FILE_CLOSE)
+            self.Bind(wx.EVT_MENU, self.OnRevertScript, id=ID_FILE_REVERT)
+            self.Bind(wx.EVT_MENU, self.OnPrint, id=ID_FILE_PRINT)
+            self.Bind(wx.EVT_MENU, self.OnSettings, id=ID_SETTINGS_CHANGE)
+            self.Bind(wx.EVT_MENU, self.OnLoadSettings, id=ID_SETTINGS_LOAD)
+            self.Bind(wx.EVT_MENU, self.OnSaveSettingsAs, id=ID_SETTINGS_SAVE_AS)
+            self.Bind(wx.EVT_MENU, self.OnSpellCheckerDictionaryDlg, id=ID_SETTINGS_SC_DICT)
+            self.Bind(wx.EVT_MENU, self.OnExit, id=ID_FILE_EXIT)
+            self.Bind(wx.EVT_MENU, self.OnUndo, id=ID_EDIT_UNDO)
+            self.Bind(wx.EVT_MENU, self.OnRedo, id=ID_EDIT_REDO)
+            self.Bind(wx.EVT_MENU, self.OnCut, id=ID_EDIT_CUT)
+            self.Bind(wx.EVT_MENU, self.OnCopy, id=ID_EDIT_COPY)
+            self.Bind(wx.EVT_MENU, self.OnPaste, id=ID_EDIT_PASTE)
+            self.Bind(wx.EVT_MENU, self.OnCopySystemCb, id=ID_EDIT_COPY_TO_CB)
+            self.Bind(wx.EVT_MENU, self.OnCopySystemCbFormatted, id=ID_EDIT_COPY_TO_CB_FMT)
+            self.Bind(wx.EVT_MENU, self.OnPasteSystemCb, id=ID_EDIT_PASTE_FROM_CB)
+            self.Bind(wx.EVT_MENU, self.OnSelectScene, id=ID_EDIT_SELECT_SCENE)
+            self.Bind(wx.EVT_MENU, self.OnSelectAll, id=ID_EDIT_SELECT_ALL)
+            self.Bind(wx.EVT_MENU, self.OnGotoPage, id=ID_EDIT_GOTO_PAGE)
+            self.Bind(wx.EVT_MENU, self.OnGotoScene, id=ID_EDIT_GOTO_SCENE)
+            self.Bind(wx.EVT_MENU, self.OnInsertNbsp, id=ID_EDIT_INSERT_NBSP)
+            self.Bind(wx.EVT_MENU, self.OnFind, id=ID_EDIT_FIND)
+            self.Bind(wx.EVT_MENU, self.OnDeleteElements, id=ID_EDIT_DELETE_ELEMENTS)
+            self.Bind(wx.EVT_MENU, self.OnViewModeChange, id=ID_VIEW_STYLE_DRAFT)
+            self.Bind(wx.EVT_MENU, self.OnViewModeChange, id=ID_VIEW_STYLE_LAYOUT)
+            self.Bind(wx.EVT_MENU, self.OnViewModeChange, id=ID_VIEW_STYLE_SIDE_BY_SIDE)
+            self.Bind(wx.EVT_MENU, self.OnShowFormatting, id=ID_VIEW_SHOW_FORMATTING)
+            self.Bind(wx.EVT_MENU, self.ToggleFullscreen, id=ID_VIEW_FULL_SCREEN)
+            self.Bind(wx.EVT_MENU, self.OnFindNextError, id=ID_SCRIPT_FIND_ERROR)
+            self.Bind(wx.EVT_MENU, self.OnPaginate, id=ID_SCRIPT_PAGINATE)
+            self.Bind(wx.EVT_MENU, self.OnAutoCompletionDlg, id=ID_SCRIPT_AUTO_COMPLETION)
+            self.Bind(wx.EVT_MENU, self.OnHeadersDlg, id=ID_SCRIPT_HEADERS)
+            self.Bind(wx.EVT_MENU, self.OnLocationsDlg, id=ID_SCRIPT_LOCATIONS)
+            self.Bind(wx.EVT_MENU, self.OnTitlesDlg, id=ID_SCRIPT_TITLES)
+            self.Bind(wx.EVT_MENU, self.OnSpellCheckerScriptDictionaryDlg, id=ID_SCRIPT_SC_DICT)
+            self.Bind(wx.EVT_MENU, self.OnScriptSettings, id=ID_SCRIPT_SETTINGS_CHANGE)
+            self.Bind(wx.EVT_MENU, self.OnLoadScriptSettings, id=ID_SCRIPT_SETTINGS_LOAD)
+            self.Bind(wx.EVT_MENU, self.OnSaveScriptSettingsAs, id=ID_SCRIPT_SETTINGS_SAVE_AS)
+            self.Bind(wx.EVT_MENU, self.OnReportDialogueChart, id=ID_REPORTS_DIALOGUE_CHART)
+            self.Bind(wx.EVT_MENU, self.OnReportCharacter, id=ID_REPORTS_CHARACTER_REP)
+            self.Bind(wx.EVT_MENU, self.OnReportScript, id=ID_REPORTS_SCRIPT_REP)
+            self.Bind(wx.EVT_MENU, self.OnReportLocation, id=ID_REPORTS_LOCATION_REP)
+            self.Bind(wx.EVT_MENU, self.OnReportScene, id=ID_REPORTS_SCENE_REP)
+            self.Bind(wx.EVT_MENU, self.OnSpellCheckerDlg, id=ID_TOOLS_SPELL_CHECK)
+            self.Bind(wx.EVT_MENU, self.OnNameDatabase, id=ID_TOOLS_NAME_DB)
+            self.Bind(wx.EVT_MENU, self.OnCharacterMap, id=ID_TOOLS_CHARMAP)
+            self.Bind(wx.EVT_MENU, self.OnCompareScripts, id=ID_TOOLS_COMPARE_SCRIPTS)
+            self.Bind(wx.EVT_MENU, self.OnWatermark, id=ID_TOOLS_WATERMARK)
+            self.Bind(wx.EVT_MENU, self.OnHelpCommands, id=ID_HELP_COMMANDS)
+            self.Bind(wx.EVT_MENU, self.OnHelpManual, id=ID_HELP_MANUAL)
+            self.Bind(wx.EVT_MENU, self.OnAbout, id=ID_HELP_ABOUT)
 
-        wx.EVT_MENU_RANGE(self, gd.mru.getIds()[0], gd.mru.getIds()[1],
-                          self.OnMRUFile)
 
-        wx.EVT_MENU_RANGE(self, ID_ELEM_TO_ACTION, ID_ELEM_TO_TRANSITION,
-                          self.OnChangeType)
+        self.Bind(wx.EVT_MENU_RANGE, self.OnMRUFile, id=gd.mru.getIds()[0], id2=gd.mru.getIds()[1])
+
+        self.Bind(wx.EVT_MENU_RANGE, self.OnChangeType, id=ID_ELEM_TO_ACTION, id2=ID_ELEM_TO_TRANSITION)
 
         def addTBMenu(id, menu):
-            wx.EVT_MENU(self, id, partial(self.OnToolBarMenu, menu=menu))
+            self.Bind(wx.EVT_MENU, partial(self.OnToolBarMenu, menu=menu), id=id)
 
         addTBMenu(ID_TOOLBAR_SETTINGS, settingsMenu)
         addTBMenu(ID_TOOLBAR_SCRIPTSETTINGS, scriptSettingsMenu)
@@ -1961,8 +1983,8 @@ class MyFrame(wx.Frame):
         addTBMenu(ID_TOOLBAR_VIEWS, viewMenu)
         addTBMenu(ID_TOOLBAR_TOOLS, toolsMenu)
 
-        wx.EVT_CLOSE(self, self.OnCloseWindow)
-        wx.EVT_SET_FOCUS(self, self.OnFocus)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
+        self.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
 
         self.Layout()
 
@@ -1971,12 +1993,12 @@ class MyFrame(wx.Frame):
         self.panel = self.createNewPanel()
 
     def mySetIcons(self):
-        wx.Image_AddHandler(wx.PNGHandler())
+        wx.Image.AddHandler(wx.PNGHandler())
 
         ib = wx.IconBundle()
 
         for sz in ("16", "32", "64", "128", "256"):
-            ib.AddIcon(wx.IconFromBitmap(misc.getBitmap("resources/icon%s.png" % sz)))
+            ib.AddIcon(wx.Icon(misc.getBitmap("resources/icon%s.png" % sz)))
 
         self.SetIcons(ib)
 
@@ -2078,7 +2100,7 @@ class MyFrame(wx.Frame):
 
     def createNewPanel(self):
         newPanel = MyPanel(self.tabCtrl.getTabParent(), -1)
-        self.tabCtrl.addPage(newPanel, u"")
+        self.tabCtrl.addPage(newPanel, "")
         newPanel.ctrl.setTabText()
         newPanel.ctrl.SetFocus()
 
@@ -2221,7 +2243,7 @@ class MyFrame(wx.Frame):
         dlg = wx.FileDialog(self, "File to open",
             misc.scriptDir,
             wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
@@ -2247,7 +2269,7 @@ class MyFrame(wx.Frame):
                        "Fountain files (*.fountain)|*.fountain|" +
                        "Fadein files (*.fadein)|*.fadein|" +
                        "All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
@@ -2288,7 +2310,7 @@ class MyFrame(wx.Frame):
             defaultDir = os.path.dirname(gd.confFilename),
             defaultFile = os.path.basename(gd.confFilename),
             wildcard = "Setting files (*.conf)|*.conf|All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             s = util.loadFile(dlg.GetPath(), self)
@@ -2445,7 +2467,7 @@ class MyFrame(wx.Frame):
         dlg = wx.FileDialog(self, "File to open",
             defaultDir = gd.scriptSettingsPath,
             wildcard = "Script setting files (*.sconf)|*.sconf|All files|*",
-            style = wx.OPEN)
+            style = wx.FD_OPEN)
 
         if dlg.ShowModal() == wx.ID_OK:
             s = util.loadFile(dlg.GetPath(), self)
@@ -2516,7 +2538,7 @@ class MyFrame(wx.Frame):
         dlg.Show()
 
     def OnHelpManual(self, event = None):
-        wx.LaunchDefaultBrowser("file://" + misc.getFullPath("manual.html"))
+        webbrowser.open("file://" + misc.getFullPath("manual.html"))
 
     def OnAbout(self, event = None):
         win = splash.SplashWindow(self, -1)
@@ -2528,9 +2550,12 @@ class MyFrame(wx.Frame):
     def OnCloseWindow(self, event):
         doExit = True
         if event.CanVeto() and self.isModifications():
-            if wx.MessageBox("You have unsaved changes. Are\n"
-                             "you sure you want to exit?", "Confirm",
-                             wx.YES_NO | wx.NO_DEFAULT, self) == wx.NO:
+            close_msg_box = wx.MessageDialog(self, "You have unsaved changes. Do\nyou want to save your changes?", "Save Changes", wx.YES_NO | wx.CANCEL | wx.YES_DEFAULT)
+            close_msg_box.SetYesNoLabels(wx.ID_SAVE, "&Don't save")
+            response = close_msg_box.ShowModal();
+            if response == wx.ID_YES:
+                self.OnSave()
+            elif response == wx.ID_CANCEL:
                 doExit = False
 
         if doExit:
@@ -2545,11 +2570,11 @@ class MyFrame(wx.Frame):
         self.Close(False)
 
     def OnMove(self, event):
-        gd.posX, gd.posY = self.GetPositionTuple()
+        gd.posX, gd.posY = self.GetPosition()
         event.Skip()
 
     def OnSize(self, event):
-        gd.width, gd.height = self.GetSizeTuple()
+        gd.width, gd.height = self.GetSize()
         event.Skip()
 
 class MyApp(wx.App):
@@ -2557,10 +2582,10 @@ class MyApp(wx.App):
     def OnInit(self):
         global cfgGl, mainFrame, gd
 
-        if (wx.MAJOR_VERSION != 3) or (wx.MINOR_VERSION != 0):
+        if (wx.MAJOR_VERSION != 4) or (wx.MINOR_VERSION < 0):
             wx.MessageBox("You seem to have an invalid version\n"
                           "(%s) of wxWidgets installed. This\n"
-                          "program needs version 3.0." %
+                          "program needs version 4.x." %
                           wx.VERSION_STRING, "Error", wx.OK)
             sys.exit()
 
@@ -2582,10 +2607,6 @@ class MyApp(wx.App):
                           "wxWidgets. This is not supported.",
                           "Error", wx.OK)
             sys.exit()
-
-        # by setting this, we don't have to convert from 8-bit strings to
-        # Unicode ourselves everywhere when we pass them to wxWidgets.
-        wx.SetDefaultPyEncoding("ISO-8859-1")
 
         os.chdir(misc.progPath)
 

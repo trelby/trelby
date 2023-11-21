@@ -3,7 +3,7 @@ PREFIX = $(DESTDIR)/usr
 .PHONY : clean dist deb
 
 dist: names.txt.gz dict_en.dat.gz manual.html trelby.1.gz
-	python setup.py sdist
+	python3 setup.py sdist && cp trelby.1.gz doc/
 
 deb: dist
 	debuild -us -uc -b
@@ -21,15 +21,15 @@ trelby.1.gz: doc/*
 	make -C doc manpage && mv doc/trelby.1.gz .
 
 rpm: dist
-	python setup.py bdist_rpm
+	python3 setup.py bdist_rpm
 
 clean:
-	rm -f bin/*.pyc src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html MANIFEST trelby.1.gz
+	rm -f bin/*.pyc src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html MANIFEST trelby.1.gz doc/trelby.1.gz
 	rm -rf build dist
 	dh_clean
 
 install: dist
-	python setup.py install
+	python3 setup.py install
 
 test:
-	cd tests && ./all.sh
+	pytest

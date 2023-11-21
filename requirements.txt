@@ -1,0 +1,5 @@
+setuptools
+wxPython
+lxml
+reportlab
+pytest>=7.0

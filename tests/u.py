@@ -1,4 +1,5 @@
 # ut:ignore
+import os
 
 import config
 import misc
@@ -22,15 +23,21 @@ def new():
 
     return screenplay.Screenplay(config.ConfigGlobal())
 
-# load script from the given file
+def fixtureFilePath(filePathRelativeToFixturesDir: str) -> str:
+    location = os.path.dirname(__file__)+'/fixtures/'
+
+    return os.path.join(location, filePathRelativeToFixturesDir)
+
+# load script from the given file, relative to the current script directory
 def load(filename = "test.trelby"):
     init()
+    filename = fixtureFilePath(filename)
 
     return screenplay.Screenplay.load(open(filename, "r").read(),
                                       config.ConfigGlobal())[0]
 
 # load script from given string
-def loadString(s):
+def loadString(s: str):
     init()
 
     return screenplay.Screenplay.load(s, config.ConfigGlobal())[0]

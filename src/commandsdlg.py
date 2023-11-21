@@ -1,4 +1,3 @@
-import misc
 import util
 
 import xml.sax.saxutils as xss
@@ -10,7 +9,7 @@ class CommandsDlg(wx.Frame):
         wx.Frame.__init__(self, None, -1, "Commands",
                           size = (650, 600), style = wx.DEFAULT_FRAME_STYLE)
 
-        self.Center()
+        # self.Center()
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(vsizer)
@@ -70,11 +69,11 @@ R                      Replace
         mb.Append(menu, "&File")
         self.SetMenuBar(mb)
 
-        wx.EVT_MENU(self, id, self.OnSave)
+        self.Bind(wx.EVT_MENU, self.OnSave, id=id)
 
         self.Layout()
 
-        wx.EVT_CLOSE(self, self.OnCloseWindow)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
     def OnCloseWindow(self, event):
         self.Destroy()

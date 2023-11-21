@@ -1,5 +1,6 @@
 import pml
 import util
+import functools
 
 # a script's title pages.
 class Titles:
@@ -48,11 +49,11 @@ class Titles:
     # sort the title strings in y,x order (makes editing them easier
     # and RTF output better)
     def sort(self):
-        def tmpfunc(a, b):
-            return cmp(a.y, b.y) or cmp(a.x, b.x)
+        def cmpfunc(a, b):
+            return ((a.y > b.y) - (a.y < b.y)) or ((a.x > b.x) - (a.x < a.y))
 
         for page in self.pages:
-            page.sort(tmpfunc)
+            page = sorted(page, key=functools.cmp_to_key(cmpfunc))
 
 # a single string displayed on a title page
 class TitleString:
@@ -197,4 +198,4 @@ class TitleString:
 
         s += ",,%s" % util.escapeStrings(self.items)
 
-        return util.toUTF8(s)
+        return s

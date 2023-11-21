@@ -1,4 +1,10 @@
-import fontinfo
+import uuid
+from typing import Optional, Tuple, Dict, AnyStr
+
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen.canvas import Canvas
+
 import pml
 import util
 
@@ -10,7 +16,7 @@ TRANSFORM_MATRIX = {
 }
 
 # users should only use this.
-def generate(doc):
+def generate(doc: 'pml.Document') -> bytes:
     tmp = PDFExporter(doc)
     return tmp.generate()
 
@@ -19,13 +25,13 @@ class PDFDrawOp:
 
     # write PDF drawing operations corresponding to the PML object pmlOp
     # to output (util.String). pe = PDFExporter.
-    def draw(self, pmlOp, pageNr, output, pe):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas: Canvas) -> None:
         raise Exception("draw not implemented")
 
 class PDFTextOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
-        if pmlOp.toc:
-            pmlOp.toc.pageObjNr = pe.pageObjs[pageNr].nr
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas) -> None:
+        if not isinstance(pmlOp, pml.TextOp):
+            raise Exception("PDFTextOp is only compatible with pml.TextOp, got "+type(pmlOp).__name__)
 
         # we need to adjust y position since PDF uses baseline of text as
         # the y pos, but pml uses top of the text as y pos. The Adobe
@@ -39,86 +45,87 @@ class PDFTextOp(PDFDrawOp):
         x = pe.x(pmlOp.x)
         y = pe.y(pmlOp.y) - 0.843 * pmlOp.size
 
-        newFont = "F%d %d" % (pe.getFontNr(pmlOp.flags), pmlOp.size)
-        if newFont != pe.currentFont:
-            output += "/%s Tf\n" % newFont
-            pe.currentFont = newFont
+        newFont = pe.getFontForFlags(pmlOp.flags)
+        canvas.setFont(newFont, pmlOp.size)
 
         if pmlOp.angle is not None:
             matrix = TRANSFORM_MATRIX.get(pmlOp.angle)
 
             if matrix:
-                output += "BT\n"\
+                canvas.addLiteral("BT\n"\
                     "%f %f %f %f %f %f Tm\n"\
                     "(%s) Tj\n"\
                     "ET\n" % (matrix[0], matrix[1], matrix[2], matrix[3],
-                              x, y, pe.escapeStr(pmlOp.text))
+                              x, y, pe.escapeStr(pmlOp.text))) # TODO: Doing this with addLiteral, non-latin characters won't work in watermarks. There must be a better way to do this with reportlab, that we do it this way is for historical reasons and because no one took the time to change it
             else:
                 # unsupported angle, don't print it.
                 pass
         else:
-            output += "BT\n"\
-                "%f %f Td\n"\
-                "(%s) Tj\n"\
-                "ET\n" % (x, y, pe.escapeStr(pmlOp.text))
+            canvas.drawString(x, y, pmlOp.text)
 
         if pmlOp.flags & pml.UNDERLINED:
 
-            undLen = fontinfo.getMetrics(pmlOp.flags).getTextWidth(
-                pmlOp.text, pmlOp.size)
+            undLen = canvas.stringWidth(pmlOp.text, newFont, pmlOp.size)
 
             # all standard PDF fonts have the underline line 100 units
             # below baseline with a thickness of 50
             undY = y - 0.1 * pmlOp.size
+            canvas.setLineWidth(0.05 * pmlOp.size)
 
-            output += "%f w\n"\
-                      "%f %f m\n"\
-                      "%f %f l\n"\
-                      "S\n" % (0.05 * pmlOp.size, x, undY, x + undLen, undY)
+            canvas.line(x, undY, x + undLen, undY)
+
+        # create bookmark for table of contents if applicable
+        if pmlOp.toc:
+            bookmarkKey = uuid.uuid4().hex  # we need a unique key to link the bookmark in toc – TODO: generate a more speaking one
+            canvas.bookmarkHorizontal(bookmarkKey, pe.x(pmlOp.x), pe.y(pmlOp.y))
+            canvas.addOutlineEntry(pmlOp.toc.text, bookmarkKey)
 
 class PDFLineOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
-        p = pmlOp.points
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas):
+        if not isinstance(pmlOp, pml.LineOp):
+            raise Exception("PDFLineOp is only compatible with pml.LineOp, got "+type(pmlOp).__name__)
 
-        pc = len(p)
+        points = pmlOp.points
+        numberOfPoints = len(points)
 
-        if pc < 2:
-            print "LineOp contains only %d points" % pc
+        if numberOfPoints < 2:
+            print("LineOp contains only %d points" % numberOfPoints)
 
             return
 
-        output += "%f w\n"\
-                  "%s m\n" % (pe.mm2points(pmlOp.width), pe.xy(p[0]))
+        canvas.setLineWidth(pe.mm2points(pmlOp.width))
 
-        for i in range(1, pc):
-            output += "%s l\n" % (pe.xy(p[i]))
+        lines = []
+        for i in range(0, numberOfPoints - 1):
+            lines.append(pe.xy(points[i]) + pe.xy(points[i+1]))
 
         if pmlOp.isClosed:
-            output += "s\n"
-        else:
-            output += "S\n"
+            lines.append(pe.xy(points[i+1]) + pe.xy(points[0]))
+
+        canvas.lines(lines)
 
 class PDFRectOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
-        if pmlOp.lw != -1:
-            output += "%f w\n" % pe.mm2points(pmlOp.lw)
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas) -> None:
+        if not isinstance(pmlOp, pml.RectOp):
+            raise Exception("PDFRectOp is only compatible with pml.RectOp, got "+type(pmlOp).__name__)
 
-        output += "%f %f %f %f re\n" % (
+        if pmlOp.lw != -1:
+            canvas.setLineWidth(pe.mm2points(pmlOp.lw))
+
+        canvas.rect(
             pe.x(pmlOp.x),
             pe.y(pmlOp.y) - pe.mm2points(pmlOp.height),
-            pe.mm2points(pmlOp.width), pe.mm2points(pmlOp.height))
-
-        if pmlOp.fillType == pml.NO_FILL:
-            output += "S\n"
-        elif pmlOp.fillType == pml.FILL:
-            output += "f\n"
-        elif pmlOp.fillType == pml.STROKE_FILL:
-            output += "B\n"
-        else:
-            print "Invalid fill type for RectOp"
+            pe.mm2points(pmlOp.width),
+            pe.mm2points(pmlOp.height),
+            pmlOp.fillType == pml.NO_FILL or pmlOp.fillType == pml.STROKE_FILL,
+            pmlOp.fillType == pml.FILL or pmlOp.fillType == pml.STROKE_FILL
+        )
 
 class PDFQuarterCircleOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas) -> None:
+        if not isinstance(pmlOp, pml.QuarterCircleOp):
+            raise Exception("PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "+type(pmlOp).__name__)
+
         sX = pmlOp.flipX and -1 or 1
         sY = pmlOp.flipY and -1 or 1
 
@@ -130,247 +137,121 @@ class PDFQuarterCircleOp(PDFDrawOp):
         # has a max. drift of 0.019608% which is 28% better.
         A = pmlOp.radius * 0.551915024494
 
-        output += "%f w\n"\
-                  "%s m\n" % (pe.mm2points(pmlOp.width),
-                              pe.xy((pmlOp.x - pmlOp.radius * sX, pmlOp.y)))
-
-        output += "%f %f %f %f %f %f c\n" % (
-            pe.x(pmlOp.x - pmlOp.radius * sX), pe.y(pmlOp.y - A * sY),
-            pe.x(pmlOp.x - A * sX), pe.y(pmlOp.y - pmlOp.radius * sY),
-            pe.x(pmlOp.x), pe.y(pmlOp.y - pmlOp.radius * sY))
-
-        output += "S\n"
+        canvas.setLineWidth(pe.mm2points(pmlOp.width))
+        canvas.bezier(
+            pe.x(pmlOp.x - pmlOp.radius * sX),
+            pe.y(pmlOp.y),
+            pe.x(pmlOp.x - pmlOp.radius * sX),
+            pe.y(pmlOp.y - A * sY),
+            pe.x(pmlOp.x - A * sX),
+            pe.y(pmlOp.y - pmlOp.radius * sY),
+            pe.x(pmlOp.x), pe.y(pmlOp.y - pmlOp.radius * sY)
+        )
 
 class PDFArbitraryOp(PDFDrawOp):
-    def draw(self, pmlOp, pageNr, output, pe):
-        output += "%s\n" % pmlOp.cmds
+    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas) -> None:
+        if not isinstance(pmlOp, pml.PDFOp):
+            raise Exception("PDFArbitraryOp is only compatible with pml.PDFOp, got "+type(pmlOp).__name__)
+
+        canvas.addLiteral("%s\n" % pmlOp.cmds)
 
 # used for keeping track of used fonts
 class FontInfo:
-    def __init__(self, name):
-        self.name = name
+    def __init__(self, name: str):
+        self.name: str = name
 
         # font number (the name in the /F PDF command), or -1 if not used
-        self.number = -1
+        self.number: int = -1
 
         # PDFObject that contains the /Font object for this font, or None
-        self.pdfObj = None
+        self.pdfObj: Optional[PDFObject] = None
 
 # one object in a PDF file
 class PDFObject:
-    def __init__(self, nr, data = ""):
+    def __init__(self, nr: int, data: str = ""):
         # PDF object number
-        self.nr = nr
+        self.nr: int = nr
 
         # all data between 'obj/endobj' tags, excluding newlines
-        self.data = data
+        self.data: str = data
 
-        # start position of object, stored in the xref table. initialized
-        # when the object is written out (by the caller of write).
-        self.xrefPos = -1
-
-    # write object to output (util.String).
-    def write(self, output):
-        output += "%d 0 obj\n" % self.nr
-        output += self.data
-        output += "\nendobj\n"
+    # write object to canvas.
+    def write(self, canvas: Canvas) -> None:
+        code = "%d 0 obj\n" % self.nr
+        code += self.data
+        code += "\nendobj\n"
+        canvas.addLiteral(code)
 
 class PDFExporter:
     # see genWidths
-    _widthsStr = None
+    _widthsStr: Optional[str] = None
 
-    def __init__(self, doc):
-        # pml.Document
-        self.doc = doc
-
-    # generate PDF document and return it as a string
-    def generate(self):
-        #lsdjflksj = util.TimerDev("generate")
-        doc = self.doc
-
+    def __init__(self, doc: 'pml.Document'):
+        self.doc: pml.Document = doc
         # fast lookup of font information
-        self.fonts = {
-            pml.COURIER : FontInfo("Courier"),
+        self.fonts: Dict[int, FontInfo] = {
+            pml.COURIER: FontInfo("Courier"),
             pml.COURIER | pml.BOLD: FontInfo("Courier-Bold"),
             pml.COURIER | pml.ITALIC: FontInfo("Courier-Oblique"),
             pml.COURIER | pml.BOLD | pml.ITALIC:
-              FontInfo("Courier-BoldOblique"),
+                FontInfo("Courier-BoldOblique"),
 
-            pml.HELVETICA : FontInfo("Helvetica"),
+            pml.HELVETICA: FontInfo("Helvetica"),
             pml.HELVETICA | pml.BOLD: FontInfo("Helvetica-Bold"),
             pml.HELVETICA | pml.ITALIC: FontInfo("Helvetica-Oblique"),
             pml.HELVETICA | pml.BOLD | pml.ITALIC:
-              FontInfo("Helvetica-BoldOblique"),
+                FontInfo("Helvetica-BoldOblique"),
 
-            pml.TIMES_ROMAN : FontInfo("Times-Roman"),
+            pml.TIMES_ROMAN: FontInfo("Times-Roman"),
             pml.TIMES_ROMAN | pml.BOLD: FontInfo("Times-Bold"),
             pml.TIMES_ROMAN | pml.ITALIC: FontInfo("Times-Italic"),
             pml.TIMES_ROMAN | pml.BOLD | pml.ITALIC:
-              FontInfo("Times-BoldItalic"),
-            }
+                FontInfo("Times-BoldItalic"),
+        }
 
-        # list of PDFObjects
-        self.objects = []
+    # generate PDF document and return it as a string
+    def generate(self) -> bytes:
+        doc = self.doc
+        canvas = Canvas(
+            '',
+            pdfVersion=(1, 5),
+            pagesize=(self.mm2points(doc.w), self.mm2points(doc.h)),
+            initialFontName=self.getFontForFlags(pml.NORMAL),
+        )
 
-        # number of fonts used
-        self.fontCnt = 0
+        # set PDF info
+        version = self.doc.version
+        canvas.setCreator('Trelby '+version)
+        canvas.setProducer('Trelby '+version)
+        if self.doc.uniqueId:
+            canvas.setKeywords(self.doc.uniqueId)
 
-        # PDF object count. it starts at 1 because the 'f' thingy in the
-        # xref table is an object of some kind or something...
-        self.objectCnt = 1
-
-        pages = len(doc.pages)
-
-        self.catalogObj = self.addObj()
-        self.infoObj = self.createInfoObj()
-        pagesObj = self.addObj()
-
-        # we only create this when needed, in genWidths
-        self.widthsObj = None
-
-        if doc.tocs:
-            self.outlinesObj = self.addObj()
-
-            # each outline is a single PDF object
-            self.outLineObjs = []
-
-            for i in xrange(len(doc.tocs)):
-                self.outLineObjs.append(self.addObj())
-
-            self.outlinesObj.data = ("<< /Type /Outlines\n"
-                                     "/Count %d\n"
-                                     "/First %d 0 R\n"
-                                     "/Last %d 0 R\n"
-                                     ">>" % (len(doc.tocs),
-                                             self.outLineObjs[0].nr,
-                                             self.outLineObjs[-1].nr))
-
-            outlinesStr = "/Outlines %d 0 R\n" % self.outlinesObj.nr
-
-            if doc.showTOC:
-                outlinesStr += "/PageMode /UseOutlines\n"
-
-        else:
-            outlinesStr = ""
-
-        # each page has two PDF objects: 1) a /Page object that links to
-        # 2) a stream object that has the actual page contents.
-        self.pageObjs = []
-        self.pageContentObjs = []
-
-        for i in xrange(pages):
-            self.pageObjs.append(self.addObj("<< /Type /Page\n"
-                                             "/Parent %d 0 R\n"
-                                             "/Contents %d 0 R\n"
-                                             ">>" % (pagesObj.nr,
-                                                     self.objectCnt + 1)))
-            self.pageContentObjs.append(self.addObj())
 
         if doc.defPage != -1:
-            outlinesStr += "/OpenAction [%d 0 R /XYZ null null 0]\n" % (
-                self.pageObjs[0].nr + doc.defPage * 2)
+            # canvas.addLiteral("/OpenAction [%d 0 R /XYZ null null 0]\n" % (self.pageObjs[0].nr + doc.defPage * 2)) # this should make the PDF reader open the PDF at the desired page
+            # TODO: This doesn't seem to be easily doable with reportlab. /OpenAction is considered a security threat by some (as it allows executing JavaScript), so I think it's unlikely they'll add support. Also, this feature didn't work with many PDF viewers anyway; I tested Evince, Okular and pdf.js in Firefox, and they all didn't support it. So maybe, we should remove this feature entirely?
+            pass
 
-        self.catalogObj.data = ("<< /Type /Catalog\n"
-                                "/Pages %d 0 R\n"
-                                "%s"
-                                ">>" % (pagesObj.nr, outlinesStr))
+        numberOfPages: int = len(doc.pages)
 
-        for i in xrange(pages):
-            self.genPage(i)
+        # draw pages
+        for i in range(numberOfPages):
+            pg = self.doc.pages[i]
+            for op in pg.ops:
+                op.pdfOp.draw(op, i, self, canvas)
 
-        kids = util.String()
-        kids += "["
-        for obj in self.pageObjs:
-            kids += "%d 0 R\n" % obj.nr
-        kids += "]"
+            if i < numberOfPages - 1:
+                canvas.showPage()
 
-        fontStr = ""
-        for fi in self.fonts.itervalues():
-            if fi.number != -1:
-                fontStr += "/F%d %d 0 R " % (fi.number, fi.pdfObj.nr)
+        if doc.showTOC:
+            canvas.showOutline()
 
-        pagesObj.data = ("<< /Type /Pages\n"
-                         "/Kids %s\n"
-                         "/Count %d\n"
-                         "/MediaBox [0 0 %f %f]\n"
-                         "/Resources << /Font <<\n"
-                         "%s >> >>\n"
-                         ">>" % (str(kids), pages, self.mm2points(doc.w),
-                                 self.mm2points(doc.h), fontStr))
-
-        if doc.tocs:
-            for i in xrange(len(doc.tocs)):
-                self.genOutline(i)
-
-        return self.genPDF()
-
-    def createInfoObj(self):
-        version = self.escapeStr(self.doc.version)
-
-        if self.doc.uniqueId:
-            extra = "/Keywords (%s)\n" % self.doc.uniqueId
-        else:
-            extra = ""
-
-        return self.addObj("<< /Creator (Trelby %s)\n"
-                           "/Producer (Trelby %s)\n"
-                           "%s"
-                           ">>" % (version, version, extra))
-
-    # create a PDF object containing a 256-entry array for the widths of a
-    # font, with all widths being 600
-    def genWidths(self):
-        if self.widthsObj:
-            return
-
-        if not self.__class__._widthsStr:
-            self.__class__._widthsStr = "[%s]" % ("600 " * 256).rstrip()
-
-        self.widthsObj = self.addObj(self.__class__._widthsStr)
-
-    # generate a single page
-    def genPage(self, pageNr):
-        pg = self.doc.pages[pageNr]
-
-        # content stream
-        cont = util.String()
-
-        self.currentFont = ""
-
-        for op in pg.ops:
-            op.pdfOp.draw(op, pageNr, cont, self)
-
-        self.pageContentObjs[pageNr].data = self.genStream(str(cont))
-
-    # generate outline number 'i'
-    def genOutline(self, i):
-        toc = self.doc.tocs[i]
-        obj = self.outLineObjs[i]
-
-        if i != (len(self.doc.tocs) - 1):
-            nextStr = "/Next %d 0 R\n" % (obj.nr + 1)
-        else:
-            nextStr = ""
-
-        if i != 0:
-            prevStr = "/Prev %d 0 R\n" % (obj.nr - 1)
-        else:
-            prevStr = ""
-
-        obj.data = ("<< /Parent %d 0 R\n"
-                    "/Dest [%d 0 R /XYZ %f %f 0]\n"
-                    "/Title (%s)\n"
-                    "%s"
-                    "%s"
-                    ">>" % (
-            self.outlinesObj.nr, toc.pageObjNr, self.x(toc.op.x),
-            self.y(toc.op.y), self.escapeStr(toc.text),
-            prevStr, nextStr))
+        return canvas.getpdfdata()
 
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
-    def genStream(self, s, isFontStream = False):
-        compress = True
+    def genStream(self, s, isFontStream = False) -> str:
+        compress = False
 
         # embedded TrueType font program streams for some reason need a
         # Length1 entry that records the uncompressed length of the stream
@@ -389,155 +270,48 @@ class PDFExporter:
                 "%s\n"
                 "endstream" % (len(s), lenStr, filterStr, s))
 
-    # add a new object and return it. 'data' is all data between
-    # 'obj/endobj' tags, excluding newlines.
-    def addObj(self, data = ""):
-        obj = PDFObject(self.objectCnt, data)
-        self.objects.append(obj)
-        self.objectCnt += 1
 
-        return obj
-
-    # write out object to 'output' (util.String)
-    def writeObj(self, output, obj):
-        obj.xrefPos = len(output)
-        obj.write(output)
-
-    # write a xref table entry to 'output' (util.String), using position
-    # 'pos, generation 'gen' and type 'typ'.
-    def writeXref(self, output, pos, gen = 0, typ = "n"):
-        output += "%010d %05d %s \n" % (pos, gen, typ)
-
-    # generate PDF file and return it as a string
-    def genPDF(self):
-        data = util.String()
-
-        data += "%PDF-1.5\n"
-
-        for obj in self.objects:
-            self.writeObj(data, obj)
-
-        xrefStartPos = len(data)
-
-        data += "xref\n0 %d\n" % self.objectCnt
-        self.writeXref(data, 0, 65535, "f")
-
-        for obj in self.objects:
-            self.writeXref(data, obj.xrefPos)
-
-        data += "\n"
-
-        data += ("trailer\n"
-                 "<< /Size %d\n"
-                 "/Root %d 0 R\n"
-                 "/Info %d 0 R\n>>\n" % (
-            self.objectCnt, self.catalogObj.nr, self.infoObj.nr))
-
-        data += "startxref\n%d\n%%%%EOF\n" % xrefStartPos
-
-        return str(data)
-
-    # get font number to use for given flags. also creates the PDF object
-    # for the font if it does not yet exist.
-    def getFontNr(self, flags):
+    # get font name to use for given flags. also registers the font in reportlabs if it does not yet exist.
+    def getFontForFlags(self, flags: int) -> str:
         # the "& 15" gets rid of the underline flag
-        fi = self.fonts.get(flags & 15)
+        fontInfo = self.fonts.get(flags & 15)
 
-        if not fi:
-            print "PDF.getfontNr: invalid flags %d" % flags
+        if not fontInfo:
+            raise Exception("PDF.getfontNr: invalid flags %d" % flags)
 
-            return 0
+        # the "& 15" gets rid of the underline flag
+        customFontInfo = self.doc.fonts.get(flags & 15)
 
-        if fi.number == -1:
-            fi.number = self.fontCnt
-            self.fontCnt += 1
+        if not customFontInfo:
+            return fontInfo.name
 
-            # the "& 15" gets rid of the underline flag
-            pfi = self.doc.fonts.get(flags & 15)
+        if not customFontInfo.name in pdfmetrics.getRegisteredFontNames():
+            if not customFontInfo.fontFileName:
+                raise Exception('Font name "%s" is not known and no font file name provided. Please provide a file name for this font in the settings or use the default font.' % customFontInfo.name)
+            pdfmetrics.registerFont(TTFont(customFontInfo.name, customFontInfo.fontFileName))
 
-            if not pfi:
-                fi.pdfObj = self.addObj("<< /Type /Font\n"
-                                        "/Subtype /Type1\n"
-                                        "/BaseFont /%s\n"
-                                        "/Encoding /WinAnsiEncoding\n"
-                                        ">>" % fi.name)
-            else:
-                self.genWidths()
-
-                fi.pdfObj = self.addObj("<< /Type /Font\n"
-                                        "/Subtype /TrueType\n"
-                                        "/BaseFont /%s\n"
-                                        "/Encoding /WinAnsiEncoding\n"
-                                        "/FirstChar 0\n"
-                                        "/LastChar 255\n"
-                                        "/Widths %d 0 R\n"
-                                        "/FontDescriptor %d 0 R\n"
-                                        ">>" % (pfi.name, self.widthsObj.nr,
-                                                self.objectCnt + 1))
-
-                fm = fontinfo.getMetrics(flags)
-
-                if pfi.fontProgram:
-                    fpStr = "/FontFile2 %d 0 R\n" % (self.objectCnt + 1)
-                else:
-                    fpStr = ""
-
-                # we use a %s format specifier for the italic angle since
-                # it sometimes contains integers, sometimes floating point
-                # values.
-                self.addObj("<< /Type /FontDescriptor\n"
-                            "/FontName /%s\n"
-                            "/FontWeight %d\n"
-                            "/Flags %d\n"
-                            "/FontBBox [%d %d %d %d]\n"
-                            "/ItalicAngle %s\n"
-                            "/Ascent %s\n"
-                            "/Descent %s\n"
-                            "/CapHeight %s\n"
-                            "/StemV %s\n"
-                            "/StemH %s\n"
-                            "/XHeight %d\n"
-                            "%s"
-                            ">>" % (pfi.name,
-                                    fm.fontWeight,
-                                    fm.flags,
-                                    fm.bbox[0], fm.bbox[1],
-                                    fm.bbox[2], fm.bbox[3],
-                                    fm.italicAngle,
-                                    fm.ascent,
-                                    fm.descent,
-                                    fm.capHeight,
-                                    fm.stemV,
-                                    fm.stemH,
-                                    fm.xHeight,
-                                    fpStr))
-
-                if pfi.fontProgram:
-                    self.addObj(self.genStream(pfi.fontProgram, True))
-
-        return fi.number
+        return customFontInfo.name
 
     # escape string
-    def escapeStr(self, s):
+    def escapeStr(self, s: str) -> str:
         return s.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
 
     # convert mm to points (1/72 inch).
-    def mm2points(self, mm):
+    def mm2points(self, mm: float) -> float:
         # 2.834 = 72 / 25.4
         return mm * 2.83464567
 
     # convert x coordinate
-    def x(self, x):
+    def x(self, x: float) -> float:
         return self.mm2points(x)
 
     # convert y coordinate
-    def y(self, y):
+    def y(self, y: float) -> float:
         return self.mm2points(self.doc.h - y)
 
-    # convert xy, which is (x, y) pair, into PDF coordinates, and format
-    # it as "%f %f", and return that.
-    def xy(self, xy):
+    # convert xy, which is (x, y) pair, into PDF coordinates
+    def xy(self, xy: Tuple[float, float]) -> Tuple[float, float]:
         x = self.x(xy[0])
         y = self.y(xy[1])
 
-        return "%f %f" % (x, y)
+        return (x, y)

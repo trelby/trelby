@@ -5,7 +5,7 @@ to inspect/modify the code.
 1. Requirements
 ===============
 
-You will need Python 2.7 and wxWidgets (2.8) and its Python bindings to
+You will need Python 3.x and wxWidgets (3.x) and its Python bindings to
 run Trelby. You also need the lxml Python library (http://lxml.de/) and
 the mock library (https://pypi.python.org/pypi/mock).
 
@@ -36,7 +36,7 @@ this, that aspect of the program will not work.
 You can run "make dist", which prepares all 4 and also generates a Linux
 distribution package which you can ignore.
 
-2.5. Preparing for a Windows build
+2.5. Preparing for a Windows build - Out of date
 ==================================
 
 If you want to create the Windows package, you'll need to place the
@@ -79,7 +79,7 @@ On Linux:
 On Windows:
 
  $ cd \trelby
- $ python bin/trelby --test sample.trelby
+ $ python3 bin/trelby --test sample.trelby
 
  The file t.bat contains the last command.
 

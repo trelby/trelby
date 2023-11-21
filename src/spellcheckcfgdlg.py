@@ -40,9 +40,9 @@ class SCDictDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.itemsEntry.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
     def OnOK(self, event):
         self.scDict.refresh()

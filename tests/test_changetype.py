@@ -25,7 +25,7 @@ def testChangeOneElem():
         "toTransition" : scr.TRANSITION,
     }
 
-    for (func, ele) in functionMap.items():
+    for (func, ele) in list(functionMap.items()):
         sp.cmd(func)
 
         assert ls[0].lt == scr.SCENE

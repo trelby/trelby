@@ -4,13 +4,13 @@ Installation instructions for Trelby on Linux (tar.gz)
 Trelby uses Python's Distutils tool for installation. By default,
 it will install everything to /opt/trelby if you run
 
-python setup.py install
+python3 setup.py install
 
 Afterwards you can run the program with the command "/opt/trelby/bin/trelby".
 
 If you prefer to install Trelby e.g. to /usr/local, run
 
-sudo python setup.py install --prefix=/usr/local \
+sudo python3 setup.py install --prefix=/usr/local \
                              --install-lib=/usr/local/share/trelby \
                              --install-data=/usr/local/share
 
@@ -20,6 +20,6 @@ your system's path (as is /usr/local/bin).
 
 External dependencies required:
 
- * Python 2.7
+ * Python 3
  * wxWidgets (2.8) and its Python bindings (wxPython)
  * lxml

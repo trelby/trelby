@@ -55,7 +55,7 @@ class Vars:
     # load() to take.
     @staticmethod
     def makeVals(s):
-        tmp = util.fixNL(s).split("\n")
+        tmp = util.fixNL(str(s)).split("\n")
 
         vals = {}
         for it in tmp:
@@ -78,7 +78,7 @@ class Vars:
         for it in self.cvars:
             if it.name2:
                 name = prefix + it.name2
-                if vals.has_key(name):
+                if name in vals:
                     res = it.fromStr(vals, vals[name], name)
                     setattr(obj, it.name, res)
                     del vals[name]
@@ -196,10 +196,10 @@ class StrUnicodeVar(ConfVar):
         ConfVar.__init__(self, name, defVal, name2)
 
     def toStr(self, val, prefix):
-        return "%s:%s\n" % (prefix, val.encode("UTF-8"))
+        return "%s:%s\n" % (prefix, str(val))
 
     def fromStr(self, vals, val, prefix):
-        return val.decode("UTF-8", "ignore")
+        return val
 
 # binary string, can contain anything. characters outside of printable
 # ASCII (and \ itself) are encoded as \XX, where XX is the hex code of the
@@ -260,7 +260,7 @@ class ListVar(ConfVar):
         for i in range(1, count + 1):
             name = prefix + "/%d" % i
 
-            if vals.has_key(name):
+            if name in vals:
                 res = self.itemType.fromStr(vals, vals[name], name)
                 tmp.append(res)
                 del vals[name]

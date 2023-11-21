@@ -8,6 +8,6 @@ language: c
 
 install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y python-lxml python-mock
+  - sudo apt-get install -y python3-lxml python3-mock
 
 script: make test

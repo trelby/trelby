@@ -17,7 +17,7 @@ def readNames(frame):
         return True
 
     try:
-        data = util.loadMaybeCompressedFile(u"names.txt", frame)
+        data = util.loadMaybeCompressedFile("names.txt", frame)
         if not data:
             return False
 
@@ -41,7 +41,7 @@ def readNames(frame):
 
         return True
 
-    except Exception, e:
+    except Exception as e:
         wx.MessageBox("Error loading name database: %s" % str(e),
                       "Error", wx.OK, frame)
 
@@ -70,8 +70,8 @@ class NamesDlg(wx.Dialog):
         for i in range(len(nameArr.typeNamesById)):
             typeName = nameArr.typeNamesById[i]
 
-            self.typeList.InsertStringItem(i, str(nameArr.typeNamesCnt[typeName]))
-            self.typeList.SetStringItem(i, 1, typeName)
+            self.typeList.InsertItem(i, str(nameArr.typeNamesCnt[typeName]))
+            self.typeList.SetItem(i, 1, typeName)
             self.typeList.SetItemData(i, i)
 
         self.typeList.SetColumnWidth(0, wx.LIST_AUTOSIZE)
@@ -99,14 +99,14 @@ class NamesDlg(wx.Dialog):
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
         searchBtn = wx.Button(self, -1, "Search")
-        wx.EVT_BUTTON(self, searchBtn.GetId(), self.OnSearch)
+        self.Bind(wx.EVT_BUTTON, self.OnSearch, id=searchBtn.GetId())
         vsizer2.Add(searchBtn, 0, wx.BOTTOM | wx.TOP, 10)
 
         self.searchEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
         vsizer2.Add(self.searchEntry, 0, wx.EXPAND)
 
         tmp = wx.Button(self, -1, "Insert")
-        wx.EVT_BUTTON(self, tmp.GetId(), self.OnInsertName)
+        self.Bind(wx.EVT_BUTTON, self.OnInsertName, id=tmp.GetId())
         vsizer2.Add(tmp, 0, wx.BOTTOM | wx.TOP, 10)
 
         hsizer2.Add(vsizer2, 1, wx.RIGHT, 10)
@@ -122,7 +122,7 @@ class NamesDlg(wx.Dialog):
         self.sexRb.SetSelection(2)
         hsizer2.Add(self.sexRb, 0, wx.LEFT, 5)
 
-        vsizer.Add(hsizer2, 0, wx.EXPAND | wx.ALIGN_CENTER)
+        vsizer.Add(hsizer2, 0, wx.EXPAND)
 
         vsizer.Add(wx.StaticText(self, -1, "Results:"))
 
@@ -135,9 +135,9 @@ class NamesDlg(wx.Dialog):
 
         hsizer.Add(vsizer, 20, wx.EXPAND | wx.LEFT, 10)
 
-        wx.EVT_TEXT_ENTER(self, self.searchEntry.GetId(), self.OnSearch)
-        wx.EVT_BUTTON(self, selectAllBtn.GetId(), self.selectAllTypes)
-        wx.EVT_LIST_COL_CLICK(self, self.typeList.GetId(), self.OnHeaderClick)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnSearch, id=self.searchEntry.GetId())
+        self.Bind(wx.EVT_BUTTON, self.selectAllTypes, id=selectAllBtn.GetId())
+        self.Bind(wx.EVT_LIST_COL_CLICK, self.OnHeaderClick, id=self.typeList.GetId())
 
         util.finishWindow(self, hsizer)
 
@@ -158,8 +158,11 @@ class NamesDlg(wx.Dialog):
     def CmpFreq(self, i1, i2):
         return nameArr.typeNamesCnt[nameArr.typeNamesById[i2]] - nameArr.typeNamesCnt[nameArr.typeNamesById[i1]]
 
+    def cmpfunc(a, b):
+        return (a > b) - (a < b)
+
     def CmpType(self, i1, i2):
-        return cmp(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
+        return util.cmpfunc(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
 
     def OnInsertName(self, event):
         item = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL,
@@ -180,10 +183,9 @@ class NamesDlg(wx.Dialog):
 
         wx.BeginBusyCursor()
 
-        s = util.lower(misc.fromGUI(self.searchEntry.GetValue()))
+        s = str(util.lower(misc.fromGUI(self.searchEntry.GetValue())))
         sex = self.sexRb.GetSelection()
         nt = self.nameRb.GetSelection()
-
         selTypes = {}
         item = -1
 
@@ -201,7 +203,7 @@ class NamesDlg(wx.Dialog):
         else:
             doTypes = True
 
-        for i in xrange(nameArr.count):
+        for i in range(nameArr.count):
             if (sex != 2) and (sex == nameArr.sex[i]):
                 continue
 
@@ -225,7 +227,8 @@ class NamesDlg(wx.Dialog):
 
         self.list.items = l
         self.list.SetItemCount(len(l))
-        self.list.EnsureVisible(0)
+        if self.list.GetItemCount() > 0:
+            self.list.EnsureVisible(0)
 
         wx.EndBusyCursor()
 

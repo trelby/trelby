@@ -1,5 +1,4 @@
 import gutil
-import locations
 import util
 
 import wx
@@ -23,11 +22,11 @@ class LocationsDlg(wx.Dialog):
 
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer.Add(self.addBtn)
-        wx.EVT_BUTTON(self, self.addBtn.GetId(), self.OnAdd)
+        self.Bind(wx.EVT_BUTTON, self.OnAdd, id=self.addBtn.GetId())
 
         self.delBtn = gutil.createStockButton(self, "Delete")
         hsizer.Add(self.delBtn, 0, wx.LEFT, 10)
-        wx.EVT_BUTTON(self, self.delBtn.GetId(), self.OnDelete)
+        self.Bind(wx.EVT_BUTTON, self.OnDelete, id=self.delBtn.GetId())
 
         vsizer.Add(hsizer, 0, wx.ALIGN_CENTER | wx.TOP, 10)
 
@@ -52,8 +51,8 @@ class LocationsDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
         self.fillGui()
 

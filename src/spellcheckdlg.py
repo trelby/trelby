@@ -1,4 +1,3 @@
-import config
 import misc
 import spellcheck
 import undo
@@ -53,21 +52,21 @@ class SpellCheckDlg(wx.Dialog):
         suggestBtn = wx.Button(self, -1, "S&uggest replacement")
         vsizer.Add(suggestBtn, 0, wx.EXPAND | wx.TOP, 10)
 
-        wx.EVT_TEXT_ENTER(self, self.replaceEntry.GetId(), self.OnReplace)
+        self.Bind(wx.EVT_TEXT_ENTER, self.OnReplace, id=self.replaceEntry.GetId())
 
-        wx.EVT_BUTTON(self, replaceBtn.GetId(), self.OnReplace)
-        wx.EVT_BUTTON(self, addScriptBtn.GetId(), self.OnAddScript)
-        wx.EVT_BUTTON(self, addGlobalBtn.GetId(), self.OnAddGlobal)
-        wx.EVT_BUTTON(self, skipBtn.GetId(), self.OnSkip)
-        wx.EVT_BUTTON(self, suggestBtn.GetId(), self.OnSuggest)
+        self.Bind(wx.EVT_BUTTON, self.OnReplace, id=replaceBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnAddScript, id=addScriptBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnAddGlobal, id=addGlobalBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnSkip, id=skipBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnSuggest, id=suggestBtn.GetId())
 
-        wx.EVT_CHAR(self, self.OnChar)
-        wx.EVT_CHAR(self.replaceEntry, self.OnChar)
-        wx.EVT_CHAR(replaceBtn, self.OnChar)
-        wx.EVT_CHAR(addScriptBtn, self.OnChar)
-        wx.EVT_CHAR(skipBtn, self.OnChar)
-        wx.EVT_CHAR(addGlobalBtn, self.OnChar)
-        wx.EVT_CHAR(suggestBtn, self.OnChar)
+        self.Bind(wx.EVT_CHAR, self.OnChar)
+        self.replaceEntry.Bind(wx.EVT_CHAR, self.OnChar)
+        replaceBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        addScriptBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        skipBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        addGlobalBtn.Bind(wx.EVT_CHAR, self.OnChar)
+        suggestBtn.Bind(wx.EVT_CHAR, self.OnChar)
 
         util.finishWindow(self, vsizer)
 
@@ -180,11 +179,11 @@ class SpellCheckDlg(wx.Dialog):
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
 
-        for w in self.gScDict.words.iterkeys():
+        for w in self.gScDict.words.keys():
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
 
-        for w in self.ctrl.sp.scDict.words.iterkeys():
+        for w in self.ctrl.sp.scDict.words.keys():
             if w.startswith(wstart):
                 d = self.tryWord(word, wl, w, d, fifo)
 

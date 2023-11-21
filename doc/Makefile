@@ -11,8 +11,14 @@ MANPAGE_SOURCE = refentry.xml
 MANPAGE = trelby.1
 MANPAGE_GZIP_TARGET = $(MANPAGE).gz
 
-XSL_MANPAGE = /usr/share/xml/docbook/stylesheet/nwalsh/manpages/docbook.xsl
-XSL_HTML = html-stylesheet.xsl
+ifneq ($(wildcard /usr/share/sgml/docbook/stylesheet/xsl/),)
+  XSL_MANPAGE = /usr/share/sgml/docbook/stylesheet/xsl/docbook-xsl/manpages/docbook.xsl
+  XSL_HTML = html-stylesheet-deb.xsl
+else
+  XSL_MANPAGE = /usr/share/sgml/docbook/xsl-stylesheets/manpages/docbook.xsl
+  XSL_HTML = html-stylesheet.xsl
+endif
+
 
 # Book xsltproc options for HTML output
 # Note: --stringparam arguments no longer go here; 

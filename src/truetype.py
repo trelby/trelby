@@ -1,4 +1,7 @@
 import struct
+
+import util
+
 unpack = struct.unpack
 
 OFFSET_TABLE_SIZE = 12
@@ -31,14 +34,14 @@ class Font:
         # parse functions for tables, and a flag for whether each has been
         # parsed successfully
         self.parseFuncs = {
-            "head" : [self.parseHead, False],
-            "name" : [self.parseName, False],
-            "OS/2" : [self.parseOS2, False]
+            util.toLatin1("head") : [self.parseHead, False],
+            util.toLatin1("name") : [self.parseName, False],
+            util.toLatin1("OS/2") : [self.parseOS2, False]
             }
 
         try:
             self.parse(s)
-        except (struct.error, ParseError), e:
+        except (struct.error, ParseError) as e:
             self.error = e
 
             return
@@ -70,7 +73,7 @@ class Font:
             self.parseTag(offset, s)
             offset += TABLE_DIR_SIZE
 
-        for name, func in self.parseFuncs.iteritems():
+        for name, func in self.parseFuncs.items():
             if not func[1]:
                 raise ParseError("Table %s missing/invalid" % name)
 

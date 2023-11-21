@@ -1,7 +1,7 @@
 # see fileformat.txt for more detailed information about the various
 # defines found here.
 
-from error import *
+from error import ConfigError
 import misc
 import mypickle
 import pml
@@ -12,7 +12,7 @@ import copy
 import os
 
 if "TRELBY_TESTING" in os.environ:
-    import mock
+    import unittest.mock as mock
     wx = mock.Mock()
 else:
     import wx
@@ -72,7 +72,7 @@ SCROLL_CENTER = 2
 
 # construct reverse lookup tables
 
-for k, v in _char2lb.items():
+for k, v in list(_char2lb.items()):
     _lb2char[v] = k
 
 del k, v
@@ -230,7 +230,7 @@ class Command:
             v = self.__class__.cvars = mypickle.Vars()
 
             v.addList("keys", [], "Keys",
-                      mypickle.IntVar("", 0, "", 0, 9223372036854775808L))
+                      mypickle.IntVar("", 0, "", 0, 9223372036854775808))
 
             v.makeDicts()
 
@@ -311,7 +311,7 @@ class PDFFontInfo:
 
             # filename for the font to embed, or empty meaning don't
             # embed.
-            v.addStrUnicode("filename", u"", "Filename")
+            v.addStrUnicode("filename", "", "Filename")
 
             v.makeDicts()
 
@@ -520,10 +520,10 @@ class Config:
 
         self.cvars.load(vals, "", self)
 
-        for t in self.types.itervalues():
+        for t in self.types.values():
             t.load(vals, "Element/")
 
-        for pf in self.pdfFonts.itervalues():
+        for pf in self.pdfFonts.values():
             pf.load(vals, "Font/")
 
         self.recalc()
@@ -532,10 +532,10 @@ class Config:
     def save(self):
         s = self.cvars.save("", self)
 
-        for t in self.types.itervalues():
+        for t in self.types.values():
             s += t.save("Element/")
 
-        for pf in self.pdfFonts.itervalues():
+        for pf in self.pdfFonts.values():
             s += pf.save("Font/")
 
         return s
@@ -550,17 +550,17 @@ class Config:
     # box, thus getting the minimum value), which would then possibly
     # modify the value of other variables which is not what we want.
     def recalc(self, doAll = True):
-        for it in self.cvars.numeric.itervalues():
+        for it in self.cvars.numeric.values():
             util.clampObj(self, it.name, it.minVal, it.maxVal)
 
-        for el in self.types.itervalues():
-            for it in el.cvars.numeric.itervalues():
+        for el in self.types.values():
+            for it in el.cvars.numeric.values():
                 util.clampObj(el, it.name, it.minVal, it.maxVal)
 
-        for it in self.cvars.stringLatin1.itervalues():
+        for it in self.cvars.stringLatin1.values():
             setattr(self, it.name, util.toInputStr(getattr(self, it.name)))
 
-        for pf in self.pdfFonts.itervalues():
+        for pf in self.pdfFonts.values():
             pf.refresh()
 
         # make sure usable space on the page isn't too small
@@ -1008,7 +1008,7 @@ class ConfigGlobal:
 
         # PDF viewer program and args. defaults are empty since generating
         # them is a complex process handled by findPDFViewer.
-        v.addStrUnicode("pdfViewerPath", u"", "PDF/ViewerPath")
+        v.addStrUnicode("pdfViewerPath", "", "PDF/ViewerPath")
         v.addStrBinary("pdfViewerArgs", "", "PDF/ViewerArguments")
 
         # fonts. real defaults are set in setDefaultFonts.
@@ -1061,7 +1061,7 @@ class ConfigGlobal:
 
         self.cvars.load(vals, "", self)
 
-        for t in self.types.itervalues():
+        for t in self.types.values():
             t.load(vals, "Element/")
 
         for cmd in self.commands:
@@ -1073,7 +1073,7 @@ class ConfigGlobal:
     def save(self):
         s = self.cvars.save("", self)
 
-        for t in self.types.itervalues():
+        for t in self.types.values():
             s += t.save("Element/")
 
         for cmd in self.commands:
@@ -1083,7 +1083,7 @@ class ConfigGlobal:
 
     # fix up all invalid config values.
     def recalc(self):
-        for it in self.cvars.numeric.itervalues():
+        for it in self.cvars.numeric.values():
             util.clampObj(self, it.name, it.minVal, it.maxVal)
 
     def getType(self, lt):
@@ -1131,7 +1131,7 @@ class ConfigGlobal:
                     keys[key] = [cmd.name]
 
         s = ""
-        for k, v in keys.iteritems():
+        for k, v in keys.items():
             if len(v) > 1:
                 s += "%s:" % util.Key.fromInt(k).toStr()
 
@@ -1201,13 +1201,13 @@ class ConfigGlobal:
 
         if misc.isUnix:
             progs = [
-                (u"/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
-                (u"acroread", "-tempFile"),
-                (u"xpdf", ""),
-                (u"evince", ""),
-                (u"gpdf", ""),
-                (u"kpdf", ""),
-                (u"okular", ""),
+                ("/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
+                ("acroread", "-tempFile"),
+                ("xpdf", ""),
+                ("evince", ""),
+                ("gpdf", ""),
+                ("kpdf", ""),
+                ("okular", ""),
                 ]
         elif misc.isWindows:
             # get value via registry if possible, or fallback to old method.
@@ -1220,23 +1220,23 @@ class ConfigGlobal:
                 return
 
             progs = [
-                (ur"C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe",
+                (r"C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe",
                  ""),
-                (ur"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe",
+                (r"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe",
                  ""),
-                (ur"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe",
+                (r"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe",
                  ""),
-                (ur"C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe",
+                (r"C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe",
                  ""),
-                (ur"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe",
+                (r"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe",
                  ""),
-                (ur"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe",
+                (r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe",
                  ""),
-                (ur"C:\Program Files\Adobe\Acrobat 5.0\Reader\AcroRd32.exe",
+                (r"C:\Program Files\Adobe\Acrobat 5.0\Reader\AcroRd32.exe",
                  ""),
-                (ur"C:\Program Files\Adobe\Acrobat 4.0\Reader\AcroRd32.exe",
+                (r"C:\Program Files\Adobe\Acrobat 4.0\Reader\AcroRd32.exe",
                  ""),
-                (ur"C:\Program Files\Foxit Software\Foxit Reader\Foxit Reader.exe",
+                (r"C:\Program Files\Foxit Software\Foxit Reader\Foxit Reader.exe",
                  ""),
                 ]
         else:
@@ -1245,7 +1245,7 @@ class ConfigGlobal:
         success = False
 
         for name, args in progs:
-            if misc.isWindows or (name[0] == u"/"):
+            if misc.isWindows or (name[0] == "/"):
                 if util.fileExists(name):
                     success = True
 
@@ -1282,7 +1282,7 @@ class ConfigGui:
             ConfigGui.constantsInited = True
 
         # convert cfgGl.MyColor -> cfgGui.wx.Colour
-        for it in cfgGl.cvars.color.itervalues():
+        for it in cfgGl.cvars.color.values():
             c = getattr(cfgGl, it.name)
             tmp = wx.Colour(c.r, c.g, c.b)
             setattr(self, it.name, tmp)
@@ -1350,7 +1350,7 @@ class ConfigGui:
                 nfi = wx.NativeFontInfo()
                 nfi.FromString(s)
 
-                fi.font = wx.FontFromNativeInfo(nfi)
+                fi.font = wx.Font(nfi)
 
                 # likewise, evil users can set the font name to "z" or
                 # something equally silly, resulting in an

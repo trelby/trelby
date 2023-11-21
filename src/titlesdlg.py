@@ -32,22 +32,22 @@ class TitlesDlg(wx.Dialog):
 
         tmp = wx.Button(self, -1, "Add")
         hsizer.Add(tmp)
-        wx.EVT_BUTTON(self, tmp.GetId(), self.OnAddPage)
+        self.Bind(wx.EVT_BUTTON, self.OnAddPage, id=tmp.GetId())
         gutil.btnDblClick(tmp, self.OnAddPage)
 
         self.delPageBtn = wx.Button(self, -1, "Delete")
         hsizer.Add(self.delPageBtn, 0, wx.LEFT, 10)
-        wx.EVT_BUTTON(self, self.delPageBtn.GetId(), self.OnDeletePage)
+        self.Bind(wx.EVT_BUTTON, self.OnDeletePage, id=self.delPageBtn.GetId())
         gutil.btnDblClick(self.delPageBtn, self.OnDeletePage)
 
         self.moveBtn = wx.Button(self, -1, "Move")
         hsizer.Add(self.moveBtn, 0, wx.LEFT, 10)
-        wx.EVT_BUTTON(self, self.moveBtn.GetId(), self.OnMovePage)
+        self.Bind(wx.EVT_BUTTON, self.OnMovePage, id=self.moveBtn.GetId())
         gutil.btnDblClick(self.moveBtn, self.OnMovePage)
 
         self.nextBtn = wx.Button(self, -1, "Next")
         hsizer.Add(self.nextBtn, 0, wx.LEFT, 10)
-        wx.EVT_BUTTON(self, self.nextBtn.GetId(), self.OnNextPage)
+        self.Bind(wx.EVT_BUTTON, self.OnNextPage, id=self.nextBtn.GetId())
         gutil.btnDblClick(self.nextBtn, self.OnNextPage)
 
         vsizer.Add(hsizer, 0, wx.TOP, 5)
@@ -69,12 +69,12 @@ class TitlesDlg(wx.Dialog):
 
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer2.Add(self.addBtn)
-        wx.EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
+        self.Bind(wx.EVT_BUTTON, self.OnAddString, id=self.addBtn.GetId())
         gutil.btnDblClick(self.addBtn, self.OnAddString)
 
         self.delBtn = gutil.createStockButton(self, "Delete")
         hsizer2.Add(self.delBtn, 0, wx.LEFT, 10)
-        wx.EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
+        self.Bind(wx.EVT_BUTTON, self.OnDeleteString, id=self.delBtn.GetId())
         gutil.btnDblClick(self.delBtn, self.OnDeleteString)
 
         vsizer2.Add(hsizer2, 0, wx.TOP, 5)
@@ -94,7 +94,7 @@ class TitlesDlg(wx.Dialog):
         self.textEntry = wx.TextCtrl(
             self, -1, style = wx.TE_MULTILINE | wx.TE_DONTWRAP, size = (200, 75))
         hsizer.Add(self.textEntry, 1, wx.LEFT, 10)
-        wx.EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.textEntry.GetId())
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
 
@@ -116,7 +116,7 @@ class TitlesDlg(wx.Dialog):
             self.alignCombo.Append(it[0], it[1])
 
         hsizer.Add(self.alignCombo, 0, wx.LEFT, 10)
-        wx.EVT_COMBOBOX(self, self.alignCombo.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_COMBOBOX, self.OnMisc, id=self.alignCombo.GetId())
 
         vsizer2.Add(hsizer, 0, wx.TOP, 5)
 
@@ -126,10 +126,10 @@ class TitlesDlg(wx.Dialog):
                    wx.ALIGN_CENTER_VERTICAL)
         self.xEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.xEntry, 0, wx.LEFT, 10)
-        wx.EVT_TEXT(self, self.xEntry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.xEntry.GetId())
         self.yEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.yEntry, 0, wx.LEFT, 10)
-        wx.EVT_TEXT(self, self.yEntry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.yEntry.GetId())
 
         vsizer2.Add(hsizer, 0, wx.TOP, 5)
 
@@ -144,12 +144,12 @@ class TitlesDlg(wx.Dialog):
             self.fontCombo.Append(it[0], it[1])
 
         hsizer.Add(self.fontCombo, 0, wx.LEFT, 10)
-        wx.EVT_COMBOBOX(self, self.fontCombo.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_COMBOBOX, self.OnMisc, id=self.fontCombo.GetId())
 
         self.sizeEntry = wx.SpinCtrl(self, -1, size = (50, -1))
         self.sizeEntry.SetRange(4, 288)
-        wx.EVT_SPINCTRL(self, self.sizeEntry.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(self.sizeEntry, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.sizeEntry.GetId())
+        self.sizeEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         hsizer.Add(self.sizeEntry, 0, wx.LEFT, 10)
 
         vsizer2.Add(hsizer, 0, wx.TOP, 10)
@@ -194,11 +194,11 @@ class TitlesDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_BUTTON(self, self.previewBtn.GetId(), self.OnPreview)
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnPreview, id=self.previewBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
-        wx.EVT_LISTBOX(self, self.stringsLb.GetId(), self.OnStringsLb)
+        self.Bind(wx.EVT_LISTBOX, self.OnStringsLb, id=self.stringsLb.GetId())
 
         # list of widgets that are specific to editing the selected string
         self.widList = [ self.textEntry, self.xEntry, self.alignCombo,
@@ -211,7 +211,7 @@ class TitlesDlg(wx.Dialog):
 
     def addCheckBox(self, name, parent, sizer, pad):
         cb = wx.CheckBox(parent, -1, name)
-        wx.EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=cb.GetId())
         sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, name.lower() + "Cb", cb)
 
@@ -423,13 +423,13 @@ class TitlesPreview(wx.Window):
         self.cfg = cfg
         self.ctrl = ctrl
 
-        wx.EVT_SIZE(self, self.OnSize)
-        wx.EVT_ERASE_BACKGROUND(self, self.OnEraseBackground)
-        wx.EVT_PAINT(self, self.OnPaint)
+        self.Bind(wx.EVT_SIZE, self.OnSize)
+        self.Bind(wx.EVT_ERASE_BACKGROUND, self.OnEraseBackground)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
 
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wx.EmptyBitmap(size.width, size.height)
+        self.screenBuf = wx.Bitmap(size.width, size.height)
 
     def OnEraseBackground(self, event):
         pass
@@ -438,7 +438,7 @@ class TitlesPreview(wx.Window):
         dc = wx.BufferedPaintDC(self, self.screenBuf)
 
         # widget size
-        ww, wh = self.GetClientSizeTuple()
+        ww, wh = self.GetClientSize()
 
         dc.SetBrush(wx.Brush(self.GetBackgroundColour()))
         dc.SetPen(wx.Pen(self.GetBackgroundColour()))

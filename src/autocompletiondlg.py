@@ -20,10 +20,10 @@ class AutoCompletionDlg(wx.Dialog):
 
         self.elementsCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
 
-        for t in autoCompletion.types.itervalues():
+        for t in autoCompletion.types.values():
             self.elementsCombo.Append(t.ti.name, t.ti.lt)
 
-        wx.EVT_COMBOBOX(self, self.elementsCombo.GetId(), self.OnElementCombo)
+        self.Bind(wx.EVT_COMBOBOX, self.OnElementCombo, id=self.elementsCombo.GetId())
 
         hsizer.Add(self.elementsCombo, 0)
 
@@ -32,14 +32,14 @@ class AutoCompletionDlg(wx.Dialog):
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 10)
 
         self.enabledCb = wx.CheckBox(self, -1, "Auto-completion enabled")
-        wx.EVT_CHECKBOX(self, self.enabledCb.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.enabledCb.GetId())
         vsizer.Add(self.enabledCb, 0, wx.BOTTOM, 10)
 
         vsizer.Add(wx.StaticText(self, -1, "Default items:"))
 
         self.itemsEntry = wx.TextCtrl(self, -1, style = wx.TE_MULTILINE |
                                       wx.TE_DONTWRAP, size = (400, 200))
-        wx.EVT_TEXT(self, self.itemsEntry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.itemsEntry.GetId())
         vsizer.Add(self.itemsEntry, 1, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -59,8 +59,8 @@ class AutoCompletionDlg(wx.Dialog):
         self.elementsCombo.SetSelection(0)
         self.OnElementCombo()
 
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
     def OnOK(self, event):
         self.autoCompletion.refresh()

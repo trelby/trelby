@@ -1,9 +1,9 @@
 import misc
 import pdf
 import pml
-import scenereport
 import screenplay
 import util
+import functools
 
 import operator
 
@@ -36,30 +36,33 @@ class LocationReport:
 
         # remove empty LocationInfos, sort them and store to a list
         tmp = []
-        for li in locations.itervalues():
+        for li in locations.values():
             if (len(li.scenes) > 0) and (li not in tmp):
                 tmp.append(li)
 
+        def cmpfunc(a, b):
+            return (a > b) - (a < b)
+
         def sortFunc(o1, o2):
-            ret = cmp(o2.lines, o1.lines)
+            ret = cmpfunc(o2.lines, o1.lines)
 
             if ret != 0:
                 return ret
             else:
-                return cmp(o1.scenes[0], o2.scenes[0])
+                return cmpfunc(o1.scenes[0], o2.scenes[0])
 
-        tmp.sort(sortFunc)
+        tmp = sorted(tmp, key=functools.cmp_to_key(sortFunc))
 
         self.locations = tmp
 
         # information about what to include (and yes, the comma is needed
         # to unpack the list)
-        self.INF_SPEAKERS, = range(1)
+        self.INF_SPEAKERS, = list(range(1))
         self.inf = []
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
-    def generate(self):
+    def generate(self) -> bytes:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 15.0, 12)
 
@@ -133,5 +136,5 @@ class LocationInfo:
         self.actionLines += si.actionLines
         self.pages += si.pages
 
-        for name, dlines in si.chars.iteritems():
+        for name, dlines in si.chars.items():
             self.chars[name] = self.chars.get(name, 0) + dlines

@@ -14,7 +14,7 @@ def loadDict(frame):
     if gdict:
         return True
 
-    s = util.loadMaybeCompressedFile(u"dict_en.dat", frame)
+    s = util.loadMaybeCompressedFile("dict_en.dat", frame)
     if not s:
         return False
 
@@ -86,7 +86,7 @@ class Dict:
     def refresh(self):
         ww = {}
 
-        for w in self.words.keys():
+        for w in list(self.words.keys()):
             w = self.cleanWord(w)
 
             if w:
@@ -114,7 +114,7 @@ class Dict:
 
     # get a sorted list of all the words.
     def get(self):
-        keys = self.words.keys()
+        keys = list(self.words.keys())
         keys.sort()
 
         return keys
@@ -198,7 +198,7 @@ def lev(a, b):
         a, b = b, a
         n, m = m, n
 
-    current = range(n + 1)
+    current = list(range(n + 1))
 
     for i in range(1, m + 1):
         previous, current = current, [i] + [0] * m

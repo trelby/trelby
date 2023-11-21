@@ -8,11 +8,11 @@ class NameArray:
 
         self.name = [None] * self.maxCount
         self.type = array.array('B')
-        self.type.fromstring(chr(0) * self.maxCount)
+        self.type.frombytes(str.encode(chr(0) * self.maxCount))
 
         # 0 = female, 1 = male
         self.sex = array.array('B')
-        self.sex.fromstring(chr(0) * self.maxCount)
+        self.sex.frombytes(str.encode(chr(0) * self.maxCount))
 
         # key = type name, value = count of names for that type
         self.typeNamesCnt = collections.defaultdict(int)

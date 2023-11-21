@@ -3,6 +3,8 @@ import pdf
 import pml
 import screenplay
 import util
+from functools import reduce
+import functools
 
 class CharacterReport:
     def __init__(self, sp):
@@ -20,7 +22,7 @@ class CharacterReport:
         # how many lines processed for current speech
         curSpeechLines = 0
 
-        for i in xrange(len(ls)):
+        for i in range(len(ls)):
             line = ls[i]
 
             if (line.lt == screenplay.SCENE) and\
@@ -64,10 +66,10 @@ class CharacterReport:
 
         # list of CharInfo objects
         self.cinfo = []
-        for v in chars.values():
+        for v in list(chars.values()):
             self.cinfo.append(v)
 
-        self.cinfo.sort(cmpLines)
+        self.cinfo = sorted(self.cinfo, key=functools.cmp_to_key(cmpLines))
 
         self.totalSpeechCnt = self.sum("speechCnt")
         self.totalLineCnt = self.sum("lineCnt")
@@ -75,7 +77,7 @@ class CharacterReport:
         self.totalWordCharCnt = self.sum("wordCharCnt")
 
         # information types and what to include
-        self.INF_BASIC, self.INF_PAGES, self.INF_LOCATIONS = range(3)
+        self.INF_BASIC, self.INF_PAGES, self.INF_LOCATIONS = list(range(3))
         self.inf = []
         for s in ["Basic information", "Page list", "Location list"]:
             self.inf.append(misc.CheckBoxItem(s))
@@ -84,7 +86,7 @@ class CharacterReport:
     def sum(self, name):
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
 
-    def generate(self):
+    def generate(self) -> bytes:
         tf = pml.TextFormatter(self.sp.cfg.paperWidth,
                                self.sp.cfg.paperHeight, 20.0, 12)
 
@@ -134,10 +136,13 @@ class CharInfo:
         self.include = True
         self.pages = screenplay.PageList(sp.getPageNumbers())
 
+def cmpfunc(a, b):
+    return (a > b) - (a < b)
+
 def cmpLines(c1, c2):
-    ret = cmp(c2.lineCnt, c1.lineCnt)
+    ret = cmpfunc(c2.lineCnt, c1.lineCnt)
 
     if ret != 0:
         return ret
     else:
-        return cmp(c1.name, c2.name)
+        return cmpfunc(c1.name, c2.name)

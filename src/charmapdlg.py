@@ -1,5 +1,4 @@
 import gutil
-import misc
 import util
 
 import wx
@@ -17,7 +16,7 @@ class CharMapDlg(wx.Dialog):
 
         self.insertButton = wx.Button(self, -1, " Insert character ")
         hsizer.Add(self.insertButton, 0, wx.ALL, 10)
-        wx.EVT_BUTTON(self, self.insertButton.GetId(), self.OnInsert)
+        self.Bind(wx.EVT_BUTTON, self.OnInsert, id=self.insertButton.GetId())
         gutil.btnDblClick(self.insertButton, self.OnInsert)
 
         util.finishWindow(self, hsizer, 0)
@@ -35,7 +34,7 @@ class MyCharMap(wx.Window):
         # all valid characters
         self.chars = ""
 
-        for i in xrange(256):
+        for i in range(256):
             if util.isValidInputChar(i):
                 self.chars += chr(i)
 
@@ -60,16 +59,16 @@ class MyCharMap(wx.Window):
         self.bigFont = util.createPixelFont(self.boxSize - 2,
             wx.FONTFAMILY_MODERN, wx.NORMAL, wx.BOLD)
 
-        wx.EVT_PAINT(self, self.OnPaint)
-        wx.EVT_LEFT_DOWN(self, self.OnLeftDown)
-        wx.EVT_MOTION(self, self.OnMotion)
-        wx.EVT_SIZE(self, self.OnSize)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
+        self.Bind(wx.EVT_MOTION, self.OnMotion)
+        self.Bind(wx.EVT_SIZE, self.OnSize)
 
         util.setWH(self, self.cols * self.cellSize + 2 * self.offset, 460)
 
     def OnSize(self, event):
         size = self.GetClientSize()
-        self.screenBuf = wx.EmptyBitmap(size.width, size.height)
+        self.screenBuf = wx.Bitmap(size.width, size.height)
 
     def OnLeftDown(self, event):
         pos = event.GetPosition()

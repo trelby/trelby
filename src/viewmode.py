@@ -5,8 +5,6 @@ import mypager
 import pml
 import util
 
-import wx
-
 # Number of lines the smooth scroll will try to search. 15-20 is a good
 # number to use with the layout mode margins we have.
 MAX_JUMP_DISTANCE = 17
@@ -202,7 +200,7 @@ class ViewModeDraft(ViewMode):
         cfg = ctrl.sp.cfg
         cfgGui = ctrl.getCfgGui()
 
-        width, height = ctrl.GetClientSizeTuple()
+        width, height = ctrl.GetClientSize()
         ls = ctrl.sp.lines
         y = 15
         i = ctrl.sp.getTopLine()
@@ -274,7 +272,7 @@ class ViewModeLayout(ViewMode):
         texts = []
         dpages = []
 
-        width, height = ctrl.GetClientSizeTuple()
+        width, height = ctrl.GetClientSize()
 
         # gap between pages (pixels)
         pageGap = 10
@@ -412,7 +410,7 @@ class ViewModeSideBySide(ViewMode):
         texts = []
         dpages = []
 
-        width, height = ctrl.GetClientSizeTuple()
+        width, height = ctrl.GetClientSize()
 
         mm2p = ctrl.mm2p
 

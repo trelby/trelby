@@ -2,13 +2,14 @@ Source: trelby
 Section: python
 Priority: extra
 Maintainer: Anil Gulecha <anil.verve@gmail.com>
-Build-Depends: debhelper (>= 8), python-all (>= 2.7), xsltproc, docbook-xsl, devscripts, fakeroot, python-mock
+Build-Depends: debhelper (>= 8), python3-all (>= 3.7), xsltproc, docbook-xsl, devscripts, fakeroot, python3-mock, dh-python, python3-wxgtk4.0, sgml-base, sgml-data, docbook-xml, python3-reportlab, python3-lxml
+XS-Python-Version: >= 3.7
 Standards-Version: 3.9.4
 Homepage: http://www.trelby.org/
 
 Package: trelby
 Architecture: all
-Depends: ${misc:Depends}, ${python:Depends}, python-wxgtk2.8, python-crypto, python-lxml
+Depends: ${misc:Depends}, ${python:Depends}, python3-wxgtk4.0, python3-cryptography, python3-lxml
 Description: Feature-rich screenwriting program
  Trelby is a simple, powerful, full-featured, multi-platform program for
  writing movie screenplays. It is simple, fast and elegantly laid out to

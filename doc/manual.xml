@@ -1396,24 +1396,16 @@
 		Bold-Italic).</para>
 
 		<para>Each font setting has two parts: a 'Name' field and a 'File'
-		field. The 'Name' field is the Postscript name of the font and is
-		used by the PDF viewer application to recognize the font to use.
-		Some examples of the names that would go here are 'AndaleMono',
-		'CourierNewPSMT', and 'BitstreamVeraSansMono-Roman'. These names
-		are, in general, impossible for human beings to know for arbitrary
-		fonts. See the next paragraphs for ways around this.</para>
+		field. The 'Name' field is the internal Postscript name of the font and
+		is used by the PDF viewer application to recognize the font to use.
+		</para>
 
 		<para>The 'File' field is the filename of the TrueType font to
 		use. If you fill in this field, the font file is embedded in the
-		generated PDF files. If you leave this field empty but fill in the
-		'Name' field, the font file is not embedded in the PDF file, just
-		the 'Name' reference is used to indicate what font the PDF viewer
-		application should use.</para>
+		generated PDF files.
+		</para>
 
-		<para>There are many factors affecting whether you should embed a
-		font or not. Embedding a font makes it much more likely that the
-		PDF file will display properly on other people's computers and/or
-		print properly. However, it will also increase the size of the PDF
+		<para>Embedding a font  will increase the size of the PDF
 		files drastically, and not all fonts allow embedding in their
 		license terms.</para>
 

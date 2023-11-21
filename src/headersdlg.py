@@ -33,8 +33,8 @@ class HeadersDlg(wx.Dialog):
 
         self.elinesEntry = wx.SpinCtrl(self, -1)
         self.elinesEntry.SetRange(0, 5)
-        wx.EVT_SPINCTRL(self, self.elinesEntry.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(self.elinesEntry, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.elinesEntry.GetId())
+        self.elinesEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         hsizer.Add(self.elinesEntry, 0, wx.LEFT, 10)
 
         vsizer.Add(hsizer)
@@ -52,12 +52,12 @@ class HeadersDlg(wx.Dialog):
 
         self.addBtn = gutil.createStockButton(self, "Add")
         hsizer.Add(self.addBtn)
-        wx.EVT_BUTTON(self, self.addBtn.GetId(), self.OnAddString)
+        self.Bind(wx.EVT_BUTTON, self.OnAddString, id=self.addBtn.GetId())
         gutil.btnDblClick(self.addBtn, self.OnAddString)
 
         self.delBtn = gutil.createStockButton(self, "Delete")
         hsizer.Add(self.delBtn, 0, wx.LEFT, 10)
-        wx.EVT_BUTTON(self, self.delBtn.GetId(), self.OnDeleteString)
+        self.Bind(wx.EVT_BUTTON, self.OnDeleteString, id=self.delBtn.GetId())
         gutil.btnDblClick(self.delBtn, self.OnDeleteString)
 
         vsizer.Add(hsizer, 0, wx.TOP, 5)
@@ -69,7 +69,7 @@ class HeadersDlg(wx.Dialog):
 
         self.textEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.textEntry, 1, wx.LEFT, 10)
-        wx.EVT_TEXT(self, self.textEntry.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.textEntry.GetId())
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
 
@@ -86,8 +86,8 @@ class HeadersDlg(wx.Dialog):
 
         self.lineEntry = wx.SpinCtrl(self, -1)
         self.lineEntry.SetRange(1, 5)
-        wx.EVT_SPINCTRL(self, self.lineEntry.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(self.lineEntry, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.lineEntry.GetId())
+        self.lineEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(self.lineEntry)
 
         gsizer.Add(wx.StaticText(self, -1, "X offset (characters):"), 0,
@@ -95,8 +95,8 @@ class HeadersDlg(wx.Dialog):
 
         self.xoffEntry = wx.SpinCtrl(self, -1)
         self.xoffEntry.SetRange(-100, 100)
-        wx.EVT_SPINCTRL(self, self.xoffEntry.GetId(), self.OnMisc)
-        wx.EVT_KILL_FOCUS(self.xoffEntry, self.OnKillFocus)
+        self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.xoffEntry.GetId())
+        self.xoffEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(self.xoffEntry)
 
         gsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0,
@@ -108,7 +108,7 @@ class HeadersDlg(wx.Dialog):
             self.alignCombo.Append(it[0], it[1])
 
         gsizer.Add(self.alignCombo)
-        wx.EVT_COMBOBOX(self, self.alignCombo.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_COMBOBOX, self.OnMisc, id=self.alignCombo.GetId())
 
         hsizerTop.Add(gsizer)
 
@@ -153,12 +153,12 @@ class HeadersDlg(wx.Dialog):
 
         util.finishWindow(self, vsizer)
 
-        wx.EVT_BUTTON(self, previewBtn.GetId(), self.OnPreview)
-        wx.EVT_BUTTON(self, applyBtn.GetId(), self.OnApply)
-        wx.EVT_BUTTON(self, cancelBtn.GetId(), self.OnCancel)
-        wx.EVT_BUTTON(self, okBtn.GetId(), self.OnOK)
+        self.Bind(wx.EVT_BUTTON, self.OnPreview, id=previewBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnApply, id=applyBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
+        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
 
-        wx.EVT_LISTBOX(self, self.stringsLb.GetId(), self.OnStringsLb)
+        self.Bind(wx.EVT_LISTBOX, self.OnStringsLb, id=self.stringsLb.GetId())
 
         # list of widgets that are specific to editing the selected string
         self.widList = [ self.textEntry, self.xoffEntry, self.alignCombo,
@@ -171,7 +171,7 @@ class HeadersDlg(wx.Dialog):
 
     def addCheckBox(self, name, parent, sizer, pad):
         cb = wx.CheckBox(parent, -1, name)
-        wx.EVT_CHECKBOX(self, cb.GetId(), self.OnMisc)
+        self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=cb.GetId())
         sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, name.lower() + "Cb", cb)
 

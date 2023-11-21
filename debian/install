@@ -1,0 +1,3 @@
+resources/icon256.png /usr/share/resources
+trelby.desktop /usr/share/applications
+doc/trelby.1.gz /usr/share/man/man1

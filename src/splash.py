@@ -4,7 +4,6 @@ import misc
 import util
 
 import random
-import sys
 
 import wx
 
@@ -29,7 +28,7 @@ class SplashWindow(wx.Frame):
 
         if not SplashWindow.inited:
             SplashWindow.inited = True
-            wx.Image_AddHandler(wx.JPEGHandler())
+            wx.Image.AddHandler(wx.JPEGHandler())
 
             self.loadQuotes(parent)
 
@@ -37,7 +36,7 @@ class SplashWindow(wx.Frame):
 
         self.pic = misc.getBitmap("resources/logo.jpg")
 
-        if self.pic.Ok():
+        if self.pic.IsOk():
             w, h = (self.pic.GetWidth(), self.pic.GetHeight())
         else:
             w, h = (375, 300)
@@ -58,13 +57,13 @@ class SplashWindow(wx.Frame):
 
         if delay != -1:
             self.timer = wx.Timer(self)
-            wx.EVT_TIMER(self, -1, self.OnTimer)
+            wx.Timer()
             self.timer.Start(delay, True)
 
-        wx.EVT_LEFT_DOWN(self, self.OnClick)
+        self.Bind(wx.EVT_LEFT_DOWN, self.OnClick)
 
-        wx.EVT_PAINT(self, self.OnPaint)
-        wx.EVT_CLOSE(self, self.OnCloseWindow)
+        self.Bind(wx.EVT_PAINT, self.OnPaint)
+        self.Bind(wx.EVT_CLOSE, self.OnCloseWindow)
 
     def OnClick(self, event):
         self.Close()
@@ -75,7 +74,7 @@ class SplashWindow(wx.Frame):
         dc.SetFont(self.font)
         dc.SetTextForeground(self.textColor)
 
-        if self.pic.Ok():
+        if self.pic.IsOk():
             dc.DrawBitmap(self.pic, 0, 0, False)
 
         util.drawText(dc, "Version %s" % (misc.version),
@@ -94,10 +93,10 @@ class SplashWindow(wx.Frame):
                 y = 260 - (len(self.quote.lines) - i - 1) * 17
 
                 if i == 0:
-                    dc.DrawText(u"“", x - 5, y)
+                    dc.DrawText("“", x - 5, y)
 
                 if i == (len(self.quote.lines) - 1):
-                    line = line + u"”"
+                    line = line + "”"
 
                 dc.DrawText(line, x, y)
 
@@ -123,7 +122,7 @@ class SplashWindow(wx.Frame):
             if data is None:
                 return
 
-            data = data.decode("utf-8")
+            #data = data.decode("utf-8")
             lines = data.splitlines()
 
             quotes = []
@@ -132,10 +131,10 @@ class SplashWindow(wx.Frame):
             tmp = []
 
             for i,line in enumerate(lines):
-                if line.startswith(u"#") or not line.strip():
+                if line.startswith("#") or not line.strip():
                     continue
 
-                if line.startswith(u"  "):
+                if line.startswith("  "):
                     if not tmp:
                         raise Exception("No lines defined for quote at line %d" % (i + 1))
 
@@ -152,6 +151,6 @@ class SplashWindow(wx.Frame):
 
             SplashWindow.quotes = quotes
 
-        except Exception, e:
+        except Exception as e:
             wx.MessageBox("Error loading quotes: %s" % str(e),
                           "Error", wx.OK, parent)
