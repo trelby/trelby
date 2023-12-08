@@ -28,10 +28,10 @@ def init(doWX = True):
     isWindows = False
     isUnix = False
 
-    if sys.platform.startswith("linux") or sys.platform.startswith("darwin"):
-        isUnix = True
-    else:
+    if sys.platform == "win32":
         isWindows = True
+    else:
+        isUnix = True
 
     # does this platform support using Python's unicode strings in various
     # filesystem calls; if not, we need to convert filenames to UTF-8
