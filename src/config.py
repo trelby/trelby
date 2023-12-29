@@ -1350,13 +1350,19 @@ class ConfigGui:
                 nfi = wx.NativeFontInfo()
                 nfi.FromString(s)
 
-                fi.font = wx.Font(nfi)
+                try:
+                    fi.font = wx.Font(nfi)
 
-                # likewise, evil users can set the font name to "z" or
-                # something equally silly, resulting in an
-                # invalid/non-existent font. on wxGTK2 and wxMSW we can
-                # detect this by checking the point size of the font.
-                if fi.font.GetPointSize() == 0:
+                    # likewise, evil users can set the font name to "z" or
+                    # something equally silly, resulting in an
+                    # invalid/non-existent font. on wxGTK2 and wxMSW we can
+                    # detect this by checking the point size of the font.
+                    if fi.font.GetPointSize() == 0:
+                        fi.font = None
+                except wx._core.wxAssertionError:
+                    # Some platforms (mac) will assert internally if point size
+                    # is 0, preventing us from even trying to check, so just
+                    # catch that too.
                     fi.font = None
 
             # if either of the above failures happened, create a dummy
