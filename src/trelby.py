@@ -85,8 +85,14 @@ class GlobalData:
 
         v = self.cvars = mypickle.Vars()
 
-        v.addInt("posX", 0, "PositionX", -20, 9999)
-        v.addInt("posY", 0, "PositionY", -20, 9999)
+        initialPosX = 0
+        initialPosY = 0
+        if misc.isMac:
+            initialPosX = 100
+            initialPosY = 100
+
+        v.addInt("posX", initialPosX, "PositionX", -20, 9999)
+        v.addInt("posY", initialPosY, "PositionY", -20, 9999)
 
         # linux has bigger font by default so it needs a wider window
         defaultW = 750

@@ -320,7 +320,13 @@ class DisplayPanel(wx.Panel):
             ps = nfi.GetPointSize()
             s = nfi.GetFaceName()
 
-            self.fontsLb.SetString(i, "%s: %s, %d" % (names[i], s, ps))
+            row = "%s: %s, %d" % (names[i], s, ps)
+            if misc.isMac:
+                # Work around odd issue where wxOSX doesn't notice change in width
+                self.fontsLb.Insert(row, i, self.fontsLb.GetClientData(i))
+                self.fontsLb.Delete(i + 1)
+            else:
+                self.fontsLb.SetString(i, row)
 
             f = wx.Font(nfi)
             widths.add(util.getTextExtent(f, "iw")[0])
@@ -1174,10 +1180,7 @@ class MiscPanel(wx.Panel):
         dlg.Destroy()
 
     def OnGuessPDF(self, event):
-        # TODO: there must be a way to find out the default PDF viewer on
-        # Linux; we should do that here.
-
-        viewer = util.getWindowsPDFViewer()
+        viewer, _ = util.getPDFViewer()
 
         if viewer:
             self.progEntry.SetValue(viewer)
