@@ -1009,7 +1009,7 @@ class TimerDev:
 
 # Get the Windows default PDF viewer path from registry and return that,
 # or None on errors.
-def getWindowsPDFViewer():
+def _getWindowsPDFViewer():
     try:
         import winreg
 
@@ -1037,6 +1037,70 @@ def getWindowsPDFViewer():
         pass
 
     return None
+
+# Get a tuple of the default PDF viewer path and args for the current platform
+# and return that, or a tuple of two Nones on errors.
+def getPDFViewer():
+    # list of programs to look for. each item is of the form (name,
+    # args). if name is an absolute path only that exact location is
+    # looked at, otherwise PATH is searched for the program (on
+    # Windows, all paths are interpreted as absolute). args is the
+    # list of arguments for the program.
+    progs = []
+
+    if misc.isMac:
+        # Need to check for Mac before Unix as macOS is a Unix
+        progs = [
+            ("/System/Applications/Preview.app", "")
+        ]
+    elif misc.isUnix:
+        progs = [
+            ("/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
+            ("acroread", "-tempFile"),
+            ("xpdf", ""),
+            ("evince", ""),
+            ("gpdf", ""),
+            ("kpdf", ""),
+            ("okular", ""),
+            ]
+    elif misc.isWindows:
+        # get value via registry if possible, or fallback to old method.
+        viewer = _getWindowsPDFViewer()
+        if viewer:
+            return (viewer, "")
+
+        progs = [
+            (r"C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe",
+                ""),
+            (r"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe",
+                ""),
+            (r"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe",
+                ""),
+            (r"C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe",
+                ""),
+            (r"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe",
+                ""),
+            (r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe",
+                ""),
+            (r"C:\Program Files\Adobe\Acrobat 5.0\Reader\AcroRd32.exe",
+                ""),
+            (r"C:\Program Files\Adobe\Acrobat 4.0\Reader\AcroRd32.exe",
+                ""),
+            (r"C:\Program Files\Foxit Software\Foxit Reader\Foxit Reader.exe",
+                ""),
+            ]
+    else:
+        # Unknown platform, don't know where to look
+        pass
+    for name, args in progs:
+        if misc.isWindows or (name[0] == "/"):
+            if fileExists(name):
+                return (name, args)
+        else:
+            name = findFileInPath(name)
+            if name:
+                return (name, args)
+    return (None, None)
 
 # get a windows environment variable in its native unicode format, or None
 # if not found
@@ -1069,31 +1133,38 @@ def showPDF(filename: str, cfgGl: 'config.ConfigGlobal', frame: wx.TopLevelWindo
     if not fileExists(pdfProgram):
         found = False
 
-        if misc.isWindows:
-            regPDF = getWindowsPDFViewer()
+        regPDF, regArgs = getPDFViewer()
 
-            if regPDF:
-                wx.MessageBox(
-                    "Currently set PDF viewer (%s) was not found.\n"
-                    "Change this in File/Settings/Change/Misc.\n\n"
-                    "Using the default PDF viewer for Windows instead:\n"
-                    "%s" % (pdfProgram, regPDF),
-                    "Warning", wx.OK, frame)
+        if regPDF:
+            wx.MessageBox(
+                "Currently set PDF viewer (%s) was not found.\n"
+                "Change this in File/Settings/Change/Misc.\n\n"
+                "Using the default PDF viewer instead:\n"
+                "%s" % (pdfProgram, regPDF),
+                "Warning", wx.OK, frame)
 
-                pdfProgram = regPDF
-                pdfArgs = ""
+            pdfProgram = regPDF
+            pdfArgs = regArgs
 
-                found = True
+            found = True
 
         if not found:
             complain()
 
             return
 
-    # on Windows, Acrobat complains about "invalid path" if we
-    # give the full path of the program as first arg, so give a
-    # dummy arg.
-    args = ["pdf"] + pdfArgs.split() + [filename]
+    if misc.isMac:
+        # on Mac, we should use 'open', so wrap the whole call in that
+        args = ["open", "-a", pdfProgram, filename]
+        if pdfArgs:
+            args = args + ["--args"] + pdfArgs.split()
+        pdfProgram = "/usr/bin/open"
+    else:
+        # on Windows, Acrobat complains about "invalid path" if we
+        # give the full path of the program as first arg, so give a
+        # dummy arg.
+        args = ["pdf"] + pdfArgs.split() + [filename]
+        
 
     # there's a race condition in checking if the path exists, above, and
     # using it, below. if the file disappears between those two we get an

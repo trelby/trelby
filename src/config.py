@@ -1192,73 +1192,8 @@ class ConfigGlobal:
 
     # set PDF viewer program to the best one found on the machine.
     def findPDFViewer(self):
-        # list of programs to look for. each item is of the form (name,
-        # args). if name is an absolute path only that exact location is
-        # looked at, otherwise PATH is searched for the program (on
-        # Windows, all paths are interpreted as absolute). args is the
-        # list of arguments for the program.
-        progs = []
-
-        if misc.isUnix:
-            progs = [
-                ("/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
-                ("acroread", "-tempFile"),
-                ("xpdf", ""),
-                ("evince", ""),
-                ("gpdf", ""),
-                ("kpdf", ""),
-                ("okular", ""),
-                ]
-        elif misc.isWindows:
-            # get value via registry if possible, or fallback to old method.
-            viewer = util.getWindowsPDFViewer()
-
-            if viewer:
-                self.pdfViewerPath = viewer
-                self.pdfViewerArgs = ""
-
-                return
-
-            progs = [
-                (r"C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe",
-                 ""),
-                (r"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe",
-                 ""),
-                (r"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe",
-                 ""),
-                (r"C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe",
-                 ""),
-                (r"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe",
-                 ""),
-                (r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe",
-                 ""),
-                (r"C:\Program Files\Adobe\Acrobat 5.0\Reader\AcroRd32.exe",
-                 ""),
-                (r"C:\Program Files\Adobe\Acrobat 4.0\Reader\AcroRd32.exe",
-                 ""),
-                (r"C:\Program Files\Foxit Software\Foxit Reader\Foxit Reader.exe",
-                 ""),
-                ]
-        else:
-            pass
-
-        success = False
-
-        for name, args in progs:
-            if misc.isWindows or (name[0] == "/"):
-                if util.fileExists(name):
-                    success = True
-
-                    break
-            else:
-                name = util.findFileInPath(name)
-
-                if name:
-                    success = True
-
-                    break
-
-        if success:
+        name, args = util.getPDFViewer()
+        if name:
             self.pdfViewerPath = name
             self.pdfViewerArgs = args
 

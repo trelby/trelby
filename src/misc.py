@@ -20,18 +20,20 @@ TAB_BAR_HEIGHT = 24
 version = "2.4.9"
 
 def init(doWX = True):
-    global isWindows, isUnix, unicodeFS, doDblBuf, progPath, confPath, tmpPrefix
+    global isWindows, isUnix, isMac, unicodeFS, doDblBuf, progPath, confPath, tmpPrefix
 
     # prefix used for temp files
     tmpPrefix = "trelby-tmp-"
 
     isWindows = False
     isUnix = False
+    isMac = False
 
     if sys.platform == "win32":
         isWindows = True
     else:
         isUnix = True
+        isMac = sys.platform == "darwin"
 
     # does this platform support using Python's unicode strings in various
     # filesystem calls; if not, we need to convert filenames to UTF-8

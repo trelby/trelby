@@ -142,6 +142,15 @@ options = {
         "compressed": 1,
         "optimize": 2,
         "includes": includes,
+    },
+    "py2app": {
+        "optimize": 2,
+        "includes": includes,
+        "plist": {
+            'CFBundleVersion': misc.version,
+            'CFBundleName': 'Trelby',
+        },
+        "iconfile": "resources_mac/icon.icns",
     }
 }
 
@@ -178,6 +187,16 @@ if sys.platform == "win32":
                 "icon_resources": [(1, "icon32.ico")],
            }]
         )
+elif sys.platform == "darwin":
+    for path, files in packageData.items():
+        for file in files:
+            dataFile = os.path.normpath(os.path.join(path, file))
+            dataFiles.append((f"lib/{os.path.dirname(dataFile)}",glob.glob(dataFile)))
+    packageData = {}
+
+    platformOptions = {
+        
+    }
 else:
     dataFiles = [
         ("applications", ["trelby.desktop"]),
@@ -187,6 +206,7 @@ else:
 
 setup(
     name = "Trelby",
+    app = ['bin/trelby'],
     cmdclass = {
         "build_scripts": build_scripts,
         "bdist_rpm": bdist_rpm,
