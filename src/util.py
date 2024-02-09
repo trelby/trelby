@@ -1048,7 +1048,12 @@ def getPDFViewer():
     # list of arguments for the program.
     progs = []
 
-    if misc.isUnix:
+    if misc.isMac:
+        # Need to check for Mac before Unix as macOS is a Unix
+        progs = [
+            ("/System/Applications/Preview.app", "")
+        ]
+    elif misc.isUnix:
         progs = [
             ("/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
             ("acroread", "-tempFile"),
@@ -1084,10 +1089,6 @@ def getPDFViewer():
             (r"C:\Program Files\Foxit Software\Foxit Reader\Foxit Reader.exe",
                 ""),
             ]
-    elif misc.isMac:
-        progs = [
-            ("/System/Applications/Preview.app", "")
-        ]
     else:
         # Unknown platform, don't know where to look
         pass
@@ -1154,7 +1155,7 @@ def showPDF(filename: str, cfgGl: 'config.ConfigGlobal', frame: wx.TopLevelWindo
 
     if misc.isMac:
         # on Mac, we should use 'open', so wrap the whole call in that
-        args = ["-a", pdfProgram, filename]
+        args = ["open", "-a", pdfProgram, filename]
         if pdfArgs:
             args = args + ["--args"] + pdfArgs.split()
         pdfProgram = "/usr/bin/open"
