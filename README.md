@@ -4,9 +4,9 @@ Trelby is a screenplay writing program. See http://www.trelby.org/ for
 more details.
 
 ### About this project
-This is a fork of the original codebase from https://github.com/trelby/trelby, >
+This is a fork of the original codebase from https://github.com/trelby/trelby, which as of this writing appears to be dormant.
 
-The major difference of this fork is conversion to Python 3.  I also have a lis>
+The major difference of this fork is conversion to Python 3.  I also have a list of possible enhancements in mind, and I'd love help updating the Windows packaging so that I can provide a Windows build.
 
 ### Installation
 
@@ -19,7 +19,7 @@ The major difference of this fork is conversion to Python 3.  I also have a lis>
 3. sudo apt install python3-pip
 
 4. sudo ./requirements.txt
-   *Depending on your python version, you might run into https://github.com/wxW>
+   *Depending on your python version, you might run into https://github.com/wxWidgets/Phoenix/issues/2296. We recommend executing `pip3 install attrdict3` before installing the requirements in that case. If that still doesn't work, we recommend upgrading your python version.*
 
 5. ./bin/trelby
 
@@ -34,6 +34,7 @@ https://software.opensuse.org//download.html?project=home%3Agwync&package=trelby
 1. make deb
 
 2. Install the resulting .deb file.
+   *If Trelby doesn't launch/work try to install these packages: sudo apt install python3-setuptools wxpython-tools python3-lxml python3-reportlab*
 
 #### Fedora
 
