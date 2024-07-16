@@ -23,15 +23,19 @@ The major difference of this fork is conversion to Python 3.  I also have a list
 
 #### Debian and variants
 
-Download and install the .deb file for Ubuntu, Debian, or Raspian here:
+1. sudo apt install python3-setuptools wxpython-tools python3-lxml python3-reportlab
+
+2. Download and install the .deb file for Ubuntu, Debian, or Raspian here:
 
 https://software.opensuse.org//download.html?project=home%3Agwync&package=trelby
 
 - or -
 
-1. make deb
+1. sudo apt install python3-setuptools wxpython-tools python3-lxml python3-reportlab
 
-2. Install the resulting .deb file.
+2. make deb
+
+3. Install the resulting .deb file
 
 #### Fedora
 
