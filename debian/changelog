@@ -1,3 +1,10 @@
+trelby (2.4.10) unstable; urgency=low
+
+  * Add horizontal scrolling support.
+  * MacOS improvements.
+
+ -- Gwyn Ciesla <gwync@protonmail.com>  Thu, 21 Sep 2023 14:11:00 +0000
+
 trelby (2.4.9) unstable; urgency=low
 
   * Move PDF generation to reportlab.
