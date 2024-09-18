@@ -55,7 +55,7 @@ def init(doWX = True):
 
             confPath = str(os.environ["HOME"]) + "/.trelby"
         else:
-            progPath = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) #Removed the registry function because the older installer creator doesn't work anymore and for portable setups it's pointless to setup a check ofr a registry key
+            progPath = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) #Removed the registry function because the older installer creator doesn't work anymore and for portable setups it's pointless to setup a check for a registry key
 
             confPath = util.getWindowsUnicodeEnvVar("USERPROFILE") + r"\Trelby\conf"
 
