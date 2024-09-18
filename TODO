@@ -1,4 +1,4 @@
--pml->pdf font baseline wrong for non-courier fonts?
+-pml->pdf font baseline wrong for non-courier fonts? 
 
 -move some/all of GlobalData/MyPanel/MyCtrl/MyFrame out of trelby.py
 
