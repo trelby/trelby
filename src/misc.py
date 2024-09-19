@@ -55,32 +55,14 @@ def init(doWX = True):
 
             confPath = str(os.environ["HOME"]) + "/.trelby"
         else:
-            progPath = getPathFromRegistry()
+            progPath = str(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))) #Removed the registry function because the older installer creator doesn't work anymore and for portable setups it's pointless to setup a check for a registry key
 
             confPath = util.getWindowsUnicodeEnvVar("USERPROFILE") + r"\Trelby\conf"
 
             if not os.path.exists(confPath):
                 os.makedirs(confPath)
 
-def getPathFromRegistry():
-    registryPath = r"Software\Microsoft\Windows\CurrentVersion\App Paths\trelby.exe"
 
-    try:
-        import winreg
-
-        regPathKey = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, registryPath)
-        regPathValue, regPathType = winreg.QueryValueEx(regPathKey, "Path")
-
-        if regPathType == winreg.REG_SZ:
-            return regPathValue
-        else:
-            raise TypeError
-
-    except:
-        wx.MessageBox("There was an error reading the following registry key: %s.\n"
-                      "You may need to reinstall the program to fix this error." %
-                      registryPath, "Error", wx.OK)
-        sys.exit()
 
 # convert s, which is returned from the wxWidgets GUI and is an Unicode
 # string, to a normal string.
@@ -503,7 +485,7 @@ class MyTabCtrl(wx.Window):
 
             dc.DestroyClippingRegion()
             dc.SetFont(self.boldFont)
-            dc.DrawText("×", xpos + tabW - self.paddingX * 2, self.textY)
+            dc.DrawText("Ã—", xpos + tabW - self.paddingX * 2, self.textY)
 
             xpos += tabW
 

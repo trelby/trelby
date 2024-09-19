@@ -43,4 +43,4 @@ sudo dnf install trelby
 
 #### Windows
 
-Currently unsupported, see above.
+It works on any windows that works with a supported version of python. It currently has to be manually installed. Ensure the dependencies in requirements.txt (either through pip or via msys2) and run the trelby.bat BATCH script.
