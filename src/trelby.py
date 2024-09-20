@@ -1803,6 +1803,7 @@ class MyFrame(wx.Frame):
         toolsMenu.Append(ID_TOOLS_CHARMAP, "&Character map...")
         toolsMenu.Append(ID_TOOLS_COMPARE_SCRIPTS, "C&ompare scripts...")
         toolsMenu.Append(ID_TOOLS_WATERMARK, "&Generate watermarked PDFs...")
+        toolsMenu.Append(ID_TOOLS_PRODUCTION_MODE, "&Production Mode")
 
         helpMenu = wx.Menu()
         helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
@@ -1974,6 +1975,7 @@ class MyFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnHelpCommands, id=ID_HELP_COMMANDS)
             self.Bind(wx.EVT_MENU, self.OnHelpManual, id=ID_HELP_MANUAL)
             self.Bind(wx.EVT_MENU, self.OnAbout, id=ID_HELP_ABOUT)
+            self.Bind(wx.EVT_MENU, self.OnProductionMode, id=ID_TOOLS_PRODUCTION_MODE)
 
 
         self.Bind(wx.EVT_MENU_RANGE, self.OnMRUFile, id=gd.mru.getIds()[0], id2=gd.mru.getIds()[1])
@@ -2065,6 +2067,7 @@ class MyFrame(wx.Frame):
             "ID_TOOLS_NAME_DB",
             "ID_TOOLS_SPELL_CHECK",
             "ID_TOOLS_WATERMARK",
+            "ID_TOOLS_PRODUCTION_MODE",
             "ID_VIEW_SHOW_FORMATTING",
             "ID_VIEW_STYLE_DRAFT",
             "ID_VIEW_STYLE_LAYOUT",
@@ -2550,6 +2553,11 @@ class MyFrame(wx.Frame):
         win = splash.SplashWindow(self, -1)
         win.Show()
 
+    #TODO: Actually implement production mode without breaking anything.
+    def OnProductionMode(self, event = None):
+        production = wx.MessageDialog(self, "This is currently a work in progress, it currently only shows this dialogue box.", "TODO: Implement production mode.",
+                               wx.OK)
+        production.ShowModal()
     def OnToolBarMenu(self, event, menu):
         self.PopupMenu(menu)
 
