@@ -1455,7 +1455,7 @@ class PDFFontsPanel(wx.Panel):
         for pfi in self.cfg.getPDFFontIds():
             pf = self.cfg.getPDFFont(pfi)
 
-            if pf.name and not pf.filename:
+            if pf.name and pf.filename != "":
                 userHasSetFontNameWithoutFile = True
 
             if pf.filename:
