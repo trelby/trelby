@@ -1448,16 +1448,19 @@ class PDFFontsPanel(wx.Panel):
 
         self.blockEvents = False
 
+
+
     # check that all embedded TrueType fonts are OK
     def checkForErrors(self):
         userHasSetFontNameWithoutFile = False
+        
 
         for pfi in self.cfg.getPDFFontIds():
             pf = self.cfg.getPDFFont(pfi)
-
-            if pf.name and not pf.filename:
+            
+            
+            if pf.pdfName and pf.filename == "":
                 userHasSetFontNameWithoutFile = True
-
             if pf.filename:
                 self.getFontPostscriptName(pf.filename)
 
