@@ -412,7 +412,7 @@ class Screenplay:
     # format, (None, None) is returned.
     @staticmethod
     def parseConfigLine(s: str)->Tuple[str,str]:
-        pattern = re.compile("#([a-zA-Z0-9\-]+) (.*)")
+        pattern = re.compile("#([a-zA-Z0-9-]+) (.*)")
         m = pattern.search(s)
         if m:
             return (m.group(1), m.group(2))
