@@ -1,6 +1,6 @@
 # Trelby
 ## Screenplay writing software
-Trelby is a screenplay writing program. See http://www.trelby.org/ for
+Trelby is a screenplay writing program. See https://www.trelby.org/ for
 more details.
 
 ### About this project
