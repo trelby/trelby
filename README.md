@@ -4,15 +4,18 @@ Trelby is a screenplay writing program. See https://www.trelby.org/ for
 more details.
 
 ### About this project
-This is a fork of the original codebase from https://github.com/trelby/trelby, which as of this writing appears to be dormant.
+This project has recently been updated by merging the fork: https://github.com/limburgher/trelby.
 
-The major difference of this fork is conversion to Python 3.  I also have a list of possible enhancements in mind, and I'd love help updating the Windows packaging so that I can provide a Windows build.
+Updates include:
+- a conversion to Python 3
+- enhancements
+- updating the Windows packaging to provide a Windows build (still in progress)
 
 ### Installation
 
 #### From source
 
-1. git clone https://github.com/limburgher/trelby.git
+1. git clone https://github.com/trelby/trelby.git
 
 2. cd trelby
 
