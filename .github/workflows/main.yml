@@ -12,7 +12,7 @@ jobs:
       strategy:
         fail-fast: false
         matrix:
-          python-version: [ "3.8", "3.9", "3.10", "3.11" ]
+          python-version: [ "3.9", "3.10", "3.11", "3.12", "3.13" ]
 
       steps:
         - uses: actions/checkout@v3
@@ -50,10 +50,5 @@ jobs:
             path: ${{ env.pythonLocation }}
             key: ${{ runner.os }}-python-${{ matrix.python-version }}-${{ hashFiles('**/requirements.txt') }}
 
-        - name: Ensure pytest is available on PATH
-          run: echo "/opt/trelby/bin" >> "$GITHUB_PATH"
-
         - name: Test with pytest
-          env:
-            PYTHONPATH: /opt/trelby
           run: pytest

@@ -14,7 +14,7 @@ from typing import Optional
 
 import os
 location = os.path.dirname(__file__)
-sys.path.append(os.path.join(location, "../src"))
+sys.path.append(os.path.join(location, "../trelby"))
 
 from screenplay import Screenplay
 

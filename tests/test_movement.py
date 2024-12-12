@@ -1,4 +1,4 @@
-import u
+import tests.u as u
 
 # tests movement commands
 

@@ -1,6 +1,6 @@
-import screenplay as scr
-import config
-import u
+import trelby.screenplay as scr
+import trelby.config as config
+import tests.u as u
 
 # tests isModified updating
 

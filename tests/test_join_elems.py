@@ -1,5 +1,5 @@
-import screenplay as scr
-import u
+import trelby.screenplay as scr
+import tests.u as u
 
 # tests element joining
 

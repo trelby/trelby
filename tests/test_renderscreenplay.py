@@ -1,5 +1,5 @@
-import u
-import util
+import tests.u as u
+import trelby.util as util
 
 def testRenderScreenplay() -> None:
     sp = u.load()

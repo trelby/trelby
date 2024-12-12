@@ -1,4 +1,0 @@
-include dict_en.dat.gz fileformat.txt INSTALL LICENSE manual.html names.txt.gz README.md sample.trelby setup.py trelby.1.gz trelby.desktop
-include bin/trelby
-recursive-include resources *
-recursive-include src *.py

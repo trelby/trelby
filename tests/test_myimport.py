@@ -2,8 +2,8 @@ import sys
 import os
 from typing import Union
 
-import screenplay
-import u
+import trelby.screenplay as screenplay
+import tests.u as u
 
 from unittest import mock
 
@@ -13,7 +13,7 @@ wxMock.Dialog.ShowModal.return_value = wxMock.ID_OK
 
 sys.modules['wx'] = wxMock
 
-import myimport
+import trelby.myimport as myimport
 
 def testImportCeltx()->None:
     u.init()

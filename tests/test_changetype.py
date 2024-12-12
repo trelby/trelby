@@ -1,5 +1,5 @@
-import u
-import screenplay as scr
+import tests.u as u
+import trelby.screenplay as scr
 
 # test changing type of one element
 def testChangeOneElem():

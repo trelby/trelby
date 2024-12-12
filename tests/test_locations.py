@@ -1,5 +1,5 @@
-import locations
-import u
+import trelby.locations as locations
+import tests.u as u
 
 # test locations.Locations
 
