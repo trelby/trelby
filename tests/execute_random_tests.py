@@ -13,18 +13,21 @@ import traceback
 from typing import Optional
 
 import os
+
 location = os.path.dirname(__file__)
-sys.path.append(os.path.join(location, "../src"))
+sys.path.append(os.path.join(location, "../trelby"))
 
 from screenplay import Screenplay
 
 
 import u
 
+
 # generates, stores, saves, loads, and runs operations against a
 # Screenplay object.
 class Ops:
     sp: Optional[Screenplay]
+
     def __init__(self):
         # a list of Op objects
         self.ops = []
@@ -48,7 +51,7 @@ class Ops:
         self.ops.append(op)
 
     # return self.ops as a text string
-    def save(self)->str:
+    def save(self) -> str:
         s = ""
 
         for op in self.ops:
@@ -66,6 +69,7 @@ class Ops:
                 self.ops.append(Op.load(line))
 
         return self
+
 
 # a single operation
 class Op:
@@ -102,14 +106,14 @@ class Op:
         "toShot",
         "toTransition",
         "undo",
-        ]
+    ]
 
     # FIXME: not tested editing commands:
     #   -removeElementTypes
     #   -cut (getSelectedAsCD(True))
     #   -paste
 
-    def __init__(self, name = None):
+    def __init__(self, name=None):
         # name of operation
         self.name = name
 
@@ -169,6 +173,7 @@ class Op:
 
         return self
 
+
 # run random operations forever
 def runRandomOps():
     cnt = 0
@@ -215,6 +220,7 @@ def runRandomOps():
 
         cnt += 1
 
+
 # run ops from given file
 def runOpsFromFile(filename):
     f = open(filename, "r")
@@ -231,6 +237,7 @@ def runOpsFromFile(filename):
 
         if not more:
             break
+
 
 # save information about failed ops.
 def save(ops: Ops, cnt: int):
@@ -251,10 +258,12 @@ def save(ops: Ops, cnt: int):
     f.write(ops.sp.save())
     f.close()
 
+
 def main():
     if len(sys.argv) == 1:
         runRandomOps()
     else:
         runOpsFromFile(sys.argv[1])
+
 
 main()

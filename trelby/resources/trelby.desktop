@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Trelby
+Comment=Screenwriting Application
+Exec=trelby
+Icon=trelby256
+Type=Application
+Categories=Office;Publishing;
+Keywords=screenwriting editor;

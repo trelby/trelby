@@ -2,8 +2,8 @@ import sys
 import os
 from typing import Union
 
-import screenplay
-import u
+import trelby.screenplay as screenplay
+import tests.u as u
 
 from unittest import mock
 
@@ -11,16 +11,17 @@ wxMock = mock.Mock()
 wxMock.ID_OK = 1
 wxMock.Dialog.ShowModal.return_value = wxMock.ID_OK
 
-sys.modules['wx'] = wxMock
+sys.modules["wx"] = wxMock
 
-import myimport
+import trelby.myimport as myimport
 
-def testImportCeltx()->None:
+
+def testImportCeltx() -> None:
     u.init()
     location = os.path.dirname(__file__)
     pathToTestScriptCeltx = os.path.join(location, "fixtures/test.celtx")
 
-    importedLines = myimport.importCeltx(pathToTestScriptCeltx,mock.Mock())
+    importedLines = myimport.importCeltx(pathToTestScriptCeltx, mock.Mock())
 
     assert importedLines is not None
 
@@ -34,19 +35,22 @@ def testImportCeltx()->None:
     for line, expectedLine in zip(importedScreenplay.lines, expectedScreenplay.lines):
         assert line == expectedLine
 
-def testImportTextFile()->None:
+
+def testImportTextFile() -> None:
     u.init()
     location = os.path.dirname(__file__)
     pathToTestScriptTxt = os.path.join(location, "fixtures/test.txt")
 
-    lines = myimport.importTextFile(pathToTestScriptTxt,mock.Mock())
+    lines = myimport.importTextFile(pathToTestScriptTxt, mock.Mock())
 
     expectedScreenplay = u.load()
     for line, expectedLine in zip(lines, expectedScreenplay.lines):
         assert TextImportMatcher(line) == TextImportMatcher(expectedLine)
 
+
 class TextImportMatcher:
     line: screenplay.Line
+
     def __init__(self, line: screenplay.Line):
         self.line = line
 
@@ -63,9 +67,13 @@ class TextImportMatcher:
             return NotImplemented
         if self.line.text.lower() != other.line.text.lower():
             return False
-        if self.line.lt != screenplay.ACTION and self.line.lt != screenplay.SCENE and self.line.lt != other.line.lt:
+        if (
+            self.line.lt != screenplay.ACTION
+            and self.line.lt != screenplay.SCENE
+            and self.line.lt != other.line.lt
+        ):
             return False
         return True
 
-    def __repr__(self)->str:
+    def __repr__(self) -> str:
         return self.line.__str__()

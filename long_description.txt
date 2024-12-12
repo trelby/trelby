@@ -1,0 +1,25 @@
+Trelby is a simple, powerful, full-featured, multi-platform program for
+writing movie screenplays. It is simple, fast and elegantly laid out to
+make screenwriting simple, and it is infinitely configurable.
+
+Features:
+
+ * Screenplay editor: Enforces correct script format and pagination,
+   auto-completion, and spell checking.
+ * Multiplatform: Behaves identically on all platforms, generating the exact
+   same output.
+ * Choice of view: Multiple views, including draft view, WYSIWYG mode,
+   and fullscreen to suit your writing style.
+ * Name database: Character name database containing over 200,000 names
+   from various countries.
+ * Reporting: Scene/location/character/dialogue reports.
+ * Compare: Ability to compare scripts, so you know what changed between
+   versions.
+ * Import: Screenplay formatted text, Final Draft XML (.fdx)
+    and Celtx (.celtx).
+ * Export: PDF, formatted text, HTML, RTF, Final Draft XML (.fdx).
+ * PDF: Built-in, highly configurable PDF generator. Supports embedding your
+   chosen font. Also supports generating PDFs with custom watermarks,
+   to help track shared files.
+ * Free software: Licensed under the GPL, Trelby welcomes developers and
+   screenwriters to contribute in making it more useful.

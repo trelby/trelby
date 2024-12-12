@@ -1,35 +1,23 @@
-PREFIX = $(DESTDIR)/usr
+.PHONY : clean dist
 
-.PHONY : clean dist deb
+dist: trelby/names.txt.gz trelby/dict_en.dat.gz trelby/manual.html trelby/trelby.1.gz
+	cp trelby/trelby.1.gz doc/
 
-dist: names.txt.gz dict_en.dat.gz manual.html trelby.1.gz
-	python3 setup.py sdist && cp trelby.1.gz doc/
+trelby/names.txt.gz: trelby/names.txt
+	gzip -c trelby/names.txt > trelby/names.txt.gz
 
-deb: dist
-	debuild -us -uc -b
+trelby/dict_en.dat.gz: trelby/dict_en.dat
+	gzip -c trelby/dict_en.dat > trelby/dict_en.dat.gz
 
-names.txt.gz: names.txt
-	gzip -c names.txt > names.txt.gz
+trelby/manual.html: doc/*
+	make -C doc html && mv doc/manual.html trelby/
 
-dict_en.dat.gz: dict_en.dat
-	gzip -c dict_en.dat > dict_en.dat.gz
-
-manual.html: doc/*
-	make -C doc html && mv doc/manual.html .
-
-trelby.1.gz: doc/*
-	make -C doc manpage && mv doc/trelby.1.gz .
-
-rpm: dist
-	python3 setup.py bdist_rpm
+trelby/trelby.1.gz: doc/*
+	make -C doc manpage && mv doc/trelby.1.gz trelby/
 
 clean:
-	rm -f bin/*.pyc src/*.pyc tests/*.pyc names.txt.gz dict_en.dat.gz manual.html MANIFEST trelby.1.gz doc/trelby.1.gz
-	rm -rf build dist
-	dh_clean
-
-install: dist
-	python3 setup.py install
+	rm -f trelby/*.pyc tests/*.pyc trelby/names.txt.gz trelby/dict_en.dat.gz trelby/manual.html trelby/trelby.1.gz doc/trelby.1.gz
+	rm -rf build dist *.egg-info trelby/*.egg-info tests/__pycache__ trelby/__pycache__
 
 test:
 	pytest

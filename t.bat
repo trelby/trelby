@@ -1,1 +1,1 @@
-python bin/trelby --test sample.trelby
+python3 trelby.py --test trelby/sample.trelby

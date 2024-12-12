@@ -1,7 +1,8 @@
-import screenplay as scr
-import u
+import trelby.screenplay as scr
+import tests.u as u
 
 # tests that Screenplay._validate() finds all errors it's supposed to
+
 
 # helper function that asserts if sp._validate() does not assert
 def v(sp):
@@ -12,11 +13,13 @@ def v(sp):
 
     assert 0
 
+
 def testEmpty():
     sp = u.new()
     sp._validate()
     sp.lines = []
     v(sp)
+
 
 def testCursorPos():
     sp = u.new()
@@ -41,17 +44,20 @@ def testCursorPos():
 
     sp._validate()
 
+
 def testInvalidChars():
     sp = u.new()
     sp._validate()
     sp.lines[0].text = chr(9)
     v(sp)
 
+
 def testTooLongLine():
     sp = u.new()
     sp._validate()
     sp.lines[0].text = "a" * 100
     v(sp)
+
 
 def testElemChangesType():
     sp = u.load()

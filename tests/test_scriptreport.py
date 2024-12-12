@@ -1,8 +1,9 @@
-import scriptreport
-import u
-import util
+import trelby.scriptreport as scriptreport
+import tests.u as u
+import trelby.util as util
 
 # tests script report (just that it runs without exceptions, for now)
+
 
 def testBasic():
     sp = u.load()

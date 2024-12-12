@@ -1,7 +1,8 @@
-import screenplay as scr
-import u
+import trelby.screenplay as scr
+import tests.u as u
 
 # tests delete commands
+
 
 # we had a bug where pasting on an empty line right after a forced
 # linebreak would think "oh, I'm in an empty element, I'll just change the
@@ -12,11 +13,11 @@ import u
 def testPasteAfterForcedLineBreak():
     sp = u.new()
 
-    sp.cmd("addChar", char = "E")
+    sp.cmd("addChar", char="E")
     assert sp.lines[0].lt != scr.CHARACTER
 
     sp.cmd("insertForcedLineBreak")
-    sp.paste([scr.Line(text = "Tsashkataar", lt = scr.CHARACTER)])
+    sp.paste([scr.Line(text="Tsashkataar", lt=scr.CHARACTER)])
 
     assert len(sp.lines) == 2
     assert (sp.line == 1) and (sp.column == 11)
@@ -28,5 +29,6 @@ def testPasteAfterForcedLineBreak():
     assert sp.lines[1].lb == scr.LB_LAST
 
     sp._validate()
+
 
 # FIXME: lot more tests
