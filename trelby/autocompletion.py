@@ -3,6 +3,7 @@ import trelby.mypickle as mypickle
 import trelby.screenplay as screenplay
 import trelby.util as util
 
+
 # manages auto completion information for a single script.
 class AutoCompletion:
     def __init__(self):
@@ -30,10 +31,10 @@ class AutoCompletion:
             "MATCH CUT TO:",
             "SLOW FADE TO BLACK",
             "SMASH CUT TO:",
-            "TIME CUT:"
-            ]
+            "TIME CUT:",
+        ]
         self.types[t.ti.lt] = t
-        
+
         t = Type(screenplay.SHOT)
         self.types[t.ti.lt] = t
 
@@ -75,6 +76,7 @@ class AutoCompletion:
     def getType(self, lt):
         return self.types.get(lt)
 
+
 # auto completion info for one element type
 class Type:
     cvars = None
@@ -88,8 +90,7 @@ class Type:
             v = self.__class__.cvars = mypickle.Vars()
 
             v.addBool("enabled", True, "Enabled")
-            v.addList("items", [], "Items",
-                      mypickle.StrLatin1Var("", "", ""))
+            v.addList("items", [], "Items", mypickle.StrLatin1Var("", "", ""))
 
             v.makeDicts()
 

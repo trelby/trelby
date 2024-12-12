@@ -1,6 +1,7 @@
 import tests.u as u
 import trelby.screenplay as scr
 
+
 # test changing type of one element
 def testChangeOneElem():
     sp = u.load()
@@ -15,17 +16,17 @@ def testChangeOneElem():
     assert ls[1].lt == scr.ACTION
 
     functionMap = {
-        "toScene" : scr.SCENE,
-        "toCharacter" : scr.CHARACTER,
-        "toAction" : scr.ACTION,
-        "toDialogue" : scr.DIALOGUE,
-        "toParen" : scr.PAREN,
-        "toShot" : scr.SHOT,
-        "toNote" : scr.NOTE,
-        "toTransition" : scr.TRANSITION,
+        "toScene": scr.SCENE,
+        "toCharacter": scr.CHARACTER,
+        "toAction": scr.ACTION,
+        "toDialogue": scr.DIALOGUE,
+        "toParen": scr.PAREN,
+        "toShot": scr.SHOT,
+        "toNote": scr.NOTE,
+        "toTransition": scr.TRANSITION,
     }
 
-    for (func, ele) in list(functionMap.items()):
+    for func, ele in list(functionMap.items()):
         sp.cmd(func)
 
         assert ls[0].lt == scr.SCENE
@@ -41,6 +42,7 @@ def testChangeOneElem():
 
         assert ls[i + 1].lt == scr.CHARACTER
 
+
 # test that when text belonging to multiple elements is selected, changing
 # type changes all of those elements
 def testChangeManyElemes():
@@ -50,7 +52,7 @@ def testChangeManyElemes():
     # select second and third elements
     sp.cmd("moveDown")
     sp.cmd("setMark")
-    sp.cmd("moveDown", count = 4)
+    sp.cmd("moveDown", count=4)
 
     sp.cmd("toTransition")
 
@@ -63,4 +65,3 @@ def testChangeManyElemes():
     assert ls[12].lb == scr.LB_LAST
 
     assert ls[13].lt == scr.DIALOGUE
-

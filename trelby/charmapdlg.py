@@ -3,6 +3,7 @@ import trelby.util as util
 
 import wx
 
+
 class CharMapDlg(wx.Dialog):
     def __init__(self, parent, ctrl):
         wx.Dialog.__init__(self, parent, -1, "Character map")
@@ -24,6 +25,7 @@ class CharMapDlg(wx.Dialog):
     def OnInsert(self, event):
         if self.charMap.selected:
             self.ctrl.OnKeyChar(util.MyKeyEvent(ord(self.charMap.selected)))
+
 
 class MyCharMap(wx.Window):
     def __init__(self, parent):
@@ -52,12 +54,15 @@ class MyCharMap(wx.Window):
         # size of the zoomed-in character boxes
         self.boxSize = 60
 
-        self.smallFont = util.createPixelFont(18,
-            wx.FONTFAMILY_SWISS, wx.NORMAL, wx.NORMAL)
-        self.normalFont = util.createPixelFont(self.cellSize - 2,
-            wx.FONTFAMILY_MODERN, wx.NORMAL, wx.BOLD)
-        self.bigFont = util.createPixelFont(self.boxSize - 2,
-            wx.FONTFAMILY_MODERN, wx.NORMAL, wx.BOLD)
+        self.smallFont = util.createPixelFont(
+            18, wx.FONTFAMILY_SWISS, wx.NORMAL, wx.NORMAL
+        )
+        self.normalFont = util.createPixelFont(
+            self.cellSize - 2, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.BOLD
+        )
+        self.bigFont = util.createPixelFont(
+            self.boxSize - 2, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.BOLD
+        )
 
         self.Bind(wx.EVT_PAINT, self.OnPaint)
         self.Bind(wx.EVT_LEFT_DOWN, self.OnLeftDown)
@@ -101,12 +106,22 @@ class MyCharMap(wx.Window):
         dc.SetTextForeground(wx.BLACK)
 
         for y in range(self.rows + 1):
-            util.drawLine(dc, self.offset, self.offset + y * self.cellSize,
-                          self.cols * self.cellSize + 1, 0)
+            util.drawLine(
+                dc,
+                self.offset,
+                self.offset + y * self.cellSize,
+                self.cols * self.cellSize + 1,
+                0,
+            )
 
         for x in range(self.cols + 1):
-            util.drawLine(dc, self.offset + x * self.cellSize,
-                self.offset, 0, self.rows * self.cellSize)
+            util.drawLine(
+                dc,
+                self.offset + x * self.cellSize,
+                self.offset,
+                0,
+                self.rows * self.cellSize,
+            )
 
         dc.SetFont(self.normalFont)
 
@@ -114,10 +129,14 @@ class MyCharMap(wx.Window):
             for x in range(self.cols):
                 i = y * self.cols + x
                 if i < len(self.chars):
-                    util.drawText(dc, self.chars[i],
+                    util.drawText(
+                        dc,
+                        self.chars[i],
                         x * self.cellSize + self.offset + self.cellSize // 2 + 1,
                         y * self.cellSize + self.offset + self.cellSize // 2 + 1,
-                        util.ALIGN_CENTER, util.VALIGN_CENTER)
+                        util.ALIGN_CENTER,
+                        util.VALIGN_CENTER,
+                    )
 
         y = self.offset + self.rows * self.cellSize
         pad = 5
@@ -125,8 +144,7 @@ class MyCharMap(wx.Window):
         if self.selected:
             code = ord(self.selected)
 
-            self.drawCharBox(dc, "Selected:", self.selected, self.offset,
-                             y + pad, 75)
+            self.drawCharBox(dc, "Selected:", self.selected, self.offset, y + pad, 75)
 
             c = util.upper(self.selected)
             if c == self.selected:
@@ -135,8 +153,9 @@ class MyCharMap(wx.Window):
                     c = None
 
             if c:
-                self.drawCharBox(dc, "Opposite case:", c, self.offset + 150,
-                                 y + pad, 110)
+                self.drawCharBox(
+                    dc, "Opposite case:", c, self.offset + 150, y + pad, 110
+                )
 
             dc.SetFont(self.smallFont)
             dc.DrawText("Character code: %d" % code, 360, y + pad)
@@ -148,8 +167,7 @@ class MyCharMap(wx.Window):
 
         else:
             dc.SetFont(self.smallFont)
-            dc.DrawText("Click on a character to select it.", self.offset,
-                        y + pad)
+            dc.DrawText("Click on a character to select it.", self.offset, y + pad)
 
     def drawCharBox(self, dc, text, char, x, y, xinc):
         dc.SetFont(self.smallFont)
@@ -160,5 +178,11 @@ class MyCharMap(wx.Window):
         dc.DrawRectangle(boxX, y, self.boxSize, self.boxSize)
 
         dc.SetFont(self.bigFont)
-        util.drawText(dc, char, boxX + self.boxSize // 2 + 1,
-            y + self.boxSize // 2 + 1, util.ALIGN_CENTER, util.VALIGN_CENTER)
+        util.drawText(
+            dc,
+            char,
+            boxX + self.boxSize // 2 + 1,
+            y + self.boxSize // 2 + 1,
+            util.ALIGN_CENTER,
+            util.VALIGN_CENTER,
+        )

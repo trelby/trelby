@@ -4,6 +4,7 @@ import trelby.util as util
 
 # tests scene report (just that it runs without exceptions, for now)
 
+
 def testBasic():
     sp = u.load()
     report = scenereport.SceneReport(sp)

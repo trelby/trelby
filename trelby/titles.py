@@ -2,6 +2,7 @@ import trelby.pml as pml
 import trelby.util as util
 import functools
 
+
 # a script's title pages.
 class Titles:
 
@@ -14,9 +15,12 @@ class Titles:
         a = []
 
         y = 105.0
-        a.append(TitleString(["UNTITLED SCREENPLAY"], y = y, size = 24,
-                             isBold = True, font = pml.HELVETICA))
-        a.append(TitleString(["by", "", "My Name Here"], y = y + 15.46))
+        a.append(
+            TitleString(
+                ["UNTITLED SCREENPLAY"], y=y, size=24, isBold=True, font=pml.HELVETICA
+            )
+        )
+        a.append(TitleString(["by", "", "My Name Here"], y=y + 15.46))
 
         x = 15.0
         y = 240.0
@@ -55,10 +59,19 @@ class Titles:
         for page in self.pages:
             page = sorted(page, key=functools.cmp_to_key(cmpfunc))
 
+
 # a single string displayed on a title page
 class TitleString:
-    def __init__(self, items, x = 0.0, y = 0.0, isCentered = True,
-                 isBold = False, size = 12, font = pml.COURIER):
+    def __init__(
+        self,
+        items,
+        x=0.0,
+        y=0.0,
+        isCentered=True,
+        isBold=False,
+        size=12,
+        font=pml.COURIER,
+    ):
 
         # list of text strings
         self.items = items
@@ -127,8 +140,9 @@ class TitleString:
             if self.isCentered:
                 x = page.doc.w / 2.0
 
-            page.add(pml.TextOp(line, x, y, self.size,
-                                self.getStyle(), self.getAlignment()))
+            page.add(
+                pml.TextOp(line, x, y, self.size, self.getStyle(), self.getAlignment())
+            )
 
             y += util.getTextHeight(self.size)
 
@@ -172,12 +186,19 @@ class TitleString:
         self.y = util.str2float(a[1], 0.0)
         self.size = util.str2int(a[2], 12, 4, 288)
 
-        self.isCentered, self.isRightJustified, self.isBold, self.isItalic, \
-            self.isUnderlined = util.flags2bools(a[3], "crbiu")
+        (
+            self.isCentered,
+            self.isRightJustified,
+            self.isBold,
+            self.isItalic,
+            self.isUnderlined,
+        ) = util.flags2bools(a[3], "crbiu")
 
-        tmp = { "Courier" : pml.COURIER,
-                "Helvetica" : pml.HELVETICA,
-                "Times" : pml.TIMES_ROMAN }
+        tmp = {
+            "Courier": pml.COURIER,
+            "Helvetica": pml.HELVETICA,
+            "Times": pml.TIMES_ROMAN,
+        }
 
         self.font = tmp.get(a[4], pml.COURIER)
         self.items = util.unescapeStrings(a[6])
@@ -185,8 +206,14 @@ class TitleString:
     def __str__(self):
         s = "%f,%f,%d," % (self.x, self.y, self.size)
 
-        s += util.bools2flags("crbiu", self.isCentered, self.isRightJustified, self.isBold,
-                               self.isItalic, self.isUnderlined)
+        s += util.bools2flags(
+            "crbiu",
+            self.isCentered,
+            self.isRightJustified,
+            self.isBold,
+            self.isItalic,
+            self.isUnderlined,
+        )
         s += ","
 
         if self.font == pml.COURIER:

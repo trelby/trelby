@@ -1,6 +1,7 @@
 import trelby.mypickle as mypickle
 import trelby.util as util
 
+
 # manages location-information for a single screenplay. a "location" is a
 # single place that can be referred to using multiple scene names, e.g.
 #  INT. MOTEL ROOM - DAY
@@ -13,9 +14,12 @@ class Locations:
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
 
-            v.addList("locations", [], "Locations",
-                      mypickle.ListVar("", [], "",
-                                       mypickle.StrLatin1Var("", "", "")))
+            v.addList(
+                "locations",
+                [],
+                "Locations",
+                mypickle.ListVar("", [], "", mypickle.StrLatin1Var("", "", "")),
+            )
 
             v.makeDicts()
 

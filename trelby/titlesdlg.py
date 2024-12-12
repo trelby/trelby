@@ -9,10 +9,12 @@ import copy
 
 import wx
 
+
 class TitlesDlg(wx.Dialog):
     def __init__(self, parent, titles, cfg, cfgGl):
-        wx.Dialog.__init__(self, parent, -1, "Title pages",
-                           style = wx.DEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(
+            self, parent, -1, "Title pages", style=wx.DEFAULT_DIALOG_STYLE
+        )
 
         self.titles = titles
         self.cfg = cfg
@@ -52,8 +54,7 @@ class TitlesDlg(wx.Dialog):
 
         vsizer.Add(hsizer, 0, wx.TOP, 5)
 
-        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM,
-                   10)
+        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 10)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -62,7 +63,7 @@ class TitlesDlg(wx.Dialog):
         tmp = wx.StaticText(self, -1, "Strings:")
         vsizer2.Add(tmp)
 
-        self.stringsLb = wx.ListBox(self, -1, size = (200, 150))
+        self.stringsLb = wx.ListBox(self, -1, size=(200, 150))
         vsizer2.Add(self.stringsLb)
 
         hsizer2 = wx.BoxSizer(wx.HORIZONTAL)
@@ -89,10 +90,10 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Text:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
+        hsizer.Add(wx.StaticText(self, -1, "Text:"), 0, wx.ALIGN_CENTER_VERTICAL)
         self.textEntry = wx.TextCtrl(
-            self, -1, style = wx.TE_MULTILINE | wx.TE_DONTWRAP, size = (200, 75))
+            self, -1, style=wx.TE_MULTILINE | wx.TE_DONTWRAP, size=(200, 75)
+        )
         hsizer.Add(self.textEntry, 1, wx.LEFT, 10)
         self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.textEntry.GetId())
 
@@ -107,12 +108,14 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-        self.alignCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
+        hsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        self.alignCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
-        for it in [ ("Left", util.ALIGN_LEFT), ("Center", util.ALIGN_CENTER),
-                    ("Right", util.ALIGN_RIGHT) ]:
+        for it in [
+            ("Left", util.ALIGN_LEFT),
+            ("Center", util.ALIGN_CENTER),
+            ("Right", util.ALIGN_RIGHT),
+        ]:
             self.alignCombo.Append(it[0], it[1])
 
         hsizer.Add(self.alignCombo, 0, wx.LEFT, 10)
@@ -122,8 +125,9 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "X / Y Pos (mm):"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
+        hsizer.Add(
+            wx.StaticText(self, -1, "X / Y Pos (mm):"), 0, wx.ALIGN_CENTER_VERTICAL
+        )
         self.xEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.xEntry, 0, wx.LEFT, 10)
         self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.xEntry.GetId())
@@ -135,18 +139,20 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Font / Size:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-        self.fontCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
+        hsizer.Add(wx.StaticText(self, -1, "Font / Size:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        self.fontCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
-        for it in [ ("Courier", pml.COURIER), ("Helvetica", pml.HELVETICA),
-                    ("Times-Roman", pml.TIMES_ROMAN) ]:
+        for it in [
+            ("Courier", pml.COURIER),
+            ("Helvetica", pml.HELVETICA),
+            ("Times-Roman", pml.TIMES_ROMAN),
+        ]:
             self.fontCombo.Append(it[0], it[1])
 
         hsizer.Add(self.fontCombo, 0, wx.LEFT, 10)
         self.Bind(wx.EVT_COMBOBOX, self.OnMisc, id=self.fontCombo.GetId())
 
-        self.sizeEntry = wx.SpinCtrl(self, -1, size = (50, -1))
+        self.sizeEntry = wx.SpinCtrl(self, -1, size=(50, -1))
         self.sizeEntry.SetRange(4, 288)
         self.Bind(wx.EVT_SPINCTRL, self.OnMisc, id=self.sizeEntry.GetId())
         self.sizeEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
@@ -156,8 +162,7 @@ class TitlesDlg(wx.Dialog):
 
         hsizerTop.Add(vsizer2)
 
-        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, "Style"),
-                                   wx.HORIZONTAL)
+        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, "Style"), wx.HORIZONTAL)
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
@@ -201,9 +206,17 @@ class TitlesDlg(wx.Dialog):
         self.Bind(wx.EVT_LISTBOX, self.OnStringsLb, id=self.stringsLb.GetId())
 
         # list of widgets that are specific to editing the selected string
-        self.widList = [ self.textEntry, self.xEntry, self.alignCombo,
-                         self.yEntry, self.fontCombo, self.sizeEntry,
-                         self.boldCb, self.italicCb, self.underlinedCb ]
+        self.widList = [
+            self.textEntry,
+            self.xEntry,
+            self.alignCombo,
+            self.yEntry,
+            self.fontCombo,
+            self.sizeEntry,
+            self.boldCb,
+            self.italicCb,
+            self.underlinedCb,
+        ]
 
         self.updateGui()
 
@@ -256,7 +269,7 @@ class TitlesDlg(wx.Dialog):
         # some weird state
         event.Skip()
 
-    def OnStringsLb(self, event = None):
+    def OnStringsLb(self, event=None):
         self.tsIndex = self.stringsLb.GetSelection()
         self.updateStringGui()
 
@@ -276,7 +289,9 @@ class TitlesDlg(wx.Dialog):
         newIndex = (self.pageIndex + 1) % len(self.titles.pages)
 
         self.titles.pages[self.pageIndex], self.titles.pages[newIndex] = (
-            self.titles.pages[newIndex], self.titles.pages[self.pageIndex])
+            self.titles.pages[newIndex],
+            self.titles.pages[self.pageIndex],
+        )
 
         self.setPage(newIndex)
 
@@ -307,8 +322,7 @@ class TitlesDlg(wx.Dialog):
             return
 
         del self.titles.pages[self.pageIndex][self.tsIndex]
-        self.tsIndex = min(self.tsIndex,
-                           len(self.titles.pages[self.pageIndex]) - 1)
+        self.tsIndex = min(self.tsIndex, len(self.titles.pages[self.pageIndex]) - 1)
 
         self.updateGui()
 
@@ -326,8 +340,7 @@ class TitlesDlg(wx.Dialog):
         if self.pageIndex != -1:
             page = self.titles.pages[self.pageIndex]
 
-            self.pageLabel.SetLabel("Page: %d / %d" % (self.pageIndex + 1,
-                                                       pgCnt))
+            self.pageLabel.SetLabel("Page: %d / %d" % (self.pageIndex + 1, pgCnt))
             self.addBtn.Enable(True)
             self.delBtn.Enable(len(page) > 0)
 
@@ -389,14 +402,16 @@ class TitlesDlg(wx.Dialog):
 
         self.previewCtrl.Refresh()
 
-    def OnMisc(self, event = None):
+    def OnMisc(self, event=None):
         if (self.tsIndex == -1) or self.block:
             return
 
         ts = self.titles.pages[self.pageIndex][self.tsIndex]
 
-        ts.items = [util.toInputStr(s) for s in
-                    misc.fromGUI(self.textEntry.GetValue()).split("\n")]
+        ts.items = [
+            util.toInputStr(s)
+            for s in misc.fromGUI(self.textEntry.GetValue()).split("\n")
+        ]
 
         self.stringsLb.SetString(self.tsIndex, "--".join(ts.items))
 
@@ -483,8 +498,13 @@ class TitlesPreview(wx.Window):
                     # whitespace
 
                     if line.strip():
-                        textW = int((util.getTextWidth(line, ts.getStyle(),
-                            ts.size) / self.cfg.paperWidth) * w)
+                        textW = int(
+                            (
+                                util.getTextWidth(line, ts.getStyle(), ts.size)
+                                / self.cfg.paperWidth
+                            )
+                            * w
+                        )
                         textW = max(1, textW)
 
                         if ts.isCentered:
@@ -507,4 +527,3 @@ class TitlesPreview(wx.Window):
                         dc.DrawRectangle(ox + xp, oy + yp, textW, textH)
 
                     y += textHinMM
-

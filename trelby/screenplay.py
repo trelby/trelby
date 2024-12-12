@@ -47,6 +47,7 @@ import time
 
 from lxml import etree
 
+
 # screenplay
 class Screenplay:
     def __init__(self, cfgGl):
@@ -56,7 +57,7 @@ class Screenplay:
         self.titles = titles.Titles()
         self.scDict = spellcheck.Dict()
 
-        self.lines = [ Line(LB_LAST, SCENE) ]
+        self.lines = [Line(LB_LAST, SCENE)]
 
         self.cfgGl = cfgGl
         self.cfg = config.Config()
@@ -116,7 +117,7 @@ class Screenplay:
 
         return (len(self.lines) > 1) or bool(self.lines[0].text)
 
-    def markChanged(self, state = True):
+    def markChanged(self, state=True):
         self.hasChanged = state
 
     def cursorAsMark(self):
@@ -168,13 +169,13 @@ class Screenplay:
         return sp
 
     # save script to a utf-8 encoded string and return that
-    def save(self)->bytes:
+    def save(self) -> bytes:
         self.cfg.cursorLine = self.line
         self.cfg.cursorColumn = self.column
 
-        output = ''
+        output = ""
 
-        output += '\ufeff'
+        output += "\ufeff"
         output += "#Version 3\n"
 
         output += "#Begin-Auto-Completion \n"
@@ -227,18 +228,22 @@ class Screenplay:
         sp.lines = []
 
         if len(lines) < 2:
-            raise error.MiscError("File has too few lines to be a valid\n"
-                                  "screenplay file.")
+            raise error.MiscError(
+                "File has too few lines to be a valid\n" "screenplay file."
+            )
 
         key, version = Screenplay.parseConfigLine(lines[0])
         if not key or (key != "Version"):
-            raise error.MiscError("File doesn't seem to be a proper\n"
-                                  "screenplay file.")
+            raise error.MiscError(
+                "File doesn't seem to be a proper\n" "screenplay file."
+            )
 
         if version not in ("1", "2", "3"):
-            raise error.MiscError("File uses fileformat version '%s',\n"
-                                  "which is not supported by this version\n"
-                                  "of the program." % version)
+            raise error.MiscError(
+                "File uses fileformat version '%s',\n"
+                "which is not supported by this version\n"
+                "of the program." % version
+            )
 
         version = int(version)
 
@@ -257,8 +262,7 @@ class Screenplay:
         if s:
             sp.locations.load(s)
 
-        s, index = Screenplay.getConfigPart(lines, "Spell-Checker-Dict",
-                                            index)
+        s, index = Screenplay.getConfigPart(lines, "Spell-Checker-Dict", index)
         if s:
             sp.scDict.load(s)
 
@@ -288,8 +292,9 @@ class Screenplay:
             if s[0] == "#":
                 key, val = Screenplay.parseConfigLine(s)
                 if not key:
-                    raise error.MiscError("Line %d has invalid syntax for\n"
-                                          "config line." % (i + 1))
+                    raise error.MiscError(
+                        "Line %d has invalid syntax for\n" "config line." % (i + 1)
+                    )
 
                 if key == "Title-Page":
                     sp.titles.pages.append([])
@@ -337,8 +342,9 @@ class Screenplay:
                     unknownTypes = True
 
                 if prevType and (lt != prevType):
-                    raise error.MiscError("Line %d has invalid element"
-                                          " type." % (i + 1))
+                    raise error.MiscError(
+                        "Line %d has invalid element" " type." % (i + 1)
+                    )
 
                 line = Line(lb, lt, text)
                 sp.lines.append(line)
@@ -352,8 +358,7 @@ class Screenplay:
             raise error.MiscError("Start-Script line not found.")
 
         if len(sp.lines) == 0:
-            raise error.MiscError("File doesn't contain any screenplay"
-                                  " lines.")
+            raise error.MiscError("File doesn't contain any screenplay" " lines.")
 
         if sp.lines[-1].lb != LB_LAST:
             raise error.MiscError("Last line doesn't end an element.")
@@ -374,15 +379,19 @@ class Screenplay:
             msgs.append("Screenplay contained unknown linebreak types.")
 
         if unknownTypes:
-            msgs.append("Screenplay contained unknown element types. These"
-                        " have been converted to Action elements.")
+            msgs.append(
+                "Screenplay contained unknown element types. These"
+                " have been converted to Action elements."
+            )
 
         if unknownConfigs:
-            msgs.append("Screenplay contained unknown information. This"
-                        " probably means that the file was created with a"
-                        " newer version of this program.\n\n"
-                        "  You'll lose that information if you save over"
-                        " the existing file.")
+            msgs.append(
+                "Screenplay contained unknown information. This"
+                " probably means that the file was created with a"
+                " newer version of this program.\n\n"
+                "  You'll lose that information if you save over"
+                " the existing file."
+            )
 
         return (sp, "\n\n".join(msgs))
 
@@ -395,8 +404,7 @@ class Screenplay:
     # for 'lines'. raises error.MiscError on errors.
     @staticmethod
     def getConfigPart(lines, name, startIndex):
-        if (startIndex >= len(lines)) or\
-               (lines[startIndex] != ("#Begin-%s " % name)):
+        if (startIndex >= len(lines)) or (lines[startIndex] != ("#Begin-%s " % name)):
             return ("", startIndex)
 
         try:
@@ -404,14 +412,14 @@ class Screenplay:
         except ValueError:
             raise error.MiscError("#End-%s not found" % name)
 
-        return ("\n".join(lines[startIndex + 1:endIndex]), endIndex + 1)
+        return ("\n".join(lines[startIndex + 1 : endIndex]), endIndex + 1)
 
     # parse a line containing a config-value in the format detailed in
     # fileformat.txt. line must have newline stripped from the end
     # already. returns a (key, value) tuple. if line doesn't match the
     # format, (None, None) is returned.
     @staticmethod
-    def parseConfigLine(s: str)->Tuple[str,str]:
+    def parseConfigLine(s: str) -> Tuple[str, str]:
         pattern = re.compile("#([a-zA-Z0-9-]+) (.*)")
         m = pattern.search(s)
         if m:
@@ -473,20 +481,20 @@ class Screenplay:
 
     # generate HTML output and return it as a string, optionally including
     # notes.
-    def generateHtml(self, includeNotes = True):
+    def generateHtml(self, includeNotes=True):
         ls = self.lines
 
         # We save space by shorter class names in html.
         htmlMap = {
-            ACTION : "ac",
-            CHARACTER : "ch",
-            DIALOGUE : "di",
-            PAREN : "pa",
-            SCENE : "sc",
-            SHOT : "sh",
-            TRANSITION : "tr",
-            NOTE : "nt",
-            ACTBREAK : "ab",
+            ACTION: "ac",
+            CHARACTER: "ch",
+            DIALOGUE: "di",
+            PAREN: "pa",
+            SCENE: "sc",
+            SHOT: "sh",
+            TRANSITION: "tr",
+            NOTE: "nt",
+            ACTBREAK: "ab",
         }
 
         # html header for files
@@ -515,7 +523,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 </html>"""
 
         content = etree.Element("div")
-        content.set("class","spcenter")
+        content.set("class", "spcenter")
 
         # title pages
         for page in self.titles.pages:
@@ -559,7 +567,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             para.set("class", htmlMap[line.lt])
             para.text = str(text)
 
-        bodyText = etree.tostring(content, encoding='UTF-8', pretty_print=True).decode()
+        bodyText = etree.tostring(content, encoding="UTF-8", pretty_print=True).decode()
 
         return htmlHeader + bodyText + htmlFooter
 
@@ -599,15 +607,15 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         content = etree.SubElement(fd, "Content")
 
         xmlMap = {
-            ACTION : "Action",
-            CHARACTER : "Character",
-            DIALOGUE : "Dialogue",
-            PAREN : "Parenthetical",
-            SCENE : "Scene Heading",
-            SHOT : "Shot",
-            TRANSITION : "Transition",
-            NOTE : "Action",
-            ACTBREAK : "New Act",
+            ACTION: "Action",
+            CHARACTER: "Character",
+            DIALOGUE: "Dialogue",
+            PAREN: "Parenthetical",
+            SCENE: "Scene Heading",
+            SHOT: "Shot",
+            TRANSITION: "Transition",
+            NOTE: "Action",
+            ACTBREAK: "New Act",
         }
 
         for ele in eleList:
@@ -632,10 +640,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         eleSetFont = etree.SubElement(eleSet, "FontSpec")
         eleSetFont.set("Style", "Underline+AllCaps")
         eleSetPara = etree.SubElement(eleSet, "ParagraphSpec")
-        eleSetPara.set("Alignment","Center")
+        eleSetPara.set("Alignment", "Center")
 
         return etree.tostring(
-            fd, xml_declaration=True, encoding='UTF-8', pretty_print=True)
+            fd, xml_declaration=True, encoding="UTF-8", pretty_print=True
+        )
 
     # generate Fountain and return it as a string.
     def generateFountain(self):
@@ -655,39 +664,39 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             return looksGood
 
         # Generate Title Page
-        def generateTitleString(keyword,titleLine,startAt,linePrefix, lineSuffix):
-            if (len(titleLine)-startAt)>1:
+        def generateTitleString(keyword, titleLine, startAt, linePrefix, lineSuffix):
+            if (len(titleLine) - startAt) > 1:
                 # multi-line
                 flines.append(keyword)
                 for part in titleLine:
                     if startAt > 0:
                         startAt -= 1
                         continue
-                    flines.append('    '+linePrefix+part+lineSuffix)
+                    flines.append("    " + linePrefix + part + lineSuffix)
             elif len(titleLine) == 1 and keyword == titleLine[0]:
                 flines.append(keyword)
             else:
-                flines.append(keyword+' '+titleLine[startAt])
+                flines.append(keyword + " " + titleLine[startAt])
 
-        titleNeeded=True
-        kwPattern = re.compile(r'^([A-za-z][^:]+:)')
+        titleNeeded = True
+        kwPattern = re.compile(r"^([A-za-z][^:]+:)")
         for page in self.titles.pages:
             for titleLine in page:
                 if titleNeeded and titleLine.isBold and titleLine.isCentered:
-                    generateTitleString('Title:',titleLine.items,0,'_**','**_')
+                    generateTitleString("Title:", titleLine.items, 0, "_**", "**_")
                     titleNeeded = False
-                elif titleLine.items[0]=='by':
-                    generateTitleString('Author:',titleLine.items,2,'','')
+                elif titleLine.items[0] == "by":
+                    generateTitleString("Author:", titleLine.items, 2, "", "")
                 elif kwPattern.match(titleLine.items[0]):
-                    generateTitleString(titleLine.items[0],titleLine.items,0,'','')
+                    generateTitleString(titleLine.items[0], titleLine.items, 0, "", "")
                 else:
-                    generateTitleString('Contact:',titleLine.items,0,'','')
+                    generateTitleString("Contact:", titleLine.items, 0, "", "")
 
         for ele in eleList:
             typ, txt = ele
             lns = txt.split("\n")
 
-            #ensure last element of flines is empty for some types.
+            # ensure last element of flines is empty for some types.
             if typ in (SCENE, ACTION, CHARACTER, TRANSITION, SHOT, ACTBREAK, NOTE):
                 if flines and flines[-1] != "":
                     flines.append("")
@@ -741,7 +750,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         s += r"{\rtf1\ansi\deff0{\fonttbl{\f0\fmodern Courier;}}" + "\n"
 
-        s+= "{\\stylesheet\n"
+        s += "{\\stylesheet\n"
 
         mt = util.mm2twips
         fs = self.cfg.fontSize
@@ -771,10 +780,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 tmp += r" \ul"
 
             # some hairy conversions going on here...
-            tmp += r" \li%d\ri%d" % (sf * t.indent * 144,
-                mt(self.cfg.paperWidth) -
-                      (mt(self.cfg.marginLeft + self.cfg.marginRight) +
-                      (t.indent + t.width) * 144 * sf))
+            tmp += r" \li%d\ri%d" % (
+                sf * t.indent * 144,
+                mt(self.cfg.paperWidth)
+                - (
+                    mt(self.cfg.marginLeft + self.cfg.marginRight)
+                    + (t.indent + t.width) * 144 * sf
+                ),
+            )
 
             tmp += r" \sb%d" % (sf * t.beforeSpacing * 24)
 
@@ -783,9 +796,13 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         s += "}\n"
 
         s += r"\paperw%d\paperh%d\margt%d\margr%d\margb%d\margl%d" % (
-            mt(self.cfg.paperWidth), mt(self.cfg.paperHeight),
-            mt(self.cfg.marginTop), mt(self.cfg.marginRight),
-            mt(self.cfg.marginBottom), mt(self.cfg.marginLeft))
+            mt(self.cfg.paperWidth),
+            mt(self.cfg.paperHeight),
+            mt(self.cfg.marginTop),
+            mt(self.cfg.marginRight),
+            mt(self.cfg.marginBottom),
+            mt(self.cfg.marginLeft),
+        )
         s += "\n"
 
         s += self.titles.generateRTF()
@@ -813,11 +830,15 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 elif lb == LB_LAST:
                     break
                 else:
-                    raise error.MiscError("Unknown line break style %d"
-                                          " in generateRTF" % lb)
+                    raise error.MiscError(
+                        "Unknown line break style %d" " in generateRTF" % lb
+                    )
 
-            s += (r"{\pard \s%d " % lt) + util.escapeRTF(text).replace(
-                magicslash, "\\") + "}{\\par}\n"
+            s += (
+                (r"{\pard \s%d " % lt)
+                + util.escapeRTF(text).replace(magicslash, "\\")
+                + "}{\\par}\n"
+            )
 
         s += "}"
 
@@ -838,8 +859,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         pager.doc.showTOC = self.cfg.pdfShowTOC
 
         if not isExport and self.cfg.pdfOpenOnCurrentPage:
-            pager.doc.defPage = len(self.titles.pages) + \
-                                self.line2page(self.line) - 1
+            pager.doc.defPage = len(self.titles.pages) + self.line2page(self.line) - 1
 
         for i in range(1, len(self.pages)):
             pg = self.generatePMLPage(pager, i, True, True)
@@ -855,13 +875,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             pf = self.cfg.getPDFFont(pfi)
 
             if pf.pdfName and pf.filename != "":
-                pager.doc.addFont(pf.style,
-                                  pml.PDFFontInfo(pf.pdfName, pf.filename))
+                pager.doc.addFont(pf.style, pml.PDFFontInfo(pf.pdfName, pf.filename))
             elif pf.pdfName:
                 userHasSetFontNameWithoutFile = True
 
         if userHasSetFontNameWithoutFile:
-            wx.MessageBox('Setting a font name without a font file is not possible in Trelby any more. Please adjust your settings in Script > Settings > Change > PDF/Fonts. Trelby will fall back to the default font for now.')
+            wx.MessageBox(
+                "Setting a font name without a font file is not possible in Trelby any more. Please adjust your settings in Script > Settings > Change > PDF/Fonts. Trelby will fall back to the default font for now."
+            )
 
         return pager.doc
 
@@ -880,7 +901,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # caller should stop calling this since all pages have been generated
     # (assuming 1-to-n calling sequence).
     def generatePMLPage(self, pager, pageNr, forPDF, doExtra):
-        #lsdjflksj = util.TimerDev("generatePMLPage")
+        # lsdjflksj = util.TimerDev("generatePMLPage")
 
         cfg = self.cfg
         ls = self.lines
@@ -905,7 +926,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             # another side-effect is that if text is deleted at the end,
             # self.pages can point to lines that no longer exist, so we
             # need to clamp it.
-            end = util.clamp(self.pages[pageNr], maxVal = length - 1)
+            end = util.clamp(self.pages[pageNr], maxVal=length - 1)
 
         pg = pml.Page(pager.doc)
 
@@ -924,24 +945,39 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                     if pager.sceneContNr != 0:
                         s += " (%d)" % (pager.sceneContNr + 1)
 
-                    pg.add(pml.TextOp(s,
-                        cfg.marginLeft + pager.sceneIndent * chX,
-                        cfg.marginTop + (y / 10.0) * chY, fs))
+                    pg.add(
+                        pml.TextOp(
+                            s,
+                            cfg.marginLeft + pager.sceneIndent * chX,
+                            cfg.marginTop + (y / 10.0) * chY,
+                            fs,
+                        )
+                    )
 
                     pager.sceneContNr += 1
 
                     if cfg.pdfShowSceneNumbers:
-                        self.addSceneNumbers(pg, "%d" % pager.scene,
-                            cfg.getType(SCENE).width, y, chX, chY)
+                        self.addSceneNumbers(
+                            pg,
+                            "%d" % pager.scene,
+                            cfg.getType(SCENE).width,
+                            y,
+                            chX,
+                            chY,
+                        )
 
                 y += 20
 
             if self.needsMore(start - 1):
                 if doExtra:
-                    pg.add(pml.TextOp(self.getPrevSpeaker(start) +
-                        cfg.strDialogueContinued,
-                        cfg.marginLeft + pager.charIndent * chX,
-                        cfg.marginTop + (y / 10.0) * chY, fs))
+                    pg.add(
+                        pml.TextOp(
+                            self.getPrevSpeaker(start) + cfg.strDialogueContinued,
+                            cfg.marginLeft + pager.charIndent * chX,
+                            cfg.marginTop + (y / 10.0) * chY,
+                            fs,
+                        )
+                    )
 
                 y += 10
 
@@ -976,9 +1012,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             extraIndent = 1 if self.needsExtraParenIndent(i) else 0
 
-            to = pml.TextOp(text,
+            to = pml.TextOp(
+                text,
                 cfg.marginLeft + (tcfg.indent + extraIndent) * chX,
-                cfg.marginTop + (y / 10.0) * chY, fs, typ, line = i)
+                cfg.marginTop + (y / 10.0) * chY,
+                fs,
+                typ,
+                line=i,
+            )
 
             pg.add(to)
 
@@ -997,24 +1038,33 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                     pg.add(pml.genLine(nx, ny - offset, nw, 0.0, lw))
                     pg.add(pml.QuarterCircleOp(nx + nw, ny, offset, lw, True))
 
-                    pg.add(pml.TextOp("Note",
-                        (nx + nx + nw) / 2.0, ny - offset, 6, pml.ITALIC,
-                        util.ALIGN_CENTER, util.VALIGN_BOTTOM))
+                    pg.add(
+                        pml.TextOp(
+                            "Note",
+                            (nx + nx + nw) / 2.0,
+                            ny - offset,
+                            6,
+                            pml.ITALIC,
+                            util.ALIGN_CENTER,
+                            util.VALIGN_BOTTOM,
+                        )
+                    )
 
                 if self.isLastLineOfElem(i):
-                    pg.add(pml.QuarterCircleOp(nx, ny + chY, offset, lw,
-                                               False, True))
+                    pg.add(pml.QuarterCircleOp(nx, ny + chY, offset, lw, False, True))
                     pg.add(pml.genLine(nx, ny + chY + offset, nw, 0.0, lw))
-                    pg.add(pml.QuarterCircleOp(nx + nw, ny + chY, offset, lw,
-                                               True, True))
+                    pg.add(
+                        pml.QuarterCircleOp(nx + nw, ny + chY, offset, lw, True, True)
+                    )
 
             if doExtra and (tcfg.lt == SCENE) and self.isFirstLineOfElem(i):
                 pager.sceneContNr = 0
 
                 if cfg.pdfShowSceneNumbers:
                     pager.scene += 1
-                    self.addSceneNumbers(pg, "%d" % pager.scene, tcfg.width,
-                                         y, chX, chY)
+                    self.addSceneNumbers(
+                        pg, "%d" % pager.scene, tcfg.width, y, chX, chY
+                    )
 
                 if cfg.pdfIncludeTOC:
                     if cfg.pdfShowSceneNumbers:
@@ -1025,25 +1075,40 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                     to.toc = pml.TOCItem(s, to)
 
             if doExtra and cfg.pdfShowLineNumbers:
-                pg.add(pml.TextOp("%02d" % (i - start + 1),
-                    cfg.marginLeft - 3 * chX,
-                    cfg.marginTop + (y / 10.0) * chY, fs))
+                pg.add(
+                    pml.TextOp(
+                        "%02d" % (i - start + 1),
+                        cfg.marginLeft - 3 * chX,
+                        cfg.marginTop + (y / 10.0) * chY,
+                        fs,
+                    )
+                )
 
             y += 10
 
         if self.needsMore(end):
             if doExtra:
-                pg.add(pml.TextOp(cfg.strMore,
+                pg.add(
+                    pml.TextOp(
+                        cfg.strMore,
                         cfg.marginLeft + pager.charIndent * chX,
-                        cfg.marginTop + (y / 10.0) * chY, fs))
+                        cfg.marginTop + (y / 10.0) * chY,
+                        fs,
+                    )
+                )
 
             y += 10
 
         if cfg.sceneContinueds and not self.isLastLineOfScene(end):
             if doExtra:
-                pg.add(pml.TextOp(cfg.strContinuedPageEnd,
+                pg.add(
+                    pml.TextOp(
+                        cfg.strContinuedPageEnd,
                         cfg.marginLeft + cfg.sceneContinuedIndent * chX,
-                        cfg.marginTop + (y / 10.0 + 1.0) * chY, fs))
+                        cfg.marginTop + (y / 10.0 + 1.0) * chY,
+                        fs,
+                    )
+                )
 
             y += 10
 
@@ -1053,18 +1118,29 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             uy = cfg.marginTop
             dy = cfg.paperHeight - cfg.marginBottom
 
-            pg.add(pml.LineOp([(lx, uy), (rx, uy), (rx, dy), (lx, dy)],
-                              0, True))
+            pg.add(pml.LineOp([(lx, uy), (rx, uy), (rx, dy), (lx, dy)], 0, True))
 
         return pg
 
     def addSceneNumbers(self, pg, s, width, y, chX, chY):
         cfg = self.cfg
 
-        pg.add(pml.TextOp(s, cfg.marginLeft - 6 * chX,
-             cfg.marginTop + (y / 10.0) * chY, cfg.fontSize))
-        pg.add(pml.TextOp(s, cfg.marginLeft + (width + 1) * chX,
-            cfg.marginTop + (y / 10.0) * chY, cfg.fontSize))
+        pg.add(
+            pml.TextOp(
+                s,
+                cfg.marginLeft - 6 * chX,
+                cfg.marginTop + (y / 10.0) * chY,
+                cfg.fontSize,
+            )
+        )
+        pg.add(
+            pml.TextOp(
+                s,
+                cfg.marginLeft + (width + 1) * chX,
+                cfg.marginTop + (y / 10.0) * chY,
+                cfg.fontSize,
+            )
+        )
 
     # get topLine, clamping it to the valid range in the process.
     def getTopLine(self):
@@ -1081,7 +1157,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         # break undo, so that can't be allowed.
         assert not self.firstUndo
 
-        #sfdlksjf = util.TimerDev("reformatAll")
+        # sfdlksjf = util.TimerDev("reformatAll")
 
         line = 0
 
@@ -1151,7 +1227,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                     # anything.
 
                     i += 1
-                    while text[i:i + 1] == " ":
+                    while text[i : i + 1] == " ":
                         i += 1
 
                     if i == len(text):
@@ -1159,12 +1235,12 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
                         break
                     else:
-                        ret.append(Line(LB_SPACE, line.lt, text[0:i - 1]))
+                        ret.append(Line(LB_SPACE, line.lt, text[0 : i - 1]))
                         text = text[i:]
 
                 elif i >= 0:
                     ret.append(Line(LB_SPACE, line.lt, text[0:i]))
-                    text = text[i + 1:]
+                    text = text[i + 1 :]
 
                 else:
                     ret.append(Line(LB_NONE, line.lt, text[0:w]))
@@ -1175,7 +1251,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # rewrap paragraph starting at given line. returns the number of lines
     # in the wrapped paragraph. if line1 is -1, rewraps paragraph
     # containing self.line. maintains cursor position correctness.
-    def rewrapPara(self, line1 = -1):
+    def rewrapPara(self, line1=-1):
         ls = self.lines
 
         if line1 == -1:
@@ -1197,8 +1273,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
                     break
                 else:
-                    cursorOffset += len(ls[i].text) + \
-                                    len(config.lb2str(ls[i].lb))
+                    cursorOffset += len(ls[i].text) + len(config.lb2str(ls[i].lb))
         else:
             cursorOffset = -1
 
@@ -1209,7 +1284,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         tmp = Line(ls[line2].lb, ls[line1].lt, s)
         wrappedLines = self.wrapLine(tmp)
-        ls[line1:line2 + 1] = wrappedLines
+        ls[line1 : line2 + 1] = wrappedLines
 
         # adjust cursor position
         if cursorOffset != -1:
@@ -1243,7 +1318,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     # rewrap element starting at given line. if line is -1, rewraps
     # element containing self.line.
-    def rewrapElem(self, line = -1):
+    def rewrapElem(self, line=-1):
         ls = self.lines
 
         if line == -1:
@@ -1264,8 +1339,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def isOnlyLineOfElem(self, line):
         # this is just "isLastLineOfElem(line) and isFirstLineOfElem(line)"
         # inlined here, since it's 130% faster this way.
-        return (self.lines[line].lb == LB_LAST) and \
-               ((line == 0) or (self.lines[line - 1].lb == LB_LAST))
+        return (self.lines[line].lb == LB_LAST) and (
+            (line == 0) or (self.lines[line - 1].lb == LB_LAST)
+        )
 
     # get first index of paragraph
     def getParaFirstIndexFromLine(self, line):
@@ -1339,8 +1415,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         return self.getElemIndexesFromLine(self.line)
 
     def getElemIndexesFromLine(self, line):
-        return (self.getElemFirstIndexFromLine(line),
-                self.getElemLastIndexFromLine(line))
+        return (
+            self.getElemFirstIndexFromLine(line),
+            self.getElemLastIndexFromLine(line),
+        )
 
     def isFirstLineOfScene(self, line):
         if line == 0:
@@ -1449,9 +1527,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def needsMore(self, line):
         ls = self.lines
 
-        return ls[line].lt in (DIALOGUE, PAREN)\
-           and (line != (len(ls) - 1)) and\
-           ls[line + 1].lt in (DIALOGUE, PAREN)
+        return (
+            ls[line].lt in (DIALOGUE, PAREN)
+            and (line != (len(ls) - 1))
+            and ls[line + 1].lt in (DIALOGUE, PAREN)
+        )
 
     # starting at line, go backwards until a line with type of CHARACTER
     # and lb of LAST is found, and return that line's text, possibly
@@ -1480,7 +1560,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         return sum([len(ln.text) for ln in self.lines])
 
     def paginate(self):
-        #sfdlksjf = util.TimerDev("paginate")
+        # sfdlksjf = util.TimerDev("paginate")
 
         self.pages = [-1]
         self.pagesNoAdjust = [-1]
@@ -1563,8 +1643,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                         if linesOnThisPage < cfg.pbActionLines:
                             i = first - 1
 
-                        i = self.removeDanglingElement(i, SCENE,
-                                                       lastBreak)
+                        i = self.removeDanglingElement(i, SCENE, lastBreak)
 
             elif line.lt == CHARACTER:
                 i = self.removeDanglingElement(i, CHARACTER, lastBreak)
@@ -1572,8 +1651,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             elif line.lt in (DIALOGUE, PAREN):
 
-                if line.lb != LB_LAST or\
-                       self.getTypeOfNextElem(i) in (DIALOGUE, PAREN):
+                if line.lb != LB_LAST or self.getTypeOfNextElem(i) in (DIALOGUE, PAREN):
 
                     cutDialogue = False
                     cutParen = False
@@ -1582,8 +1660,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                         line = ls[i]
 
                         if line.lt == PAREN:
-                            i = self.removeDanglingElement(i, PAREN,
-                              lastBreak)
+                            i = self.removeDanglingElement(i, PAREN, lastBreak)
                             cutParen = True
 
                         elif line.lt == DIALOGUE:
@@ -1615,10 +1692,8 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                                 break
 
                         elif line.lt == CHARACTER:
-                            i = self.removeDanglingElement(i, CHARACTER,
-                                                           lastBreak)
-                            i = self.removeDanglingElement(i, SCENE,
-                                                           lastBreak)
+                            i = self.removeDanglingElement(i, CHARACTER, lastBreak)
+                            i = self.removeDanglingElement(i, SCENE, lastBreak)
 
                             break
 
@@ -1681,14 +1756,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         if saveUndo:
             u = undo.ManyElems(
-                self, undo.CMD_MISC, currentLine, selectedElems, selectedElems)
+                self, undo.CMD_MISC, currentLine, selectedElems, selectedElems
+            )
 
         while currentLine <= endSection:
             first, last = self.getElemIndexesFromLine(currentLine)
 
             # if changing away from PAREN containing only "()", remove it
-            if (first == last) and (ls[first].lt == PAREN) and\
-                   (ls[first].text == "()"):
+            if (first == last) and (ls[first].lt == PAREN) and (ls[first].text == "()"):
                 ls[first].text = ""
 
                 if first == self.line:
@@ -1698,8 +1773,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 ls[i].lt = lt
 
             # if changing empty element to PAREN, add "()"
-            if (first == last) and (ls[first].lt == PAREN) and\
-                   (len(ls[first].text) == 0):
+            if (
+                (first == last)
+                and (ls[first].lt == PAREN)
+                and (len(ls[first].text) == 0)
+            ):
                 ls[first].text = "()"
 
                 if first == self.line:
@@ -1718,7 +1796,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             self.reformatRange(
                 self.getElemFirstIndexFromLine(startSection),
-                self.getParaFirstIndexFromLine(self.getElemLastIndexFromLine(endSection)))
+                self.getParaFirstIndexFromLine(
+                    self.getElemLastIndexFromLine(endSection)
+                ),
+            )
         else:
             self.rewrapElem(first)
 
@@ -1749,8 +1830,8 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         ln = self.lines[self.line]
 
         s = ln.text
-        preStr = s[:self.column]
-        postStr = s[self.column:]
+        preStr = s[: self.column]
+        postStr = s[self.column :]
         newLine = Line(ln.lb, ln.lt, postStr)
         ln.text = preStr
         ln.lb = LB_FORCED
@@ -1793,9 +1874,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     # delete character at given position and optionally position
     # cursor there.
-    def deleteChar(self, line, column, posCursor = True):
+    def deleteChar(self, line, column, posCursor=True):
         s = self.lines[line].text
-        self.lines[line].text = s[:column] + s[column + 1:]
+        self.lines[line].text = s[:column] + s[column + 1 :]
 
         if posCursor:
             self.column = column
@@ -1842,8 +1923,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         pageNr = util.clamp(pageNr, 1, len(self.pages) - 1)
         last = len(self.lines) - 1
 
-        return (util.clamp(self.pages[pageNr - 1] + 1, 0, last),
-                util.clamp(self.pages[pageNr], 0, last))
+        return (
+            util.clamp(self.pages[pageNr - 1] + 1, 0, last),
+            util.clamp(self.pages[pageNr], 0, last),
+        )
 
     # return a list of all page numbers as strings.
     def getPageNumbers(self):
@@ -1904,7 +1987,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         ls = self.lines
 
         while 1:
-            if ((line < 0) or (line >= len(ls))):
+            if (line < 0) or (line >= len(ls)):
                 return (None, 0, 0)
 
             s = ls[line].text
@@ -1941,9 +2024,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     def isAtEndOfParen(self):
         ls = self.lines
 
-        return self.isLastLineOfElem(self.line) and\
-           (ls[self.line].lt == PAREN) and\
-           (ls[self.line].text[self.column:] == ")")
+        return (
+            self.isLastLineOfElem(self.line)
+            and (ls[self.line].lt == PAREN)
+            and (ls[self.line].text[self.column :] == ")")
+        )
 
     # returns True if pressing TAB at current position would make a new
     # element, False if it would just change element's type.
@@ -2127,7 +2212,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             ln = ls[i]
 
-            cd.lines.append(Line(ln.lb, ln.lt, ln.text[c1:c2 + 1]))
+            cd.lines.append(Line(ln.lb, ln.lt, ln.text[c1 : c2 + 1]))
 
         cd.lines[-1].lb = LB_LAST
 
@@ -2145,7 +2230,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             c1, c2 = self.getMarkedColumns(i, marked)
 
             ln = ls[i]
-            ln.text = ln.text[0:c1] + ln.text[c2 + 1:]
+            ln.text = ln.text[0:c1] + ln.text[c2 + 1 :]
 
             if i == marked[0]:
                 endCol = c1
@@ -2193,8 +2278,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 # element's new end, otherwise we must set it to
                 # LB_NONE so that the new element is reformatted
                 # properly.
-                if self.isLastLineOfElem(marked[1]) and \
-                       not ls[marked[1]].text:
+                if self.isLastLineOfElem(marked[1]) and not ls[marked[1]].text:
                     ln.lb = LB_LAST
                 else:
                     ln.lb = LB_NONE
@@ -2205,7 +2289,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         # anyway) to that of the first element.
         self.setLineTypes(marked[1], ls[marked[0]].lt)
 
-        del ls[del1:del2 + 1]
+        del ls[del1 : del2 + 1]
 
         self.clearMark()
 
@@ -2272,8 +2356,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if (len(ln.text) == 0) and self.isOnlyLineOfElem(self.line):
             ln.lt = inLines[0].lt
 
-        ln.text = ln.text[:self.column] + inLines[0].text + \
-                  ln.text[self.column:]
+        ln.text = ln.text[: self.column] + inLines[0].text + ln.text[self.column :]
         self.column += len(inLines[0].text)
 
         if len(inLines) != 1:
@@ -2281,7 +2364,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             if not atEnd:
                 self.splitLine()
                 ls[self.line - 1].lb = inLines[0].lb
-                ls[self.line:self.line] = inLines[1:]
+                ls[self.line : self.line] = inLines[1:]
                 self.line += len(inLines) - 2
 
                 # FIXME: pasting a multi-paragraph ACTION where first line
@@ -2289,7 +2372,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 # things
 
             else:
-                ls[self.line + 1:self.line + 1] = inLines[1:]
+                ls[self.line + 1 : self.line + 1] = inLines[1:]
                 self.line += len(inLines) - 1
 
                 # FIXME: this doesn't modify .lb, and pasting a
@@ -2368,7 +2451,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             else:
                 if char in (".", "?", "!"):
                     return True
-                elif char not in (" ", "\""):
+                elif char not in (" ", '"'):
                     return False
 
             cnt += 1
@@ -2431,26 +2514,31 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
             if ln.lt == CHARACTER:
                 if isLast and next and next not in (PAREN, DIALOGUE):
-                    msg = "Element type '%s' can not follow type '%s'." %\
-                          (cfg.getType(next).ti.name, tcfg.ti.name)
+                    msg = "Element type '%s' can not follow type '%s'." % (
+                        cfg.getType(next).ti.name,
+                        tcfg.ti.name,
+                    )
                     break
 
             if ln.lt == PAREN:
                 if isFirst and prev and prev not in (CHARACTER, DIALOGUE):
-                    msg = "Element type '%s' can not follow type '%s'." %\
-                          (tcfg.ti.name, cfg.getType(prev).ti.name)
+                    msg = "Element type '%s' can not follow type '%s'." % (
+                        tcfg.ti.name,
+                        cfg.getType(prev).ti.name,
+                    )
                     break
 
             if ln.lt == DIALOGUE:
                 if isFirst and prev and prev not in (CHARACTER, PAREN):
-                    msg = "Element type '%s' can not follow type '%s'." %\
-                          (tcfg.ti.name, cfg.getType(prev).ti.name)
+                    msg = "Element type '%s' can not follow type '%s'." % (
+                        tcfg.ti.name,
+                        cfg.getType(prev).ti.name,
+                    )
                     break
 
             if prevType:
                 if ln.lt != prevType:
-                    msg = "Element contains lines with different line"\
-                          " types (BUG)."
+                    msg = "Element contains lines with different line" " types (BUG)."
                     break
 
             if ln.lb == LB_LAST:
@@ -2471,7 +2559,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         s1 = self.generateText(False).split("\n")
         s2 = sp2.generateText(False).split("\n")
 
-        dltTmp = difflib.unified_diff(s1, s2, lineterm = "")
+        dltTmp = difflib.unified_diff(s1, s2, lineterm="")
 
         # get rid of stupid delta generator object that doesn't allow
         # subscription or anything else really. also expands hunk
@@ -2504,10 +2592,13 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             # missing line', and that we're either at end of list or next
             # line does not start with "+".
 
-            if (s[0] == "+") and \
-               (i != 0) and (dltTmp[i - 1][0] == "-") and (
-                (i == 1) or (dltTmp[i - 2][0] != "-")) and (
-                (i == (len(dltTmp) - 1)) or (dltTmp[i + 1][0] != "+")):
+            if (
+                (s[0] == "+")
+                and (i != 0)
+                and (dltTmp[i - 1][0] == "-")
+                and ((i == 1) or (dltTmp[i - 2][0] != "-"))
+                and ((i == (len(dltTmp) - 1)) or (dltTmp[i + 1][0] != "+"))
+            ):
 
                 # generate line with "^" character at every position that
                 # the lines differ
@@ -2530,10 +2621,17 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
                 dlt.append(res)
 
-        tmp = ["  Color information:", "1", "-  Deleted lines",
-               "+  Added lines",
-               "^  Positions of single-line changes (marked with ^)", "1",
-               "2", "2", "3"]
+        tmp = [
+            "  Color information:",
+            "1",
+            "-  Deleted lines",
+            "+  Added lines",
+            "^  Positions of single-line changes (marked with ^)",
+            "1",
+            "2",
+            "2",
+            "3",
+        ]
         tmp.extend(dlt)
         dlt = tmp
 
@@ -2573,8 +2671,14 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             elif s[0] == "2":
                 pg.add(pml.PDFOp("0.75 g"))
                 w = 50.0
-                pg.add(pml.RectOp(doc.w / 2.0 - w / 2.0, cfg.marginTop +
-                    y * chY + chY / 4, w, chY / 2.0))
+                pg.add(
+                    pml.RectOp(
+                        doc.w / 2.0 - w / 2.0,
+                        cfg.marginTop + y * chY + chY / 4,
+                        w,
+                        chY / 2.0,
+                    )
+                )
                 pg.add(pml.PDFOp("0.0 g"))
 
             else:
@@ -2589,12 +2693,21 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
                 if color:
                     pg.add(pml.PDFOp("%s rg" % color))
-                    pg.add(pml.RectOp(cfg.marginLeft, cfg.marginTop + y * chY,
-                        doc.w - cfg.marginLeft - 5.0, chY))
+                    pg.add(
+                        pml.RectOp(
+                            cfg.marginLeft,
+                            cfg.marginTop + y * chY,
+                            doc.w - cfg.marginLeft - 5.0,
+                            chY,
+                        )
+                    )
                     pg.add(pml.PDFOp("0.0 g"))
 
-                textOps.append(pml.TextOp(s[1:], cfg.marginLeft,
-                    cfg.marginTop + y * chY, cfg.fontSize))
+                textOps.append(
+                    pml.TextOp(
+                        s[1:], cfg.marginLeft, cfg.marginTop + y * chY, cfg.fontSize
+                    )
+                )
 
             y += 1
 
@@ -2604,7 +2717,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         return pdf.generate(doc)
 
     # move to line,col, and if mark is True, set mark there
-    def gotoPos(self, line, col, mark = False):
+    def gotoPos(self, line, col, mark=False):
         self.clearAutoComp()
 
         self.line = line
@@ -2668,8 +2781,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # make sure current line and column are within the valid bounds.
     def validatePos(self):
         self.line = util.clamp(self.line, 0, len(self.lines) - 1)
-        self.column = util.clamp(self.column, 0,
-                                 len(self.lines[self.line].text))
+        self.column = util.clamp(self.column, 0, len(self.lines[self.line].text))
 
     # this must be called after each command (all functions named fooCmd
     # are commands)
@@ -2684,7 +2796,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
     # helper function for calling commands. name is the name of the
     # command, e.g. "moveLeft".
-    def cmd(self, name, char = None, count = 1):
+    def cmd(self, name, char=None, count=1):
         for i in range(count):
             cs = CommandState()
 
@@ -2698,7 +2810,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
     # TEST CODE.
     def cmdChars(self, s):
         for char in s:
-            self.cmd("addChar", char = char)
+            self.cmd("addChar", char=char)
 
     def moveLeftCmd(self, cs):
         self.maybeMark(cs.mark)
@@ -2802,9 +2914,12 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         #   -we are not in middle of undo/redo
         #   -previous item is "delete backward"
         #   -cursor is exactly where it was left off by the previous item
-        if (not self.currentUndo and self.lastUndo and
-            (self.lastUndo.getType() == undo.CMD_DEL_BACKWARD) and
-            (self.lastUndo.endPos == self.cursorAsMark())):
+        if (
+            not self.currentUndo
+            and self.lastUndo
+            and (self.lastUndo.getType() == undo.CMD_DEL_BACKWARD)
+            and (self.lastUndo.endPos == self.cursorAsMark())
+        ):
             u = self.lastUndo
             mergeUndo = True
 
@@ -2831,8 +2946,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                         u = undo.ManyElems(self, undo.CMD_DEL_BACKWARD, self.line, 1, 1)
 
                 if ln.lb == LB_NONE:
-                    self.deleteChar(self.line - 1, len(ln.text) - 1,
-                                    False)
+                    self.deleteChar(self.line - 1, len(ln.text) - 1, False)
 
                 self.joinLines(self.line - 1)
 
@@ -2855,9 +2969,12 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         #   -we are not in middle of undo/redo
         #   -previous item is "delete forward"
         #   -cursor is exactly where it was left off by the previous item
-        if (not self.currentUndo and self.lastUndo and
-            (self.lastUndo.getType() == undo.CMD_DEL_FORWARD) and
-            (self.lastUndo.endPos == self.cursorAsMark())):
+        if (
+            not self.currentUndo
+            and self.lastUndo
+            and (self.lastUndo.getType() == undo.CMD_DEL_FORWARD)
+            and (self.lastUndo.endPos == self.cursorAsMark())
+        ):
             u = self.lastUndo
             mergeUndo = True
 
@@ -2994,10 +3111,17 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         # space       space      Y
         # space       non-space  N
 
-        if (not self.currentUndo and self.lastUndo and
-            (self.lastUndo.getType() in (undo.CMD_ADD_CHAR, undo.CMD_ADD_CHAR_SPACE)) and
-            (self.lastUndo.endPos == self.cursorAsMark()) and
-            not ((self.lastUndo.getType() == undo.CMD_ADD_CHAR_SPACE) and not isSpace)):
+        if (
+            not self.currentUndo
+            and self.lastUndo
+            and (
+                self.lastUndo.getType() in (undo.CMD_ADD_CHAR, undo.CMD_ADD_CHAR_SPACE)
+            )
+            and (self.lastUndo.endPos == self.cursorAsMark())
+            and not (
+                (self.lastUndo.getType() == undo.CMD_ADD_CHAR_SPACE) and not isSpace
+            )
+        ):
 
             u = self.lastUndo
             mergeUndo = True
@@ -3029,14 +3153,13 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                         if not util.isAlnum(s[self.column - 2]):
                             doIt = True
                     else:
-                        if (self.line == 0) or \
-                               (ls[self.line - 1].lb != LB_NONE):
+                        if (self.line == 0) or (ls[self.line - 1].lb != LB_NONE):
                             doIt = True
 
                     if doIt:
                         s = util.replace(s, "I", self.column - 1, 1)
 
-        s = s[:self.column] + char + s[self.column:]
+        s = s[: self.column] + char + s[self.column :]
         ls[self.line].text = s
         self.column += 1
 
@@ -3044,9 +3167,11 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         if (tmp == "EXT.") or (tmp == "INT."):
             if self.isOnlyLineOfElem(self.line):
                 ls[self.line].lt = SCENE
-        elif (tmp == "(") and\
-             ls[self.line].lt in (DIALOGUE, CHARACTER) and\
-             self.isOnlyLineOfElem(self.line):
+        elif (
+            (tmp == "(")
+            and ls[self.line].lt in (DIALOGUE, CHARACTER)
+            and self.isOnlyLineOfElem(self.line)
+        ):
             ls[self.line].lt = PAREN
             ls[self.line].text = "()"
 
@@ -3093,14 +3218,15 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
         return bool(
             # undo history exists
             self.lastUndo
-
             # and we either:
             and (
                 # are not in the middle of undo/redo
-                not self.currentUndo or
-
+                not self.currentUndo
+                or
                 # or are, but can still undo more
-                self.currentUndo.prev))
+                self.currentUndo.prev
+            )
+        )
 
     # return True if we can redo
     def canRedo(self):
@@ -3146,8 +3272,9 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
 
         # trim undo history until the estimated memory usage is small
         # enough
-        while ((self.firstUndo is not self.lastUndo) and
-               (self.undoMemoryUsed >= 5000000)):
+        while (self.firstUndo is not self.lastUndo) and (
+            self.undoMemoryUsed >= 5000000
+        ):
 
             tmp = self.firstUndo
             tmp.next.prev = None
@@ -3236,9 +3363,10 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             else:
                 prevType = ln.lt
 
+
 # one line in a screenplay
 class Line:
-    def __init__(self, lb = LB_LAST, lt = ACTION, text = ""):
+    def __init__(self, lb=LB_LAST, lt=ACTION, text=""):
 
         # line break type
         self.lb = lb
@@ -3250,15 +3378,16 @@ class Line:
         self.text = text
 
     def __str__(self):
-        return config.lb2char(self.lb) + config.lt2char(self.lt)\
-               + self.text
+        return config.lb2char(self.lb) + config.lt2char(self.lt) + self.text
 
-    def __repr__(self)->str:
+    def __repr__(self) -> str:
         return self.__str__()
 
     def __ne__(self, other):
-        return ((self.lt != other.lt) or (self.lb != other.lb) or
-                (self.text != other.text))
+        return (
+            (self.lt != other.lt) or (self.lb != other.lb) or (self.text != other.text)
+        )
+
     def __eq__(self, other):
         return not self.__ne__(other)
 
@@ -3268,6 +3397,7 @@ class Line:
     @staticmethod
     def fromStr(s):
         return Line(config.char2lb(s[0]), config.char2lt(s[1]), s[2:])
+
 
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.
@@ -3279,12 +3409,14 @@ class Mark:
     def __eq__(self, other):
         return (self.line == other.line) and (self.column == other.column)
 
+
 # data held in internal clipboard.
 class ClipData:
     def __init__(self):
 
         # list of Line objects
         self.lines = []
+
 
 # stuff we need when handling commands in Screenplay.
 class CommandState:
@@ -3307,6 +3439,7 @@ class CommandState:
 
         # True if we need to make current line visible
         self.needsVisifying = True
+
 
 # keeps a collection of page numbers from a given screenplay, and allows
 # formatting of the list intelligently, e.g. "4-7, 9, 11-16".

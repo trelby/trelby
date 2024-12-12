@@ -4,10 +4,16 @@ import trelby.util as util
 
 import wx
 
+
 class SCDictDlg(wx.Dialog):
     def __init__(self, parent, scDict, isGlobal):
-        wx.Dialog.__init__(self, parent, -1, "Spell checker dictionary",
-                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        wx.Dialog.__init__(
+            self,
+            parent,
+            -1,
+            "Spell checker dictionary",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
+        )
 
         self.scDict = scDict
 
@@ -20,8 +26,9 @@ class SCDictDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticText(self, -1, s))
 
-        self.itemsEntry = wx.TextCtrl(self, -1, style = wx.TE_MULTILINE |
-                                     wx.TE_DONTWRAP, size = (300, 300))
+        self.itemsEntry = wx.TextCtrl(
+            self, -1, style=wx.TE_MULTILINE | wx.TE_DONTWRAP, size=(300, 300)
+        )
         vsizer.Add(self.itemsEntry, 1, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)

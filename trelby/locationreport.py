@@ -7,6 +7,7 @@ import functools
 
 import operator
 
+
 class LocationReport:
     # sr = SceneReport
     def __init__(self, sr):
@@ -31,8 +32,7 @@ class LocationReport:
         for si in sr.scenes:
             locations.setdefault(si.name, LocationInfo(self.sp)).addScene(si)
 
-            self.scenes.setdefault(si.name, LocationInfo(self.sp)).\
-                 addScene(si)
+            self.scenes.setdefault(si.name, LocationInfo(self.sp)).addScene(si)
 
         # remove empty LocationInfos, sort them and store to a list
         tmp = []
@@ -57,14 +57,15 @@ class LocationReport:
 
         # information about what to include (and yes, the comma is needed
         # to unpack the list)
-        self.INF_SPEAKERS, = list(range(1))
+        (self.INF_SPEAKERS,) = list(range(1))
         self.inf = []
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
     def generate(self) -> bytes:
-        tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 15.0, 12)
+        tf = pml.TextFormatter(
+            self.sp.cfg.paperWidth, self.sp.cfg.paperHeight, 15.0, 12
+        )
 
         scriptLines = sum([li.lines for li in self.locations])
 
@@ -75,8 +76,8 @@ class LocationReport:
             # DESC(lines_in_scene) ASC(scenename) order.
             tmp = [(scene, self.scenes[scene].lines) for scene in li.scenes]
 
-            tmp.sort(key = operator.itemgetter(0))
-            tmp.sort(key = operator.itemgetter(1), reverse=True)
+            tmp.sort(key=operator.itemgetter(0))
+            tmp.sort(key=operator.itemgetter(1), reverse=True)
 
             for scene, lines in tmp:
                 if len(tmp) > 1:
@@ -84,16 +85,23 @@ class LocationReport:
                 else:
                     pct = ""
 
-                tf.addText("%s%s" % (scene, pct), style = pml.BOLD)
+                tf.addText("%s%s" % (scene, pct), style=pml.BOLD)
 
             tf.addSpace(1.0)
 
-            tf.addWrappedText("Lines: %d (%d%% action, %d%% of script),"
-                " Scenes: %d, Pages: %d (%s)" % (li.lines,
-                util.pct(li.actionLines, li.lines),
-                util.pct(li.lines, scriptLines), li.sceneCount,
-                len(li.pages), li.pages), "  ")
-
+            tf.addWrappedText(
+                "Lines: %d (%d%% action, %d%% of script),"
+                " Scenes: %d, Pages: %d (%s)"
+                % (
+                    li.lines,
+                    util.pct(li.actionLines, li.lines),
+                    util.pct(li.lines, scriptLines),
+                    li.sceneCount,
+                    len(li.pages),
+                    li.pages,
+                ),
+                "  ",
+            )
 
             if self.inf[self.INF_SPEAKERS].selected:
                 tf.addSpace(2.5)
@@ -102,6 +110,7 @@ class LocationReport:
                     tf.addText("     %3d  %s" % (it[1], it[0]))
 
         return pdf.generate(tf.doc)
+
 
 # information about one location
 class LocationInfo:

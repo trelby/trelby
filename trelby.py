@@ -2,4 +2,5 @@
 """ Launch local trelby """
 
 import trelby.trelby
+
 trelby.trelby.main()

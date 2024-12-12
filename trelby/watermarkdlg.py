@@ -5,13 +5,19 @@ import trelby.util as util
 
 import wx
 
+
 # The watermark tool dialog.
 class WatermarkDlg(wx.Dialog):
     # sp - screenplay object, from which to generate PDF
     # prefix - prefix name for the PDF files (unicode)
     def __init__(self, parent, sp, prefix):
-        wx.Dialog.__init__(self, parent, -1, "Watermarked PDFs generator",
-                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        wx.Dialog.__init__(
+            self,
+            parent,
+            -1,
+            "Watermarked PDFs generator",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
+        )
 
         self.frame = parent
         self.sp = sp
@@ -42,12 +48,12 @@ class WatermarkDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticText(self, -1, "Common mark:"), 0)
         self.commonMark = wx.TextCtrl(self, -1, "Confidential")
-        vsizer.Add(self.commonMark, 0, wx.EXPAND| wx.BOTTOM, 5)
+        vsizer.Add(self.commonMark, 0, wx.EXPAND | wx.BOTTOM, 5)
 
         vsizer.Add(wx.StaticText(self, -1, "Watermarks (one per line):"))
         self.itemsEntry = wx.TextCtrl(
-            self, -1, style = wx.TE_MULTILINE | wx.TE_DONTWRAP,
-            size = (300, 200))
+            self, -1, style=wx.TE_MULTILINE | wx.TE_DONTWRAP, size=(300, 200)
+        )
         vsizer.Add(self.itemsEntry, 1, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -72,7 +78,7 @@ class WatermarkDlg(wx.Dialog):
             uid = ""
 
             for i in range(8):
-                uid += '%02x' % random.randint(0, 255)
+                uid += "%02x" % random.randint(0, 255)
 
             if uid in usedIds:
                 continue
@@ -108,7 +114,7 @@ class WatermarkDlg(wx.Dialog):
                 continue
 
             basename = item.replace(" ", "-")
-            fn = directory + "/" + fnprefix + '-' + basename + ".pdf"
+            fn = directory + "/" + fnprefix + "-" + basename + ".pdf"
             pmldoc = self.sp.generatePML(True)
 
             ops = []
@@ -119,14 +125,22 @@ class WatermarkDlg(wx.Dialog):
             if common:
                 wm = pml.TextOp(
                     util.cleanInput(common),
-                    self.sp.cfg.marginLeft + 20, self.sp.cfg.paperHeight * 0.45,
-                    fontsize, pml.BOLD, angle = 45)
+                    self.sp.cfg.marginLeft + 20,
+                    self.sp.cfg.paperHeight * 0.45,
+                    fontsize,
+                    pml.BOLD,
+                    angle=45,
+                )
                 ops.append(wm)
 
             wm = pml.TextOp(
                 util.cleanInput(s),
-                self.sp.cfg.marginLeft + 20, self.sp.cfg.paperHeight * 0.6,
-                fontsize, pml.BOLD, angle = 45)
+                self.sp.cfg.marginLeft + 20,
+                self.sp.cfg.paperHeight * 0.6,
+                fontsize,
+                pml.BOLD,
+                angle=45,
+            )
             ops.append(wm)
 
             # ...and back to black
@@ -146,9 +160,12 @@ class WatermarkDlg(wx.Dialog):
                 count += 1
 
         if count > 0:
-            wx.MessageBox("Generated %d files in directory %s." %
-                          (count, directory), "PDFs generated",
-                          wx.OK, self)
+            wx.MessageBox(
+                "Generated %d files in directory %s." % (count, directory),
+                "PDFs generated",
+                wx.OK,
+                self,
+            )
         else:
             wx.MessageBox("No watermarks specified.", "Error", wx.OK, self)
 
@@ -156,8 +173,7 @@ class WatermarkDlg(wx.Dialog):
         self.EndModal(wx.OK)
 
     def OnBrowse(self, event):
-        dlg = wx.DirDialog(
-            self.frame, style = wx.DD_NEW_DIR_BUTTON)
+        dlg = wx.DirDialog(self.frame, style=wx.DD_NEW_DIR_BUTTON)
 
         if dlg.ShowModal() == wx.ID_OK:
             self.dirEntry.SetValue(dlg.GetPath())

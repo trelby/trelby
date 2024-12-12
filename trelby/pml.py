@@ -22,7 +22,7 @@ import textwrap
 
 # text flags. don't change these unless you know what you're doing.
 NORMAL = 0
-BOLD   = 1
+BOLD = 1
 ITALIC = 2
 COURIER = 0
 TIMES_ROMAN = 4
@@ -33,6 +33,7 @@ UNDERLINED = 16
 NO_FILL = 0
 FILL = 1
 STROKE_FILL = 2
+
 
 # A single document.
 class Document:
@@ -46,7 +47,7 @@ class Document:
 
         # user-specified fonts, if any. key = 2 lowest bits of
         # TextOp.flags, value = pml.PDFFontInfo
-        self.fonts: Dict[int, 'PDFFontInfo'] = {}
+        self.fonts: Dict[int, "PDFFontInfo"] = {}
 
         # whether to show TOC by default on document open
         self.showTOC: bool = False
@@ -62,11 +63,12 @@ class Document:
         # PDFs
         self.uniqueId: Optional[str] = None
 
-    def add(self, page: 'Page') -> None:
+    def add(self, page: "Page") -> None:
         self.pages.append(page)
 
-    def addFont(self, style: int, pfi: 'PDFFontInfo') -> None:
+    def addFont(self, style: int, pfi: "PDFFontInfo") -> None:
         self.fonts[style] = pfi
+
 
 class Page:
     def __init__(self, doc: Document):
@@ -75,23 +77,25 @@ class Page:
         self.doc: Document = doc
 
         # a collection of Operation objects
-        self.ops: List['DrawOp'] = []
+        self.ops: List["DrawOp"] = []
 
-    def add(self, op: 'DrawOp') -> None:
+    def add(self, op: "DrawOp") -> None:
         self.ops.append(op)
 
-    def addOpsToFront(self, opsList: List['DrawOp']) -> None:
+    def addOpsToFront(self, opsList: List["DrawOp"]) -> None:
         self.ops = opsList + self.ops
+
 
 # Table of content item (Outline item, in PDF lingo)
 class TOCItem:
-    def __init__(self, text: str, op: 'TextOp'):
+    def __init__(self, text: str, op: "TextOp"):
         # text to show in TOC
         self.text: str = text
 
         # pointer to the TextOp that this item links to (used to get the
         # correct positioning information)
         self.op: TextOp = op
+
 
 # information about one PDF font
 class PDFFontInfo:
@@ -104,9 +108,11 @@ class PDFFontInfo:
         # the font), or None, in which case the font is not embedded.
         self.fontFileName: Optional[str] = fontFileName
 
+
 # An abstract base class for all drawing operations.
 class DrawOp:
     pdfOp: pdf.PDFDrawOp
+
 
 # Draw text string 'text', at position (x, y) mm from the upper left
 # corner of the page. Font used is 'size' points, and Courier / Times/
@@ -116,9 +122,18 @@ class DrawOp:
 class TextOp(DrawOp):
     pdfOp = pdf.PDFTextOp()
 
-    def __init__(self, text: str, x: float, y: float, size: int, flags: int = NORMAL | COURIER,
-                 align: int = util.ALIGN_LEFT, valign: int = util.VALIGN_TOP,
-                 line: int = -1, angle: Optional[int] = None):
+    def __init__(
+        self,
+        text: str,
+        x: float,
+        y: float,
+        size: int,
+        flags: int = NORMAL | COURIER,
+        align: int = util.ALIGN_LEFT,
+        valign: int = util.VALIGN_TOP,
+        line: int = -1,
+        angle: Optional[int] = None,
+    ):
         """
         :param line: index of line in `Screenplay.lines`, or -1 if some other text. only used when drawing display, pdf output doesn't use this.
         :param size: the font size
@@ -152,6 +167,7 @@ class TextOp(DrawOp):
             elif valign == util.VALIGN_BOTTOM:
                 self.y -= h
 
+
 # Draw consecutive lines. 'points' is a list of (x, y) pairs (minimum 2
 # pairs) and 'width' is the line width, with 0 being the thinnest possible
 # line. if 'isClosed' is True, the last point on the list is connected to
@@ -159,21 +175,33 @@ class TextOp(DrawOp):
 class LineOp(DrawOp):
     pdfOp = pdf.PDFLineOp()
 
-    def __init__(self, points: List[Tuple[float, float]], width: float, isClosed: bool = False):
+    def __init__(
+        self, points: List[Tuple[float, float]], width: float, isClosed: bool = False
+    ):
         self.points: List[Tuple[float, float]] = points
         self.width: float = width
         self.isClosed: bool = isClosed
 
+
 # helper function for creating simple lines
 def genLine(x: float, y: float, xd: float, yd: float, width: float) -> LineOp:
     return LineOp([(x, y), (x + xd, y + yd)], width)
+
 
 # Draw a rectangle, possibly filled, with specified lineWidth (which can
 # be -1 if fillType is FILL). (x, y) is position of upper left corner.
 class RectOp(DrawOp):
     pdfOp = pdf.PDFRectOp()
 
-    def __init__(self, x: float, y: float, width: float, height: float, fillType: int = FILL, lineWidth: float = -1):
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        width: float,
+        height: float,
+        fillType: int = FILL,
+        lineWidth: float = -1,
+    ):
         self.x: float = x
         self.y: float = y
         self.width: float = width
@@ -181,19 +209,29 @@ class RectOp(DrawOp):
         self.fillType: int = fillType
         self.lw: float = lineWidth
 
+
 # Draw a quarter circle centered at (x, y) with given radius and line
 # width. By default it will be the upper left quadrant of a circle, but
 # using the flip[XY] parameters you can choose other quadrants.
 class QuarterCircleOp(DrawOp):
     pdfOp = pdf.PDFQuarterCircleOp()
 
-    def __init__(self, x: float, y: float, radius: float, width: float, flipX: bool = False, flipY: bool = False):
+    def __init__(
+        self,
+        x: float,
+        y: float,
+        radius: float,
+        width: float,
+        flipX: bool = False,
+        flipY: bool = False,
+    ):
         self.x: float = x
         self.y: float = y
         self.radius: float = radius
         self.width: float = width
         self.flipX: bool = flipX
         self.flipY: bool = flipY
+
 
 # Arbitrary PDF commands. Should not have whitespace in the beginning or
 # the end. Should be used only for non-critical things like tweaking line
@@ -206,6 +244,7 @@ class PDFOp(DrawOp):
         :param cmds: the straight PDF code to be inserted into the file
         """
         self.cmds: str = cmds
+
 
 # create a PML document containing text (possibly linewrapped) divided
 # into pages automatically.
@@ -220,8 +259,9 @@ class TextFormatter:
         self.fontSize: int = fontSize
 
         # number of chararacters that fit on a single line
-        self.charsToLine: int = int((width - margin * 2.0) /
-                               util.getTextWidth(" ", COURIER, fontSize))
+        self.charsToLine: int = int(
+            (width - margin * 2.0) / util.getTextWidth(" ", COURIER, fontSize)
+        )
 
         self.createPage()
 
@@ -238,7 +278,13 @@ class TextFormatter:
             self.y += mm
 
     # add text
-    def addText(self, text: str, x: Optional[float] = None, fs: Optional[int] = None, style: int = NORMAL) -> None:
+    def addText(
+        self,
+        text: str,
+        x: Optional[float] = None,
+        fs: Optional[int] = None,
+        style: int = NORMAL,
+    ) -> None:
         if x == None:
             x = self.margin
 
@@ -258,8 +304,7 @@ class TextFormatter:
     # font size and style, and add the lines. 'indent' is the text to
     # prefix lines other than the first one with.
     def addWrappedText(self, text: str, indent: str) -> None:
-        tmp = textwrap.wrap(text, self.charsToLine,
-                subsequent_indent = indent)
+        tmp = textwrap.wrap(text, self.charsToLine, subsequent_indent=indent)
 
         for s in tmp:
             self.addText(s)

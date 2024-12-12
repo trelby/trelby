@@ -7,6 +7,7 @@ import random
 
 import wx
 
+
 class Quote:
     def __init__(self, source, lines):
         # unicode string
@@ -14,6 +15,7 @@ class Quote:
 
         # list of unicode strings
         self.lines = lines
+
 
 class SplashWindow(wx.Frame):
     inited = False
@@ -23,8 +25,8 @@ class SplashWindow(wx.Frame):
 
     def __init__(self, parent, delay):
         wx.Frame.__init__(
-            self, parent, -1, "Splash",
-            style = wx.FRAME_FLOAT_ON_PARENT | wx.NO_BORDER)
+            self, parent, -1, "Splash", style=wx.FRAME_FLOAT_ON_PARENT | wx.NO_BORDER
+        )
 
         if not SplashWindow.inited:
             SplashWindow.inited = True
@@ -46,14 +48,15 @@ class SplashWindow(wx.Frame):
 
         self.textColor = wx.Colour(0, 0, 0)
 
-        self.font = util.createPixelFont(
-            14, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.NORMAL)
+        self.font = util.createPixelFont(14, wx.FONTFAMILY_MODERN, wx.NORMAL, wx.NORMAL)
 
         self.quoteFont = util.createPixelFont(
-            16, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL)
+            16, wx.FONTFAMILY_DEFAULT, wx.NORMAL, wx.NORMAL
+        )
 
         self.sourceFont = util.createPixelFont(
-            15, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL)
+            15, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_ITALIC, wx.NORMAL
+        )
 
         if delay != -1:
             self.timer = wx.Timer(self)
@@ -77,8 +80,7 @@ class SplashWindow(wx.Frame):
         if self.pic.IsOk():
             dc.DrawBitmap(self.pic, 0, 0, False)
 
-        util.drawText(dc, "Version %s" % (misc.version),
-                      200, 170, util.ALIGN_RIGHT)
+        util.drawText(dc, "Version %s" % (misc.version), 200, 170, util.ALIGN_RIGHT)
 
         util.drawText(dc, "http://www.trelby.org/", 200, 185, util.ALIGN_RIGHT)
 
@@ -88,7 +90,7 @@ class SplashWindow(wx.Frame):
 
             dc.SetFont(self.quoteFont)
 
-            for i,line in enumerate(self.quote.lines):
+            for i, line in enumerate(self.quote.lines):
                 x = 10
                 y = 260 - (len(self.quote.lines) - i - 1) * 17
 
@@ -99,7 +101,6 @@ class SplashWindow(wx.Frame):
                     line = line + "”"
 
                 dc.DrawText(line, x, y)
-
 
     def OnTimer(self, event):
         self.timer.Stop()
@@ -118,11 +119,13 @@ class SplashWindow(wx.Frame):
     @staticmethod
     def loadQuotes(parent):
         try:
-            data = util.loadFile(misc.getFullPath("trelby/resources/quotes.txt"), parent)
+            data = util.loadFile(
+                misc.getFullPath("trelby/resources/quotes.txt"), parent
+            )
             if data is None:
                 return
 
-            #data = data.decode("utf-8")
+            # data = data.decode("utf-8")
             lines = data.splitlines()
 
             quotes = []
@@ -130,16 +133,20 @@ class SplashWindow(wx.Frame):
             # lines saved for current quote being processed
             tmp = []
 
-            for i,line in enumerate(lines):
+            for i, line in enumerate(lines):
                 if line.startswith("#") or not line.strip():
                     continue
 
                 if line.startswith("  "):
                     if not tmp:
-                        raise Exception("No lines defined for quote at line %d" % (i + 1))
+                        raise Exception(
+                            "No lines defined for quote at line %d" % (i + 1)
+                        )
 
                     if len(tmp) > 3:
-                        raise Exception("Too many lines defined for quote at line %d" % (i + 1))
+                        raise Exception(
+                            "Too many lines defined for quote at line %d" % (i + 1)
+                        )
 
                     quotes.append(Quote(line.strip(), tmp))
                     tmp = []
@@ -152,5 +159,4 @@ class SplashWindow(wx.Frame):
             SplashWindow.quotes = quotes
 
         except Exception as e:
-            wx.MessageBox("Error loading quotes: %s" % str(e),
-                          "Error", wx.OK, parent)
+            wx.MessageBox("Error loading quotes: %s" % str(e), "Error", wx.OK, parent)

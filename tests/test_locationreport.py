@@ -5,6 +5,7 @@ import trelby.util as util
 
 # tests location report (just that it runs without exceptions, for now)
 
+
 def testBasic():
     sp = u.load()
     report = locationreport.LocationReport(scenereport.SceneReport(sp))

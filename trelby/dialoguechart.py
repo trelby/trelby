@@ -10,6 +10,7 @@ import functools
 
 import wx
 
+
 def genDialogueChart(mainFrame, sp):
     # TODO: would be nice if this behaved like the other reports, i.e. the
     # junk below would be inside the class, not outside. this would allow
@@ -17,16 +18,18 @@ def genDialogueChart(mainFrame, sp):
     # which would need some thinking.
 
     inf = []
-    for it in [ ("Characters with < 10 lines", None),
-                ("Sorted by: First appearance", cmpFirst),
-                ("Sorted by: Last appearance", cmpLast),
-                ("Sorted by: Number of lines spoken", cmpCount),
-                ("Sorted by: Name", cmpName)
-                ]:
-        inf.append(misc.CheckBoxItem(it[0], cdata = it[1]))
+    for it in [
+        ("Characters with < 10 lines", None),
+        ("Sorted by: First appearance", cmpFirst),
+        ("Sorted by: Last appearance", cmpLast),
+        ("Sorted by: Number of lines spoken", cmpCount),
+        ("Sorted by: Name", cmpName),
+    ]:
+        inf.append(misc.CheckBoxItem(it[0], cdata=it[1]))
 
-    dlg = misc.CheckBoxDlg(mainFrame, "Report type", inf,
-                           "Information to include:", False)
+    dlg = misc.CheckBoxDlg(
+        mainFrame, "Report type", inf, "Information to include:", False
+    )
 
     if dlg.ShowModal() != wx.ID_OK:
         dlg.Destroy()
@@ -42,22 +45,21 @@ def genDialogueChart(mainFrame, sp):
     chart = DialogueChart(sp, minLines)
 
     if not chart.cinfo:
-        wx.MessageBox("No characters speaking found.", "Error", wx.OK,
-                      mainFrame)
+        wx.MessageBox("No characters speaking found.", "Error", wx.OK, mainFrame)
 
         return
 
     del inf[0]
 
     if len(misc.CheckBoxItem.getClientData(inf)) == 0:
-        wx.MessageBox("Can't disable all output.", "Error", wx.OK,
-                      mainFrame)
+        wx.MessageBox("Can't disable all output.", "Error", wx.OK, mainFrame)
 
         return
 
     data = chart.generate(inf)
 
     gutil.showTempPDF(data, sp.cfgGl, mainFrame)
+
 
 class DialogueChart:
     def __init__(self, sp, minLines):
@@ -78,14 +80,13 @@ class DialogueChart:
         name = "UNKNOWN"
 
         for i in range(len(ls)):
-            pgNr = sp.line2page(i) -1
+            pgNr = sp.line2page(i) - 1
             pi = self.pages[pgNr]
             line = ls[i]
 
             pi.addLine(line.lt)
 
-            if (line.lt == screenplay.CHARACTER) and\
-                   (line.lb == screenplay.LB_LAST):
+            if (line.lt == screenplay.CHARACTER) and (line.lb == screenplay.LB_LAST):
                 name = util.upper(line.text)
 
             elif line.lt == screenplay.DIALOGUE:
@@ -136,8 +137,7 @@ class DialogueChart:
             if size <= 6:
                 break
 
-            if (self.chartY + self.chartHeight) <= \
-                   (sp.cfg.paperWidth - self.margin):
+            if (self.chartY + self.chartHeight) <= (sp.cfg.paperWidth - self.margin):
                 break
 
             size -= 1
@@ -174,8 +174,7 @@ class DialogueChart:
         self.legendSize = 4.0
 
     def generate(self, cbil: List[misc.CheckBoxItem]) -> bytes:
-        doc = pml.Document(self.sp.cfg.paperHeight,
-                           self.sp.cfg.paperWidth)
+        doc = pml.Document(self.sp.cfg.paperHeight, self.sp.cfg.paperWidth)
 
         for it in cbil:
             if it.selected:
@@ -187,8 +186,16 @@ class DialogueChart:
     def generatePage(self, title, doc):
         pg = pml.Page(doc)
 
-        pg.add(pml.TextOp(title, doc.w / 2.0, self.margin, 18,
-            pml.BOLD | pml.ITALIC | pml.UNDERLINED, util.ALIGN_CENTER))
+        pg.add(
+            pml.TextOp(
+                title,
+                doc.w / 2.0,
+                self.margin,
+                18,
+                pml.BOLD | pml.ITALIC | pml.UNDERLINED,
+                util.ALIGN_CENTER,
+            )
+        )
 
         pageCnt = len(self.pages)
         mmPerPage = max(0.1, self.chartWidth / pageCnt)
@@ -202,8 +209,7 @@ class DialogueChart:
 
             if (i % 2) == 1:
                 pg.add(pml.PDFOp("0.93 g"))
-                pg.add(pml.RectOp(self.chartX, y, self.chartWidth,
-                                  self.charY))
+                pg.add(pml.RectOp(self.chartX, y, self.chartWidth, self.charY))
                 pg.add(pml.PDFOp("0.0 g"))
 
         # line width to use
@@ -218,15 +224,24 @@ class DialogueChart:
         for i in range(pageCnt):
             if (i == 0) or ((i + 1) % 10) == 0:
                 x = self.chartX + i * mmPerPage
-                pg.add(pml.TextOp("%d" % (i + 1), x, self.pageY,
-                                  10, align = util.ALIGN_CENTER))
+                pg.add(
+                    pml.TextOp(
+                        "%d" % (i + 1), x, self.pageY, 10, align=util.ALIGN_CENTER
+                    )
+                )
                 if i != 0:
-                    pg.add(pml.genLine(x, self.chartY, 0, self.chartHeight,
-                                        lw))
+                    pg.add(pml.genLine(x, self.chartY, 0, self.chartHeight, lw))
 
-
-        pg.add(pml.RectOp(self.chartX, self.chartY, self.chartWidth,
-                          self.chartHeight, pml.NO_FILL, lw))
+        pg.add(
+            pml.RectOp(
+                self.chartX,
+                self.chartY,
+                self.chartWidth,
+                self.chartHeight,
+                pml.NO_FILL,
+                lw,
+            )
+        )
 
         pg.add(pml.PDFOp("0.0 G"))
 
@@ -234,8 +249,16 @@ class DialogueChart:
         pg.add(pml.PDFOp("[] 0 d"))
 
         # legend for page content bars
-        pg.add(pml.RectOp(self.legendX, self.legendY,
-            self.legendWidth, self.legendHeight, pml.NO_FILL, lw))
+        pg.add(
+            pml.RectOp(
+                self.legendX,
+                self.legendY,
+                self.legendWidth,
+                self.legendHeight,
+                pml.NO_FILL,
+                lw,
+            )
+        )
 
         self.drawLegend(pg, 0, 1.0, "Other", lw)
         self.drawLegend(pg, 1, 0.7, "Character", lw)
@@ -267,19 +290,28 @@ class DialogueChart:
             pg.add(pml.RectOp(x, y - barH, mmPerPage, barH))
             y -= barH
 
-
         pg.add(pml.PDFOp("0.0 g"))
 
         # rectangle around page content bars
-        pg.add(pml.RectOp(self.chartX, self.barY, self.chartWidth,
-                         self.barHeight, pml.NO_FILL, lw))
+        pg.add(
+            pml.RectOp(
+                self.chartX, self.barY, self.chartWidth, self.barHeight, pml.NO_FILL, lw
+            )
+        )
 
         for i in range(len(self.cinfo)):
             y = self.chartY + i * self.charY
             ci = self.cinfo[i]
 
-            pg.add(pml.TextOp(ci.name, self.margin, y + self.charY / 2.0,
-                self.charFs, valign = util.VALIGN_CENTER))
+            pg.add(
+                pml.TextOp(
+                    ci.name,
+                    self.margin,
+                    y + self.charY / 2.0,
+                    self.charFs,
+                    valign=util.VALIGN_CENTER,
+                )
+            )
 
             for i in range(pageCnt):
                 pi = self.pages[i]
@@ -288,8 +320,14 @@ class DialogueChart:
                 if cnt > 0:
                     h = self.charY * (float(cnt) / self.sp.cfg.linesOnPage)
 
-                    pg.add(pml.RectOp(self.chartX + i * mmPerPage,
-                        y + (self.charY - h) / 2.0, mmPerPage, h))
+                    pg.add(
+                        pml.RectOp(
+                            self.chartX + i * mmPerPage,
+                            y + (self.charY - h) / 2.0,
+                            mmPerPage,
+                            h,
+                        )
+                    )
 
         return pg
 
@@ -300,8 +338,7 @@ class DialogueChart:
 
         pg.add(pml.PDFOp("%f g" % color))
 
-        pg.add(pml.RectOp(x, y, self.legendSize, self.legendSize,
-                          pml.STROKE_FILL, lw))
+        pg.add(pml.RectOp(x, y, self.legendSize, self.legendSize, pml.STROKE_FILL, lw))
 
         pg.add(pml.PDFOp("0.0 g"))
 
@@ -347,6 +384,7 @@ class PageInfo:
     def getSpeakerLineCount(self, name):
         return self.speakers.get(name, 0)
 
+
 # keeps track of each character's dialogue lines.
 class CharInfo:
     def __init__(self, name, firstPage):
@@ -360,8 +398,10 @@ class CharInfo:
         self.lastPage = page
         self.lineCnt += 1
 
+
 def cmpfunc(a, b):
     return (a > b) - (a < b)
+
 
 def cmpCount(c1, c2):
     ret = cmpfunc(c2.lineCnt, c1.lineCnt)
@@ -371,6 +411,7 @@ def cmpCount(c1, c2):
     else:
         return cmpFirst(c1, c2)
 
+
 def cmpCountThenName(c1, c2):
     ret = cmpfunc(c2.lineCnt, c1.lineCnt)
 
@@ -378,6 +419,7 @@ def cmpCountThenName(c1, c2):
         return ret
     else:
         return cmpName(c1, c2)
+
 
 def cmpFirst(c1, c2):
     ret = cmpfunc(c1.firstPage, c2.firstPage)
@@ -387,6 +429,7 @@ def cmpFirst(c1, c2):
     else:
         return cmpLastRev(c1, c2)
 
+
 def cmpLast(c1, c2):
     ret = cmpfunc(c1.lastPage, c2.lastPage)
 
@@ -395,6 +438,7 @@ def cmpLast(c1, c2):
     else:
         return cmpName(c1, c2)
 
+
 def cmpLastRev(c1, c2):
     ret = cmpfunc(c2.lastPage, c1.lastPage)
 
@@ -402,6 +446,7 @@ def cmpLastRev(c1, c2):
         return ret
     else:
         return cmpCountThenName(c1, c2)
+
 
 def cmpName(c1, c2):
     return cmpfunc(c1.name, c2.name)

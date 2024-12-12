@@ -22,7 +22,8 @@ SCENE_ACTION = -2
 # numbers etc
 IGNORE = -3
 
-#like importTextFile, but for Adobe Story files.
+
+# like importTextFile, but for Adobe Story files.
 def importAstx(fileName, frame):
     # astx files are xml files. The textlines can be found under
     # AdobeStory/document/stream/section/scene/paragraph which contain
@@ -40,19 +41,19 @@ def importAstx(fileName, frame):
         return None
 
     elemMap = {
-        "Action" : screenplay.ACTION,
-        "Character" : screenplay.CHARACTER,
-        "Dialog" : screenplay.DIALOGUE,
-        "Parenthetical" : screenplay.PAREN,
-        "SceneHeading" : screenplay.SCENE,
-        "Shot" : screenplay.SHOT,
-        "Transition" : screenplay.TRANSITION,
+        "Action": screenplay.ACTION,
+        "Character": screenplay.CHARACTER,
+        "Dialog": screenplay.DIALOGUE,
+        "Parenthetical": screenplay.PAREN,
+        "SceneHeading": screenplay.SCENE,
+        "Shot": screenplay.SHOT,
+        "Transition": screenplay.TRANSITION,
     }
 
     try:
         root = etree.XML(data)
     except etree.XMLSyntaxError as e:
-        wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
+        wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
         return None
 
     lines = []
@@ -64,11 +65,13 @@ def importAstx(fileName, frame):
             items = items[:-1]
 
         for s in items[:-1]:
-            lines.append(screenplay.Line(
-                    screenplay.LB_FORCED, eleType, util.cleanInput(s)))
+            lines.append(
+                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+            )
 
-        lines.append(screenplay.Line(
-                screenplay.LB_LAST, eleType, util.cleanInput(items[-1])))
+        lines.append(
+            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(items[-1]))
+        )
 
     for para in root.xpath("/AdobeStory/document/stream/section/scene/paragraph"):
         lt = elemMap.get(para.get("element"), screenplay.ACTION)
@@ -92,6 +95,7 @@ def importAstx(fileName, frame):
         return None
 
     return lines
+
 
 # like importTextFile, but for fadein files.
 def importFadein(fileName, frame):
@@ -127,19 +131,19 @@ def importFadein(fileName, frame):
         return None
 
     elemMap = {
-        "Action" : screenplay.ACTION,
-        "Character" : screenplay.CHARACTER,
-        "Dialogue" : screenplay.DIALOGUE,
-        "Parenthetical" : screenplay.PAREN,
-        "Scene Heading" : screenplay.SCENE,
-        "Shot" : screenplay.SHOT,
-        "Transition" : screenplay.TRANSITION,
+        "Action": screenplay.ACTION,
+        "Character": screenplay.CHARACTER,
+        "Dialogue": screenplay.DIALOGUE,
+        "Parenthetical": screenplay.PAREN,
+        "Scene Heading": screenplay.SCENE,
+        "Shot": screenplay.SHOT,
+        "Transition": screenplay.TRANSITION,
     }
 
     try:
         root = etree.XML(content)
     except etree.XMLSyntaxError as e:
-        wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
+        wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
         return None
 
     lines = []
@@ -151,24 +155,36 @@ def importFadein(fileName, frame):
             lns = lns[:-1]
 
         for s in lns[:-1]:
-            lines.append(screenplay.Line(
-                    screenplay.LB_FORCED, eleType, util.cleanInput(s)))
+            lines.append(
+                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+            )
 
-        lines.append(screenplay.Line(
-                screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
+        lines.append(
+            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+        )
 
     # removes html formatting from s, and returns list of lines.
     # if s is None, return a list with single empty string.
-    re_rem = [r'<font[^>]*>', r'<size[^>]*>', r'<bgcolor[^>]*>']
-    rem = ["<b>", "</b>", "<i>", "</i>", "<u>",
-           "</u>", "</font>", "</size>", "</bgcolor>"]
+    re_rem = [r"<font[^>]*>", r"<size[^>]*>", r"<bgcolor[^>]*>"]
+    rem = [
+        "<b>",
+        "</b>",
+        "<i>",
+        "</i>",
+        "<u>",
+        "</u>",
+        "</font>",
+        "</size>",
+        "</bgcolor>",
+    ]
+
     def sanitizeStr(s):
         if s:
             s = "" + s
             for r in re_rem:
                 s = re.sub(r, "", s)
             for r in rem:
-                s = s.replace(r,"")
+                s = s.replace(r, "")
 
             if s:
                 return s.split("<br>")
@@ -214,6 +230,7 @@ def importFadein(fileName, frame):
 
     return lines
 
+
 # like importTextFile, but for Celtx files.
 def importCeltx(fileName, frame):
     # Celtx files are zipfiles, and the script content is within a file
@@ -225,10 +242,12 @@ def importCeltx(fileName, frame):
         return None
 
     files = z.namelist()
-    scripts = [s for s in files if s.startswith("script") ]
+    scripts = [s for s in files if s.startswith("script")]
 
     if len(scripts) == 0:
-        wx.MessageBox("Unable to find script in this Celtx file.", "Error", wx.OK, frame)
+        wx.MessageBox(
+            "Unable to find script in this Celtx file.", "Error", wx.OK, frame
+        )
         return None
 
     f = z.open(scripts[0])
@@ -240,21 +259,21 @@ def importCeltx(fileName, frame):
         return None
 
     elemMap = {
-        "action" : screenplay.ACTION,
-        "character" : screenplay.CHARACTER,
-        "dialog" : screenplay.DIALOGUE,
-        "parenthetical" : screenplay.PAREN,
-        "sceneheading" : screenplay.SCENE,
-        "shot" : screenplay.SHOT,
-        "transition" : screenplay.TRANSITION,
-        "act" : screenplay.ACTBREAK,
+        "action": screenplay.ACTION,
+        "character": screenplay.CHARACTER,
+        "dialog": screenplay.DIALOGUE,
+        "parenthetical": screenplay.PAREN,
+        "sceneheading": screenplay.SCENE,
+        "shot": screenplay.SHOT,
+        "transition": screenplay.TRANSITION,
+        "act": screenplay.ACTBREAK,
     }
 
     try:
         parser = etree.HTMLParser()
         root = etree.XML(content, parser)
     except etree.XMLSyntaxError as e:
-        wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
+        wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
         return None
 
     lines = []
@@ -266,17 +285,19 @@ def importCeltx(fileName, frame):
             lns = lns[:-1]
 
         for s in lns[:-1]:
-            lines.append(screenplay.Line(
-                    screenplay.LB_FORCED, eleType, util.cleanInput(s)))
+            lines.append(
+                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+            )
 
-        lines.append(screenplay.Line(
-                screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
+        lines.append(
+            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+        )
 
     for para in root.xpath("/html/body/p"):
         items = []
         for line in para.itertext():
             text = line.replace("\n", " ").strip()
-            if text != '':
+            if text != "":
                 items.append(text)
 
         lt = elemMap.get(para.get("class"), screenplay.ACTION)
@@ -290,16 +311,17 @@ def importCeltx(fileName, frame):
 
     return lines
 
+
 # like importTextFile, but for Final Draft files.
 def importFDX(fileName, frame):
     elemMap = {
-        "Action" : screenplay.ACTION,
-        "Character" : screenplay.CHARACTER,
-        "Dialogue" : screenplay.DIALOGUE,
-        "Parenthetical" : screenplay.PAREN,
-        "Scene Heading" : screenplay.SCENE,
-        "Shot" : screenplay.SHOT,
-        "Transition" : screenplay.TRANSITION,
+        "Action": screenplay.ACTION,
+        "Character": screenplay.CHARACTER,
+        "Dialogue": screenplay.DIALOGUE,
+        "Parenthetical": screenplay.PAREN,
+        "Scene Heading": screenplay.SCENE,
+        "Shot": screenplay.SHOT,
+        "Transition": screenplay.TRANSITION,
     }
 
     # the 5 MB limit is arbitrary, we just want to avoid getting a
@@ -327,11 +349,13 @@ def importFDX(fileName, frame):
                 lns = lns[:-1]
 
             for s in lns[:-1]:
-                lines.append(screenplay.Line(
-                        screenplay.LB_FORCED, eleType, util.cleanInput(s)))
+                lines.append(
+                    screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                )
 
-            lines.append(screenplay.Line(
-                    screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
+            lines.append(
+                screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+            )
 
         for para in root.xpath("Content//Paragraph"):
             addedNote = False
@@ -373,14 +397,17 @@ def importFDX(fileName, frame):
                 addElem(lt, s)
 
         if len(lines) == 0:
-            wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
+            wx.MessageBox(
+                "The file contains no importable lines", "Error", wx.OK, frame
+            )
             return None
 
         return lines
 
     except etree.XMLSyntaxError as e:
-        wx.MessageBox("Error parsing file: %s" %e, "Error", wx.OK, frame)
+        wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
         return None
+
 
 # import Fountain files.
 # http://fountain.io
@@ -388,36 +415,36 @@ def importFountain(fileName, frame, titlePages):
     # regular expressions for fountain markdown.
     # https://github.com/vilcans/screenplain/blob/master/screenplain/richstring.py
     ire = re.compile(
-            # one star
-            r'\*'
-            # anything but a space, then text
-            r'([^\s].*?)'
-            # finishing with one star
-            r'\*'
-            # must not be followed by star
-            r'(?!\*)'
-        )
+        # one star
+        r"\*"
+        # anything but a space, then text
+        r"([^\s].*?)"
+        # finishing with one star
+        r"\*"
+        # must not be followed by star
+        r"(?!\*)"
+    )
     bre = re.compile(
-            # two stars
-            r'\*\*'
-            # must not be followed by space
-            r'(?=\S)'
-            # inside text
-            r'(.+?[*_]*)'
-            # finishing with two stars
-            r'(?<=\S)\*\*'
-        )
+        # two stars
+        r"\*\*"
+        # must not be followed by space
+        r"(?=\S)"
+        # inside text
+        r"(.+?[*_]*)"
+        # finishing with two stars
+        r"(?<=\S)\*\*"
+    )
     ure = re.compile(
-            # underline
-            r'_'
-            # must not be followed by space
-            r'(?=\S)'
-            # inside text
-            r'([^_]+)'
-            # finishing with underline
-            r'(?<=\S)_'
-        )
-    boneyard_re = re.compile('/\\*.*?\\*/', flags=re.DOTALL)
+        # underline
+        r"_"
+        # must not be followed by space
+        r"(?=\S)"
+        # inside text
+        r"([^_]+)"
+        # finishing with underline
+        r"(?<=\S)_"
+    )
+    boneyard_re = re.compile("/\\*.*?\\*/", flags=re.DOTALL)
 
     # random magicstring used to escape literal star '\*'
     literalstar = "Aq7RR"
@@ -426,7 +453,7 @@ def importFountain(fileName, frame, titlePages):
     def unmarkdown(s):
         s = s.replace("\\*", literalstar)
         for style in (bre, ire, ure):
-            s = style.sub(r'\1', s)
+            s = style.sub(r"\1", s)
         return s.replace(literalstar, "*")
 
     data = util.loadFile(fileName, frame, 1000000)
@@ -440,12 +467,13 @@ def importFountain(fileName, frame, titlePages):
 
     inf = []
     inf.append(misc.CheckBoxItem("Import titles to title page."))
-    inf.append(misc.CheckBoxItem("Import titles as action lines.",selected=False))
+    inf.append(misc.CheckBoxItem("Import titles as action lines.", selected=False))
     inf.append(misc.CheckBoxItem("Remove unsupported formatting markup."))
     inf.append(misc.CheckBoxItem("Import section/synopsis as notes."))
 
-    dlg = misc.CheckBoxDlg(frame, "Fountain import options", inf,
-        "Import options:", False)
+    dlg = misc.CheckBoxDlg(
+        frame, "Fountain import options", inf, "Import options:", False
+    )
 
     if dlg.ShowModal() != wx.ID_OK:
         dlg.Destroy()
@@ -458,13 +486,13 @@ def importFountain(fileName, frame, titlePages):
 
     # pre-process data - fix newlines, remove boneyard.
     data = util.fixNL(data)
-    data = boneyard_re.sub('', data)
+    data = boneyard_re.sub("", data)
     prelines = data.split("\n")
     for i in range(len(prelines)):
         try:
             util.toLatin1(prelines[i])
         except:
-            prelines[i] = util.cleanInput("" + prelines[i].decode('UTF-8', "ignore"))
+            prelines[i] = util.cleanInput("" + prelines[i].decode("UTF-8", "ignore"))
     lines = []
 
     tabWidth = 4
@@ -476,7 +504,7 @@ def importFountain(fileName, frame, titlePages):
     c = 0
     while c < len(prelines):
         if prelines[c] != "":
-            c = c+1
+            c = c + 1
         else:
             break
 
@@ -490,51 +518,53 @@ def importFountain(fileName, frame, titlePages):
         if not l.startswith("fade") and l.count(":") == 1:
             # these are title lines. Now do what the user requested.
             if importTitlePage:
-                #Extract usable title page lines
-                kwPattern = re.compile(r'^([A-za-z][^:]+:)')
-                continuePattern = re.compile(r'^\s\s\s+') # line begins with 3 or more spaces
-                titleIdx=0
-                gatheredTitles=[]
-                rejects=[]
+                # Extract usable title page lines
+                kwPattern = re.compile(r"^([A-za-z][^:]+:)")
+                continuePattern = re.compile(
+                    r"^\s\s\s+"
+                )  # line begins with 3 or more spaces
+                titleIdx = 0
+                gatheredTitles = []
+                rejects = []
                 l = prelines[0]
-                while l != '':
-                    match=kwPattern.split(l)
-                    match=[ll.strip() for ll in match]
-                    if len(match) == 3: # keyword line
-                        if match[2] == '':
-                            follows=[]
-                            titleIdx+=1 # gather indented prelines
+                while l != "":
+                    match = kwPattern.split(l)
+                    match = [ll.strip() for ll in match]
+                    if len(match) == 3:  # keyword line
+                        if match[2] == "":
+                            follows = []
+                            titleIdx += 1  # gather indented prelines
                             nextline = continuePattern.match(prelines[titleIdx])
                             while nextline:
-                                follows.append(prelines[titleIdx].strip('_* \t'))
-                                titleIdx+=1
+                                follows.append(prelines[titleIdx].strip("_* \t"))
+                                titleIdx += 1
                                 nextline = continuePattern.match(prelines[titleIdx])
-                            titleIdx-=1
-                            gatheredTitles.append([match[1],follows])
+                            titleIdx -= 1
+                            gatheredTitles.append([match[1], follows])
                         else:
-                            gatheredTitles.append([match[1],[match[2].strip('_* \t')]])
+                            gatheredTitles.append([match[1], [match[2].strip("_* \t")]])
                     else:
                         l += TWOSPACE
                         rejects.append(l)
-                    titleIdx+=1
-                    l=prelines[titleIdx]
+                    titleIdx += 1
+                    l = prelines[titleIdx]
                 # replace default titles with imported ones
                 leftX = 15.0
                 leftY = 220.0
                 centreX = 0.0
                 centreY = 150.0
                 for t in gatheredTitles:
-                    titlenr=-1
-                    if t[0] == 'Title:':
-                        titlenr=0
-                    elif t[0] == 'Author:' or t[0]=='Authors:':
-                        titlenr=1
-                        t[1]=["by",""]+t[1]
-                    elif t[0] == 'Contact:':
-                        titlenr=2
+                    titlenr = -1
+                    if t[0] == "Title:":
+                        titlenr = 0
+                    elif t[0] == "Author:" or t[0] == "Authors:":
+                        titlenr = 1
+                        t[1] = ["by", ""] + t[1]
+                    elif t[0] == "Contact:":
+                        titlenr = 2
                     else:
-                        titlenr=len(titlePages[0])
-                        if t[0] == 'Credit:' or t[0] == 'Source:':
+                        titlenr = len(titlePages[0])
+                        if t[0] == "Credit:" or t[0] == "Source:":
                             centred = True
                             thisX = centreX
                             thisY = centreY
@@ -542,28 +572,30 @@ def importFountain(fileName, frame, titlePages):
                         else:
                             centred = False
                             thisX = leftX
-                            thisY=leftY
+                            thisY = leftY
                             leftY -= 5
-                        if len(t[1])==1:
-                            newItems = [t[0]+" "+t[1][0]]
+                        if len(t[1]) == 1:
+                            newItems = [t[0] + " " + t[1][0]]
                         else:
-                            newItems = [t[0]]+t[1]
-                        newTitleString = titles.TitleString(newItems, y = thisY, isCentered = centred)
-                        titlePages[0].append( newTitleString)
+                            newItems = [t[0]] + t[1]
+                        newTitleString = titles.TitleString(
+                            newItems, y=thisY, isCentered=centred
+                        )
+                        titlePages[0].append(newTitleString)
                         continue
-                    targetTitle=titlePages[0][titlenr]
-                    targetTitle.items=t[1]
+                    targetTitle = titlePages[0][titlenr]
+                    targetTitle.items = t[1]
                 # user might request that titles go into both title page & script
                 if not importTitles:
-                    rejects += prelines[c+1:]
-                    prelines=rejects
+                    rejects += prelines[c + 1 :]
+                    prelines = rejects
             if importTitles:
                 # add TWOSPACE to all the title lines.
                 for i in range(c):
                     prelines[i] += TWOSPACE
             elif not importTitlePage:
-                #remove these lines
-                prelines = prelines[c+1:]
+                # remove these lines
+                prelines = prelines[c + 1 :]
 
     for l in prelines:
         if l != TWOSPACE:
@@ -579,11 +611,11 @@ def importFountain(fileName, frame, titlePages):
         return False
 
     def isPrevType(ltype):
-        return (lns and lns[-1].lt == ltype)
+        return lns and lns[-1].lt == ltype
 
     # looks ahead to check if next line is not empty
     def isNextEmpty(i):
-        return  (i+1 < len(lines) and lines[i+1] == "")
+        return i + 1 < len(lines) and lines[i + 1] == ""
 
     def getPrevType():
         if lns:
@@ -592,7 +624,7 @@ def importFountain(fileName, frame, titlePages):
             return screenplay.ACTION
 
     def isParen(s):
-        return (s.startswith('(') and s.endswith(')'))
+        return s.startswith("(") and s.endswith(")")
 
     def isScene(s):
         if s.endswith(TWOSPACE):
@@ -600,21 +632,24 @@ def importFountain(fileName, frame, titlePages):
         if s.startswith(".") and not s.startswith(".."):
             return True
         tmp = s.upper()
-        if (re.match(r'^(INT|EXT|EST)[ .]', tmp) or
-            re.match(r'^(INT\.?/EXT\.?)[ .]', tmp) or
-            re.match(r'^I/E[ .]', tmp)):
+        if (
+            re.match(r"^(INT|EXT|EST)[ .]", tmp)
+            or re.match(r"^(INT\.?/EXT\.?)[ .]", tmp)
+            or re.match(r"^I/E[ .]", tmp)
+        ):
             return True
         return False
 
     def isTransition(s):
-        return ((s.isupper() and s.endswith("TO:")) or
-                (s.startswith(">") and not s.endswith("<")))
+        return (s.isupper() and s.endswith("TO:")) or (
+            s.startswith(">") and not s.endswith("<")
+        )
 
     def isCentered(s):
         return s.startswith(">") and s.endswith("<")
 
     def isPageBreak(s):
-        return s.startswith('===') and s.lstrip('=') == ''
+        return s.startswith("===") and s.lstrip("=") == ""
 
     def isNote(s):
         return s.startswith("[[") and s.endswith("]]")
@@ -648,14 +683,14 @@ def importFountain(fileName, frame, titlePages):
 
         elif isScene(s):
             line.lt = screenplay.SCENE
-            if sl.startswith('.'):
+            if sl.startswith("."):
                 line.text = sl[1:]
             else:
                 line.text = sl
 
         elif isTransition(sl) and isPrevEmpty() and isNextEmpty(i):
             line.lt = screenplay.TRANSITION
-            if line.text.startswith('>'):
+            if line.text.startswith(">"):
                 line.text = sl[1:].lstrip()
 
         elif s.isupper() and isPrevEmpty() and not isNextEmpty(i):
@@ -663,18 +698,21 @@ def importFountain(fileName, frame, titlePages):
             if s.endswith(TWOSPACE):
                 line.lt = screenplay.ACTION
 
-        elif isParen(sl) and (isPrevType(screenplay.CHARACTER) or
-                                isPrevType(screenplay.DIALOGUE)):
+        elif isParen(sl) and (
+            isPrevType(screenplay.CHARACTER) or isPrevType(screenplay.DIALOGUE)
+        ):
             line.lt = screenplay.PAREN
 
-        elif (isPrevType(screenplay.CHARACTER) or
-             isPrevType(screenplay.DIALOGUE) or
-             isPrevType(screenplay.PAREN)):
+        elif (
+            isPrevType(screenplay.CHARACTER)
+            or isPrevType(screenplay.DIALOGUE)
+            or isPrevType(screenplay.PAREN)
+        ):
             line.lt = screenplay.DIALOGUE
 
         elif isNote(sl):
             line.lt = screenplay.NOTE
-            line.text = sl.strip('[]')
+            line.text = sl.strip("[]")
 
         elif isSection(s) or isSynopsis(s):
             if not importSectSyn:
@@ -683,7 +721,7 @@ def importFountain(fileName, frame, titlePages):
                 continue
 
             line.lt = screenplay.NOTE
-            line.text = sl.lstrip('=#')
+            line.text = sl.lstrip("=#")
 
         if line.text == TWOSPACE:
             pass
@@ -698,12 +736,12 @@ def importFountain(fileName, frame, titlePages):
                 tmp = tmp[1:-1].strip()
                 width = frame.panel.ctrl.sp.cfg.getType(screenplay.ACTION).width
                 if len(tmp) < width:
-                    tmp = ' ' * ((width - len(tmp)) // 2) + tmp
+                    tmp = " " * ((width - len(tmp)) // 2) + tmp
             line.text = tmp
 
         if removeMarkdown:
             line.text = unmarkdown(line.text)
-            if line.lt == screenplay.CHARACTER and line.text.endswith('^'):
+            if line.lt == screenplay.CHARACTER and line.text.endswith("^"):
                 line.text = line.text[:-1]
 
         lns.append(line)
@@ -723,7 +761,7 @@ def importFountain(fileName, frame, titlePages):
 
     # second pass - remove unneeded empty lines, and fix the linebreaks.
     for ln in lns:
-        if ln.text == '':
+        if ln.text == "":
             if isLastLBForced():
                 makeLastLBLast()
             else:
@@ -739,10 +777,11 @@ def importFountain(fileName, frame, titlePages):
     makeLastLBLast()
     return ret, titlePages
 
+
 # import text file from fileName, return list of Line objects for the
 # screenplay or None if something went wrong. returned list always
 # contains at least one line.
-def importTextFile(fileName: str, frame: wx.Frame)->Optional[List[screenplay.Line]]:
+def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[screenplay.Line]]:
 
     # the 1 MB limit is arbitrary, we just want to avoid getting a
     # MemoryError exception for /dev/zero etc.
@@ -823,9 +862,9 @@ def importTextFile(fileName: str, frame: wx.Frame)->Optional[List[screenplay.Lin
     # this handles them.
     parenIndent = findIndent(indDict, lambda v: v.lt == screenplay.PAREN)
     if parenIndent != -1:
-        paren2Indent = findIndent(indDict,
-            lambda v, var: (v.lt == -1) and (v.indent == var),
-            parenIndent + 1)
+        paren2Indent = findIndent(
+            indDict, lambda v, var: (v.lt == -1) and (v.indent == var), parenIndent + 1
+        )
 
         if paren2Indent != -1:
             indDict[paren2Indent].lt = screenplay.PAREN
@@ -890,6 +929,7 @@ def importTextFile(fileName: str, frame: wx.Frame)->Optional[List[screenplay.Lin
 
     return ret
 
+
 # go through indents, find the one with maximum value in something, and
 # set its linetype to given lt.
 def setType(lt, indDict, func):
@@ -910,6 +950,7 @@ def setType(lt, indDict, func):
     if found != -1:
         indDict[found].lt = lt
 
+
 # go through indents calling func(it, *vars) on each. return indent count
 # for the indent func returns True, or -1 if it returns False for each.
 def findIndent(indDict, func, *vars):
@@ -918,6 +959,7 @@ def findIndent(indDict, func, *vars):
             return v.indent
 
     return -1
+
 
 # information about one indent level in imported text files.
 class Indent:
@@ -945,8 +987,9 @@ class Indent:
 
 class ImportDlg(wx.Dialog):
     def __init__(self, parent, indents):
-        wx.Dialog.__init__(self, parent, -1, "Adjust styles",
-                           style = wx.DEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(
+            self, parent, -1, "Adjust styles", style=wx.DEFAULT_DIALOG_STYLE
+        )
 
         indents.sort(key=lambda indent: indent.lines)
 
@@ -955,18 +998,18 @@ class ImportDlg(wx.Dialog):
         tmp = wx.StaticText(self, -1, "Input:")
         vsizer.Add(tmp)
 
-        self.inputLb = wx.ListBox(self, -1, size = (400, 200))
+        self.inputLb = wx.ListBox(self, -1, size=(400, 200))
         for it in indents:
-            self.inputLb.Append("%d lines (indented %d characters)" %
-                                (len(it.lines), it.indent), it)
+            self.inputLb.Append(
+                "%d lines (indented %d characters)" % (len(it.lines), it.indent), it
+            )
 
         vsizer.Add(self.inputLb, 0, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Style:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-        self.styleCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
+        hsizer.Add(wx.StaticText(self, -1, "Style:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        self.styleCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
         self.styleCombo.Append("Scene / Action", SCENE_ACTION)
         for t in config.getTIs():
@@ -974,7 +1017,7 @@ class ImportDlg(wx.Dialog):
 
         self.styleCombo.Append("Ignore", IGNORE)
 
-        util.setWH(self.styleCombo, w = 150)
+        util.setWH(self.styleCombo, w=150)
 
         hsizer.Add(self.styleCombo, 0, wx.LEFT, 10)
 
@@ -982,8 +1025,9 @@ class ImportDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticText(self, -1, "Lines:"))
 
-        self.linesEntry = wx.TextCtrl(self, -1, size = (400, 200),
-            style = wx.TE_MULTILINE | wx.TE_DONTWRAP)
+        self.linesEntry = wx.TextCtrl(
+            self, -1, size=(400, 200), style=wx.TE_MULTILINE | wx.TE_DONTWRAP
+        )
         vsizer.Add(self.linesEntry, 0, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -1015,12 +1059,11 @@ class ImportDlg(wx.Dialog):
     def OnCancel(self, event):
         self.EndModal(wx.ID_CANCEL)
 
-    def OnInputLb(self, event = None):
+    def OnInputLb(self, event=None):
         self.selected = self.inputLb.GetClientData(self.inputLb.GetSelection())
 
         util.reverseComboSelect(self.styleCombo, self.selected.lt)
         self.linesEntry.SetValue("\n".join(self.selected.lines))
 
     def OnStyleCombo(self, event):
-        self.selected.lt = self.styleCombo.GetClientData(
-            self.styleCombo.GetSelection())
+        self.selected.lt = self.styleCombo.GetClientData(self.styleCombo.GetSelection())

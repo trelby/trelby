@@ -3,6 +3,7 @@ import trelby.util as util
 
 import copy
 
+
 # keep track about one object's variables
 class Vars:
     def __init__(self):
@@ -21,7 +22,7 @@ class Vars:
 
     # return dictionary containing given type of variable objects, or all
     # if typeObj is None.
-    def getDict(self, typeObj = None):
+    def getDict(self, typeObj=None):
         tmp = {}
 
         for it in self.cvars:
@@ -90,8 +91,9 @@ class Vars:
         self.addVar(BoolVar(*params))
 
     def addColor(self, name, r, g, b, name2, descr):
-        self.addVar(ColorVar(name + "Color", util.MyColor(r, g, b),
-                             "Color/" + name2, descr))
+        self.addVar(
+            ColorVar(name + "Color", util.MyColor(r, g, b), "Color/" + name2, descr)
+        )
 
     def addFloat(self, *params):
         self.addVar(FloatVar(*params))
@@ -114,6 +116,7 @@ class Vars:
     def addList(self, *params):
         self.addVar(ListVar(*params))
 
+
 class ConfVar:
     # name2 is the name to use while saving/loading the variable. if it's
     # empty, the variable is not loaded/saved, i.e. is used only
@@ -122,6 +125,7 @@ class ConfVar:
         self.name = name
         self.defVal = defVal
         self.name2 = name2
+
 
 class BoolVar(ConfVar):
     def __init__(self, name, defVal, name2):
@@ -132,6 +136,7 @@ class BoolVar(ConfVar):
 
     def fromStr(self, vals, val, prefix):
         return val == "True"
+
 
 class ColorVar(ConfVar):
     def __init__(self, name, defVal, name2, descr):
@@ -152,14 +157,16 @@ class ColorVar(ConfVar):
 
         return util.MyColor(r, g, b)
 
+
 class NumericVar(ConfVar):
     def __init__(self, name, defVal, name2, minVal, maxVal):
         ConfVar.__init__(self, name, defVal, name2)
         self.minVal = minVal
         self.maxVal = maxVal
 
+
 class FloatVar(NumericVar):
-    def __init__(self, name, defVal, name2, minVal, maxVal, precision = 2):
+    def __init__(self, name, defVal, name2, minVal, maxVal, precision=2):
         NumericVar.__init__(self, name, defVal, name2, minVal, maxVal)
         self.precision = precision
 
@@ -168,6 +175,7 @@ class FloatVar(NumericVar):
 
     def fromStr(self, vals, val, prefix):
         return util.str2float(val, self.defVal, self.minVal, self.maxVal)
+
 
 class IntVar(NumericVar):
     def __init__(self, name, defVal, name2, minVal, maxVal):
@@ -178,6 +186,7 @@ class IntVar(NumericVar):
 
     def fromStr(self, vals, val, prefix):
         return util.str2int(val, self.defVal, self.minVal, self.maxVal)
+
 
 # ISO-8859-1 (Latin 1) string.
 class StrLatin1Var(ConfVar):
@@ -190,6 +199,7 @@ class StrLatin1Var(ConfVar):
     def fromStr(self, vals, val, prefix):
         return util.fromUTF8(val)
 
+
 # Unicode string.
 class StrUnicodeVar(ConfVar):
     def __init__(self, name, defVal, name2):
@@ -200,6 +210,7 @@ class StrUnicodeVar(ConfVar):
 
     def fromStr(self, vals, val, prefix):
         return val
+
 
 # binary string, can contain anything. characters outside of printable
 # ASCII (and \ itself) are encoded as \XX, where XX is the hex code of the
@@ -213,6 +224,7 @@ class StrBinaryVar(ConfVar):
 
     def fromStr(self, vals, val, prefix):
         return util.decodeStr(val)
+
 
 # screenplay.ACTION <-> "Action"
 class ElementNameVar(ConfVar):
@@ -229,6 +241,7 @@ class ElementNameVar(ConfVar):
             return ti.lt
         else:
             return self.defVal
+
 
 class ListVar(ConfVar):
     def __init__(self, name, defVal, name2, itemType):

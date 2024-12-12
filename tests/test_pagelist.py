@@ -3,6 +3,7 @@ import tests.u as u
 
 # test screenplay.PageList
 
+
 # helper test function.
 def ch(allPages, pages, res):
     pl = scr.PageList(allPages)
@@ -11,6 +12,7 @@ def ch(allPages, pages, res):
         pl.addPage(p)
 
     assert str(pl) == res
+
 
 def testBasic():
     u.init()
@@ -31,10 +33,13 @@ def testBasic():
 
     # test that int/str makes no difference
     ch(allPages, [1, 2, 3, 5, 7, 9, 42, 43, 44], "1-3, 5, 7, 9, 42-44")
-    ch(allPages, ["1", "2", "3", "5", "7", "9", "42", "43", "44"],
-       "1-3, 5, 7, 9, 42-44")
-    ch(allPages, ["1", 2, "3", 5, "7", 9, "42", 43, "44"],
-       "1-3, 5, 7, 9, 42-44")
+    ch(
+        allPages,
+        ["1", "2", "3", "5", "7", "9", "42", "43", "44"],
+        "1-3, 5, 7, 9, 42-44",
+    )
+    ch(allPages, ["1", 2, "3", 5, "7", 9, "42", 43, "44"], "1-3, 5, 7, 9, 42-44")
+
 
 def testFancy():
     u.init()

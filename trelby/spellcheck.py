@@ -9,6 +9,7 @@ gdict = set()
 # that prefix (only words in gdict)
 prefixDict = {}
 
+
 # load word dictionary. returns True on success or if it's already loaded,
 # False on errors.
 def loadDict(frame):
@@ -43,6 +44,7 @@ def loadDict(frame):
 
     return True
 
+
 # dictionary, a list of known words that the user has specified.
 class Dict:
     cvars = None
@@ -51,8 +53,7 @@ class Dict:
         if not self.__class__.cvars:
             v = self.__class__.cvars = mypickle.Vars()
 
-            v.addList("wordsList", [], "Words",
-                      mypickle.StrLatin1Var("", "", ""))
+            v.addList("wordsList", [], "Words", mypickle.StrLatin1Var("", "", ""))
 
             v.makeDicts()
 
@@ -130,6 +131,7 @@ class Dict:
 
         return word[0]
 
+
 # spell check a script
 class SpellChecker:
     def __init__(self, sp, gScDict):
@@ -184,11 +186,14 @@ class SpellChecker:
     def isKnown(self, word):
         word = util.lower(word)
 
-        return word in gdict or \
-               word in self.cnames or \
-               self.sp.scDict.isKnown(word) or \
-               self.gScDict.isKnown(word) or \
-               word.isdigit()
+        return (
+            word in gdict
+            or word in self.cnames
+            or self.sp.scDict.isKnown(word)
+            or self.gScDict.isKnown(word)
+            or word.isdigit()
+        )
+
 
 # Calculates the Levenshtein distance between a and b.
 def lev(a, b):

@@ -5,10 +5,16 @@ import trelby.util as util
 
 import wx
 
+
 class SpellCheckDlg(wx.Dialog):
     def __init__(self, parent, ctrl, sc, gScDict):
-        wx.Dialog.__init__(self, parent, -1, "Spell checker",
-                           style = wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS)
+        wx.Dialog.__init__(
+            self,
+            parent,
+            -1,
+            "Spell checker",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS,
+        )
 
         self.ctrl = ctrl
 
@@ -25,9 +31,10 @@ class SpellCheckDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Word:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
-        self.replaceEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
+        hsizer.Add(
+            wx.StaticText(self, -1, "Word:"), 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10
+        )
+        self.replaceEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         hsizer.Add(self.replaceEntry, 1, wx.EXPAND)
 
         vsizer.Add(hsizer, 1, wx.EXPAND | wx.BOTTOM, 15)
@@ -82,13 +89,12 @@ class SpellCheckDlg(wx.Dialog):
         self.ctrl.makeLineVisible(self.sc.line)
         self.ctrl.updateScreen()
 
-    def gotoNext(self, incCol = True):
+    def gotoNext(self, incCol=True):
         if incCol:
             self.sc.col += len(self.sc.word)
 
         if not self.sc.findNext():
-            wx.MessageBox("No more incorrect words found.", "Results",
-                          wx.OK, self)
+            wx.MessageBox("No more incorrect words found.", "Results", wx.OK, self)
 
             self.EndModal(wx.ID_OK)
 
@@ -119,8 +125,8 @@ class SpellCheckDlg(wx.Dialog):
         sp.gotoPos(self.sc.line, self.sc.col)
 
         ls[self.sc.line].text = util.replace(
-            ls[self.sc.line].text, word,
-            self.sc.col, len(self.sc.word))
+            ls[self.sc.line].text, word, self.sc.col, len(self.sc.word)
+        )
 
         sp.rewrapPara(sp.getParaFirstIndexFromLine(self.sc.line))
 
@@ -137,7 +143,7 @@ class SpellCheckDlg(wx.Dialog):
 
         self.gotoNext(False)
 
-    def OnSkip(self, event = None, autoFind = False):
+    def OnSkip(self, event=None, autoFind=False):
         if not self.sc.word:
             return
 
@@ -192,13 +198,11 @@ class SpellCheckDlg(wx.Dialog):
         wx.EndBusyCursor()
 
         if len(items) == 0:
-            wx.MessageBox("No similar words found.", "Results",
-                          wx.OK, self)
+            wx.MessageBox("No similar words found.", "Results", wx.OK, self)
 
             return
 
-        dlg = wx.SingleChoiceDialog(
-            self, "Most similar words:", "Suggestions", items)
+        dlg = wx.SingleChoiceDialog(self, "Most similar words:", "Suggestions", items)
 
         if dlg.ShowModal() == wx.ID_OK:
             sel = dlg.GetSelection()
@@ -228,4 +232,3 @@ class SpellCheckDlg(wx.Dialog):
             return d2
 
         return d
-

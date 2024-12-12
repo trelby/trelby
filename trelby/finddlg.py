@@ -6,10 +6,16 @@ import trelby.util as util
 
 import wx
 
+
 class FindDlg(wx.Dialog):
     def __init__(self, parent, ctrl):
-        wx.Dialog.__init__(self, parent, -1, "Find & Replace",
-                           style = wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS)
+        wx.Dialog.__init__(
+            self,
+            parent,
+            -1,
+            "Find & Replace",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS,
+        )
 
         self.ctrl = ctrl
 
@@ -24,14 +30,14 @@ class FindDlg(wx.Dialog):
         gsizer = wx.FlexGridSizer(2, 2, 5, 20)
         gsizer.AddGrowableCol(1)
 
-        gsizer.Add(wx.StaticText(self, -1, "Find what:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-        self.findEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
+        gsizer.Add(wx.StaticText(self, -1, "Find what:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        self.findEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         gsizer.Add(self.findEntry, 0, wx.EXPAND)
 
-        gsizer.Add(wx.StaticText(self, -1, "Replace with:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-        self.replaceEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
+        gsizer.Add(
+            wx.StaticText(self, -1, "Replace with:"), 0, wx.ALIGN_CENTER_VERTICAL
+        )
+        self.replaceEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         gsizer.Add(self.replaceEntry, 0, wx.EXPAND)
 
         vsizer.Add(gsizer, 0, wx.EXPAND | wx.BOTTOM, 10)
@@ -54,8 +60,7 @@ class FindDlg(wx.Dialog):
 
         hsizer2.Add(vsizer2, 0, wx.EXPAND | wx.RIGHT, 10)
 
-        self.direction = wx.RadioBox(self, -1, "Direction",
-                                    choices = ["Up", "Down"])
+        self.direction = wx.RadioBox(self, -1, "Direction", choices=["Up", "Down"])
         self.direction.SetSelection(1)
 
         hsizer2.Add(self.direction, 1, 0)
@@ -120,7 +125,7 @@ class FindDlg(wx.Dialog):
         self.direction.Bind(wx.EVT_CHAR, self.OnCharMisc)
         self.elements.Bind(wx.EVT_CHAR, self.OnCharMisc)
 
-        util.finishWindow(self, hsizer, center = False)
+        util.finishWindow(self, hsizer, center=False)
 
         self.loadState()
         self.findEntry.SetFocus()
@@ -151,8 +156,7 @@ class FindDlg(wx.Dialog):
         self.getParams()
 
         self.ctrl.findDlgFindText = misc.fromGUI(self.findEntry.GetValue())
-        self.ctrl.findDlgReplaceText = misc.fromGUI(
-            self.replaceEntry.GetValue())
+        self.ctrl.findDlgReplaceText = misc.fromGUI(self.replaceEntry.GetValue())
         self.ctrl.findDlgMatchWholeWord = self.matchWhole
         self.ctrl.findDlgMatchCase = self.matchCase
         self.ctrl.findDlgDirUp = self.dirUp
@@ -222,16 +226,23 @@ class FindDlg(wx.Dialog):
             # don't know of a way to get the vertical spacing of items in
             # a wx.CheckListBox, so estimate it at font height + 5 pixels,
             # which is close enough on everything I've tested.
-            h = pos.y + len(self.elementTypes) * \
-                (util.getFontHeight(self.elements.GetFont()) + 5) + 15
+            h = (
+                pos.y
+                + len(self.elementTypes)
+                * (util.getFontHeight(self.elements.GetFont()) + 5)
+                + 15
+            )
         else:
             self.moreButton.SetLabel("More >>>")
-            h = max(self.extraLabel.GetPosition().y,
-                    self.moreButton.GetPosition().y +
-                    self.moreButton.GetClientSize().height + 5)
+            h = max(
+                self.extraLabel.GetPosition().y,
+                self.moreButton.GetPosition().y
+                + self.moreButton.GetClientSize().height
+                + 5,
+            )
 
         self.SetSizeHints(self.GetClientSize().width, h)
-        util.setWH(self, h = h)
+        util.setWH(self, h=h)
 
     def getParams(self):
         self.dirUp = self.direction.GetSelection() == 0
@@ -241,8 +252,7 @@ class FindDlg(wx.Dialog):
         if self.useExtra:
             self.elementMap = {}
             for i in range(self.elements.GetCount()):
-                self.elementMap[self.elementTypes[i]] = \
-                    self.elements.IsChecked(i)
+                self.elementMap[self.elementTypes[i]] = self.elements.IsChecked(i)
 
     def typeIncluded(self, lt):
         if not self.useExtra:
@@ -250,7 +260,7 @@ class FindDlg(wx.Dialog):
 
         return self.elementMap[lt]
 
-    def OnFind(self, event = None, autoFind = False):
+    def OnFind(self, event=None, autoFind=False):
         if not autoFind:
             self.getParams()
 
@@ -314,9 +324,11 @@ class FindDlg(wx.Dialog):
 
                     if res != -1:
                         if not self.matchWhole or (
-                            util.isWordBoundary(text[res - 1 : res]) and
-                            util.isWordBoundary(text[res + len(value) :
-                                                     res + len(value) + 1])):
+                            util.isWordBoundary(text[res - 1 : res])
+                            and util.isWordBoundary(
+                                text[res + len(value) : res + len(value) + 1]
+                            )
+                        ):
 
                             found = True
 
@@ -345,8 +357,9 @@ class FindDlg(wx.Dialog):
                     break
 
                 if fullSearch:
-                    wx.MessageBox("Search finished without results.",
-                                  "No matches", wx.OK, self)
+                    wx.MessageBox(
+                        "Search finished without results.", "No matches", wx.OK, self
+                    )
 
                     break
 
@@ -359,10 +372,16 @@ class FindDlg(wx.Dialog):
                     s2 = "end"
                     restart = len(ls) - 1
 
-                if wx.MessageBox("Search finished at the %s of the script. Do\n"
-                                 "you want to continue at the %s of the script?"
-                                 % (s1, s2), "Continue?",
-                                 wx.YES_NO | wx.YES_DEFAULT, self) == wx.YES:
+                if (
+                    wx.MessageBox(
+                        "Search finished at the %s of the script. Do\n"
+                        "you want to continue at the %s of the script?" % (s1, s2),
+                        "Continue?",
+                        wx.YES_NO | wx.YES_DEFAULT,
+                        self,
+                    )
+                    == wx.YES
+                ):
                     line = restart
                     fullSearch = True
                 else:
@@ -371,7 +390,7 @@ class FindDlg(wx.Dialog):
         if not autoFind:
             self.ctrl.updateScreen()
 
-    def OnReplace(self, event = None, autoFind = False):
+    def OnReplace(self, event=None, autoFind=False):
         if self.searchLine == -1:
             return False
 
@@ -382,8 +401,8 @@ class FindDlg(wx.Dialog):
         u = undo.SinglePara(sp, undo.CMD_MISC, self.searchLine)
 
         ls[self.searchLine].text = util.replace(
-            ls[self.searchLine].text, value,
-            self.searchColumn, self.searchWidth)
+            ls[self.searchLine].text, value, self.searchColumn, self.searchWidth
+        )
 
         sp.rewrapPara(sp.getParaFirstIndexFromLine(self.searchLine))
 
@@ -415,18 +434,18 @@ class FindDlg(wx.Dialog):
         u.setAfter(sp)
         sp.addUndo(u)
 
-        self.OnFind(autoFind = autoFind)
+        self.OnFind(autoFind=autoFind)
 
         return True
 
-    def OnReplaceAll(self, event = None):
+    def OnReplaceAll(self, event=None):
         self.getParams()
 
         if self.searchLine == -1:
-            self.OnFind(autoFind = True)
+            self.OnFind(autoFind=True)
 
         count = 0
-        while self.OnReplace(autoFind = True):
+        while self.OnReplace(autoFind=True):
             count += 1
 
         if count != 0:

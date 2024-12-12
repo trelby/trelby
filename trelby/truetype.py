@@ -9,6 +9,7 @@ TABLE_DIR_SIZE = 16
 NAME_TABLE_SIZE = 6
 NAME_RECORD_SIZE = 12
 
+
 class ParseError(Exception):
     def __init__(self, msg):
         Exception.__init__(self, msg)
@@ -17,9 +18,11 @@ class ParseError(Exception):
     def __str__(self):
         return str(self.msg)
 
+
 def check(val):
     if not val:
         raise ParseError("")
+
 
 # a parser for TrueType/OpenType fonts.
 # http://www.microsoft.com/typography/otspec/default.htm contained the
@@ -34,10 +37,10 @@ class Font:
         # parse functions for tables, and a flag for whether each has been
         # parsed successfully
         self.parseFuncs = {
-            util.toLatin1("head") : [self.parseHead, False],
-            util.toLatin1("name") : [self.parseName, False],
-            util.toLatin1("OS/2") : [self.parseOS2, False]
-            }
+            util.toLatin1("head"): [self.parseHead, False],
+            util.toLatin1("name"): [self.parseName, False],
+            util.toLatin1("OS/2"): [self.parseOS2, False],
+        }
 
         try:
             self.parse(s)
@@ -79,11 +82,11 @@ class Font:
 
     # parse a single tag
     def parseTag(self, offset, s):
-        tag, checkSum, tagOffset, length = unpack(">4s3L",
-            s[offset : offset + TABLE_DIR_SIZE])
+        tag, checkSum, tagOffset, length = unpack(
+            ">4s3L", s[offset : offset + TABLE_DIR_SIZE]
+        )
 
-        check(tagOffset >= (OFFSET_TABLE_SIZE +
-                            self.tableCnt * TABLE_DIR_SIZE))
+        check(tagOffset >= (OFFSET_TABLE_SIZE + self.tableCnt * TABLE_DIR_SIZE))
 
         func = self.parseFuncs.get(tag)
         if func:
@@ -106,8 +109,7 @@ class Font:
         offset = NAME_TABLE_SIZE
 
         for i in range(nameCnt):
-            if self.parseNameRecord(s[offset : offset + NAME_RECORD_SIZE],
-                                    storage):
+            if self.parseNameRecord(s[offset : offset + NAME_RECORD_SIZE], storage):
                 return
 
             offset += NAME_RECORD_SIZE
@@ -117,8 +119,7 @@ class Font:
     # parse a single name record. s2 is string storage. returns True if
     # this record is a valid Postscript name.
     def parseNameRecord(self, s, s2):
-        platformID, encodingID, langID, nameID, strLen, strOffset = \
-                    unpack(">6H", s)
+        platformID, encodingID, langID, nameID, strLen, strOffset = unpack(">6H", s)
 
         if nameID != 6:
             return False
@@ -126,19 +127,18 @@ class Font:
         if (platformID == 1) and (encodingID == 0) and (langID == 0):
             # Macintosh, 1-byte strings
 
-            self.psName = unpack("%ds" % strLen,
-                                 s2[strOffset : strOffset + strLen])[0]
+            self.psName = unpack("%ds" % strLen, s2[strOffset : strOffset + strLen])[0]
 
             return True
 
         elif (platformID == 3) and (encodingID == 1) and (langID == 0x409):
             # Windows, UTF-16BE
 
-            tmp = unpack("%ds" % strLen,
-                                 s2[strOffset : strOffset + strLen])[0]
+            tmp = unpack("%ds" % strLen, s2[strOffset : strOffset + strLen])[0]
 
             self.psName = tmp.decode("UTF-16BE", "ignore").encode(
-                "ISO-8859-1", "ignore")
+                "ISO-8859-1", "ignore"
+            )
 
             return True
 

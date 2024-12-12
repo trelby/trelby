@@ -1,17 +1,18 @@
 import array
 import collections
 
+
 class NameArray:
     def __init__(self):
         self.maxCount = 205000
         self.count = 0
 
         self.name = [None] * self.maxCount
-        self.type = array.array('B')
+        self.type = array.array("B")
         self.type.frombytes(str.encode(chr(0) * self.maxCount))
 
         # 0 = female, 1 = male
-        self.sex = array.array('B')
+        self.sex = array.array("B")
         self.sex.frombytes(str.encode(chr(0) * self.maxCount))
 
         # key = type name, value = count of names for that type

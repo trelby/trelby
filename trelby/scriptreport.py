@@ -6,6 +6,7 @@ import trelby.scenereport as scenereport
 import trelby.screenplay as screenplay
 import trelby.util as util
 
+
 class ScriptReport:
     def __init__(self, sp):
         self.sp = sp
@@ -13,8 +14,9 @@ class ScriptReport:
         self.cr = characterreport.CharacterReport(sp)
 
     def generate(self) -> bytes:
-        tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 15.0, 12)
+        tf = pml.TextFormatter(
+            self.sp.cfg.paperWidth, self.sp.cfg.paperHeight, 15.0, 12
+        )
 
         ls = self.sp.lines
 
@@ -25,24 +27,41 @@ class ScriptReport:
 
         for t in config.getTIs():
             cnt = sum([1 for line in ls if line.lt == t.lt])
-            tf.addText("        %13s:  %4d (%d%%)" % (t.name, cnt,
-                                                      util.pct(cnt, total)))
+            tf.addText(
+                "        %13s:  %4d (%d%%)" % (t.name, cnt, util.pct(cnt, total))
+            )
 
         tf.addSpace(4.0)
 
-        intLines = sum([si.lines for si in self.sr.scenes if
-                        util.upper(si.name).startswith("INT.")])
-        extLines = sum([si.lines for si in self.sr.scenes if
-                        util.upper(si.name).startswith("EXT.")])
+        intLines = sum(
+            [
+                si.lines
+                for si in self.sr.scenes
+                if util.upper(si.name).startswith("INT.")
+            ]
+        )
+        extLines = sum(
+            [
+                si.lines
+                for si in self.sr.scenes
+                if util.upper(si.name).startswith("EXT.")
+            ]
+        )
 
-        tf.addText("Interior / exterior scenes: %d%% / %d%%" % (
-            util.pct(intLines, intLines + extLines),
-            util.pct(extLines, intLines + extLines)))
+        tf.addText(
+            "Interior / exterior scenes: %d%% / %d%%"
+            % (
+                util.pct(intLines, intLines + extLines),
+                util.pct(extLines, intLines + extLines),
+            )
+        )
 
         tf.addSpace(4.0)
 
-        tf.addText("Max / avg. scene length in lines: %d / %.2f" % (
-            self.sr.longestScene, self.sr.avgScene))
+        tf.addText(
+            "Max / avg. scene length in lines: %d / %.2f"
+            % (self.sr.longestScene, self.sr.avgScene)
+        )
 
         # lengths of action elements
         actions = []
@@ -78,8 +97,9 @@ class ScriptReport:
             maxA = 0
             avgA = 0.0
 
-        tf.addText("Max / avg. action element length in lines: %d / %.2f" % (
-            maxA, avgA))
+        tf.addText(
+            "Max / avg. action element length in lines: %d / %.2f" % (maxA, avgA)
+        )
 
         tf.addSpace(4.0)
 

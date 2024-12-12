@@ -11,27 +11,35 @@ import trelby.pml as util
 # PDF transform matrixes where key is the angle from x-axis
 # in counter-clockwise direction.
 TRANSFORM_MATRIX = {
-    45 : (1, 1, -1, 1),
-    90 : (0, 1, -1, 0),
+    45: (1, 1, -1, 1),
+    90: (0, 1, -1, 0),
 }
 
+
 # users should only use this.
-def generate(doc: 'pml.Document') -> bytes:
+def generate(doc: "pml.Document") -> bytes:
     tmp = PDFExporter(doc)
     return tmp.generate()
+
 
 # An abstract base class for all PDF drawing operations.
 class PDFDrawOp:
 
     # write PDF drawing operations corresponding to the PML object pmlOp
     # to output (util.String). pe = PDFExporter.
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas: Canvas) -> None:
+    def draw(
+        self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas: Canvas
+    ) -> None:
         raise Exception("draw not implemented")
 
+
 class PDFTextOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas) -> None:
+    def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.TextOp):
-            raise Exception("PDFTextOp is only compatible with pml.TextOp, got "+type(pmlOp).__name__)
+            raise Exception(
+                "PDFTextOp is only compatible with pml.TextOp, got "
+                + type(pmlOp).__name__
+            )
 
         # we need to adjust y position since PDF uses baseline of text as
         # the y pos, but pml uses top of the text as y pos. The Adobe
@@ -52,11 +60,21 @@ class PDFTextOp(PDFDrawOp):
             matrix = TRANSFORM_MATRIX.get(pmlOp.angle)
 
             if matrix:
-                canvas.addLiteral("BT\n"\
-                    "%f %f %f %f %f %f Tm\n"\
-                    "(%s) Tj\n"\
-                    "ET\n" % (matrix[0], matrix[1], matrix[2], matrix[3],
-                              x, y, pe.escapeStr(pmlOp.text))) # TODO: Doing this with addLiteral, non-latin characters won't work in watermarks. There must be a better way to do this with reportlab, that we do it this way is for historical reasons and because no one took the time to change it
+                canvas.addLiteral(
+                    "BT\n"
+                    "%f %f %f %f %f %f Tm\n"
+                    "(%s) Tj\n"
+                    "ET\n"
+                    % (
+                        matrix[0],
+                        matrix[1],
+                        matrix[2],
+                        matrix[3],
+                        x,
+                        y,
+                        pe.escapeStr(pmlOp.text),
+                    )
+                )  # TODO: Doing this with addLiteral, non-latin characters won't work in watermarks. There must be a better way to do this with reportlab, that we do it this way is for historical reasons and because no one took the time to change it
             else:
                 # unsupported angle, don't print it.
                 pass
@@ -76,14 +94,20 @@ class PDFTextOp(PDFDrawOp):
 
         # create bookmark for table of contents if applicable
         if pmlOp.toc:
-            bookmarkKey = uuid.uuid4().hex  # we need a unique key to link the bookmark in toc – TODO: generate a more speaking one
+            bookmarkKey = (
+                uuid.uuid4().hex
+            )  # we need a unique key to link the bookmark in toc – TODO: generate a more speaking one
             canvas.bookmarkHorizontal(bookmarkKey, pe.x(pmlOp.x), pe.y(pmlOp.y))
             canvas.addOutlineEntry(pmlOp.toc.text, bookmarkKey)
 
+
 class PDFLineOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas):
+    def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas):
         if not isinstance(pmlOp, pml.LineOp):
-            raise Exception("PDFLineOp is only compatible with pml.LineOp, got "+type(pmlOp).__name__)
+            raise Exception(
+                "PDFLineOp is only compatible with pml.LineOp, got "
+                + type(pmlOp).__name__
+            )
 
         points = pmlOp.points
         numberOfPoints = len(points)
@@ -97,17 +121,21 @@ class PDFLineOp(PDFDrawOp):
 
         lines = []
         for i in range(0, numberOfPoints - 1):
-            lines.append(pe.xy(points[i]) + pe.xy(points[i+1]))
+            lines.append(pe.xy(points[i]) + pe.xy(points[i + 1]))
 
         if pmlOp.isClosed:
-            lines.append(pe.xy(points[i+1]) + pe.xy(points[0]))
+            lines.append(pe.xy(points[i + 1]) + pe.xy(points[0]))
 
         canvas.lines(lines)
 
+
 class PDFRectOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas) -> None:
+    def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.RectOp):
-            raise Exception("PDFRectOp is only compatible with pml.RectOp, got "+type(pmlOp).__name__)
+            raise Exception(
+                "PDFRectOp is only compatible with pml.RectOp, got "
+                + type(pmlOp).__name__
+            )
 
         if pmlOp.lw != -1:
             canvas.setLineWidth(pe.mm2points(pmlOp.lw))
@@ -118,13 +146,17 @@ class PDFRectOp(PDFDrawOp):
             pe.mm2points(pmlOp.width),
             pe.mm2points(pmlOp.height),
             pmlOp.fillType == pml.NO_FILL or pmlOp.fillType == pml.STROKE_FILL,
-            pmlOp.fillType == pml.FILL or pmlOp.fillType == pml.STROKE_FILL
+            pmlOp.fillType == pml.FILL or pmlOp.fillType == pml.STROKE_FILL,
         )
 
+
 class PDFQuarterCircleOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas) -> None:
+    def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.QuarterCircleOp):
-            raise Exception("PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "+type(pmlOp).__name__)
+            raise Exception(
+                "PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "
+                + type(pmlOp).__name__
+            )
 
         sX = pmlOp.flipX and -1 or 1
         sY = pmlOp.flipY and -1 or 1
@@ -145,15 +177,21 @@ class PDFQuarterCircleOp(PDFDrawOp):
             pe.y(pmlOp.y - A * sY),
             pe.x(pmlOp.x - A * sX),
             pe.y(pmlOp.y - pmlOp.radius * sY),
-            pe.x(pmlOp.x), pe.y(pmlOp.y - pmlOp.radius * sY)
+            pe.x(pmlOp.x),
+            pe.y(pmlOp.y - pmlOp.radius * sY),
         )
 
+
 class PDFArbitraryOp(PDFDrawOp):
-    def draw(self, pmlOp: 'pml.DrawOp', pageNr: int, pe: 'PDFExporter', canvas) -> None:
+    def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.PDFOp):
-            raise Exception("PDFArbitraryOp is only compatible with pml.PDFOp, got "+type(pmlOp).__name__)
+            raise Exception(
+                "PDFArbitraryOp is only compatible with pml.PDFOp, got "
+                + type(pmlOp).__name__
+            )
 
         canvas.addLiteral("%s\n" % pmlOp.cmds)
+
 
 # used for keeping track of used fonts
 class FontInfo:
@@ -165,6 +203,7 @@ class FontInfo:
 
         # PDFObject that contains the /Font object for this font, or None
         self.pdfObj: Optional[PDFObject] = None
+
 
 # one object in a PDF file
 class PDFObject:
@@ -182,38 +221,34 @@ class PDFObject:
         code += "\nendobj\n"
         canvas.addLiteral(code)
 
+
 class PDFExporter:
     # see genWidths
     _widthsStr: Optional[str] = None
 
-    def __init__(self, doc: 'pml.Document'):
+    def __init__(self, doc: "pml.Document"):
         self.doc: pml.Document = doc
         # fast lookup of font information
         self.fonts: Dict[int, FontInfo] = {
             pml.COURIER: FontInfo("Courier"),
             pml.COURIER | pml.BOLD: FontInfo("Courier-Bold"),
             pml.COURIER | pml.ITALIC: FontInfo("Courier-Oblique"),
-            pml.COURIER | pml.BOLD | pml.ITALIC:
-                FontInfo("Courier-BoldOblique"),
-
+            pml.COURIER | pml.BOLD | pml.ITALIC: FontInfo("Courier-BoldOblique"),
             pml.HELVETICA: FontInfo("Helvetica"),
             pml.HELVETICA | pml.BOLD: FontInfo("Helvetica-Bold"),
             pml.HELVETICA | pml.ITALIC: FontInfo("Helvetica-Oblique"),
-            pml.HELVETICA | pml.BOLD | pml.ITALIC:
-                FontInfo("Helvetica-BoldOblique"),
-
+            pml.HELVETICA | pml.BOLD | pml.ITALIC: FontInfo("Helvetica-BoldOblique"),
             pml.TIMES_ROMAN: FontInfo("Times-Roman"),
             pml.TIMES_ROMAN | pml.BOLD: FontInfo("Times-Bold"),
             pml.TIMES_ROMAN | pml.ITALIC: FontInfo("Times-Italic"),
-            pml.TIMES_ROMAN | pml.BOLD | pml.ITALIC:
-                FontInfo("Times-BoldItalic"),
+            pml.TIMES_ROMAN | pml.BOLD | pml.ITALIC: FontInfo("Times-BoldItalic"),
         }
 
     # generate PDF document and return it as a string
     def generate(self) -> bytes:
         doc = self.doc
         canvas = Canvas(
-            '',
+            "",
             pdfVersion=(1, 5),
             pagesize=(self.mm2points(doc.w), self.mm2points(doc.h)),
             initialFontName=self.getFontForFlags(pml.NORMAL),
@@ -221,11 +256,10 @@ class PDFExporter:
 
         # set PDF info
         version = self.doc.version
-        canvas.setCreator('Trelby '+version)
-        canvas.setProducer('Trelby '+version)
+        canvas.setCreator("Trelby " + version)
+        canvas.setProducer("Trelby " + version)
         if self.doc.uniqueId:
             canvas.setKeywords(self.doc.uniqueId)
-
 
         if doc.defPage != -1:
             # canvas.addLiteral("/OpenAction [%d 0 R /XYZ null null 0]\n" % (self.pageObjs[0].nr + doc.defPage * 2)) # this should make the PDF reader open the PDF at the desired page
@@ -250,7 +284,7 @@ class PDFExporter:
 
     # generate a stream object's contents. 's' is all data between
     # 'stream/endstream' tags, excluding newlines.
-    def genStream(self, s, isFontStream = False) -> str:
+    def genStream(self, s, isFontStream=False) -> str:
         compress = False
 
         # embedded TrueType font program streams for some reason need a
@@ -265,11 +299,12 @@ class PDFExporter:
             s = s.encode("zlib")
             filterStr = "/Filter /FlateDecode\n"
 
-        return ("<< /Length %d\n%s%s>>\n"
-                "stream\n"
-                "%s\n"
-                "endstream" % (len(s), lenStr, filterStr, s))
-
+        return (
+            "<< /Length %d\n%s%s>>\n"
+            "stream\n"
+            "%s\n"
+            "endstream" % (len(s), lenStr, filterStr, s)
+        )
 
     # get font name to use for given flags. also registers the font in reportlabs if it does not yet exist.
     def getFontForFlags(self, flags: int) -> str:
@@ -287,8 +322,13 @@ class PDFExporter:
 
         if not customFontInfo.name in pdfmetrics.getRegisteredFontNames():
             if not customFontInfo.fontFileName:
-                raise Exception('Font name "%s" is not known and no font file name provided. Please provide a file name for this font in the settings or use the default font.' % customFontInfo.name)
-            pdfmetrics.registerFont(TTFont(customFontInfo.name, customFontInfo.fontFileName))
+                raise Exception(
+                    'Font name "%s" is not known and no font file name provided. Please provide a file name for this font in the settings or use the default font.'
+                    % customFontInfo.name
+                )
+            pdfmetrics.registerFont(
+                TTFont(customFontInfo.name, customFontInfo.fontFileName)
+            )
 
         return customFontInfo.name
 

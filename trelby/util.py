@@ -15,15 +15,16 @@ import functools
 
 if "TRELBY_TESTING" in os.environ:
     import unittest.mock as mock
+
     wx = mock.Mock()
 else:
     import wx
 
 # alignment values
-ALIGN_LEFT    = 0
-ALIGN_CENTER  = 1
-ALIGN_RIGHT   = 2
-VALIGN_TOP    = 1
+ALIGN_LEFT = 0
+ALIGN_CENTER = 1
+ALIGN_RIGHT = 2
+VALIGN_TOP = 1
 VALIGN_CENTER = 2
 VALIGN_BOTTOM = 3
 
@@ -33,19 +34,63 @@ import trelby.fontinfo as fontinfo
 
 # mappings from lowercase to uppercase letters for different charsets
 _iso_8859_1_map = {
-    97 : 65, 98 : 66, 99 : 67, 100 : 68, 101 : 69,
-    102 : 70, 103 : 71, 104 : 72, 105 : 73, 106 : 74,
-    107 : 75, 108 : 76, 109 : 77, 110 : 78, 111 : 79,
-    112 : 80, 113 : 81, 114 : 82, 115 : 83, 116 : 84,
-    117 : 85, 118 : 86, 119 : 87, 120 : 88, 121 : 89,
-    122 : 90, 224 : 192, 225 : 193, 226 : 194, 227 : 195,
-    228 : 196, 229 : 197, 230 : 198, 231 : 199, 232 : 200,
-    233 : 201, 234 : 202, 235 : 203, 236 : 204, 237 : 205,
-    238 : 206, 239 : 207, 240 : 208, 241 : 209, 242 : 210,
-    243 : 211, 244 : 212, 245 : 213, 246 : 214, 248 : 216,
-    249 : 217, 250 : 218, 251 : 219, 252 : 220, 253 : 221,
-    254 : 222
-    }
+    97: 65,
+    98: 66,
+    99: 67,
+    100: 68,
+    101: 69,
+    102: 70,
+    103: 71,
+    104: 72,
+    105: 73,
+    106: 74,
+    107: 75,
+    108: 76,
+    109: 77,
+    110: 78,
+    111: 79,
+    112: 80,
+    113: 81,
+    114: 82,
+    115: 83,
+    116: 84,
+    117: 85,
+    118: 86,
+    119: 87,
+    120: 88,
+    121: 89,
+    122: 90,
+    224: 192,
+    225: 193,
+    226: 194,
+    227: 195,
+    228: 196,
+    229: 197,
+    230: 198,
+    231: 199,
+    232: 200,
+    233: 201,
+    234: 202,
+    235: 203,
+    236: 204,
+    237: 205,
+    238: 206,
+    239: 207,
+    240: 208,
+    241: 209,
+    242: 210,
+    243: 211,
+    244: 212,
+    245: 213,
+    246: 214,
+    248: 216,
+    249: 217,
+    250: 218,
+    251: 219,
+    252: 220,
+    253: 221,
+    254: 222,
+}
 
 # current mappings, 256 chars long.
 _to_upper = ""
@@ -65,20 +110,20 @@ _identity_tbl = ""
 # map some fancy unicode characters to their nearest ASCII/Latin-1
 # equivalents so when people import text it's not mangled to uselessness
 _fancy_unicode_map = {
-#    ord('‘') : "'",
-#    ord('’') : "'",
-#    ord('“') : '"',
-#    ord('”') : '"',
-#    ord('—') : "--",
-#    ord('–') : "-",
-    }
+    #    ord('‘') : "'",
+    #    ord('’') : "'",
+    #    ord('“') : '"',
+    #    ord('”') : '"',
+    #    ord('—') : "--",
+    #    ord('–') : "-",
+}
 
 # permanent memory DC to get text extents etc
 permDc = None
 
-def init(doWX = True):
-    global _to_upper, _to_lower, _input_tbl, _normalize_tbl, _identity_tbl, \
-           permDc
+
+def init(doWX=True):
+    global _to_upper, _to_lower, _input_tbl, _normalize_tbl, _identity_tbl, permDc
 
     # setup ISO-8859-1 case-conversion stuff
     tmpUpper = []
@@ -124,26 +169,32 @@ def init(doWX = True):
         permDc = wx.MemoryDC()
         permDc.SelectObject(wx.Bitmap(512, 32))
 
+
 # like string.upper/lower/capitalize, but we do our own charset-handling
 # that doesn't need locales etc
 def upper(s):
     return s.upper()
 
+
 def lower(s):
     return s.lower()
 
+
 def capitalize(s):
     return upper(s[:1]) + s[1:]
+
 
 # return 's', which must be a unicode string, converted to a ISO-8859-1
 # 8-bit string. characters not representable in ISO-8859-1 are discarded.
 def toLatin1(s):
     return s.encode("ISO-8859-1", "ignore")
 
+
 # return 's', which must be a string of ISO-8859-1 characters, converted
 # to UTF-8.
 def toUTF8(s):
     return s
+
 
 # return 's', which must be a string of UTF-8 characters, converted to
 # ISO-8859-1, with characters not representable in ISO-8859-1 discarded
@@ -151,45 +202,57 @@ def toUTF8(s):
 def fromUTF8(s):
     return s
 
+
 # returns True if kc (key-code) is a valid character to add to the script.
 def isValidInputChar(kc):
     # [0x80, 0x9F] = unspecified control characters in ISO-8859-1, added
     # characters like euro etc in windows-1252. 0x7F = backspace, 0xA0 =
     # non-breaking space, 0xAD = soft hyphen.
-    return (kc >= 32) and (kc <= 255) and not\
-           ((kc >= 0x7F) and (kc < 0xA0)) and (kc != 0xAD)
+    return (
+        (kc >= 32)
+        and (kc <= 255)
+        and not ((kc >= 0x7F) and (kc < 0xA0))
+        and (kc != 0xAD)
+    )
+
 
 # return s with all non-valid input characters converted to valid input
 # characters, except form feeds, which are just deleted.
 def toInputStr(s):
     return str(s).replace("\f", "").replace("\t", "|")
 
+
 # replace fancy unicode characters with their ASCII/Latin1 equivalents.
 def removeFancyUnicode(s):
     return s.translate(_fancy_unicode_map)
+
 
 # transform external input (unicode) into a form suitable for having in a
 # script
 def cleanInput(s):
     return s
 
+
 # replace s[start:start + width] with toInputStr(new) and return s
 def replace(s, new, start, width):
-    return s[0 : start] + toInputStr(new) + s[start + width:]
+    return s[0:start] + toInputStr(new) + s[start + width :]
+
 
 # delete all characters in 'chars' from s and return that.
 def deleteChars(s: str, chars: str) -> str:
     for char in chars:
-        s = s.replace(char, '')
+        s = s.replace(char, "")
     return s
+
 
 # returns s with all possible different types of newlines converted to
 # unix newlines, i.e. a single "\n"
 def fixNL(s):
     return s.replace("\r\n", "\n").replace("\r", "\n")
 
+
 # clamps the given value to a specific range. both limits are optional.
-def clamp(val, minVal = None, maxVal = None):
+def clamp(val, minVal=None, maxVal=None):
     ret = val
 
     if minVal != None:
@@ -200,14 +263,16 @@ def clamp(val, minVal = None, maxVal = None):
 
     return ret
 
+
 # like clamp, but gets/sets value directly from given object
-def clampObj(obj, name, minVal = None, maxVal = None):
+def clampObj(obj, name, minVal=None, maxVal=None):
     setattr(obj, name, clamp(getattr(obj, name), minVal, maxVal))
+
 
 # convert given string to float, clamping it to the given range
 # (optional). never throws any exceptions, return defVal (possibly clamped
 # as well) on any errors.
-def str2float(s, defVal, minVal = None, maxVal = None):
+def str2float(s, defVal, minVal=None, maxVal=None):
     val = defVal
 
     try:
@@ -217,8 +282,9 @@ def str2float(s, defVal, minVal = None, maxVal = None):
 
     return clamp(val, minVal, maxVal)
 
+
 # like str2float, but for ints.
-def str2int(s, defVal, minVal = None, maxVal = None, radix = 10):
+def str2int(s, defVal, minVal=None, maxVal=None, radix=10):
     val = defVal
 
     try:
@@ -227,6 +293,7 @@ def str2int(s, defVal, minVal = None, maxVal = None, radix = 10):
         pass
 
     return clamp(val, minVal, maxVal)
+
 
 # extract 'name' field from each item in 'seq', put it in a list, and
 # return that list.
@@ -237,6 +304,7 @@ def listify(seq, name):
 
     return l
 
+
 # return percentage of 'val1' of 'val2' (both ints) as an int (50% -> 50
 # etc.), or 0 if val2 is 0.
 def pct(val1, val2):
@@ -244,6 +312,7 @@ def pct(val1, val2):
         return (100 * val1) // val2
     else:
         return 0
+
 
 # return percentage of 'val1' of 'val2' (both ints/floats) as a float (50%
 # -> 50.0 etc.), or 0.0 if val2 is 0.0
@@ -253,6 +322,7 @@ def pctf(val1, val2):
     else:
         return 0.0
 
+
 # return float(val1) / val2, or 0.0 if val2 is 0.0
 def safeDiv(val1, val2):
     if val2 != 0.0:
@@ -260,12 +330,14 @@ def safeDiv(val1, val2):
     else:
         return 0.0
 
+
 # return float(val1) / val2, or 0.0 if val2 is 0
 def safeDivInt(val1, val2):
     if val2 != 0:
         return float(val1) / val2
     else:
         return 0.0
+
 
 # for each character in 'flags', starting at beginning, checks if that
 # character is found in 's'. if so, appends True to a tuple, False
@@ -280,6 +352,7 @@ def flags2bools(s, flags):
             b += (False,)
 
     return b
+
 
 # reverse of flags2bools. is given a number of objects, if each object
 # evaluates to true, chars[i] is appended to the return string. len(chars)
@@ -296,11 +369,13 @@ def bools2flags(chars, *bools):
 
     return s
 
+
 # return items, which is a list of ISO-8859-1 strings, as a single string
 # with \n between each string. any \ characters in the individual strings
 # are escaped as \\.
 def escapeStrings(items):
     return "\\n".join([s.replace("\\", "\\\\") for s in items])
+
 
 # opposite of escapeStrings. takes in a string, returns a list of strings.
 def unescapeStrings(s):
@@ -334,6 +409,7 @@ def unescapeStrings(s):
 
     return items
 
+
 # return s encoded so that all characters outside the range [32,126] (and
 # "\\") are escaped.
 def encodeStr(s):
@@ -352,10 +428,12 @@ def encodeStr(s):
 
     return ret
 
+
 # reverse of encodeStr. if string contains invalid escapes, they're
 # silently and arbitrarily replaced by something.
 def decodeStr(s):
     return re.sub(r"\\..", _decodeRepl, s)
+
 
 # converts "\A4" style matches to their character values.
 def _decodeRepl(mo):
@@ -366,20 +444,25 @@ def _decodeRepl(mo):
     else:
         return ""
 
+
 # return string s escaped for use in RTF.
 def escapeRTF(s):
     return s.replace("\\", "\\\\").replace("{", r"\{").replace("}", r"\}")
+
 
 # convert mm to twips (1/1440 inch = 1/20 point).
 def mm2twips(mm):
     # 56.69291 = 1440 / 25.4
     return mm * 56.69291
 
+
 # TODO: move all GUI stuff to gutil
+
 
 # return True if given font is a fixed-width one.
 def isFixedWidth(font):
     return getTextExtent(font, "iiiii")[0] == getTextExtent(font, "OOOOO")[0]
+
 
 # get extent of 's' as (w, h)
 def getTextExtent(font, s):
@@ -417,18 +500,22 @@ def getTextExtent(font, s):
 
     return (w2 - w1, h)
 
+
 # get height of font in pixels
 def getFontHeight(font):
     permDc.SetFont(font)
     return permDc.GetTextExtent("_\xC5")[1]
 
+
 # return how many mm tall given font size is.
 def getTextHeight(size):
     return (size / 72.0) * 25.4
 
+
 # return how many mm wide given text is at given style with given size.
 def getTextWidth(text, style, size):
     return (fontinfo.getMetrics(style).getTextWidth(text, size) / 72.0) * 25.4
+
 
 # create a font that's height is at most 'height' pixels. other parameters
 # are the same as in wx.Font's constructor.
@@ -442,10 +529,9 @@ def createPixelFont(height, family, style, weight):
     # FIXME: what's this "keep trying even once we go over the max height"
     # stuff? get rid of it.
     while 1:
-        fn = wx.Font(fs, family, style, weight,
-                     encoding = wx.FONTENCODING_ISO8859_1)
+        fn = wx.Font(fs, family, style, weight, encoding=wx.FONTENCODING_ISO8859_1)
         h = getFontHeight(fn)
-        diff = height -h
+        diff = height - h
 
         if diff >= 0:
             if diff < closest:
@@ -459,8 +545,8 @@ def createPixelFont(height, family, style, weight):
 
         fs += 2
 
-    return wx.Font(selected, family, style, weight,
-                   encoding = wx.FONTENCODING_ISO8859_1)
+    return wx.Font(selected, family, style, weight, encoding=wx.FONTENCODING_ISO8859_1)
+
 
 def reverseComboSelect(combo, clientData):
     for i in range(combo.GetCount()):
@@ -472,8 +558,9 @@ def reverseComboSelect(combo, clientData):
 
     return False
 
+
 # set widget's client size. if w or h is -1, that dimension is not changed.
-def setWH(ctrl, w = -1, h = -1):
+def setWH(ctrl, w=-1, h=-1):
     size = ctrl.GetClientSize()
 
     if w != -1:
@@ -485,6 +572,7 @@ def setWH(ctrl, w = -1, h = -1):
     ctrl.SetMinSize(wx.Size(size.width, size.height))
     ctrl.SetClientSize(size.width, size.height)
 
+
 # wxMSW doesn't respect the control's min/max values at all, so we have to
 # implement this ourselves
 def getSpinValue(spinCtrl):
@@ -492,6 +580,7 @@ def getSpinValue(spinCtrl):
     spinCtrl.SetValue(tmp)
 
     return tmp
+
 
 # return True if c is not a word character, i.e. is either empty, not an
 # alphanumeric character or a "'", or is more than one character.
@@ -504,9 +593,11 @@ def isWordBoundary(c):
 
     return not isAlnum(c)
 
+
 # return True if c is an alphanumeric character
 def isAlnum(c):
     return str(c).isalnum()
+
 
 # make sure s (unicode) ends in suffix (case-insensitively) and return
 # that. suffix must already be lower-case.
@@ -515,6 +606,7 @@ def ensureEndsIn(s, suffix):
         return s
     else:
         return s + suffix
+
 
 # return string 's' split into words (as a list), using isWordBoundary.
 def splitToWords(s):
@@ -528,10 +620,12 @@ def splitToWords(s):
 
     return tmp.split()
 
+
 # return two-character prefix of s, using characters a-z only. len(s) must
 # be at least 2.
 def getWordPrefix(s):
     return s[:2].translate(_normalize_tbl)
+
 
 # return count of how many 'ch' characters 's' begins with.
 def countInitial(s, ch):
@@ -545,6 +639,7 @@ def countInitial(s, ch):
 
     return cnt
 
+
 # searches string 's' for each item of list 'seq', returning True if any
 # of them were found.
 def multiFind(s, seq):
@@ -554,13 +649,15 @@ def multiFind(s, seq):
 
     return False
 
+
 def cmpfunc(a, b):
     return (a > b) - (a < b)
+
 
 # put everything from dictionary d into a list as (key, value) tuples,
 # then sort the list and return that. by default sorts by "desc(value)
 # asc(key)", but a custom sort function can be given
-def sortDict(d, sortFunc = None):
+def sortDict(d, sortFunc=None):
     def tmpSortFunc(o1, o2):
         ret = cmpfunc(o2[1], o1[1])
 
@@ -579,6 +676,7 @@ def sortDict(d, sortFunc = None):
     tmp = sorted(tmp, key=functools.cmp_to_key(sortFunc))
 
     return tmp
+
 
 # an efficient FIFO container of fixed size. can't contain None objects.
 class FIFO:
@@ -608,20 +706,22 @@ class FIFO:
 
             obj = self.arr[j]
 
-            if  obj != None:
+            if obj != None:
                 tmp.append(obj)
 
             j -= 1
 
         return tmp
 
+
 # DrawLine-wrapper that makes it easier when the end-point is just
 # offsetted from the starting point
 def drawLine(dc, x, y, xd, yd):
     dc.DrawLine(x, y, x + xd, y + yd)
 
+
 # draws text aligned somehow. returns a (w, h) tuple of the text extent.
-def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
+def drawText(dc, text, x, y, align=ALIGN_LEFT, valign=VALIGN_TOP):
     w, h = dc.GetTextExtent(text)
 
     if align == ALIGN_CENTER:
@@ -638,10 +738,11 @@ def drawText(dc, text, x, y, align = ALIGN_LEFT, valign = VALIGN_TOP):
 
     return (w, h)
 
+
 # create pad sizer for given window whose controls are in topSizer, with
 # 'pad' pixels of padding on each side, resize window to correct size, and
 # optionally center it.
-def finishWindow(window, topSizer, pad = 10, center = False):
+def finishWindow(window, topSizer, pad=10, center=False):
     padSizer = wx.BoxSizer(wx.VERTICAL)
     padSizer.Add(topSizer, 1, wx.EXPAND | wx.ALL, pad)
     window.SetSizerAndFit(padSizer)
@@ -649,6 +750,7 @@ def finishWindow(window, topSizer, pad = 10, center = False):
 
     if center:
         window.Center()
+
 
 # wx.Colour replacement that can safely be copy.deepcopy'd
 class MyColor:
@@ -670,9 +772,10 @@ class MyColor:
 
         return o
 
+
 # fake key event, supports same operations as the real one
 class MyKeyEvent:
-    def __init__(self, kc = 0):
+    def __init__(self, kc=0):
         # keycode
         self.kc = kc
 
@@ -695,76 +798,75 @@ class MyKeyEvent:
     def Skip(self):
         pass
 
+
 # one key press
 class Key:
     keyMap = {
-        1 : "A",
-        2 : "B",
-        3 : "C",
-        4 : "D",
-        5 : "E",
-        6 : "F",
-        7 : "G",
-
+        1: "A",
+        2: "B",
+        3: "C",
+        4: "D",
+        5: "E",
+        6: "F",
+        7: "G",
         # CTRL+Enter = 10 in Windows
-        10 : "Enter (Windows)",
+        10: "Enter (Windows)",
+        11: "K",
+        12: "L",
+        14: "N",
+        15: "O",
+        16: "P",
+        17: "Q",
+        18: "R",
+        19: "S",
+        20: "T",
+        21: "U",
+        22: "V",
+        23: "W",
+        24: "X",
+        25: "Y",
+        26: "Z",
+        wx.WXK_BACK: "Backspace",
+        wx.WXK_TAB: "Tab",
+        wx.WXK_RETURN: "Enter",
+        wx.WXK_ESCAPE: "Escape",
+        wx.WXK_DELETE: "Delete",
+        wx.WXK_END: "End",
+        wx.WXK_HOME: "Home",
+        wx.WXK_LEFT: "Left",
+        wx.WXK_UP: "Up",
+        wx.WXK_RIGHT: "Right",
+        wx.WXK_DOWN: "Down",
+        wx.WXK_PAGEUP: "Page up",
+        wx.WXK_PAGEDOWN: "Page down",
+        wx.WXK_INSERT: "Insert",
+        wx.WXK_F1: "F1",
+        wx.WXK_F2: "F2",
+        wx.WXK_F3: "F3",
+        wx.WXK_F4: "F4",
+        wx.WXK_F5: "F5",
+        wx.WXK_F6: "F6",
+        wx.WXK_F7: "F7",
+        wx.WXK_F8: "F8",
+        wx.WXK_F9: "F9",
+        wx.WXK_F10: "F10",
+        wx.WXK_F11: "F11",
+        wx.WXK_F12: "F12",
+        wx.WXK_F13: "F13",
+        wx.WXK_F14: "F14",
+        wx.WXK_F15: "F15",
+        wx.WXK_F16: "F16",
+        wx.WXK_F17: "F17",
+        wx.WXK_F18: "F18",
+        wx.WXK_F19: "F19",
+        wx.WXK_F20: "F20",
+        wx.WXK_F21: "F21",
+        wx.WXK_F22: "F22",
+        wx.WXK_F23: "F23",
+        wx.WXK_F24: "F24",
+    }
 
-        11 : "K",
-        12 : "L",
-        14 : "N",
-        15 : "O",
-        16 : "P",
-        17 : "Q",
-        18 : "R",
-        19 : "S",
-        20 : "T",
-        21 : "U",
-        22 : "V",
-        23 : "W",
-        24 : "X",
-        25 : "Y",
-        26 : "Z",
-        wx.WXK_BACK : "Backspace",
-        wx.WXK_TAB : "Tab",
-        wx.WXK_RETURN : "Enter",
-        wx.WXK_ESCAPE : "Escape",
-        wx.WXK_DELETE : "Delete",
-        wx.WXK_END : "End",
-        wx.WXK_HOME : "Home",
-        wx.WXK_LEFT : "Left",
-        wx.WXK_UP : "Up",
-        wx.WXK_RIGHT : "Right",
-        wx.WXK_DOWN : "Down",
-        wx.WXK_PAGEUP : "Page up",
-        wx.WXK_PAGEDOWN : "Page down",
-        wx.WXK_INSERT : "Insert",
-        wx.WXK_F1 : "F1",
-        wx.WXK_F2 : "F2",
-        wx.WXK_F3 : "F3",
-        wx.WXK_F4 : "F4",
-        wx.WXK_F5 : "F5",
-        wx.WXK_F6 : "F6",
-        wx.WXK_F7 : "F7",
-        wx.WXK_F8 : "F8",
-        wx.WXK_F9 : "F9",
-        wx.WXK_F10 : "F10",
-        wx.WXK_F11 : "F11",
-        wx.WXK_F12 : "F12",
-        wx.WXK_F13 : "F13",
-        wx.WXK_F14 : "F14",
-        wx.WXK_F15 : "F15",
-        wx.WXK_F16 : "F16",
-        wx.WXK_F17 : "F17",
-        wx.WXK_F18 : "F18",
-        wx.WXK_F19 : "F19",
-        wx.WXK_F20 : "F20",
-        wx.WXK_F21 : "F21",
-        wx.WXK_F22 : "F22",
-        wx.WXK_F23 : "F23",
-        wx.WXK_F24 : "F24",
-        }
-
-    def __init__(self, kc, ctrl = False, alt = False, shift = False):
+    def __init__(self, kc, ctrl=False, alt=False, shift=False):
 
         # we don't want to handle ALT+a/ALT+A etc separately, so uppercase
         # input char combinations
@@ -800,19 +902,21 @@ class Key:
     #        34:  Shift
 
     def toInt(self):
-        return (self.kc & 0xFFFFFFFF) | (self.ctrl << 32) | \
-               (self.alt << 33) | (self.shift << 34)
+        return (
+            (self.kc & 0xFFFFFFFF)
+            | (self.ctrl << 32)
+            | (self.alt << 33)
+            | (self.shift << 34)
+        )
 
     @staticmethod
     def fromInt(val):
-        return Key(val & 0xFFFFFFFF, (val >> 32) & 1, (val >> 33) & 1,
-                   (val >> 34) & 1)
+        return Key(val & 0xFFFFFFFF, (val >> 32) & 1, (val >> 33) & 1, (val >> 34) & 1)
 
     # construct from wx.KeyEvent
     @staticmethod
     def fromKE(ev):
-        return Key(ev.GetKeyCode(), ev.ControlDown(), ev.AltDown(),
-                   ev.ShiftDown())
+        return Key(ev.GetKeyCode(), ev.ControlDown(), ev.AltDown(), ev.ShiftDown())
 
     def toStr(self):
         s = ""
@@ -841,11 +945,12 @@ class Key:
 
         return s
 
+
 # a string-like object that features reasonably fast repeated appends even
 # for large strings, since it keeps each appended string as an item in a
 # list.
 class String:
-    def __init__(self, s = None):
+    def __init__(self, s=None):
 
         # byte count of data appended
         self.pos = 0
@@ -870,15 +975,18 @@ class String:
 
         return self
 
+
 # load at most maxSize (all if -1) bytes from 'filename', returning the
 # data as a string or None on errors. pops up message boxes with 'frame'
 # as parent on errors.
-def loadFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1, binary: bool = False) -> Optional[AnyStr]:
+def loadFile(
+    filename: str, frame: Optional[wx.Frame], maxSize: int = -1, binary: bool = False
+) -> Optional[AnyStr]:
     try:
         if binary:
             f = open(misc.toPath(filename), "rb")
         else:
-            f = open(misc.toPath(filename), "r", encoding='UTF-8')
+            f = open(misc.toPath(filename), "r", encoding="UTF-8")
 
         try:
             ret = f.read(maxSize)
@@ -887,14 +995,19 @@ def loadFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1, binary
 
     except IOError as xxx_todo_changeme:
         (errno, strerror) = xxx_todo_changeme.args
-        wx.MessageBox("Error loading file '%s': %s" % (
-                filename, strerror), "Error", wx.OK, frame)
+        wx.MessageBox(
+            "Error loading file '%s': %s" % (filename, strerror), "Error", wx.OK, frame
+        )
         ret = None
 
     return ret
 
-def loadLatin1EncodedFile(filename: str, frame: Optional[wx.Frame], maxSize: int = -1) -> Optional[AnyStr]:
-    return loadFile(filename, frame, maxSize, 'ISO-8859-1')
+
+def loadLatin1EncodedFile(
+    filename: str, frame: Optional[wx.Frame], maxSize: int = -1
+) -> Optional[AnyStr]:
+    return loadFile(filename, frame, maxSize, "ISO-8859-1")
+
 
 # like loadFile, but if file doesn't exist, tries to load a .gz compressed
 # version of it.
@@ -910,12 +1023,17 @@ def loadMaybeCompressedFile(filename, frame):
         return s
 
     try:
-        f = gzip.open(filename, 'r')
-        return f.read().decode('utf-8')
+        f = gzip.open(filename, "r")
+        return f.read().decode("utf-8")
     except:
-        wx.MessageBox("Error loading file '%s': Decompression failed" % \
-                          filename, "Error", wx.OK, frame)
+        wx.MessageBox(
+            "Error loading file '%s': Decompression failed" % filename,
+            "Error",
+            wx.OK,
+            frame,
+        )
         return None
+
 
 # write 'data' to 'filename', popping up a messagebox using 'frame' as
 # parent on errors. returns True on success.
@@ -935,10 +1053,12 @@ def writeToFile(filename: str, data: AnyStr, frame: wx.TopLevelWindow) -> bool:
 
     except IOError as xxx_todo_changeme1:
         (errno, strerror) = xxx_todo_changeme1.args
-        wx.MessageBox("Error writing file '%s': %s" % (
-                filename, strerror), "Error", wx.OK, frame)
+        wx.MessageBox(
+            "Error writing file '%s': %s" % (filename, strerror), "Error", wx.OK, frame
+        )
 
         return False
+
 
 def removeTempFiles(prefix):
     files = glob.glob(tempfile.gettempdir() + "/%s*" % prefix)
@@ -949,6 +1069,7 @@ def removeTempFiles(prefix):
         except OSError:
             continue
 
+
 # return True if given file exists.
 def fileExists(filename):
     try:
@@ -957,6 +1078,7 @@ def fileExists(filename):
         return False
 
     return True
+
 
 # look for file 'filename' in all the directories listed in 'dirs', which
 # is a list of absolute directory paths. if found, return the absolute
@@ -972,6 +1094,7 @@ def findFile(filename, dirs):
             return path
 
     return None
+
 
 # look for file 'filename' in all the directories listed in $PATH. if
 # found, return the absolute filename, otherwise None.
@@ -990,13 +1113,14 @@ def findFileInPath(filename):
 
     return findFile(filename, dirs)
 
+
 # simple timer class for use during development only
 class TimerDev:
 
     # how many TimerDev instances are currently in existence
     nestingLevel = 0
 
-    def __init__(self, msg = ""):
+    def __init__(self, msg=""):
         self.msg = msg
         self.__class__.nestingLevel += 1
         self.t = time.time()
@@ -1004,8 +1128,11 @@ class TimerDev:
     def __del__(self):
         self.t = time.time() - self.t
         self.__class__.nestingLevel -= 1
-        print("%s%s took %.5f seconds" % (" " * self.__class__.nestingLevel,
-                                          self.msg, self.t))
+        print(
+            "%s%s took %.5f seconds"
+            % (" " * self.__class__.nestingLevel, self.msg, self.t)
+        )
+
 
 # Get the Windows default PDF viewer path from registry and return that,
 # or None on errors.
@@ -1023,7 +1150,8 @@ def _getWindowsPDFViewer():
         # Example: "C:\Program Files\Acrobat 8.0\acroread.exe" "%1"
 
         key2 = winreg.OpenKey(
-            winreg.HKEY_CLASSES_ROOT, pdfClass + r"\shell\open\command")
+            winreg.HKEY_CLASSES_ROOT, pdfClass + r"\shell\open\command"
+        )
 
         # Almost every PDF program out there accepts passing the PDF path
         # as the argument, so we don't parse the arguments from the
@@ -1038,6 +1166,7 @@ def _getWindowsPDFViewer():
 
     return None
 
+
 # Get a tuple of the default PDF viewer path and args for the current platform
 # and return that, or a tuple of two Nones on errors.
 def getPDFViewer():
@@ -1050,9 +1179,7 @@ def getPDFViewer():
 
     if misc.isMac:
         # Need to check for Mac before Unix as macOS is a Unix
-        progs = [
-            ("/System/Applications/Preview.app", "")
-        ]
+        progs = [("/System/Applications/Preview.app", "")]
     elif misc.isUnix:
         progs = [
             ("/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
@@ -1062,7 +1189,7 @@ def getPDFViewer():
             ("gpdf", ""),
             ("kpdf", ""),
             ("okular", ""),
-            ]
+        ]
     elif misc.isWindows:
         # get value via registry if possible, or fallback to old method.
         viewer = _getWindowsPDFViewer()
@@ -1070,25 +1197,16 @@ def getPDFViewer():
             return (viewer, "")
 
         progs = [
-            (r"C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe",
-                ""),
-            (r"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe",
-                ""),
-            (r"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe",
-                ""),
-            (r"C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe",
-                ""),
-            (r"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe",
-                ""),
-            (r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe",
-                ""),
-            (r"C:\Program Files\Adobe\Acrobat 5.0\Reader\AcroRd32.exe",
-                ""),
-            (r"C:\Program Files\Adobe\Acrobat 4.0\Reader\AcroRd32.exe",
-                ""),
-            (r"C:\Program Files\Foxit Software\Foxit Reader\Foxit Reader.exe",
-                ""),
-            ]
+            (r"C:\Program Files\Adobe\Reader 11.0\Reader\AcroRd32.exe", ""),
+            (r"C:\Program Files\Adobe\Reader 10.0\Reader\AcroRd32.exe", ""),
+            (r"C:\Program Files\Adobe\Reader 9.0\Reader\AcroRd32.exe", ""),
+            (r"C:\Program Files\Adobe\Reader 8.0\Reader\AcroRd32.exe", ""),
+            (r"C:\Program Files\Adobe\Acrobat 7.0\Reader\AcroRd32.exe", ""),
+            (r"C:\Program Files\Adobe\Acrobat 6.0\Reader\AcroRd32.exe", ""),
+            (r"C:\Program Files\Adobe\Acrobat 5.0\Reader\AcroRd32.exe", ""),
+            (r"C:\Program Files\Adobe\Acrobat 4.0\Reader\AcroRd32.exe", ""),
+            (r"C:\Program Files\Foxit Software\Foxit Reader\Foxit Reader.exe", ""),
+        ]
     else:
         # Unknown platform, don't know where to look
         pass
@@ -1101,6 +1219,7 @@ def getPDFViewer():
             if name:
                 return (name, args)
     return (None, None)
+
 
 # get a windows environment variable in its native unicode format, or None
 # if not found
@@ -1117,13 +1236,20 @@ def getWindowsUnicodeEnvVar(name):
 
     return buf.value
 
+
 # show PDF file.
-def showPDF(filename: str, cfgGl: 'config.ConfigGlobal', frame: wx.TopLevelWindow) -> None:
+def showPDF(
+    filename: str, cfgGl: "config.ConfigGlobal", frame: wx.TopLevelWindow
+) -> None:
     def complain():
-        wx.MessageBox("PDF viewer application not found.\n\n"
-                      "You can change your PDF viewer\n"
-                      "settings at File/Settings/Change/Misc.",
-                      "Error", wx.OK, frame)
+        wx.MessageBox(
+            "PDF viewer application not found.\n\n"
+            "You can change your PDF viewer\n"
+            "settings at File/Settings/Change/Misc.",
+            "Error",
+            wx.OK,
+            frame,
+        )
 
     pdfProgram = cfgGl.pdfViewerPath
     pdfArgs = cfgGl.pdfViewerArgs
@@ -1141,7 +1267,10 @@ def showPDF(filename: str, cfgGl: 'config.ConfigGlobal', frame: wx.TopLevelWindo
                 "Change this in File/Settings/Change/Misc.\n\n"
                 "Using the default PDF viewer instead:\n"
                 "%s" % (pdfProgram, regPDF),
-                "Warning", wx.OK, frame)
+                "Warning",
+                wx.OK,
+                frame,
+            )
 
             pdfProgram = regPDF
             pdfArgs = regArgs
@@ -1164,7 +1293,6 @@ def showPDF(filename: str, cfgGl: 'config.ConfigGlobal', frame: wx.TopLevelWindo
         # give the full path of the program as first arg, so give a
         # dummy arg.
         args = ["pdf"] + pdfArgs.split() + [filename]
-        
 
     # there's a race condition in checking if the path exists, above, and
     # using it, below. if the file disappears between those two we get an

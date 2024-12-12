@@ -40,11 +40,10 @@ BASE_MEMORY_USAGE = 1500
 
 # possible command types. only used for possibly merging consecutive
 # edits.
-(CMD_ADD_CHAR,
- CMD_ADD_CHAR_SPACE,
- CMD_DEL_FORWARD,
- CMD_DEL_BACKWARD,
- CMD_MISC) = list(range(5))
+(CMD_ADD_CHAR, CMD_ADD_CHAR_SPACE, CMD_DEL_FORWARD, CMD_DEL_BACKWARD, CMD_MISC) = list(
+    range(5)
+)
+
 
 # convert a list of Screenplay.Line objects into an unspecified, but
 # compact, form of storage. storage2lines will convert this back to the
@@ -78,6 +77,7 @@ def lines2storage(lines):
     else:
         return (len(lines), False, linesStr.encode())
 
+
 # see lines2storage.
 def storage2lines(storage):
     if storage[0] == 0:
@@ -90,6 +90,7 @@ def storage2lines(storage):
 
     return [screenplay.Line.fromStr(s) for s in linesStr.split("\n")]
 
+
 # how much memory is used by the given storage object
 def memoryUsed(storage):
     # 16 is a rough estimate for the first two tuple members' memory usage
@@ -98,6 +99,7 @@ def memoryUsed(storage):
         return 16
 
     return 16 + len(storage[2])
+
 
 # abstract base class for storing undo history. concrete subclasses
 # implement undo/redo for specific actions taken on a screenplay.
@@ -123,24 +125,30 @@ class Base:
     # rough estimate of how much memory is used by this undo object. can
     # be overridden by subclasses that need something different.
     def memoryUsed(self):
-        return (BASE_MEMORY_USAGE + memoryUsed(self.linesBefore) +
-                memoryUsed(self.linesAfter))
+        return (
+            BASE_MEMORY_USAGE
+            + memoryUsed(self.linesBefore)
+            + memoryUsed(self.linesAfter)
+        )
 
     # default implementation for undo. can be overridden by subclasses
     # that need something different.
     def undo(self, sp):
         sp.line, sp.column = self.startPos.line, self.startPos.column
 
-        sp.lines[self.elemStartLine : self.elemStartLine + self.linesAfter[0]] = \
+        sp.lines[self.elemStartLine : self.elemStartLine + self.linesAfter[0]] = (
             storage2lines(self.linesBefore)
+        )
 
     # default implementation for redo. can be overridden by subclasses
     # that need something different.
     def redo(self, sp):
         sp.line, sp.column = self.endPos.line, self.endPos.column
 
-        sp.lines[self.elemStartLine : self.elemStartLine + self.linesBefore[0]] = \
+        sp.lines[self.elemStartLine : self.elemStartLine + self.linesBefore[0]] = (
             storage2lines(self.linesAfter)
+        )
+
 
 # stores a full copy of the screenplay before/after the action. used by
 # actions that modify the screenplay globally.
@@ -179,8 +187,7 @@ class SinglePara(Base):
         self.elemStartLine = sp.getParaFirstIndexFromLine(line)
         endLine = sp.getParaLastIndexFromLine(line)
 
-        self.linesBefore = lines2storage(
-            sp.lines[self.elemStartLine : endLine + 1])
+        self.linesBefore = lines2storage(sp.lines[self.elemStartLine : endLine + 1])
 
     def setAfter(self, sp):
         # if all we did was modify a single paragraph, the index of its
@@ -191,8 +198,7 @@ class SinglePara(Base):
 
         endLine = sp.getParaLastIndexFromLine(self.elemStartLine)
 
-        self.linesAfter = lines2storage(
-            sp.lines[self.elemStartLine : endLine + 1])
+        self.linesAfter = lines2storage(sp.lines[self.elemStartLine : endLine + 1])
 
         self.setEndPos(sp)
 
@@ -216,8 +222,7 @@ class ManyElems(Base):
         for i in range(nrOfElemsStart - 1):
             endLine = sp.getElemLastIndexFromLine(endLine + 1)
 
-        self.linesBefore = lines2storage(
-            sp.lines[self.elemStartLine : endLine + 1])
+        self.linesBefore = lines2storage(sp.lines[self.elemStartLine : endLine + 1])
 
     def setAfter(self, sp):
         endLine = sp.getElemLastIndexFromLine(self.elemStartLine)
@@ -225,10 +230,10 @@ class ManyElems(Base):
         for i in range(self.nrOfElemsEnd - 1):
             endLine = sp.getElemLastIndexFromLine(endLine + 1)
 
-        self.linesAfter = lines2storage(
-            sp.lines[self.elemStartLine : endLine + 1])
+        self.linesAfter = lines2storage(sp.lines[self.elemStartLine : endLine + 1])
 
         self.setEndPos(sp)
+
 
 # stores a single block of changed lines by diffing before/after states of
 # a screenplay
@@ -249,8 +254,7 @@ class AnyDifference(Base):
         del self.linesBefore
 
     def memoryUsed(self):
-        return (BASE_MEMORY_USAGE + memoryUsed(self.removed) +
-                memoryUsed(self.inserted))
+        return BASE_MEMORY_USAGE + memoryUsed(self.removed) + memoryUsed(self.inserted)
 
     def undo(self, sp):
         sp.line, sp.column = self.startPos.line, self.startPos.column

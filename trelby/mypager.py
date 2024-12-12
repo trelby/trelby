@@ -1,6 +1,7 @@
 import trelby.screenplay as screenplay
 import trelby.pml as pml
 
+
 # used to iteratively add PML pages to a document
 class Pager:
     def __init__(self, cfg):

@@ -1,6 +1,7 @@
 import trelby.pml as pml
 import trelby.util as util
 
+
 # a script's headers.
 class Headers:
 
@@ -37,6 +38,7 @@ class Headers:
     def generatePML(self, page, pageNr, cfg):
         for h in self.hdrs:
             h.generatePML(page, pageNr, cfg)
+
 
 # a single header string
 class HeaderString:
@@ -103,8 +105,9 @@ class HeaderString:
         self.line = util.str2int(a[0], 1, 1, 5)
         self.xoff = util.str2int(a[1], 0, -100, 100)
 
-        l, c, self.isBold, self.isItalic, self.isUnderlined = \
-            util.flags2bools(a[2], "lcbiu")
+        l, c, self.isBold, self.isItalic, self.isUnderlined = util.flags2bools(
+            a[2], "lcbiu"
+        )
 
         if l:
             self.align = util.ALIGN_LEFT
@@ -125,8 +128,7 @@ class HeaderString:
         else:
             s += "r"
 
-        s += util.bools2flags("biu", self.isBold, self.isItalic,
-                              self.isUnderlined)
+        s += util.bools2flags("biu", self.isBold, self.isItalic, self.isUnderlined)
 
         s += ",,%s" % self.text
 

@@ -4,18 +4,22 @@ import xml.sax.saxutils as xss
 import wx
 import wx.html
 
+
 class CommandsDlg(wx.Frame):
     def __init__(self, cfgGl):
-        wx.Frame.__init__(self, None, -1, "Commands",
-                          size = (650, 600), style = wx.DEFAULT_FRAME_STYLE)
+        wx.Frame.__init__(
+            self, None, -1, "Commands", size=(650, 600), style=wx.DEFAULT_FRAME_STYLE
+        )
 
         # self.Center()
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
         self.SetSizer(vsizer)
 
-        s = '<table border="1"><tr><td><b>Key(s)</b></td>'\
-            '<td><b>Command</b></td></tr>'
+        s = (
+            '<table border="1"><tr><td><b>Key(s)</b></td>'
+            "<td><b>Command</b></td></tr>"
+        )
 
         for cmd in cfgGl.commands:
             s += '<tr><td bgcolor="#dddddd" valign="top">'
@@ -33,7 +37,8 @@ class CommandsDlg(wx.Frame):
 
         s += "</table>"
 
-        self.html = """
+        self.html = (
+            """
 <html><head></head><body>
 
 %s
@@ -51,7 +56,9 @@ F                      Find
 R                      Replace
 </pre>
 </body></html>
-        """ % s
+        """
+            % s
+        )
 
         htmlWin = wx.html.HtmlWindow(self)
         rep = htmlWin.GetInternalRepresentation()
@@ -79,9 +86,12 @@ R                      Replace
         self.Destroy()
 
     def OnSave(self, event):
-        dlg = wx.FileDialog(self, "Filename to save as",
-            wildcard = "HTML files (*.html)|*.html|All files|*",
-            style = wx.SAVE | wx.OVERWRITE_PROMPT)
+        dlg = wx.FileDialog(
+            self,
+            "Filename to save as",
+            wildcard="HTML files (*.html)|*.html|All files|*",
+            style=wx.SAVE | wx.OVERWRITE_PROMPT,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             util.writeToFile(dlg.GetPath(), self.html, self)

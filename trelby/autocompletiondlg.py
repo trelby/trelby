@@ -4,10 +4,16 @@ import trelby.util as util
 
 import wx
 
+
 class AutoCompletionDlg(wx.Dialog):
     def __init__(self, parent, autoCompletion):
-        wx.Dialog.__init__(self, parent, -1, "Auto-completion",
-                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        wx.Dialog.__init__(
+            self,
+            parent,
+            -1,
+            "Auto-completion",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
+        )
 
         self.autoCompletion = autoCompletion
 
@@ -15,10 +21,14 @@ class AutoCompletionDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Element:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        hsizer.Add(
+            wx.StaticText(self, -1, "Element:"),
+            0,
+            wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
+            10,
+        )
 
-        self.elementsCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
+        self.elementsCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
         for t in autoCompletion.types.values():
             self.elementsCombo.Append(t.ti.name, t.ti.lt)
@@ -37,8 +47,9 @@ class AutoCompletionDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticText(self, -1, "Default items:"))
 
-        self.itemsEntry = wx.TextCtrl(self, -1, style = wx.TE_MULTILINE |
-                                      wx.TE_DONTWRAP, size = (400, 200))
+        self.itemsEntry = wx.TextCtrl(
+            self, -1, style=wx.TE_MULTILINE | wx.TE_DONTWRAP, size=(400, 200)
+        )
         self.Bind(wx.EVT_TEXT, self.OnMisc, id=self.itemsEntry.GetId())
         vsizer.Add(self.itemsEntry, 1, wx.EXPAND)
 
@@ -69,9 +80,8 @@ class AutoCompletionDlg(wx.Dialog):
     def OnCancel(self, event):
         self.EndModal(wx.ID_CANCEL)
 
-    def OnElementCombo(self, event = None):
-        self.lt = self.elementsCombo.GetClientData(self.elementsCombo.
-                                                     GetSelection())
+    def OnElementCombo(self, event=None):
+        self.lt = self.elementsCombo.GetClientData(self.elementsCombo.GetSelection())
         t = self.autoCompletion.getType(self.lt)
 
         self.enabledCb.SetValue(t.enabled)
@@ -79,7 +89,7 @@ class AutoCompletionDlg(wx.Dialog):
         self.itemsEntry.Enable(t.enabled)
         self.itemsEntry.SetValue("\n".join(t.items))
 
-    def OnMisc(self, event = None):
+    def OnMisc(self, event=None):
         t = self.autoCompletion.getType(self.lt)
 
         t.enabled = bool(self.enabledCb.IsChecked())

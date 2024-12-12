@@ -7,10 +7,10 @@ import trelby.util as util
 
 import wx
 
+
 class HeadersDlg(wx.Dialog):
     def __init__(self, parent, headers, cfg, cfgGl, applyFunc):
-        wx.Dialog.__init__(self, parent, -1, "Headers",
-                           style = wx.DEFAULT_DIALOG_STYLE)
+        wx.Dialog.__init__(self, parent, -1, "Headers", style=wx.DEFAULT_DIALOG_STYLE)
 
         self.headers = headers
         self.cfg = cfg
@@ -28,8 +28,11 @@ class HeadersDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Empty lines after headers:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
+        hsizer.Add(
+            wx.StaticText(self, -1, "Empty lines after headers:"),
+            0,
+            wx.ALIGN_CENTER_VERTICAL,
+        )
 
         self.elinesEntry = wx.SpinCtrl(self, -1)
         self.elinesEntry.SetRange(0, 5)
@@ -39,13 +42,12 @@ class HeadersDlg(wx.Dialog):
 
         vsizer.Add(hsizer)
 
-        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM,
-                   10)
+        vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 10)
 
         tmp = wx.StaticText(self, -1, "Strings:")
         vsizer.Add(tmp)
 
-        self.stringsLb = wx.ListBox(self, -1, size = (200, 100))
+        self.stringsLb = wx.ListBox(self, -1, size=(200, 100))
         vsizer.Add(self.stringsLb, 0, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -64,8 +66,7 @@ class HeadersDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Text:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
+        hsizer.Add(wx.StaticText(self, -1, "Text:"), 0, wx.ALIGN_CENTER_VERTICAL)
 
         self.textEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.textEntry, 1, wx.LEFT, 10)
@@ -73,16 +74,18 @@ class HeadersDlg(wx.Dialog):
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
 
-        vsizer.Add(wx.StaticText(self, -1,
-            "'${PAGE}' will be replaced by the page number."), 0,
-            wx.ALIGN_CENTER | wx.TOP, 5)
+        vsizer.Add(
+            wx.StaticText(self, -1, "'${PAGE}' will be replaced by the page number."),
+            0,
+            wx.ALIGN_CENTER | wx.TOP,
+            5,
+        )
 
         hsizerTop = wx.BoxSizer(wx.HORIZONTAL)
 
         gsizer = wx.FlexGridSizer(3, 2, 5, 0)
 
-        gsizer.Add(wx.StaticText(self, -1, "Header line:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
+        gsizer.Add(wx.StaticText(self, -1, "Header line:"), 0, wx.ALIGN_CENTER_VERTICAL)
 
         self.lineEntry = wx.SpinCtrl(self, -1)
         self.lineEntry.SetRange(1, 5)
@@ -90,8 +93,12 @@ class HeadersDlg(wx.Dialog):
         self.lineEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(self.lineEntry)
 
-        gsizer.Add(wx.StaticText(self, -1, "X offset (characters):"), 0,
-                   wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10)
+        gsizer.Add(
+            wx.StaticText(self, -1, "X offset (characters):"),
+            0,
+            wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
+            10,
+        )
 
         self.xoffEntry = wx.SpinCtrl(self, -1)
         self.xoffEntry.SetRange(-100, 100)
@@ -99,12 +106,14 @@ class HeadersDlg(wx.Dialog):
         self.xoffEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(self.xoffEntry)
 
-        gsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0,
-                   wx.ALIGN_CENTER_VERTICAL)
-        self.alignCombo = wx.ComboBox(self, -1, style = wx.CB_READONLY)
+        gsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        self.alignCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
-        for it in [ ("Left", util.ALIGN_LEFT), ("Center", util.ALIGN_CENTER),
-                    ("Right", util.ALIGN_RIGHT) ]:
+        for it in [
+            ("Left", util.ALIGN_LEFT),
+            ("Center", util.ALIGN_CENTER),
+            ("Right", util.ALIGN_RIGHT),
+        ]:
             self.alignCombo.Append(it[0], it[1])
 
         gsizer.Add(self.alignCombo)
@@ -112,8 +121,7 @@ class HeadersDlg(wx.Dialog):
 
         hsizerTop.Add(gsizer)
 
-        bsizer = wx.StaticBoxSizer(
-            wx.StaticBox(self, -1, "Style"), wx.HORIZONTAL)
+        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, "Style"), wx.HORIZONTAL)
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
@@ -161,9 +169,15 @@ class HeadersDlg(wx.Dialog):
         self.Bind(wx.EVT_LISTBOX, self.OnStringsLb, id=self.stringsLb.GetId())
 
         # list of widgets that are specific to editing the selected string
-        self.widList = [ self.textEntry, self.xoffEntry, self.alignCombo,
-                         self.lineEntry, self.boldCb, self.italicCb,
-                         self.underlinedCb ]
+        self.widList = [
+            self.textEntry,
+            self.xoffEntry,
+            self.alignCombo,
+            self.lineEntry,
+            self.boldCb,
+            self.italicCb,
+            self.underlinedCb,
+        ]
 
         self.updateGui()
 
@@ -195,11 +209,23 @@ class HeadersDlg(wx.Dialog):
 
         y = self.cfg.marginTop + self.headers.getNrOfLines() * chY
 
-        pg.add(pml.TextOp("Mindy runs away from the dinosaur, but trips on"
-            " the power", self.cfg.marginLeft, y, fs))
+        pg.add(
+            pml.TextOp(
+                "Mindy runs away from the dinosaur, but trips on" " the power",
+                self.cfg.marginLeft,
+                y,
+                fs,
+            )
+        )
 
-        pg.add(pml.TextOp("cord. The raptor approaches her slowly.",
-            self.cfg.marginLeft, y + chY, fs))
+        pg.add(
+            pml.TextOp(
+                "cord. The raptor approaches her slowly.",
+                self.cfg.marginLeft,
+                y + chY,
+                fs,
+            )
+        )
 
         doc.add(pg)
 
@@ -213,7 +239,7 @@ class HeadersDlg(wx.Dialog):
         # some weird state
         event.Skip()
 
-    def OnStringsLb(self, event = None):
+    def OnStringsLb(self, event=None):
         self.hdrIndex = self.stringsLb.GetSelection()
         self.updateHeaderGui()
 
@@ -285,7 +311,7 @@ class HeadersDlg(wx.Dialog):
 
         self.block = False
 
-    def OnMisc(self, event = None):
+    def OnMisc(self, event=None):
         self.headers.emptyLinesAfter = util.getSpinValue(self.elinesEntry)
 
         if (self.hdrIndex == -1) or self.block:

@@ -8,6 +8,7 @@ import wx
 # NameArray, or None if not loaded
 nameArr = None
 
+
 # if not already loaded, read the name database from disk and store it.
 # returns False on errors.
 def readNames(frame):
@@ -43,16 +44,20 @@ def readNames(frame):
         return True
 
     except Exception as e:
-        wx.MessageBox("Error loading name database: %s" % str(e),
-                      "Error", wx.OK, frame)
-
+        wx.MessageBox("Error loading name database: %s" % str(e), "Error", wx.OK, frame)
 
         return False
 
+
 class NamesDlg(wx.Dialog):
     def __init__(self, parent, ctrl):
-        wx.Dialog.__init__(self, parent, -1, "Character name database",
-                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        wx.Dialog.__init__(
+            self,
+            parent,
+            -1,
+            "Character name database",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
+        )
 
         self.ctrl = ctrl
 
@@ -62,8 +67,9 @@ class NamesDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticText(self, -1, "Search in:"))
 
-        self.typeList = wx.ListCtrl(self, -1,
-            style = wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES)
+        self.typeList = wx.ListCtrl(
+            self, -1, style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES
+        )
 
         self.typeList.InsertColumn(0, "Count")
         self.typeList.InsertColumn(1, "Type")
@@ -103,7 +109,7 @@ class NamesDlg(wx.Dialog):
         self.Bind(wx.EVT_BUTTON, self.OnSearch, id=searchBtn.GetId())
         vsizer2.Add(searchBtn, 0, wx.BOTTOM | wx.TOP, 10)
 
-        self.searchEntry = wx.TextCtrl(self, -1, style = wx.TE_PROCESS_ENTER)
+        self.searchEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         vsizer2.Add(self.searchEntry, 0, wx.EXPAND)
 
         tmp = wx.Button(self, -1, "Insert")
@@ -112,14 +118,24 @@ class NamesDlg(wx.Dialog):
 
         hsizer2.Add(vsizer2, 1, wx.RIGHT, 10)
 
-        self.nameRb = wx.RadioBox(self, -1, "Name",
-            style = wx.RA_SPECIFY_COLS, majorDimension = 1,
-            choices = [ "begins with", "contains", "ends in" ])
+        self.nameRb = wx.RadioBox(
+            self,
+            -1,
+            "Name",
+            style=wx.RA_SPECIFY_COLS,
+            majorDimension=1,
+            choices=["begins with", "contains", "ends in"],
+        )
         hsizer2.Add(self.nameRb)
 
-        self.sexRb = wx.RadioBox(self, -1, "Sex",
-            style = wx.RA_SPECIFY_COLS, majorDimension = 1,
-            choices = [ "Male", "Female", "Both" ])
+        self.sexRb = wx.RadioBox(
+            self,
+            -1,
+            "Sex",
+            style=wx.RA_SPECIFY_COLS,
+            majorDimension=1,
+            choices=["Male", "Female", "Both"],
+        )
         self.sexRb.SetSelection(2)
         hsizer2.Add(self.sexRb, 0, wx.LEFT, 5)
 
@@ -130,8 +146,9 @@ class NamesDlg(wx.Dialog):
         self.list = MyListCtrl(self)
         vsizer.Add(self.list, 1, wx.EXPAND | wx.BOTTOM, 5)
 
-        self.foundLabel = wx.StaticText(self, -1, "",
-            style = wx.ALIGN_CENTRE | wx.ST_NO_AUTORESIZE)
+        self.foundLabel = wx.StaticText(
+            self, -1, "", style=wx.ALIGN_CENTRE | wx.ST_NO_AUTORESIZE
+        )
         vsizer.Add(self.foundLabel, 0, wx.EXPAND)
 
         hsizer.Add(vsizer, 20, wx.EXPAND | wx.LEFT, 10)
@@ -145,10 +162,11 @@ class NamesDlg(wx.Dialog):
         self.OnSearch()
         self.searchEntry.SetFocus()
 
-    def selectAllTypes(self, event = None):
+    def selectAllTypes(self, event=None):
         for i in range(len(nameArr.typeNamesById)):
-            self.typeList.SetItemState(i, wx.LIST_STATE_SELECTED,
-                                       wx.LIST_STATE_SELECTED)
+            self.typeList.SetItemState(
+                i, wx.LIST_STATE_SELECTED, wx.LIST_STATE_SELECTED
+            )
 
     def OnHeaderClick(self, event):
         if event.GetColumn() == 0:
@@ -157,7 +175,10 @@ class NamesDlg(wx.Dialog):
             self.typeList.SortItems(self.CmpType)
 
     def CmpFreq(self, i1, i2):
-        return nameArr.typeNamesCnt[nameArr.typeNamesById[i2]] - nameArr.typeNamesCnt[nameArr.typeNamesById[i1]]
+        return (
+            nameArr.typeNamesCnt[nameArr.typeNamesById[i2]]
+            - nameArr.typeNamesCnt[nameArr.typeNamesById[i1]]
+        )
 
     def cmpfunc(a, b):
         return (a > b) - (a < b)
@@ -166,8 +187,7 @@ class NamesDlg(wx.Dialog):
         return util.cmpfunc(nameArr.typeNamesById[i1], nameArr.typeNamesById[i2])
 
     def OnInsertName(self, event):
-        item = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL,
-                                     wx.LIST_STATE_SELECTED)
+        item = self.list.GetNextItem(-1, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED)
 
         if item == -1:
             return
@@ -179,7 +199,7 @@ class NamesDlg(wx.Dialog):
         for ch in name:
             self.ctrl.OnKeyChar(util.MyKeyEvent(ord(ch)))
 
-    def OnSearch(self, event = None):
+    def OnSearch(self, event=None):
         l = []
 
         wx.BeginBusyCursor()
@@ -191,8 +211,9 @@ class NamesDlg(wx.Dialog):
         item = -1
 
         while 1:
-            item = self.typeList.GetNextItem(item, wx.LIST_NEXT_ALL,
-                wx.LIST_STATE_SELECTED)
+            item = self.typeList.GetNextItem(
+                item, wx.LIST_NEXT_ALL, wx.LIST_STATE_SELECTED
+            )
 
             if item == -1:
                 break
@@ -235,11 +256,19 @@ class NamesDlg(wx.Dialog):
 
         self.foundLabel.SetLabel("%d names found." % len(l))
 
+
 class MyListCtrl(wx.ListCtrl):
     def __init__(self, parent):
-        wx.ListCtrl.__init__(self, parent, -1,
-            style = wx.LC_REPORT | wx.LC_VIRTUAL | wx.LC_SINGLE_SEL |
-                    wx.LC_HRULES | wx.LC_VRULES)
+        wx.ListCtrl.__init__(
+            self,
+            parent,
+            -1,
+            style=wx.LC_REPORT
+            | wx.LC_VIRTUAL
+            | wx.LC_SINGLE_SEL
+            | wx.LC_HRULES
+            | wx.LC_VRULES,
+        )
 
         self.sex = ["Female", "Male"]
 
@@ -255,7 +284,7 @@ class MyListCtrl(wx.ListCtrl):
         w = util.getTextExtent(self.GetFont(), "Female")[0] + 15
         self.SetColumnWidth(2, w)
 
-        util.setWH(self, w = 120*2 + w + 25)
+        util.setWH(self, w=120 * 2 + w + 25)
 
     def OnGetItemText(self, item, col):
         n = self.items[item]

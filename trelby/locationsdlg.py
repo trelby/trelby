@@ -3,10 +3,16 @@ import trelby.util as util
 
 import wx
 
+
 class LocationsDlg(wx.Dialog):
     def __init__(self, parent, sp):
-        wx.Dialog.__init__(self, parent, -1, "Locations",
-                           style = wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
+        wx.Dialog.__init__(
+            self,
+            parent,
+            -1,
+            "Locations",
+            style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
+        )
 
         self.sp = sp
 
@@ -15,7 +21,7 @@ class LocationsDlg(wx.Dialog):
         tmp = wx.StaticText(self, -1, "Locations:")
         vsizer.Add(tmp)
 
-        self.locationsLb = wx.ListBox(self, -1, size = (450, 200))
+        self.locationsLb = wx.ListBox(self, -1, size=(450, 200))
         vsizer.Add(self.locationsLb, 1, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -33,8 +39,7 @@ class LocationsDlg(wx.Dialog):
         tmp = wx.StaticText(self, -1, "Scenes:")
         vsizer.Add(tmp)
 
-        self.scenesLb = wx.ListBox(self, -1, size = (450, 200),
-                                   style = wx.LB_EXTENDED)
+        self.scenesLb = wx.ListBox(self, -1, size=(450, 200), style=wx.LB_EXTENDED)
         vsizer.Add(self.scenesLb, 1, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -84,16 +89,14 @@ class LocationsDlg(wx.Dialog):
         selected = self.scenesLb.GetSelections()
 
         if not selected:
-            wx.MessageBox("No scenes selected in the lower list.", "Error",
-                          wx.OK, self)
+            wx.MessageBox("No scenes selected in the lower list.", "Error", wx.OK, self)
 
             return
 
         locIdx = self.locationsLb.GetSelection()
 
         # if user has selected a separator line, treat it as no selection
-        if (locIdx != -1) and\
-               (self.locationsLb.GetClientData(locIdx) == None):
+        if (locIdx != -1) and (self.locationsLb.GetClientData(locIdx) == None):
             locIdx = -1
 
         addSep = False
@@ -133,8 +136,7 @@ class LocationsDlg(wx.Dialog):
             scene = self.locationsLb.GetClientData(idx)
 
         if scene == None:
-            wx.MessageBox("No scene selected in the upper list.", "Error",
-                          wx.OK, self)
+            wx.MessageBox("No scene selected in the upper list.", "Error", wx.OK, self)
 
             return
 
@@ -157,8 +159,9 @@ class LocationsDlg(wx.Dialog):
             lastWasSep = cdata == None
 
         # if it goes completely empty, remove the single separator line
-        if (self.locationsLb.GetCount() == 1) and\
-           (self.locationsLb.GetClientData(0) == None):
+        if (self.locationsLb.GetCount() == 1) and (
+            self.locationsLb.GetClientData(0) == None
+        ):
             self.locationsLb.Delete(0)
 
     def fillGui(self):

@@ -1,5 +1,5 @@
 import trelby.config as config
-from trelby.error import MiscError,TrelbyError
+from trelby.error import MiscError, TrelbyError
 import trelby.misc as misc
 import trelby.util as util
 
@@ -8,11 +8,13 @@ import tempfile
 
 if "TRELBY_TESTING" in os.environ:
     import unittest.mock as mock
+
     wx = mock.Mock()
 else:
     import wx
 
 # this contains misc GUI-related functions
+
 
 # since at least GTK 1.2's single-selection listbox is buggy in that if we
 # don't deselect the old item manually, it does multiple selections, we
@@ -23,10 +25,11 @@ else:
 def listBoxSelect(lb, index):
     old = lb.GetSelection()
 
-    if  old!= -1:
+    if old != -1:
         lb.SetSelection(old, False)
 
     lb.SetSelection(index, True)
+
 
 # add (name, cdata) to the listbox at the correct place, determined by
 # cmp(cdata1, cdata2).
@@ -40,6 +43,7 @@ def listBoxAdd(lb, name, cdata):
 
     lb.Append(name, cdata)
 
+
 # create stock button.
 def createStockButton(parent, label):
     # wxMSW does not really have them: it does not have any icons and it
@@ -47,17 +51,18 @@ def createStockButton(parent, label):
     # all, so it's better not to use them at all on Windows.
     if misc.isUnix:
         ids = {
-            "OK" : wx.ID_OK,
-            "Cancel" : wx.ID_CANCEL,
-            "Apply" : wx.ID_APPLY,
-            "Add" : wx.ID_ADD,
-            "Delete" : wx.ID_DELETE,
-            "Preview" : wx.ID_PREVIEW
-            }
+            "OK": wx.ID_OK,
+            "Cancel": wx.ID_CANCEL,
+            "Apply": wx.ID_APPLY,
+            "Add": wx.ID_ADD,
+            "Delete": wx.ID_DELETE,
+            "Preview": wx.ID_PREVIEW,
+        }
 
         return wx.Button(parent, ids[label])
     else:
         return wx.Button(parent, -1, label)
+
 
 # wxWidgets has a bug in 2.6 on wxGTK2 where double clicking on a button
 # does not send two wx.EVT_BUTTON events, only one. since the wxWidgets
@@ -69,17 +74,19 @@ def btnDblClick(btn, func):
     if misc.isUnix:
         btn.Bind(wx.EVT_LEFT_DCLICK, func)
 
+
 # show PDF document 'pdfData' in an external viewer program. writes out a
 # temporary file, first deleting all old temporary files, then opens PDF
 # viewer application. 'mainFrame' is used as a parent for message boxes in
 # case there are any errors.
-def showTempPDF(pdfData: bytes, cfgGl: 'config.ConfigGlobal', mainFrame: wx.TopLevelWindow) -> None:
+def showTempPDF(
+    pdfData: bytes, cfgGl: "config.ConfigGlobal", mainFrame: wx.TopLevelWindow
+) -> None:
     try:
         try:
             util.removeTempFiles(misc.tmpPrefix)
 
-            fd, filename = tempfile.mkstemp(prefix = misc.tmpPrefix,
-                                            suffix = ".pdf")
+            fd, filename = tempfile.mkstemp(prefix=misc.tmpPrefix, suffix=".pdf")
 
             try:
                 if isinstance(pdfData, str):
@@ -96,5 +103,6 @@ def showTempPDF(pdfData: bytes, cfgGl: 'config.ConfigGlobal', mainFrame: wx.TopL
             raise MiscError("IOError: %s" % strerror)
 
     except TrelbyError as e:
-        wx.MessageBox("Error writing temporary PDF file: %s" % e,
-                      "Error", wx.OK, mainFrame)
+        wx.MessageBox(
+            "Error writing temporary PDF file: %s" % e, "Error", wx.OK, mainFrame
+        )

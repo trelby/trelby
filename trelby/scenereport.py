@@ -4,6 +4,7 @@ import trelby.pml as pml
 import trelby.screenplay as screenplay
 import trelby.util as util
 
+
 class SceneReport:
     def __init__(self, sp):
         self.sp = sp
@@ -31,25 +32,33 @@ class SceneReport:
 
         # information about what to include (and yes, the comma is needed
         # to unpack the list)
-        self.INF_SPEAKERS, = list(range(1))
+        (self.INF_SPEAKERS,) = list(range(1))
         self.inf = []
         for s in ["Speakers"]:
             self.inf.append(misc.CheckBoxItem(s))
 
     def generate(self) -> bytes:
-        tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 15.0, 12)
+        tf = pml.TextFormatter(
+            self.sp.cfg.paperWidth, self.sp.cfg.paperHeight, 15.0, 12
+        )
 
         for si in self.scenes:
             tf.addSpace(5.0)
 
-            tf.addText("%-4s %s" % (si.number, si.name), style = pml.BOLD)
+            tf.addText("%-4s %s" % (si.number, si.name), style=pml.BOLD)
 
             tf.addSpace(1.0)
 
-            tf.addText("     Lines: %d (%s%% action), Pages: %d"
-                " (%s)" % (si.lines, util.pct(si.actionLines, si.lines),
-                len(si.pages), si.pages))
+            tf.addText(
+                "     Lines: %d (%s%% action), Pages: %d"
+                " (%s)"
+                % (
+                    si.lines,
+                    util.pct(si.actionLines, si.lines),
+                    len(si.pages),
+                    si.pages,
+                )
+            )
 
             if self.inf[self.INF_SPEAKERS].selected:
                 tf.addSpace(2.5)
@@ -58,6 +67,7 @@ class SceneReport:
                     tf.addText("     %3d  %s" % (it[1], it[0]))
 
         return pdf.generate(tf.doc)
+
 
 # information about one scene
 class SceneInfo:

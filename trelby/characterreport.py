@@ -6,6 +6,7 @@ import trelby.util as util
 from functools import reduce
 import functools
 
+
 class CharacterReport:
     def __init__(self, sp):
 
@@ -25,12 +26,10 @@ class CharacterReport:
         for i in range(len(ls)):
             line = ls[i]
 
-            if (line.lt == screenplay.SCENE) and\
-                   (line.lb == screenplay.LB_LAST):
+            if (line.lt == screenplay.SCENE) and (line.lb == screenplay.LB_LAST):
                 scene = util.upper(line.text)
 
-            elif (line.lt == screenplay.CHARACTER) and\
-                   (line.lb == screenplay.LB_LAST):
+            elif (line.lt == screenplay.CHARACTER) and (line.lb == screenplay.LB_LAST):
                 name = util.upper(line.text)
                 curSpeechLines = 0
 
@@ -55,8 +54,7 @@ class CharacterReport:
                     words = util.splitToWords(line.text)
 
                     ci.wordCnt += len(words)
-                    ci.wordCharCnt += reduce(lambda x, y: x + len(y), words,
-                                             0)
+                    ci.wordCharCnt += reduce(lambda x, y: x + len(y), words, 0)
 
                 ci.pages.addPage(sp.line2page(i))
 
@@ -87,41 +85,53 @@ class CharacterReport:
         return reduce(lambda tot, ci: tot + getattr(ci, name), self.cinfo, 0)
 
     def generate(self) -> bytes:
-        tf = pml.TextFormatter(self.sp.cfg.paperWidth,
-                               self.sp.cfg.paperHeight, 20.0, 12)
+        tf = pml.TextFormatter(
+            self.sp.cfg.paperWidth, self.sp.cfg.paperHeight, 20.0, 12
+        )
 
         for ci in self.cinfo:
             if not ci.include:
                 continue
 
-            tf.addText(ci.name, fs = 14,
-                       style = pml.BOLD | pml.UNDERLINED)
+            tf.addText(ci.name, fs=14, style=pml.BOLD | pml.UNDERLINED)
 
             if self.inf[self.INF_BASIC].selected:
-                tf.addText("Speeches: %d, Lines: %d (%.2f%%),"
-                    " per speech: %.2f" % (ci.speechCnt, ci.lineCnt,
-                    util.pctf(ci.lineCnt, self.totalLineCnt),
-                    util.safeDiv(ci.lineCnt, ci.speechCnt)))
+                tf.addText(
+                    "Speeches: %d, Lines: %d (%.2f%%),"
+                    " per speech: %.2f"
+                    % (
+                        ci.speechCnt,
+                        ci.lineCnt,
+                        util.pctf(ci.lineCnt, self.totalLineCnt),
+                        util.safeDiv(ci.lineCnt, ci.speechCnt),
+                    )
+                )
 
-                tf.addText("Words: %d, per speech: %.2f,"
-                    " characters per: %.2f" % (ci.wordCnt,
-                    util.safeDiv(ci.wordCnt, ci.speechCnt),
-                    util.safeDiv(ci.wordCharCnt, ci.wordCnt)))
+                tf.addText(
+                    "Words: %d, per speech: %.2f,"
+                    " characters per: %.2f"
+                    % (
+                        ci.wordCnt,
+                        util.safeDiv(ci.wordCnt, ci.speechCnt),
+                        util.safeDiv(ci.wordCharCnt, ci.wordCnt),
+                    )
+                )
 
             if self.inf[self.INF_PAGES].selected:
-                tf.addWrappedText("Pages: %d, list: %s" % (len(ci.pages),
-                    ci.pages), "       ")
+                tf.addWrappedText(
+                    "Pages: %d, list: %s" % (len(ci.pages), ci.pages), "       "
+                )
 
             if self.inf[self.INF_LOCATIONS].selected:
                 tf.addSpace(2.5)
 
                 for it in util.sortDict(ci.scenes):
-                    tf.addText("%3d %s" % (it[1], it[0]),
-                               x = tf.margin * 2.0, fs = 10)
+                    tf.addText("%3d %s" % (it[1], it[0]), x=tf.margin * 2.0, fs=10)
 
             tf.addSpace(5.0)
 
         return pdf.generate(tf.doc)
+
 
 # information about one character
 class CharInfo:
@@ -136,8 +146,10 @@ class CharInfo:
         self.include = True
         self.pages = screenplay.PageList(sp.getPageNumbers())
 
+
 def cmpfunc(a, b):
     return (a > b) - (a < b)
+
 
 def cmpLines(c1, c2):
     ret = cmpfunc(c2.lineCnt, c1.lineCnt)
