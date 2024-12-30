@@ -668,7 +668,7 @@ class MyCtrl(wx.Control):
         else:
             delta = cfgGl.mouseWheelLines
 
-        self.sp.setTopLine(self.sp.getTopLine() + delta)
+        self.sp.setTopLine(self.scrollBarVertical.GetThumbPosition() + delta)
         self.updateScreen()
 
     def OnScroll(self, event):
