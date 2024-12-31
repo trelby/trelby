@@ -61,7 +61,7 @@ def init(doWX=True):
             elif os.path.exists(default_confPath):
                 confPath = default_confPath
             else:
-                str(os.environ["HOME"]) + ".config/trelby"
+                confPath = str(os.environ["HOME"]) + ".config/trelby"
 
         else:
             progPath = str(
