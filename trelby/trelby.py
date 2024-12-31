@@ -1,33 +1,32 @@
 # -*- coding: iso-8859-1 -*-
 
-import trelby
-from trelby.error import TrelbyError
-import trelby.autocompletiondlg as autocompletiondlg
-import trelby.cfgdlg as cfgdlg
-import trelby.charmapdlg as charmapdlg
-import trelby.commandsdlg as commandsdlg
-import trelby.config as config
-import trelby.dialoguechart as dialoguechart
-import trelby.finddlg as finddlg
-import trelby.gutil as gutil
-import trelby.headersdlg as headersdlg
-import trelby.locationsdlg as locationsdlg
-import trelby.misc as misc
-import trelby.myimport as myimport
-import trelby.mypickle as mypickle
-import trelby.namesdlg as namesdlg
-import trelby.opts as opts
-import trelby.pml as pml
-import trelby.reports as reports
-import trelby.screenplay as screenplay
-import trelby.spellcheck as spellcheck
-import trelby.spellcheckcfgdlg as spellcheckcfgdlg
-import trelby.spellcheckdlg as spellcheckdlg
-import trelby.splash as splash
-import trelby.titlesdlg as titlesdlg
-import trelby.util as util
-import trelby.viewmode as viewmode
-import trelby.watermarkdlg as watermarkdlg
+from error import TrelbyError
+import autocompletiondlg
+import cfgdlg
+import charmapdlg
+import commandsdlg
+import config
+import dialoguechart
+import finddlg
+import gutil
+import headersdlg
+import locationsdlg
+import misc
+import myimport
+import mypickle
+import namesdlg
+import opts
+import pml
+import reports
+import screenplay
+import spellcheck
+import spellcheckcfgdlg
+import spellcheckdlg
+import splash
+import titlesdlg
+import util
+import viewmode
+import watermarkdlg
 import webbrowser
 
 import copy
@@ -41,7 +40,7 @@ import wx
 
 from functools import partial
 
-# keycodes
+#keycodes
 KC_CTRL_A = 1
 KC_CTRL_B = 2
 KC_CTRL_D = 4
@@ -51,22 +50,18 @@ KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
 
-(
-    VIEWMODE_DRAFT,
-    VIEWMODE_LAYOUT,
-    VIEWMODE_SIDE_BY_SIDE,
-) = list(range(3))
-
+VIEWMODE_DRAFT,\
+VIEWMODE_LAYOUT,\
+VIEWMODE_SIDE_BY_SIDE,\
+= list(range(3))
 
 def refreshGuiConfig():
     global cfgGui
 
     cfgGui = config.ConfigGui(cfgGl)
 
-
 def getCfgGui():
     return cfgGui
-
 
 # keeps (some) global data
 class GlobalData:
@@ -90,14 +85,8 @@ class GlobalData:
 
         v = self.cvars = mypickle.Vars()
 
-        initialPosX = 0
-        initialPosY = 0
-        if misc.isMac:
-            initialPosX = 100
-            initialPosY = 100
-
-        v.addInt("posX", initialPosX, "PositionX", -20, 9999)
-        v.addInt("posY", initialPosY, "PositionY", -20, 9999)
+        v.addInt("posX", 0, "PositionX", -20, 9999)
+        v.addInt("posY", 0, "PositionY", -20, 9999)
 
         # linux has bigger font by default so it needs a wider window
         defaultW = 750
@@ -107,22 +96,17 @@ class GlobalData:
         v.addInt("width", defaultW, "Width", 500, 9999)
 
         v.addInt("height", 830, "Height", 300, 9999)
-        v.addInt(
-            "viewMode",
-            VIEWMODE_DRAFT,
-            "ViewMode",
-            VIEWMODE_DRAFT,
-            VIEWMODE_SIDE_BY_SIDE,
-        )
+        v.addInt("viewMode", VIEWMODE_DRAFT, "ViewMode", VIEWMODE_DRAFT,
+                 VIEWMODE_SIDE_BY_SIDE)
 
-        v.addList("files", [], "Files", mypickle.StrUnicodeVar("", "", ""))
+        v.addList("files", [], "Files",
+                  mypickle.StrUnicodeVar("", "", ""))
 
         v.makeDicts()
         v.setDefaults(self)
 
-        self.height = min(
-            self.height, wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) - 50
-        )
+        self.height = min(self.height,
+            wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) - 50)
 
         self.vmDraft = viewmode.ViewModeDraft()
         self.vmLayout = viewmode.ViewModeLayout()
@@ -139,13 +123,9 @@ class GlobalData:
             try:
                 os.mkdir(misc.toPath(misc.confPath), mode=0o755)
             except OSError(os.errno, os.strerror):
-                wx.MessageBox(
-                    "Error creating configuration directory\n"
-                    "'%s': %s" % (misc.confPath, os.strerror),
-                    "Error",
-                    wx.OK,
-                    None,
-                )
+                wx.MessageBox("Error creating configuration directory\n"
+                              "'%s': %s" % (misc.confPath, os.strerror),
+                              "Error", wx.OK, None)
 
     # set viewmode, the parameter is one of the VIEWMODE_ defines.
     def setViewMode(self, viewMode):
@@ -176,67 +156,46 @@ class GlobalData:
     def saveScDict(self):
         util.writeToFile(self.scDictFilename, self.scDict.save(), mainFrame)
 
-
-class MyPanel(wx.Panel):
+class MyPanel(wx.ScrolledWindow):
 
     def __init__(self, parent, id):
-        wx.Panel.__init__(
-            self,
-            parent,
-            id,
+        wx.ScrolledWindow.__init__(
+            self, parent, id,
             # wxMSW/Windows does not seem to support
             # wx.NO_BORDER, which sucks
-            style=wx.WANTS_CHARS | wx.NO_BORDER,
-        )
+            style = wx.WANTS_CHARS | wx.NO_BORDER | wx.HSCROLL)
 
-        # Vertical scrolling is achieved using a scroll bar that is connected to the Screenplay object. It changes
-        # the sp.line property when scrolled, which causes the rendering code to render starting from a different line.
-        # The reasons for this architectural decision are unknown as of 2023, but it has the advantage that only the
-        # part of the screenplay that gets displayed given the current scrolling position will be rendered.
-        self.scrollBarVertical = wx.ScrollBar(self, -1, style=wx.SB_VERTICAL)
+        hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         # Horizontal scrolling is achieved by putting the MyControl instance into a ScrolledWindow. The MyControl
         # content will always be rendered at full width, but if the available size is less than the rendered size, a
         # scroll bar will automatically appear an allow scrolling.
         scrolledWindowForCtrl = wx.ScrolledWindow(self, id, style=wx.HSCROLL)
 
-        # scrollBarVertical and the (horizontally scrollable) scrolledWindowForCtrl need to be created before
-        self.ctrl = MyCtrl(scrolledWindowForCtrl, -1, self.scrollBarVertical)
-
-        scrolledWindowForCtrl.SetScrollRate(int(self.ctrl.chX), int(self.ctrl.chY))
-        scrolledWindowForCtrl.EnableScrolling(True, False)
-
-        sizer = wx.BoxSizer(
-            wx.VERTICAL
-        )  # we need this sizer only to make the MyCtrl expand to the size of the ScrolledWindow
-        sizer.Add(self.ctrl, 1, wx.EXPAND)
-        scrolledWindowForCtrl.SetSizer(sizer)
-
-        # the vertical scroll bar will be placed next to the (horizontally scrollable) ScrolledWindow that contains the
-        # MyCtrl instance
-        hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        hsizer.Add(scrolledWindowForCtrl, 1, wx.EXPAND)
+        hsizer.Add(self.ctrl, 1, wx.EXPAND)
         hsizer.Add(self.scrollBarVertical, 0, wx.EXPAND)
 
         self.scrollBarVertical.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
+
         self.scrollBarVertical.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
 
         self.SetSizer(hsizer)
+        self.SetScrollRate(int(self.ctrl.chX), int(self.ctrl.chY))
+        self.EnableScrolling(True, False)
 
     # we never want the scrollbar to get the keyboard focus, pass it on to
     # the main widget
     def OnScrollbarFocus(self, event):
         self.ctrl.SetFocus()
 
-
 class MyCtrl(wx.Control):
 
     def __init__(self, parent, id, scrollBarVertical: wx.ScrollBar):
         style = wx.WANTS_CHARS | wx.FULL_REPAINT_ON_RESIZE | wx.NO_BORDER
-        wx.Control.__init__(self, parent, id, style=style)
+        wx.Control.__init__(self, parent, id, style = style)
 
         self.scrollBarVertical = scrollBarVertical
-        self.panel = parent.GetParent()
+        self.panel = parent
 
         self.Bind(wx.EVT_SIZE, self.OnSize)
         self.Bind(wx.EVT_PAINT, self.OnPaint)
@@ -271,7 +230,7 @@ class MyCtrl(wx.Control):
         # find dialog stored settings
         self.findDlgFindText = ""
         self.findDlgReplaceText = ""
-        self.findDlgMatchWholeWord = False
+        self.findDlgMatchWholeWord= False
         self.findDlgMatchCase = False
         self.findDlgDirUp = False
         self.findDlgUseExtra = False
@@ -310,7 +269,8 @@ class MyCtrl(wx.Control):
         try:
             (sp, msg) = screenplay.Screenplay.load(s, cfgGl)
         except TrelbyError as e:
-            wx.MessageBox("Error loading file:\n\n%s" % e, "Error", wx.OK, mainFrame)
+            wx.MessageBox("Error loading file:\n\n%s" % e, "Error",
+                          wx.OK, mainFrame)
 
             return
 
@@ -348,9 +308,7 @@ class MyCtrl(wx.Control):
         elif fileName.endswith("astx"):
             lines = myimport.importAstx(fileName, mainFrame)
         elif fileName.endswith("fountain"):
-            lines, titlePages = myimport.importFountain(
-                fileName, mainFrame, self.sp.titles.pages
-            )
+            lines, titlePages = myimport.importFountain(fileName, mainFrame, self.sp.titles.pages)
         elif fileName.endswith("fadein"):
             lines = myimport.importFadein(fileName, mainFrame)
         else:
@@ -373,7 +331,8 @@ class MyCtrl(wx.Control):
         inf = []
         inf.append(misc.CheckBoxItem("Include page markers"))
 
-        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf, "Options:", False)
+        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf,
+                               "Options:", False)
 
         if dlg.ShowModal() != wx.ID_OK:
             dlg.Destroy()
@@ -386,7 +345,8 @@ class MyCtrl(wx.Control):
         inf = []
         inf.append(misc.CheckBoxItem("Include Notes"))
 
-        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf, "Options:", False)
+        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf,
+                               "Options:", False)
 
         if dlg.ShowModal() != wx.ID_OK:
             dlg.Destroy()
