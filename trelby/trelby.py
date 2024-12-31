@@ -167,10 +167,8 @@ class MyPanel(wx.Panel):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        # Horizontal scrolling is achieved by putting the MyControl instance into a ScrolledWindow. The MyControl
-        # content will always be rendered at full width, but if the available size is less than the rendered size, a
-        # scroll bar will automatically appear an allow scrolling.
-        scrolledWindowForCtrl = wx.ScrolledWindow(self, id, style=wx.HSCROLL)
+        self.scrollBarVertical = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
+        self.ctrl = MyCtrl(self, -1)
 
         hsizer.Add(self.ctrl, 1, wx.EXPAND)
         hsizer.Add(self.scrollBarVertical, 0, wx.EXPAND)
@@ -188,11 +186,10 @@ class MyPanel(wx.Panel):
 
 class MyCtrl(wx.Control):
 
-    def __init__(self, parent, id, scrollBarVertical: wx.ScrollBar):
+    def __init__(self, parent, id):
         style = wx.WANTS_CHARS | wx.FULL_REPAINT_ON_RESIZE | wx.NO_BORDER
         wx.Control.__init__(self, parent, id, style = style)
 
-        self.scrollBarVertical = scrollBarVertical
         self.panel = parent
 
         self.Bind(wx.EVT_SIZE, self.OnSize)
@@ -420,8 +417,8 @@ class MyCtrl(wx.Control):
         # about draft / layout mode differences.
         approx = int(((height / self.mm2p) / self.chY) / 1.3)
 
-        self.scrollBarVertical.SetScrollbar(self.sp.getTopLine(), approx,
-                                                  len(self.sp.lines) + approx - 1, approx)
+        self.panel.scrollBar.SetScrollbar(self.sp.getTopLine(), approx,
+            len(self.sp.lines) + approx - 1, approx)
 
     def clearAutoComp(self):
         if self.sp.clearAutoComp():
@@ -614,7 +611,7 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     def OnScroll(self, event):
-        pos = self.scrollBarVertical.GetThumbPosition()
+        pos = self.panel.scrollBar.GetThumbPosition()
         self.sp.setTopLine(pos)
         self.sp.clearAutoComp()
         self.updateScreen()
