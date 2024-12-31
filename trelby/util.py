@@ -1181,15 +1181,7 @@ def getPDFViewer():
         # Need to check for Mac before Unix as macOS is a Unix
         progs = [("/System/Applications/Preview.app", "")]
     elif misc.isUnix:
-        progs = [
-            ("/usr/local/Adobe/Acrobat7.0/bin/acroread", "-tempFile"),
-            ("acroread", "-tempFile"),
-            ("xpdf", ""),
-            ("evince", ""),
-            ("gpdf", ""),
-            ("kpdf", ""),
-            ("okular", ""),
-        ]
+        progs = [("/usr/bin/xdg-open/", "")]
     elif misc.isWindows:
         # get value via registry if possible, or fallback to old method.
         viewer = _getWindowsPDFViewer()
