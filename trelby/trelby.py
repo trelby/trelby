@@ -156,14 +156,14 @@ class GlobalData:
     def saveScDict(self):
         util.writeToFile(self.scDictFilename, self.scDict.save(), mainFrame)
 
-class MyPanel(wx.ScrolledWindow):
+class MyPanel(wx.Panel):
 
     def __init__(self, parent, id):
-        wx.ScrolledWindow.__init__(
+        wx.Panel.__init__(
             self, parent, id,
             # wxMSW/Windows does not seem to support
             # wx.NO_BORDER, which sucks
-            style = wx.WANTS_CHARS | wx.NO_BORDER | wx.HSCROLL)
+            style = wx.WANTS_CHARS | wx.NO_BORDER)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -180,8 +180,6 @@ class MyPanel(wx.ScrolledWindow):
         self.scrollBarVertical.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
 
         self.SetSizer(hsizer)
-        self.SetScrollRate(int(self.ctrl.chX), int(self.ctrl.chY))
-        self.EnableScrolling(True, False)
 
     # we never want the scrollbar to get the keyboard focus, pass it on to
     # the main widget
@@ -440,8 +438,6 @@ class MyCtrl(wx.Control):
 
     def updateScreen(self, redraw = True, setCommon = True):
         self.adjustScrollBar()
-        self.SetMinSize(wx.Size(int(self.pageW), 10)) # the vertical min size is irrelevant currently, as vertical scrolling is still self-implemented
-        self.PostSizeEventToParent()
 
         if setCommon:
             self.updateCommon()
