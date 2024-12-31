@@ -200,6 +200,7 @@ class MyPanel(wx.Panel):
         # scroll bar will automatically appear an allow scrolling.
         scrolledWindowForCtrl = wx.ScrolledWindow(self, id, style=wx.HSCROLL)
 
+        # scrollBarVertical and the (horizontally scrollable) scrolledWindowForCtrl need to be created before
         self.ctrl = MyCtrl(scrolledWindowForCtrl, -1, self.scrollBarVertical)
 
         scrolledWindowForCtrl.SetScrollRate(int(self.ctrl.chX), int(self.ctrl.chY))
