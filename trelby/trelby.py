@@ -1,32 +1,33 @@
 # -*- coding: iso-8859-1 -*-
 
-from error import TrelbyError
-import autocompletiondlg
-import cfgdlg
-import charmapdlg
-import commandsdlg
-import config
-import dialoguechart
-import finddlg
-import gutil
-import headersdlg
-import locationsdlg
-import misc
-import myimport
-import mypickle
-import namesdlg
-import opts
-import pml
-import reports
-import screenplay
-import spellcheck
-import spellcheckcfgdlg
-import spellcheckdlg
-import splash
-import titlesdlg
-import util
-import viewmode
-import watermarkdlg
+import trelby
+from trelby.error import TrelbyError
+import trelby.autocompletiondlg as autocompletiondlg
+import trelby.cfgdlg as cfgdlg
+import trelby.charmapdlg as charmapdlg
+import trelby.commandsdlg as commandsdlg
+import trelby.config as config
+import trelby.dialoguechart as dialoguechart
+import trelby.finddlg as finddlg
+import trelby.gutil as gutil
+import trelby.headersdlg as headersdlg
+import trelby.locationsdlg as locationsdlg
+import trelby.misc as misc
+import trelby.myimport as myimport
+import trelby.mypickle as mypickle
+import trelby.namesdlg as namesdlg
+import trelby.opts as opts
+import trelby.pml as pml
+import trelby.reports as reports
+import trelby.screenplay as screenplay
+import trelby.spellcheck as spellcheck
+import trelby.spellcheckcfgdlg as spellcheckcfgdlg
+import trelby.spellcheckdlg as spellcheckdlg
+import trelby.splash as splash
+import trelby.titlesdlg as titlesdlg
+import trelby.util as util
+import trelby.viewmode as viewmode
+import trelby.watermarkdlg as watermarkdlg
 import webbrowser
 
 import copy
@@ -40,7 +41,7 @@ import wx
 
 from functools import partial
 
-#keycodes
+# keycodes
 KC_CTRL_A = 1
 KC_CTRL_B = 2
 KC_CTRL_D = 4
@@ -50,18 +51,22 @@ KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
 
-VIEWMODE_DRAFT,\
-VIEWMODE_LAYOUT,\
-VIEWMODE_SIDE_BY_SIDE,\
-= list(range(3))
+(
+    VIEWMODE_DRAFT,
+    VIEWMODE_LAYOUT,
+    VIEWMODE_SIDE_BY_SIDE,
+) = list(range(3))
+
 
 def refreshGuiConfig():
     global cfgGui
 
     cfgGui = config.ConfigGui(cfgGl)
 
+
 def getCfgGui():
     return cfgGui
+
 
 # keeps (some) global data
 class GlobalData:
@@ -96,17 +101,22 @@ class GlobalData:
         v.addInt("width", defaultW, "Width", 500, 9999)
 
         v.addInt("height", 830, "Height", 300, 9999)
-        v.addInt("viewMode", VIEWMODE_DRAFT, "ViewMode", VIEWMODE_DRAFT,
-                 VIEWMODE_SIDE_BY_SIDE)
+        v.addInt(
+            "viewMode",
+            VIEWMODE_DRAFT,
+            "ViewMode",
+            VIEWMODE_DRAFT,
+            VIEWMODE_SIDE_BY_SIDE,
+        )
 
-        v.addList("files", [], "Files",
-                  mypickle.StrUnicodeVar("", "", ""))
+        v.addList("files", [], "Files", mypickle.StrUnicodeVar("", "", ""))
 
         v.makeDicts()
         v.setDefaults(self)
 
-        self.height = min(self.height,
-            wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) - 50)
+        self.height = min(
+            self.height, wx.SystemSettings.GetMetric(wx.SYS_SCREEN_Y) - 50
+        )
 
         self.vmDraft = viewmode.ViewModeDraft()
         self.vmLayout = viewmode.ViewModeLayout()
@@ -123,9 +133,13 @@ class GlobalData:
             try:
                 os.mkdir(misc.toPath(misc.confPath), mode=0o755)
             except OSError(os.errno, os.strerror):
-                wx.MessageBox("Error creating configuration directory\n"
-                              "'%s': %s" % (misc.confPath, os.strerror),
-                              "Error", wx.OK, None)
+                wx.MessageBox(
+                    "Error creating configuration directory\n"
+                    "'%s': %s" % (misc.confPath, os.strerror),
+                    "Error",
+                    wx.OK,
+                    None,
+                )
 
     # set viewmode, the parameter is one of the VIEWMODE_ defines.
     def setViewMode(self, viewMode):
@@ -156,26 +170,30 @@ class GlobalData:
     def saveScDict(self):
         util.writeToFile(self.scDictFilename, self.scDict.save(), mainFrame)
 
+
 class MyPanel(wx.Panel):
 
     def __init__(self, parent, id):
         wx.Panel.__init__(
-            self, parent, id,
+            self,
+            parent,
+            id,
             # wxMSW/Windows does not seem to support
             # wx.NO_BORDER, which sucks
-            style = wx.WANTS_CHARS | wx.NO_BORDER)
+            style=wx.WANTS_CHARS | wx.NO_BORDER,
+        )
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.scrollBarVertical = wx.ScrollBar(self, -1, style = wx.SB_VERTICAL)
+        self.scrollBar = wx.ScrollBar(self, -1, style=wx.SB_VERTICAL)
         self.ctrl = MyCtrl(self, -1)
 
         hsizer.Add(self.ctrl, 1, wx.EXPAND)
-        hsizer.Add(self.scrollBarVertical, 0, wx.EXPAND)
+        hsizer.Add(self.scrollBar, 0, wx.EXPAND)
 
-        self.scrollBarVertical.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
+        self.scrollBar.Bind(wx.EVT_COMMAND_SCROLL, self.ctrl.OnScroll)
 
-        self.scrollBarVertical.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
+        self.scrollBar.Bind(wx.EVT_SET_FOCUS, self.OnScrollbarFocus)
 
         self.SetSizer(hsizer)
 
@@ -184,11 +202,12 @@ class MyPanel(wx.Panel):
     def OnScrollbarFocus(self, event):
         self.ctrl.SetFocus()
 
+
 class MyCtrl(wx.Control):
 
     def __init__(self, parent, id):
         style = wx.WANTS_CHARS | wx.FULL_REPAINT_ON_RESIZE | wx.NO_BORDER
-        wx.Control.__init__(self, parent, id, style = style)
+        wx.Control.__init__(self, parent, id, style=style)
 
         self.panel = parent
 
@@ -204,7 +223,7 @@ class MyCtrl(wx.Control):
         self.Bind(wx.EVT_CHAR, self.OnKeyChar)
 
         self.createEmptySp()
-        self.updateScreen(redraw = False)
+        self.updateScreen(redraw=False)
 
     def OnChangeType(self, event):
         cs = screenplay.CommandState()
@@ -225,7 +244,7 @@ class MyCtrl(wx.Control):
         # find dialog stored settings
         self.findDlgFindText = ""
         self.findDlgReplaceText = ""
-        self.findDlgMatchWholeWord= False
+        self.findDlgMatchWholeWord = False
         self.findDlgMatchCase = False
         self.findDlgDirUp = False
         self.findDlgUseExtra = False
@@ -264,8 +283,7 @@ class MyCtrl(wx.Control):
         try:
             (sp, msg) = screenplay.Screenplay.load(s, cfgGl)
         except TrelbyError as e:
-            wx.MessageBox("Error loading file:\n\n%s" % e, "Error",
-                          wx.OK, mainFrame)
+            wx.MessageBox("Error loading file:\n\n%s" % e, "Error", wx.OK, mainFrame)
 
             return
 
@@ -303,7 +321,9 @@ class MyCtrl(wx.Control):
         elif fileName.endswith("astx"):
             lines = myimport.importAstx(fileName, mainFrame)
         elif fileName.endswith("fountain"):
-            lines, titlePages = myimport.importFountain(fileName, mainFrame, self.sp.titles.pages)
+            lines, titlePages = myimport.importFountain(
+                fileName, mainFrame, self.sp.titles.pages
+            )
         elif fileName.endswith("fadein"):
             lines = myimport.importFadein(fileName, mainFrame)
         else:
@@ -326,8 +346,7 @@ class MyCtrl(wx.Control):
         inf = []
         inf.append(misc.CheckBoxItem("Include page markers"))
 
-        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf,
-                               "Options:", False)
+        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf, "Options:", False)
 
         if dlg.ShowModal() != wx.ID_OK:
             dlg.Destroy()
@@ -340,8 +359,7 @@ class MyCtrl(wx.Control):
         inf = []
         inf.append(misc.CheckBoxItem("Include Notes"))
 
-        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf,
-                               "Options:", False)
+        dlg = misc.CheckBoxDlg(mainFrame, "Output options", inf, "Options:", False)
 
         if dlg.ShowModal() != wx.ID_OK:
             dlg.Destroy()
@@ -391,7 +409,7 @@ class MyCtrl(wx.Control):
 
     # texts = gd.vm.getScreen(self, False)[0], or None, in which case it's
     # called in this function.
-    def isLineVisible(self, line, texts = None):
+    def isLineVisible(self, line, texts=None):
         if texts == None:
             texts = gd.vm.getScreen(self, False)[0]
 
@@ -401,7 +419,7 @@ class MyCtrl(wx.Control):
 
         return (line >= texts[0].line) and (line <= texts[-1].line)
 
-    def makeLineVisible(self, line, direction = config.SCROLL_CENTER):
+    def makeLineVisible(self, line, direction=config.SCROLL_CENTER):
         texts = gd.vm.getScreen(self, False)[0]
 
         if self.isLineVisible(line, texts):
@@ -417,8 +435,9 @@ class MyCtrl(wx.Control):
         # about draft / layout mode differences.
         approx = int(((height / self.mm2p) / self.chY) / 1.3)
 
-        self.panel.scrollBar.SetScrollbar(self.sp.getTopLine(), approx,
-            len(self.sp.lines) + approx - 1, approx)
+        self.panel.scrollBar.SetScrollbar(
+            self.sp.getTopLine(), approx, len(self.sp.lines) + approx - 1, approx
+        )
 
     def clearAutoComp(self):
         if self.sp.clearAutoComp():
@@ -427,13 +446,16 @@ class MyCtrl(wx.Control):
     # returns true if there are no contents at all and we're not
     # attached to any file
     def isUntouched(self):
-        if self.fileName or (len(self.sp.lines) > 1) or \
-           (len(self.sp.lines[0].text) > 0):
+        if (
+            self.fileName
+            or (len(self.sp.lines) > 1)
+            or (len(self.sp.lines[0].text) > 0)
+        ):
             return False
         else:
             return True
 
-    def updateScreen(self, redraw = True, setCommon = True):
+    def updateScreen(self, redraw=True, setCommon=True):
         self.adjustScrollBar()
 
         if setCommon:
@@ -476,7 +498,7 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     # apply global config
-    def applyGlobalCfg(self, newCfgGl, writeCfg = True):
+    def applyGlobalCfg(self, newCfgGl, writeCfg=True):
         global cfgGl
 
         oldCfgGl = cfgGl
@@ -525,17 +547,23 @@ class MyCtrl(wx.Control):
             line = self.sp.findError(0)[0]
 
             if line != -1:
-                if wx.MessageBox(
-                    "The script seems to contain errors.\n"
-                    "Are you sure you want to %s it?" % action, "Confirm",
-                     wx.YES_NO | wx.NO_DEFAULT, mainFrame) == wx.NO:
+                if (
+                    wx.MessageBox(
+                        "The script seems to contain errors.\n"
+                        "Are you sure you want to %s it?" % action,
+                        "Confirm",
+                        wx.YES_NO | wx.NO_DEFAULT,
+                        mainFrame,
+                    )
+                    == wx.NO
+                ):
 
                     return None
 
         sp = self.sp
         if sp.cfg.pdfRemoveNotes:
             sp = copy.deepcopy(self.sp)
-            sp.removeElementTypes({screenplay.NOTE : None}, False)
+            sp.removeElementTypes({screenplay.NOTE: None}, False)
 
         sp.paginate()
 
@@ -551,14 +579,17 @@ class MyCtrl(wx.Control):
             sb = wx.Bitmap(size.width, size.height)
             old = getattr(self.__class__, "screenBuf", None)
 
-            if (old == None) or (old.GetDepth() != sb.GetDepth()) or \
-               (old.GetHeight() != sb.GetHeight()) or \
-               (old.GetWidth() != sb.GetWidth()):
+            if (
+                (old == None)
+                or (old.GetDepth() != sb.GetDepth())
+                or (old.GetHeight() != sb.GetHeight())
+                or (old.GetWidth() != sb.GetWidth())
+            ):
                 self.__class__.screenBuf = sb
 
         self.makeLineVisible(self.sp.line)
 
-    def OnLeftDown(self, event, mark = False):
+    def OnLeftDown(self, event, mark=False):
         if not self.mouseSelectActive:
             self.sp.clearMark()
             self.updateScreen()
@@ -584,7 +615,7 @@ class MyCtrl(wx.Control):
 
     def OnMotion(self, event):
         if event.LeftIsDown():
-            self.OnLeftDown(event, mark = True)
+            self.OnLeftDown(event, mark=True)
 
     def OnRightDown(self, event):
         pos = event.GetPosition()
@@ -622,8 +653,9 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     def OnAutoCompletionDlg(self):
-        dlg = autocompletiondlg.AutoCompletionDlg(mainFrame,
-            copy.deepcopy(self.sp.autoCompletion))
+        dlg = autocompletiondlg.AutoCompletionDlg(
+            mainFrame, copy.deepcopy(self.sp.autoCompletion)
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             self.sp.autoCompletion = dlg.autoCompletion
@@ -632,8 +664,9 @@ class MyCtrl(wx.Control):
         dlg.Destroy()
 
     def OnTitlesDlg(self):
-        dlg = titlesdlg.TitlesDlg(mainFrame, copy.deepcopy(self.sp.titles),
-                                  self.sp.cfg, cfgGl)
+        dlg = titlesdlg.TitlesDlg(
+            mainFrame, copy.deepcopy(self.sp.titles), self.sp.cfg, cfgGl
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             self.sp.titles = dlg.titles
@@ -642,9 +675,13 @@ class MyCtrl(wx.Control):
         dlg.Destroy()
 
     def OnHeadersDlg(self):
-        dlg = headersdlg.HeadersDlg(mainFrame,
-            copy.deepcopy(self.sp.headers), self.sp.cfg, cfgGl,
-                                    self.applyHeaders)
+        dlg = headersdlg.HeadersDlg(
+            mainFrame,
+            copy.deepcopy(self.sp.headers),
+            self.sp.cfg,
+            cfgGl,
+            self.applyHeaders,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             self.applyHeaders(dlg.headers)
@@ -661,8 +698,9 @@ class MyCtrl(wx.Control):
         dlg.Destroy()
 
     def OnSpellCheckerScriptDictionaryDlg(self):
-        dlg = spellcheckcfgdlg.SCDictDlg(mainFrame,
-            copy.deepcopy(self.sp.scDict), False)
+        dlg = spellcheckcfgdlg.SCDictDlg(
+            mainFrame, copy.deepcopy(self.sp.scDict), False
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             self.sp.scDict = dlg.scDict
@@ -672,7 +710,8 @@ class MyCtrl(wx.Control):
 
     def OnWatermark(self):
         dlg = watermarkdlg.WatermarkDlg(
-            mainFrame, self.sp, self.fileNameDisplay.replace(".trelby", ""))
+            mainFrame, self.sp, self.fileNameDisplay.replace(".trelby", "")
+        )
         dlg.ShowModal()
         dlg.Destroy()
 
@@ -698,8 +737,12 @@ class MyCtrl(wx.Control):
 
     def OnCompareScripts(self):
         if mainFrame.tabCtrl.getPageCount() < 2:
-            wx.MessageBox("You need at least two scripts open to"
-                          " compare them.", "Error", wx.OK, mainFrame)
+            wx.MessageBox(
+                "You need at least two scripts open to" " compare them.",
+                "Error",
+                wx.OK,
+                mainFrame,
+            )
 
             return
 
@@ -722,8 +765,9 @@ class MyCtrl(wx.Control):
             return
 
         if sel1 == sel2:
-            wx.MessageBox("You can't compare a script to itself.", "Error",
-                          wx.OK, mainFrame)
+            wx.MessageBox(
+                "You can't compare a script to itself.", "Error", wx.OK, mainFrame
+            )
 
             return
 
@@ -747,14 +791,20 @@ class MyCtrl(wx.Control):
         if s:
             gutil.showTempPDF(s, cfgGl, mainFrame)
         else:
-            wx.MessageBox("The scripts are identical.", "Results", wx.OK,
-                          mainFrame)
+            wx.MessageBox("The scripts are identical.", "Results", wx.OK, mainFrame)
 
     def canBeClosed(self):
         if self.sp.isModified():
-            if wx.MessageBox("The script has been modified. Are you sure\n"
-                             "you want to discard the changes?", "Confirm",
-                             wx.YES_NO | wx.NO_DEFAULT, mainFrame) == wx.NO:
+            if (
+                wx.MessageBox(
+                    "The script has been modified. Are you sure\n"
+                    "you want to discard the changes?",
+                    "Confirm",
+                    wx.YES_NO | wx.NO_DEFAULT,
+                    mainFrame,
+                )
+                == wx.NO
+            ):
                 return False
 
         return True
@@ -802,7 +852,7 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     # returns True if something was deleted
-    def OnCut(self, doUpdate = True, doDelete = True, copyToClip = True):
+    def OnCut(self, doUpdate=True, doDelete=True, copyToClip=True):
         marked = self.sp.getMarkedLines()
 
         if not marked:
@@ -820,9 +870,9 @@ class MyCtrl(wx.Control):
         return doDelete
 
     def OnCopy(self):
-        self.OnCut(doDelete = False)
+        self.OnCut(doDelete=False)
 
-    def OnCopySystem(self, formatted = False):
+    def OnCopySystem(self, formatted=False):
         cd = self.sp.getSelectedAsCD(False)
 
         if not cd:
@@ -858,7 +908,7 @@ class MyCtrl(wx.Control):
 
             wx.TheClipboard.Close()
 
-    def OnPaste(self, clines = None):
+    def OnPaste(self, clines=None):
         if not clines:
             cd = mainFrame.clipboard
 
@@ -902,8 +952,7 @@ class MyCtrl(wx.Control):
 
         for s in inLines:
             if s:
-                lines.append(screenplay.Line(screenplay.LB_LAST,
-                                             screenplay.ACTION, s))
+                lines.append(screenplay.Line(screenplay.LB_LAST, screenplay.ACTION, s))
 
         self.OnPaste(lines)
 
@@ -931,8 +980,12 @@ class MyCtrl(wx.Control):
             else:
                 return "Invalid scene number."
 
-        dlg = misc.TextInputDlg(mainFrame, "Enter scene number (%s - %s):" %\
-            (scenes[0][0], scenes[-1][0]), "Goto scene", validateFunc)
+        dlg = misc.TextInputDlg(
+            mainFrame,
+            "Enter scene number (%s - %s):" % (scenes[0][0], scenes[-1][0]),
+            "Goto scene",
+            validateFunc,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             for it in scenes:
@@ -959,8 +1012,12 @@ class MyCtrl(wx.Control):
             else:
                 return "Invalid page number."
 
-        dlg = misc.TextInputDlg(mainFrame, "Enter page number (%s - %s):" %\
-            (pages[0], pages[-1]), "Goto page", validateFunc)
+        dlg = misc.TextInputDlg(
+            mainFrame,
+            "Enter page number (%s - %s):" % (pages[0], pages[-1]),
+            "Goto page",
+            validateFunc,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             page = int(dlg.input)
@@ -1028,10 +1085,13 @@ class MyCtrl(wx.Control):
             s = ""
 
             if not wasAtStart:
-                s = "\n\n(Starting position was not at\n"\
+                s = (
+                    "\n\n(Starting position was not at\n"
                     "the beginning of the script.)"
-            wx.MessageBox("Spell checker found no errors." + s, "Results",
-                          wx.OK, mainFrame)
+                )
+            wx.MessageBox(
+                "Spell checker found no errors." + s, "Results", wx.OK, mainFrame
+            )
 
             return
 
@@ -1057,8 +1117,9 @@ class MyCtrl(wx.Control):
         for t in config.getTIs():
             types.append(misc.CheckBoxItem(t.name, False, t.lt))
 
-        dlg = misc.CheckBoxDlg(mainFrame, "Delete elements", types,
-                               "Element types to delete:", True)
+        dlg = misc.CheckBoxDlg(
+            mainFrame, "Delete elements", types, "Element types to delete:", True
+        )
 
         ok = False
         if dlg.ShowModal() == wx.ID_OK:
@@ -1090,11 +1151,14 @@ class MyCtrl(wx.Control):
             dDir = misc.scriptDir
             dFile = ""
 
-        dlg = wx.FileDialog(mainFrame, "Filename to save as",
-            defaultDir = dDir,
-            defaultFile = dFile,
-            wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
-            style = wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+        dlg = wx.FileDialog(
+            mainFrame,
+            "Filename to save as",
+            defaultDir=dDir,
+            defaultFile=dFile,
+            wildcard="Trelby files (*.trelby)|*.trelby|All files|*",
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+        )
         if dlg.ShowModal() == wx.ID_OK:
             self.saveFile(dlg.GetPath())
 
@@ -1105,15 +1169,18 @@ class MyCtrl(wx.Control):
         if not sp:
             return
 
-        dlg = wx.FileDialog(mainFrame, "Filename to export as",
+        dlg = wx.FileDialog(
+            mainFrame,
+            "Filename to export as",
             misc.scriptDir,
-            wildcard = "PDF|*.pdf|"
-                       "RTF|*.rtf|"
-                       "Final Draft XML|*.fdx|"
-                       "HTML|*.html|"
-                       "Fountain|*.fountain|"
-                       "Formatted text|*.txt",
-            style = wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT)
+            wildcard="PDF|*.pdf|"
+            "RTF|*.rtf|"
+            "Final Draft XML|*.fdx|"
+            "HTML|*.html|"
+            "Fountain|*.fountain|"
+            "Formatted text|*.txt",
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
@@ -1154,8 +1221,7 @@ class MyCtrl(wx.Control):
         gutil.showTempPDF(s, cfgGl, mainFrame)
 
     def OnSettings(self):
-        dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfgGl),
-                            self.applyGlobalCfg, True)
+        dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(cfgGl), self.applyGlobalCfg, True)
 
         if dlg.ShowModal() == wx.ID_OK:
             self.applyGlobalCfg(dlg.cfg)
@@ -1163,8 +1229,7 @@ class MyCtrl(wx.Control):
         dlg.Destroy()
 
     def OnScriptSettings(self):
-        dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(self.sp.cfg),
-                            self.applyCfg, False)
+        dlg = cfgdlg.CfgDlg(mainFrame, copy.deepcopy(self.sp.cfg), self.applyCfg, False)
 
         if dlg.ShowModal() == wx.ID_OK:
             self.applyCfg(dlg.cfg)
@@ -1195,7 +1260,7 @@ class MyCtrl(wx.Control):
     def cmdChangeToShot(self, cs):
         self.sp.toShotCmd(cs)
 
-    def cmdChangeToActBreak(self,cs):
+    def cmdChangeToActBreak(self, cs):
         self.sp.toActBreakCmd(cs)
 
     def cmdChangeToTransition(self, cs):
@@ -1205,13 +1270,13 @@ class MyCtrl(wx.Control):
         if not self.sp.mark:
             self.sp.deleteForwardCmd(cs)
         else:
-            self.OnCut(doUpdate = False, copyToClip = False)
+            self.OnCut(doUpdate=False, copyToClip=False)
 
     def cmdDeleteBackward(self, cs):
         if not self.sp.mark:
             self.sp.deleteBackwardCmd(cs)
         else:
-            self.OnCut(doUpdate = False, copyToClip = False)
+            self.OnCut(doUpdate=False, copyToClip=False)
 
     def cmdForcedLineBreak(self, cs):
         self.sp.insertForcedLineBreakCmd(cs)
@@ -1266,6 +1331,7 @@ class MyCtrl(wx.Control):
 
     def cmdSpeedTest(self, cs):
         import undo
+
         self.speedTestUndo = []
 
         def testUndoFullCopy():
@@ -1328,8 +1394,7 @@ class MyCtrl(wx.Control):
         cs.mark = bool(ev.ShiftDown())
         scrollDirection = config.SCROLL_CENTER
 
-        if not ev.ControlDown() and not ev.AltDown() and \
-               util.isValidInputChar(kc):
+        if not ev.ControlDown() and not ev.AltDown() and util.isValidInputChar(kc):
             # WX2.6-FIXME: we should probably use GetUnicodeKey() (dunno
             # how to get around the isValidInputChar test in the preceding
             # line, need to test what GetUnicodeKey() returns on
@@ -1339,7 +1404,7 @@ class MyCtrl(wx.Control):
 
             # If there's something selected, either remove it, or clear selection.
             if self.sp.mark and cfgGl.overwriteSelectionOnInsert:
-                if not self.OnCut(doUpdate = False, copyToClip = False):
+                if not self.OnCut(doUpdate=False, copyToClip=False):
                     self.sp.clearMark()
                     addChar = False
 
@@ -1356,8 +1421,9 @@ class MyCtrl(wx.Control):
                     self.sp.addCharCmd(cs)
 
         else:
-            cmd = mainFrame.kbdCommands.get(util.Key(kc,
-                ev.ControlDown(), ev.AltDown(), ev.ShiftDown()).toInt())
+            cmd = mainFrame.kbdCommands.get(
+                util.Key(kc, ev.ControlDown(), ev.AltDown(), ev.ShiftDown()).toInt()
+            )
 
             if cmd:
                 scrollDirection = cmd.scrollDirection
@@ -1386,7 +1452,7 @@ class MyCtrl(wx.Control):
         self.updateScreen()
 
     def OnPaint(self, event):
-        #ldkjfldsj = util.TimerDev("paint")
+        # ldkjfldsj = util.TimerDev("paint")
 
         ls = self.sp.lines
 
@@ -1419,7 +1485,7 @@ class MyCtrl(wx.Control):
         dc.DrawRectangle(0, 0, size.width, size.height)
 
         dc.SetPen(cfgGui.tabBorderPen)
-        dc.DrawLine(0,0,0,size.height)
+        dc.DrawLine(0, 0, 0, size.height)
 
         if not dpages:
             # draft mode; draw an infinite page
@@ -1438,8 +1504,7 @@ class MyCtrl(wx.Control):
             dc.SetBrush(cfgGui.textBgBrush)
             dc.SetPen(cfgGui.pageBorderPen)
             for dp in dpages:
-                dc.DrawRectangle(dp.x1, dp.y1, dp.x2 - dp.x1 + 1,
-                                 dp.y2 - dp.y1 + 1)
+                dc.DrawRectangle(dp.x1, dp.y1, dp.x2 - dp.x1 + 1, dp.y2 - dp.y1 + 1)
 
             dc.SetPen(cfgGui.pageShadowPen)
             for dp in dpages:
@@ -1474,8 +1539,7 @@ class MyCtrl(wx.Control):
                         util.drawLine(dc, nx - 1, y - 1, nw + 2, 0)
 
                     if self.sp.isLastLineOfElem(i):
-                        util.drawLine(dc, nx - 1, y + lineh,
-                                      nw + 2, 0)
+                        util.drawLine(dc, nx - 1, y + lineh, nw + 2, 0)
 
                 if marked and self.sp.isLineMarked(i, marked):
                     c1, c2 = self.sp.getMarkedColumns(i, marked)
@@ -1483,8 +1547,7 @@ class MyCtrl(wx.Control):
                     dc.SetPen(cfgGui.selectedPen)
                     dc.SetBrush(cfgGui.selectedBrush)
 
-                    dc.DrawRectangle(t.x + c1 * fx, y, (c2 - c1 + 1) * fx,
-                        lineh)
+                    dc.DrawRectangle(t.x + c1 * fx, y, (c2 - c1 + 1) * fx, lineh)
 
                 if mainFrame.showFormatting:
                     dc.SetPen(cfgGui.bluePen)
@@ -1492,9 +1555,13 @@ class MyCtrl(wx.Control):
 
                     extraIndent = 1 if self.sp.needsExtraParenIndent(i) else 0
 
-                    util.drawLine(dc,
+                    util.drawLine(
+                        dc,
                         t.x + (self.sp.cfg.getType(l.lt).width - extraIndent) * fx,
-                        y, 0, lineh)
+                        y,
+                        0,
+                        lineh,
+                    )
 
                     dc.SetTextForeground(cfgGui.redColor)
                     dc.SetFont(cfgGui.fonts[pml.NORMAL].font)
@@ -1502,20 +1569,18 @@ class MyCtrl(wx.Control):
 
                 if not dpages:
                     if cfgGl.pbi == config.PBI_REAL_AND_UNADJ:
-                        if self.sp.line2pageNoAdjust(i) != \
-                               self.sp.line2pageNoAdjust(i + 1):
+                        if self.sp.line2pageNoAdjust(i) != self.sp.line2pageNoAdjust(
+                            i + 1
+                        ):
                             dc.SetPen(cfgGui.pagebreakNoAdjustPen)
-                            util.drawLine(dc, 0, y + lineh - 1,
-                                size.width, 0)
+                            util.drawLine(dc, 0, y + lineh - 1, size.width, 0)
 
-                    if cfgGl.pbi in (config.PBI_REAL,
-                                   config.PBI_REAL_AND_UNADJ):
+                    if cfgGl.pbi in (config.PBI_REAL, config.PBI_REAL_AND_UNADJ):
                         thisPage = self.sp.line2page(i)
 
                         if thisPage != self.sp.line2page(i + 1):
                             dc.SetPen(cfgGui.pagebreakPen)
-                            util.drawLine(dc, 0, y + lineh - 1,
-                                size.width, 0)
+                            util.drawLine(dc, 0, y + lineh - 1, size.width, 0)
 
                 if i == self.sp.line:
                     posX = t.x
@@ -1526,9 +1591,9 @@ class MyCtrl(wx.Control):
                     dc.DrawRectangle(t.x + self.sp.column * fx, y, fx, fi.fy)
 
             if len(t.text) != 0:
-                #tl = texts.get(fi.font)
+                # tl = texts.get(fi.font)
                 if fi.font not in texts:
-                #if tl == None:
+                    # if tl == None:
                     tl = ([], [], [])
                     texts.append((fi.font, tl))
 
@@ -1548,8 +1613,7 @@ class MyCtrl(wx.Control):
                     else:
                         uli = ulinesHdr
 
-                    uli.append((t.x, y + lineh - 1,
-                               len(t.text) * fx - 1))
+                    uli.append((t.x, y + lineh - 1, len(t.text) * fx - 1))
 
         if ulines:
             dc.SetPen(cfgGui.textPen)
@@ -1623,16 +1687,17 @@ class MyCtrl(wx.Control):
                 dc.SetPen(cfgGui.autoCompRevPen)
                 dc.SetBrush(cfgGui.autoCompRevBrush)
                 dc.SetTextForeground(cfgGui.autoCompBgColor)
-                dc.DrawRectangle(posX + offset - selBleed,
+                dc.DrawRectangle(
+                    posX + offset - selBleed,
                     posY + offset + (i - startPos) * fi.fy - selBleed,
                     itemW,
-                    fi.fy + selBleed * 2)
+                    fi.fy + selBleed * 2,
+                )
                 dc.SetTextForeground(cfgGui.autoCompBgColor)
                 dc.SetPen(cfgGui.autoCompPen)
                 dc.SetBrush(cfgGui.autoCompBrush)
 
-            dc.DrawText(ac[i], posX + offset, posY + offset +
-                        (i - startPos) * fi.fy)
+            dc.DrawText(ac[i], posX + offset, posY + offset + (i - startPos) * fi.fy)
 
             if i == asel:
                 dc.SetTextForeground(cfgGui.autoCompFgColor)
@@ -1640,17 +1705,19 @@ class MyCtrl(wx.Control):
         if doSbw:
             dc.SetPen(cfgGui.autoCompPen)
             dc.SetBrush(cfgGui.autoCompRevBrush)
-            util.drawLine(dc, posX + w - offset * 2 - sbw,
-                posY, 0, h)
-            dc.DrawRectangle(posX + w - offset - sbw,
-                posY + offset - selBleed + int((float(startPos) /
-                     len(ac)) * sbh),
-                sbw, int((float(show) / len(ac)) * sbh))
+            util.drawLine(dc, posX + w - offset * 2 - sbw, posY, 0, h)
+            dc.DrawRectangle(
+                posX + w - offset - sbw,
+                posY + offset - selBleed + int((float(startPos) / len(ac)) * sbh),
+                sbw,
+                int((float(show) / len(ac)) * sbh),
+            )
+
 
 class MyFrame(wx.Frame):
 
     def __init__(self, parent, id, title):
-        wx.Frame.__init__(self, parent, id, title, name = "Trelby")
+        wx.Frame.__init__(self, parent, id, title, name="Trelby")
 
         if misc.isUnix:
             # automatically reaps zombies
@@ -1659,8 +1726,7 @@ class MyFrame(wx.Frame):
         self.clipboard = None
         self.showFormatting = False
 
-        self.SetSizeHints(gd.cvars.getMin("width"),
-                          gd.cvars.getMin("height"))
+        self.SetSizeHints(gd.cvars.getMin("width"), gd.cvars.getMin("height"))
 
         self.Move(gd.posX, gd.posY)
         self.SetSize(wx.Size(gd.width, gd.height))
@@ -1798,8 +1864,11 @@ class MyFrame(wx.Frame):
 
         def addTB(id, iconFilename, toolTip):
             self.toolBar.AddTool(
-                id, "", misc.getBitmap("resources/%s" % iconFilename),
-                shortHelp=toolTip)
+                id,
+                "",
+                misc.getBitmap("trelby/resources/%s" % iconFilename),
+                shortHelp=toolTip,
+            )
 
         addTB(ID_FILE_NEW, "new.png", "New script")
         addTB(ID_FILE_OPEN, "open.png", "Open Script..")
@@ -1858,7 +1927,6 @@ class MyFrame(wx.Frame):
 
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND)
 
-
         gd.mru.useMenu(fileMenu, 14)
 
         self.Bind(wx.EVT_MENU_HIGHLIGHT_ALL, self.OnMenuHighlight)
@@ -1903,7 +1971,9 @@ class MyFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnSettings, id=ID_SETTINGS_CHANGE)
             self.Bind(wx.EVT_MENU, self.OnLoadSettings, id=ID_SETTINGS_LOAD)
             self.Bind(wx.EVT_MENU, self.OnSaveSettingsAs, id=ID_SETTINGS_SAVE_AS)
-            self.Bind(wx.EVT_MENU, self.OnSpellCheckerDictionaryDlg, id=ID_SETTINGS_SC_DICT)
+            self.Bind(
+                wx.EVT_MENU, self.OnSpellCheckerDictionaryDlg, id=ID_SETTINGS_SC_DICT
+            )
             self.Bind(wx.EVT_MENU, self.OnExit, id=ID_FILE_EXIT)
             self.Bind(wx.EVT_MENU, self.OnUndo, id=ID_EDIT_UNDO)
             self.Bind(wx.EVT_MENU, self.OnRedo, id=ID_EDIT_REDO)
@@ -1911,7 +1981,9 @@ class MyFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnCopy, id=ID_EDIT_COPY)
             self.Bind(wx.EVT_MENU, self.OnPaste, id=ID_EDIT_PASTE)
             self.Bind(wx.EVT_MENU, self.OnCopySystemCb, id=ID_EDIT_COPY_TO_CB)
-            self.Bind(wx.EVT_MENU, self.OnCopySystemCbFormatted, id=ID_EDIT_COPY_TO_CB_FMT)
+            self.Bind(
+                wx.EVT_MENU, self.OnCopySystemCbFormatted, id=ID_EDIT_COPY_TO_CB_FMT
+            )
             self.Bind(wx.EVT_MENU, self.OnPasteSystemCb, id=ID_EDIT_PASTE_FROM_CB)
             self.Bind(wx.EVT_MENU, self.OnSelectScene, id=ID_EDIT_SELECT_SCENE)
             self.Bind(wx.EVT_MENU, self.OnSelectAll, id=ID_EDIT_SELECT_ALL)
@@ -1927,15 +1999,27 @@ class MyFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.ToggleFullscreen, id=ID_VIEW_FULL_SCREEN)
             self.Bind(wx.EVT_MENU, self.OnFindNextError, id=ID_SCRIPT_FIND_ERROR)
             self.Bind(wx.EVT_MENU, self.OnPaginate, id=ID_SCRIPT_PAGINATE)
-            self.Bind(wx.EVT_MENU, self.OnAutoCompletionDlg, id=ID_SCRIPT_AUTO_COMPLETION)
+            self.Bind(
+                wx.EVT_MENU, self.OnAutoCompletionDlg, id=ID_SCRIPT_AUTO_COMPLETION
+            )
             self.Bind(wx.EVT_MENU, self.OnHeadersDlg, id=ID_SCRIPT_HEADERS)
             self.Bind(wx.EVT_MENU, self.OnLocationsDlg, id=ID_SCRIPT_LOCATIONS)
             self.Bind(wx.EVT_MENU, self.OnTitlesDlg, id=ID_SCRIPT_TITLES)
-            self.Bind(wx.EVT_MENU, self.OnSpellCheckerScriptDictionaryDlg, id=ID_SCRIPT_SC_DICT)
+            self.Bind(
+                wx.EVT_MENU,
+                self.OnSpellCheckerScriptDictionaryDlg,
+                id=ID_SCRIPT_SC_DICT,
+            )
             self.Bind(wx.EVT_MENU, self.OnScriptSettings, id=ID_SCRIPT_SETTINGS_CHANGE)
-            self.Bind(wx.EVT_MENU, self.OnLoadScriptSettings, id=ID_SCRIPT_SETTINGS_LOAD)
-            self.Bind(wx.EVT_MENU, self.OnSaveScriptSettingsAs, id=ID_SCRIPT_SETTINGS_SAVE_AS)
-            self.Bind(wx.EVT_MENU, self.OnReportDialogueChart, id=ID_REPORTS_DIALOGUE_CHART)
+            self.Bind(
+                wx.EVT_MENU, self.OnLoadScriptSettings, id=ID_SCRIPT_SETTINGS_LOAD
+            )
+            self.Bind(
+                wx.EVT_MENU, self.OnSaveScriptSettingsAs, id=ID_SCRIPT_SETTINGS_SAVE_AS
+            )
+            self.Bind(
+                wx.EVT_MENU, self.OnReportDialogueChart, id=ID_REPORTS_DIALOGUE_CHART
+            )
             self.Bind(wx.EVT_MENU, self.OnReportCharacter, id=ID_REPORTS_CHARACTER_REP)
             self.Bind(wx.EVT_MENU, self.OnReportScript, id=ID_REPORTS_SCRIPT_REP)
             self.Bind(wx.EVT_MENU, self.OnReportLocation, id=ID_REPORTS_LOCATION_REP)
@@ -1949,10 +2033,19 @@ class MyFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnHelpManual, id=ID_HELP_MANUAL)
             self.Bind(wx.EVT_MENU, self.OnAbout, id=ID_HELP_ABOUT)
 
+        self.Bind(
+            wx.EVT_MENU_RANGE,
+            self.OnMRUFile,
+            id=gd.mru.getIds()[0],
+            id2=gd.mru.getIds()[1],
+        )
 
-        self.Bind(wx.EVT_MENU_RANGE, self.OnMRUFile, id=gd.mru.getIds()[0], id2=gd.mru.getIds()[1])
-
-        self.Bind(wx.EVT_MENU_RANGE, self.OnChangeType, id=ID_ELEM_TO_ACTION, id2=ID_ELEM_TO_TRANSITION)
+        self.Bind(
+            wx.EVT_MENU_RANGE,
+            self.OnChangeType,
+            id=ID_ELEM_TO_ACTION,
+            id2=ID_ELEM_TO_TRANSITION,
+        )
 
         def addTBMenu(id, menu):
             self.Bind(wx.EVT_MENU, partial(self.OnToolBarMenu, menu=menu), id=id)
@@ -1978,7 +2071,7 @@ class MyFrame(wx.Frame):
         ib = wx.IconBundle()
 
         for sz in ("16", "32", "64", "128", "256"):
-            ib.AddIcon(wx.Icon(misc.getBitmap("resources/icon%s.png" % sz)))
+            ib.AddIcon(wx.Icon(misc.getBitmap("trelby/resources/icon%s.png" % sz)))
 
         self.SetIcons(ib)
 
@@ -2058,7 +2151,7 @@ class MyFrame(wx.Frame):
             "ID_ELEM_TO_SHOT",
             "ID_ELEM_TO_ACTBREAK",
             "ID_ELEM_TO_TRANSITION",
-            ]
+        ]
 
         g = globals()
 
@@ -2067,16 +2160,16 @@ class MyFrame(wx.Frame):
 
         # see OnChangeType
         g["idToLTMap"] = {
-            ID_ELEM_TO_SCENE : screenplay.SCENE,
-            ID_ELEM_TO_ACTION : screenplay.ACTION,
-            ID_ELEM_TO_CHARACTER : screenplay.CHARACTER,
-            ID_ELEM_TO_DIALOGUE : screenplay.DIALOGUE,
-            ID_ELEM_TO_PAREN : screenplay.PAREN,
-            ID_ELEM_TO_TRANSITION : screenplay.TRANSITION,
-            ID_ELEM_TO_SHOT : screenplay.SHOT,
-            ID_ELEM_TO_ACTBREAK : screenplay.ACTBREAK,
-            ID_ELEM_TO_NOTE : screenplay.NOTE,
-            }
+            ID_ELEM_TO_SCENE: screenplay.SCENE,
+            ID_ELEM_TO_ACTION: screenplay.ACTION,
+            ID_ELEM_TO_CHARACTER: screenplay.CHARACTER,
+            ID_ELEM_TO_DIALOGUE: screenplay.DIALOGUE,
+            ID_ELEM_TO_PAREN: screenplay.PAREN,
+            ID_ELEM_TO_TRANSITION: screenplay.TRANSITION,
+            ID_ELEM_TO_SHOT: screenplay.SHOT,
+            ID_ELEM_TO_ACTBREAK: screenplay.ACTBREAK,
+            ID_ELEM_TO_NOTE: screenplay.NOTE,
+        }
 
     def createNewPanel(self):
         newPanel = MyPanel(self.tabCtrl.getTabParent(), -1)
@@ -2133,10 +2226,14 @@ class MyFrame(wx.Frame):
         cfgGl.addShiftKeys()
 
         if cfgGl.getConflictingKeys() != None:
-            wx.MessageBox("You have at least one key bound to more than one\n"
-                          "command. The program will not work correctly until\n"
-                          "you fix this.",
-                          "Warning", wx.OK, self)
+            wx.MessageBox(
+                "You have at least one key bound to more than one\n"
+                "command. The program will not work correctly until\n"
+                "you fix this.",
+                "Warning",
+                wx.OK,
+                self,
+            )
 
         self.kbdCommands = {}
 
@@ -2148,8 +2245,7 @@ class MyFrame(wx.Frame):
     # open script, in the current tab if it's untouched, or in a new one
     # otherwise
     def openScript(self, filename):
-        if not self.tabCtrl.getPage(self.findPage(self.panel))\
-               .ctrl.isUntouched():
+        if not self.tabCtrl.getPage(self.findPage(self.panel)).ctrl.isUntouched():
             self.panel = self.createNewPanel()
 
         self.panel.ctrl.loadFile(filename)
@@ -2169,7 +2265,11 @@ class MyFrame(wx.Frame):
                 "The fonts listed below are not fixed width and\n"
                 "will cause the program not to function correctly.\n"
                 "Please change the fonts at File/Settings/Change.\n\n"
-                + "\n".join(failed), "Error", wx.OK, self)
+                + "\n".join(failed),
+                "Error",
+                wx.OK,
+                self,
+            )
 
     # If we get focus, pass it on to ctrl.
     def OnFocus(self, event):
@@ -2206,24 +2306,27 @@ class MyFrame(wx.Frame):
 
         self.tabCtrl.selectPage(pageNr)
 
-    def OnScriptNext(self, event = None):
+    def OnScriptNext(self, event=None):
         self.selectScript(True)
 
-    def OnScriptPrev(self, event = None):
+    def OnScriptPrev(self, event=None):
         self.selectScript(False)
 
-    def OnNewScript(self, event = None):
+    def OnNewScript(self, event=None):
         self.panel = self.createNewPanel()
 
     def OnMRUFile(self, event):
         i = event.GetId() - gd.mru.getIds()[0]
         self.openScript(gd.mru.get(i))
 
-    def OnOpen(self, event = None):
-        dlg = wx.FileDialog(self, "File to open",
+    def OnOpen(self, event=None):
+        dlg = wx.FileDialog(
+            self,
+            "File to open",
             misc.scriptDir,
-            wildcard = "Trelby files (*.trelby)|*.trelby|All files|*",
-            style = wx.FD_OPEN)
+            wildcard="Trelby files (*.trelby)|*.trelby|All files|*",
+            style=wx.FD_OPEN,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
@@ -2231,31 +2334,33 @@ class MyFrame(wx.Frame):
 
         dlg.Destroy()
 
-    def OnSave(self, event = None):
+    def OnSave(self, event=None):
         self.panel.ctrl.OnSave()
 
-    def OnSaveScriptAs(self, event = None):
+    def OnSaveScriptAs(self, event=None):
         self.panel.ctrl.OnSaveScriptAs()
 
-    def OnImportScript(self, event = None):
-        dlg = wx.FileDialog(self, "File to import",
+    def OnImportScript(self, event=None):
+        dlg = wx.FileDialog(
+            self,
+            "File to import",
             misc.scriptDir,
-            wildcard = "Importable files (*.txt;*.fdx;*.celtx;*.astx;*.fountain;*.fadein)|" +
-                       "*.fdx;*.txt;*.celtx;*.astx;*.fountain;*.fadein|" +
-                       "Formatted text files (*.txt)|*.txt|" +
-                       "Final Draft XML(*.fdx)|*.fdx|" +
-                       "Celtx files (*.celtx)|*.celtx|" +
-                       "Adobe Story XML files (*.astx)|*.astx|" +
-                       "Fountain files (*.fountain)|*.fountain|" +
-                       "Fadein files (*.fadein)|*.fadein|" +
-                       "All files|*",
-            style = wx.FD_OPEN)
+            wildcard="Importable files (*.txt;*.fdx;*.celtx;*.astx;*.fountain;*.fadein)|"
+            + "*.fdx;*.txt;*.celtx;*.astx;*.fountain;*.fadein|"
+            + "Formatted text files (*.txt)|*.txt|"
+            + "Final Draft XML(*.fdx)|*.fdx|"
+            + "Celtx files (*.celtx)|*.celtx|"
+            + "Adobe Story XML files (*.astx)|*.astx|"
+            + "Fountain files (*.fountain)|*.fountain|"
+            + "Fadein files (*.fadein)|*.fadein|"
+            + "All files|*",
+            style=wx.FD_OPEN,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             misc.scriptDir = dlg.GetDirectory()
 
-            if not self.tabCtrl.getPage(self.findPage(self.panel))\
-                   .ctrl.isUntouched():
+            if not self.tabCtrl.getPage(self.findPage(self.panel)).ctrl.isUntouched():
                 self.panel = self.createNewPanel()
 
             self.panel.ctrl.importFile(dlg.GetPath())
@@ -2263,10 +2368,10 @@ class MyFrame(wx.Frame):
 
         dlg.Destroy()
 
-    def OnExportScript(self, event = None):
+    def OnExportScript(self, event=None):
         self.panel.ctrl.OnExportScript()
 
-    def OnCloseScript(self, event = None):
+    def OnCloseScript(self, event=None):
         if not self.panel.ctrl.canBeClosed():
             return
 
@@ -2276,21 +2381,24 @@ class MyFrame(wx.Frame):
             self.panel.ctrl.createEmptySp()
             self.panel.ctrl.updateScreen()
 
-    def OnRevertScript(self, event = None):
+    def OnRevertScript(self, event=None):
         self.panel.ctrl.OnRevertScript()
 
-    def OnPrint(self, event = None):
+    def OnPrint(self, event=None):
         self.panel.ctrl.OnPrint()
 
-    def OnSettings(self, event = None):
+    def OnSettings(self, event=None):
         self.panel.ctrl.OnSettings()
 
-    def OnLoadSettings(self, event = None):
-        dlg = wx.FileDialog(self, "File to open",
-            defaultDir = os.path.dirname(gd.confFilename),
-            defaultFile = os.path.basename(gd.confFilename),
-            wildcard = "Setting files (*.conf)|*.conf|All files|*",
-            style = wx.FD_OPEN)
+    def OnLoadSettings(self, event=None):
+        dlg = wx.FileDialog(
+            self,
+            "File to open",
+            defaultDir=os.path.dirname(gd.confFilename),
+            defaultFile=os.path.basename(gd.confFilename),
+            wildcard="Setting files (*.conf)|*.conf|All files|*",
+            style=wx.FD_OPEN,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             s = util.loadFile(dlg.GetPath(), self)
@@ -2304,12 +2412,15 @@ class MyFrame(wx.Frame):
 
         dlg.Destroy()
 
-    def OnSaveSettingsAs(self, event = None):
-        dlg = wx.FileDialog(self, "Filename to save as",
-            defaultDir = os.path.dirname(gd.confFilename),
-            defaultFile = os.path.basename(gd.confFilename),
-            wildcard = "Setting files (*.conf)|*.conf|All files|*",
-            style = wx.SAVE | wx.OVERWRITE_PROMPT)
+    def OnSaveSettingsAs(self, event=None):
+        dlg = wx.FileDialog(
+            self,
+            "Filename to save as",
+            defaultDir=os.path.dirname(gd.confFilename),
+            defaultFile=os.path.basename(gd.confFilename),
+            wildcard="Setting files (*.conf)|*.conf|All files|*",
+            style=wx.SAVE | wx.OVERWRITE_PROMPT,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             if util.writeToFile(dlg.GetPath(), cfgGl.save(), self):
@@ -2317,61 +2428,62 @@ class MyFrame(wx.Frame):
 
         dlg.Destroy()
 
-    def OnUndo(self, event = None):
+    def OnUndo(self, event=None):
         self.panel.ctrl.OnUndo()
 
-    def OnRedo(self, event = None):
+    def OnRedo(self, event=None):
         self.panel.ctrl.OnRedo()
 
-    def OnCut(self, event = None):
+    def OnCut(self, event=None):
         self.panel.ctrl.OnCut()
 
-    def OnCopy(self, event = None):
+    def OnCopy(self, event=None):
         self.panel.ctrl.OnCopy()
 
-    def OnCopySystemCb(self, event = None):
-        self.panel.ctrl.OnCopySystem(formatted = False)
+    def OnCopySystemCb(self, event=None):
+        self.panel.ctrl.OnCopySystem(formatted=False)
 
-    def OnCopySystemCbFormatted(self, event = None):
-        self.panel.ctrl.OnCopySystem(formatted = True)
+    def OnCopySystemCbFormatted(self, event=None):
+        self.panel.ctrl.OnCopySystem(formatted=True)
 
-    def OnPaste(self, event = None):
+    def OnPaste(self, event=None):
         self.panel.ctrl.OnPaste()
 
-    def OnPasteSystemCb(self, event = None):
+    def OnPasteSystemCb(self, event=None):
         self.panel.ctrl.OnPasteSystemCb()
 
-    def OnSelectScene(self, event = None):
+    def OnSelectScene(self, event=None):
         self.panel.ctrl.OnSelectScene()
 
-    def OnSelectAll(self, event = None):
+    def OnSelectAll(self, event=None):
         self.panel.ctrl.OnSelectAll()
 
-    def OnGotoPage(self, event = None):
+    def OnGotoPage(self, event=None):
         self.panel.ctrl.OnGotoPage()
 
-    def OnGotoScene(self, event = None):
+    def OnGotoScene(self, event=None):
         self.panel.ctrl.OnGotoScene()
 
-    def OnFindNextError(self, event = None):
+    def OnFindNextError(self, event=None):
         self.panel.ctrl.OnFindNextError()
 
-    def OnFind(self, event = None):
+    def OnFind(self, event=None):
         self.panel.ctrl.OnFind()
 
-    def OnInsertNbsp(self, event = None):
+    def OnInsertNbsp(self, event=None):
         self.panel.ctrl.OnInsertNbsp()
 
-    def OnDeleteElements(self, event = None):
+    def OnDeleteElements(self, event=None):
         self.panel.ctrl.OnDeleteElements()
 
-    def OnToggleShowFormatting(self, event = None):
-        self.menuBar.Check(ID_VIEW_SHOW_FORMATTING,
-            not self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING))
+    def OnToggleShowFormatting(self, event=None):
+        self.menuBar.Check(
+            ID_VIEW_SHOW_FORMATTING, not self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING)
+        )
         self.showFormatting = not self.showFormatting
         self.panel.ctrl.Refresh(False)
 
-    def OnShowFormatting(self, event = None):
+    def OnShowFormatting(self, event=None):
         self.showFormatting = self.menuBar.IsChecked(ID_VIEW_SHOW_FORMATTING)
         self.panel.ctrl.Refresh(False)
 
@@ -2387,7 +2499,7 @@ class MyFrame(wx.Frame):
         self.menuBar.Check(ID_VIEW_STYLE_SIDE_BY_SIDE, True)
         self.OnViewModeChange()
 
-    def OnViewModeChange(self, event = None):
+    def OnViewModeChange(self, event=None):
         if self.menuBar.IsChecked(ID_VIEW_STYLE_DRAFT):
             mode = VIEWMODE_DRAFT
         elif self.menuBar.IsChecked(ID_VIEW_STYLE_LAYOUT):
@@ -2404,29 +2516,28 @@ class MyFrame(wx.Frame):
         c.makeLineVisible(c.sp.line)
         c.updateScreen()
 
-    def ToggleFullscreen(self, event = None):
+    def ToggleFullscreen(self, event=None):
         self.noFSBtn.Show(not self.IsFullScreen())
         self.ShowFullScreen(not self.IsFullScreen(), wx.FULLSCREEN_ALL)
         self.panel.ctrl.SetFocus()
 
-    def OnPaginate(self, event = None):
+    def OnPaginate(self, event=None):
         self.panel.ctrl.OnPaginate()
 
-    def OnAutoCompletionDlg(self, event = None):
+    def OnAutoCompletionDlg(self, event=None):
         self.panel.ctrl.OnAutoCompletionDlg()
 
-    def OnTitlesDlg(self, event = None):
+    def OnTitlesDlg(self, event=None):
         self.panel.ctrl.OnTitlesDlg()
 
-    def OnHeadersDlg(self, event = None):
+    def OnHeadersDlg(self, event=None):
         self.panel.ctrl.OnHeadersDlg()
 
-    def OnLocationsDlg(self, event = None):
+    def OnLocationsDlg(self, event=None):
         self.panel.ctrl.OnLocationsDlg()
 
-    def OnSpellCheckerDictionaryDlg(self, event = None):
-        dlg = spellcheckcfgdlg.SCDictDlg(self, copy.deepcopy(gd.scDict),
-                                         True)
+    def OnSpellCheckerDictionaryDlg(self, event=None):
+        dlg = spellcheckcfgdlg.SCDictDlg(self, copy.deepcopy(gd.scDict), True)
 
         if dlg.ShowModal() == wx.ID_OK:
             gd.scDict = dlg.scDict
@@ -2434,20 +2545,23 @@ class MyFrame(wx.Frame):
 
         dlg.Destroy()
 
-    def OnSpellCheckerScriptDictionaryDlg(self, event = None):
+    def OnSpellCheckerScriptDictionaryDlg(self, event=None):
         self.panel.ctrl.OnSpellCheckerScriptDictionaryDlg()
 
-    def OnWatermark(self, event = None):
+    def OnWatermark(self, event=None):
         self.panel.ctrl.OnWatermark()
 
-    def OnScriptSettings(self, event = None):
+    def OnScriptSettings(self, event=None):
         self.panel.ctrl.OnScriptSettings()
 
-    def OnLoadScriptSettings(self, event = None):
-        dlg = wx.FileDialog(self, "File to open",
-            defaultDir = gd.scriptSettingsPath,
-            wildcard = "Script setting files (*.sconf)|*.sconf|All files|*",
-            style = wx.FD_OPEN)
+    def OnLoadScriptSettings(self, event=None):
+        dlg = wx.FileDialog(
+            self,
+            "File to open",
+            defaultDir=gd.scriptSettingsPath,
+            wildcard="Script setting files (*.sconf)|*.sconf|All files|*",
+            style=wx.FD_OPEN,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             s = util.loadFile(dlg.GetPath(), self)
@@ -2461,11 +2575,14 @@ class MyFrame(wx.Frame):
 
         dlg.Destroy()
 
-    def OnSaveScriptSettingsAs(self, event = None):
-        dlg = wx.FileDialog(self, "Filename to save as",
-            defaultDir = gd.scriptSettingsPath,
-            wildcard = "Script setting files (*.sconf)|*.sconf|All files|*",
-            style = wx.SAVE | wx.OVERWRITE_PROMPT)
+    def OnSaveScriptSettingsAs(self, event=None):
+        dlg = wx.FileDialog(
+            self,
+            "Filename to save as",
+            defaultDir=gd.scriptSettingsPath,
+            wildcard="Script setting files (*.sconf)|*.sconf|All files|*",
+            style=wx.SAVE | wx.OVERWRITE_PROMPT,
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             if util.writeToFile(dlg.GetPath(), self.panel.ctrl.sp.saveCfg(), self):
@@ -2473,28 +2590,27 @@ class MyFrame(wx.Frame):
 
         dlg.Destroy()
 
-    def OnReportCharacter(self, event = None):
+    def OnReportCharacter(self, event=None):
         self.panel.ctrl.OnReportCharacter()
 
-    def OnReportDialogueChart(self, event = None):
+    def OnReportDialogueChart(self, event=None):
         self.panel.ctrl.OnReportDialogueChart()
 
-    def OnReportLocation(self, event = None):
+    def OnReportLocation(self, event=None):
         self.panel.ctrl.OnReportLocation()
 
-    def OnReportScene(self, event = None):
+    def OnReportScene(self, event=None):
         self.panel.ctrl.OnReportScene()
 
-    def OnReportScript(self, event = None):
+    def OnReportScript(self, event=None):
         self.panel.ctrl.OnReportScript()
 
-    def OnSpellCheckerDlg(self, event = None):
+    def OnSpellCheckerDlg(self, event=None):
         self.panel.ctrl.OnSpellCheckerDlg()
 
-    def OnNameDatabase(self, event = None):
+    def OnNameDatabase(self, event=None):
         if not namesdlg.readNames(self):
-            wx.MessageBox("Error opening name database.", "Error",
-                          wx.OK, self)
+            wx.MessageBox("Error opening name database.", "Error", wx.OK, self)
 
             return
 
@@ -2502,25 +2618,25 @@ class MyFrame(wx.Frame):
         dlg.ShowModal()
         dlg.Destroy()
 
-    def OnCharacterMap(self, event = None):
+    def OnCharacterMap(self, event=None):
         dlg = charmapdlg.CharMapDlg(self, self.panel.ctrl)
         dlg.ShowModal()
         dlg.Destroy()
 
-    def OnCompareScripts(self, event = None):
+    def OnCompareScripts(self, event=None):
         self.panel.ctrl.OnCompareScripts()
 
     def OnChangeType(self, event):
         self.panel.ctrl.OnChangeType(event)
 
-    def OnHelpCommands(self, event = None):
+    def OnHelpCommands(self, event=None):
         dlg = commandsdlg.CommandsDlg(cfgGl)
         dlg.Show()
 
-    def OnHelpManual(self, event = None):
+    def OnHelpManual(self, event=None):
         webbrowser.open("file://" + misc.getFullPath("manual.html"))
 
-    def OnAbout(self, event = None):
+    def OnAbout(self, event=None):
         win = splash.SplashWindow(self, -1)
         win.Show()
 
@@ -2530,9 +2646,14 @@ class MyFrame(wx.Frame):
     def OnCloseWindow(self, event):
         doExit = True
         if event.CanVeto() and self.isModifications():
-            close_msg_box = wx.MessageDialog(self, "You have unsaved changes. Do\nyou want to save your changes?", "Save Changes", wx.YES_NO | wx.CANCEL | wx.YES_DEFAULT)
+            close_msg_box = wx.MessageDialog(
+                self,
+                "You have unsaved changes. Do\nyou want to save your changes?",
+                "Save Changes",
+                wx.YES_NO | wx.CANCEL | wx.YES_DEFAULT,
+            )
             close_msg_box.SetYesNoLabels(wx.ID_SAVE, "&Don't save")
-            response = close_msg_box.ShowModal();
+            response = close_msg_box.ShowModal()
             if response == wx.ID_YES:
                 self.OnSave()
             elif response == wx.ID_CANCEL:
@@ -2557,16 +2678,20 @@ class MyFrame(wx.Frame):
         gd.width, gd.height = self.GetSize()
         event.Skip()
 
+
 class MyApp(wx.App):
 
     def OnInit(self):
         global cfgGl, mainFrame, gd
 
         if (wx.MAJOR_VERSION != 4) or (wx.MINOR_VERSION < 0):
-            wx.MessageBox("You seem to have an invalid version\n"
-                          "(%s) of wxWidgets installed. This\n"
-                          "program needs version 4.x." %
-                          wx.VERSION_STRING, "Error", wx.OK)
+            wx.MessageBox(
+                "You seem to have an invalid version\n"
+                "(%s) of wxWidgets installed. This\n"
+                "program needs version 4.x." % wx.VERSION_STRING,
+                "Error",
+                wx.OK,
+            )
             sys.exit()
 
         misc.init()
@@ -2577,15 +2702,22 @@ class MyApp(wx.App):
         if misc.isWindows:
             major = sys.getwindowsversion()[0]
             if major < 5:
-                wx.MessageBox("You seem to have a version of Windows\n"
-                              "older than Windows 2000, which is the minimum\n"
-                              "requirement for this program.", "Error", wx.OK)
+                wx.MessageBox(
+                    "You seem to have a version of Windows\n"
+                    "older than Windows 2000, which is the minimum\n"
+                    "requirement for this program.",
+                    "Error",
+                    wx.OK,
+                )
                 sys.exit()
 
         if not "unicode" in wx.PlatformInfo:
-            wx.MessageBox("You seem to be using a non-Unicode build of\n"
-                          "wxWidgets. This is not supported.",
-                          "Error", wx.OK)
+            wx.MessageBox(
+                "You seem to be using a non-Unicode build of\n"
+                "wxWidgets. This is not supported.",
+                "Error",
+                wx.OK,
+            )
             sys.exit()
 
         os.chdir(misc.progPath)
@@ -2645,6 +2777,7 @@ class MyApp(wx.App):
             win.Raise()
 
         return True
+
 
 def main():
     global myApp
