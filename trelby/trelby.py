@@ -41,6 +41,9 @@ import wx
 
 from functools import partial
 
+# Boolean to determine if toolbar should be shown or not.
+toolbarshown = True
+
 # keycodes
 KC_CTRL_A = 1
 KC_CTRL_B = 2
@@ -50,6 +53,7 @@ KC_CTRL_F = 6
 KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
+
 
 (
     VIEWMODE_DRAFT,
@@ -1798,6 +1802,7 @@ class MyFrame(wx.Frame):
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_DRAFT, "&Draft")
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_LAYOUT, "&Layout")
         viewMenu.AppendRadioItem(ID_VIEW_STYLE_SIDE_BY_SIDE, "&Side by side")
+        viewMenu.AppendCheckItem(ID_SHOW_HIDE_TOOLBAR, "&Show/Hide Toolbar")
 
         if gd.viewMode == VIEWMODE_DRAFT:
             viewMenu.Check(ID_VIEW_STYLE_DRAFT, True)
@@ -1860,7 +1865,12 @@ class MyFrame(wx.Frame):
         self.menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(self.menuBar)
 
+        
+        
         self.toolBar = self.CreateToolBar(wx.TB_VERTICAL)
+
+        
+        
 
         def addTB(id, iconFilename, toolTip):
             self.toolBar.AddTool(
@@ -1869,6 +1879,8 @@ class MyFrame(wx.Frame):
                 misc.getBitmap("trelby/resources/%s" % iconFilename),
                 shortHelp=toolTip,
             )
+
+
 
         addTB(ID_FILE_NEW, "new.png", "New script")
         addTB(ID_FILE_OPEN, "open.png", "Open Script..")
@@ -1898,6 +1910,7 @@ class MyFrame(wx.Frame):
 
         self.toolBar.SetBackgroundColour(cfgGui.tabBarBgColor)
         self.toolBar.Realize()
+        
 
         self.Bind(wx.EVT_MOVE, self.OnMove)
         self.Bind(wx.EVT_SIZE, self.OnSize)
@@ -1993,6 +2006,7 @@ class MyFrame(wx.Frame):
             self.Bind(wx.EVT_MENU, self.OnFind, id=ID_EDIT_FIND)
             self.Bind(wx.EVT_MENU, self.OnDeleteElements, id=ID_EDIT_DELETE_ELEMENTS)
             self.Bind(wx.EVT_MENU, self.OnViewModeChange, id=ID_VIEW_STYLE_DRAFT)
+            self.Bind(wx.EVT_MENU, self.ShowHideToolbar, id=ID_SHOW_HIDE_TOOLBAR)
             self.Bind(wx.EVT_MENU, self.OnViewModeChange, id=ID_VIEW_STYLE_LAYOUT)
             self.Bind(wx.EVT_MENU, self.OnViewModeChange, id=ID_VIEW_STYLE_SIDE_BY_SIDE)
             self.Bind(wx.EVT_MENU, self.OnShowFormatting, id=ID_VIEW_SHOW_FORMATTING)
@@ -2060,6 +2074,7 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
 
         self.Layout()
+        
 
     def init(self):
         self.updateKbdCommands()
@@ -2127,6 +2142,7 @@ class MyFrame(wx.Frame):
             "ID_SETTINGS_LOAD",
             "ID_SETTINGS_SAVE_AS",
             "ID_SETTINGS_SC_DICT",
+            "ID_SHOW_HIDE_TOOLBAR",
             "ID_TOOLS_CHARMAP",
             "ID_TOOLS_COMPARE_SCRIPTS",
             "ID_TOOLS_NAME_DB",
@@ -2491,6 +2507,15 @@ class MyFrame(wx.Frame):
         self.menuBar.Check(ID_VIEW_STYLE_DRAFT, True)
         self.OnViewModeChange()
 
+    def ShowHideToolbar(self, event=None):
+        self.CheckToolbar = self.menuBar.IsChecked(ID_SHOW_HIDE_TOOLBAR)
+        
+        if (self.CheckToolbar == True):
+            self.toolBar.Hide()
+
+        else:
+            self.toolBar.Show()
+
     def OnViewModeLayout(self):
         self.menuBar.Check(ID_VIEW_STYLE_LAYOUT, True)
         self.OnViewModeChange()
@@ -2785,4 +2810,6 @@ def main():
     opts.init()
 
     myApp = MyApp(0)
+    
     myApp.MainLoop()
+    
