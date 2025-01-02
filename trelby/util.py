@@ -990,6 +990,8 @@ def loadFile(
 
         try:
             ret = f.read(maxSize)
+        except MemoryError as error:
+            print(f"File too large: {error}")
         finally:
             f.close()
 

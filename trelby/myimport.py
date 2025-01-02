@@ -30,7 +30,7 @@ def importAstx(fileName, frame):
     # one or more textRun/break elements, to be joined. The paragraph
     # attribute "element" gives us the element style.
 
-    data = util.loadFile(fileName, frame, 5000000)
+    data = util.loadFile(fileName, frame, -1)
 
     if data == None:
         return None
@@ -312,9 +312,7 @@ def importFDX(fileName, frame):
         "Transition": screenplay.TRANSITION,
     }
 
-    # the 5 MB limit is arbitrary, we just want to avoid getting a
-    # MemoryError exception for /dev/zero etc.
-    data = util.loadFile(fileName, frame, 5000000)
+    data = util.loadFile(fileName, frame, -1)
 
     if data == None:
         return None
@@ -444,7 +442,7 @@ def importFountain(fileName, frame, titlePages):
             s = style.sub(r"\1", s)
         return s.replace(literalstar, "*")
 
-    data = util.loadFile(fileName, frame, 1000000)
+    data = util.loadFile(fileName, frame, -1)
 
     if data == None:
         return None
@@ -771,9 +769,7 @@ def importFountain(fileName, frame, titlePages):
 # contains at least one line.
 def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[screenplay.Line]]:
 
-    # the 1 MB limit is arbitrary, we just want to avoid getting a
-    # MemoryError exception for /dev/zero etc.
-    data = util.loadFile(fileName, frame, 1000000)
+    data = util.loadFile(fileName, frame, -1)
 
     if data == None:
         return None
