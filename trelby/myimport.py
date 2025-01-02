@@ -103,31 +103,19 @@ def importFadein(fileName, frame):
     # the .xml is in open screenplay format:
     # http://sourceforge.net/projects/openscrfmt/files/latest/download
 
-    # the 5 MB limit is arbitrary, we just want to avoid getting a
-    # MemoryError exception for /dev/zero etc.
-    data = util.loadFile(fileName, frame, 5000000)
+    try:
+        with zipfile.ZipFile(fileName) as fadein_file:
+            with fadein_file.open("document.xml") as fadein_document:
+                data = fadein_document.read()
+    except:
+        wx.MessageBox("File is not a valid .fadein file.", "Error", wx.OK, frame)
+        return None
 
     if data == None:
         return None
 
     if len(data) == 0:
         wx.MessageBox("File is empty.", "Error", wx.OK, frame)
-
-        return None
-
-    buf = io.StringIO(data)
-
-    try:
-        z = zipfile.ZipFile(buf)
-        f = z.open("document.xml")
-        content = f.read()
-        z.close()
-    except:
-        wx.MessageBox("File is not a valid .fadein file.", "Error", wx.OK, frame)
-        return None
-
-    if not content:
-        wx.MessageBox("Script seems to be empty.", "Error", wx.OK, frame)
         return None
 
     elemMap = {
@@ -141,7 +129,7 @@ def importFadein(fileName, frame):
     }
 
     try:
-        root = etree.XML(content)
+        root = etree.XML(data)
     except etree.XMLSyntaxError as e:
         wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
         return None
