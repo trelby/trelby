@@ -13,4 +13,3 @@ for name in glob.glob(os.path.join(IN_DIR, "icon*.png")):
     except icnsutil.IcnsType.CanNotDetermine:
         print(f"Skipping {name}")
 img.write(os.path.join(OUT_DIR, "icon.icns"))
-

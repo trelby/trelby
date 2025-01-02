@@ -1865,12 +1865,7 @@ class MyFrame(wx.Frame):
         self.menuBar.Append(helpMenu, "&Help")
         self.SetMenuBar(self.menuBar)
 
-        
-        
         self.toolBar = self.CreateToolBar(wx.TB_VERTICAL)
-
-        
-        
 
         def addTB(id, iconFilename, toolTip):
             self.toolBar.AddTool(
@@ -1879,8 +1874,6 @@ class MyFrame(wx.Frame):
                 misc.getBitmap("trelby/resources/%s" % iconFilename),
                 shortHelp=toolTip,
             )
-
-
 
         addTB(ID_FILE_NEW, "new.png", "New script")
         addTB(ID_FILE_OPEN, "open.png", "Open Script..")
@@ -1910,7 +1903,6 @@ class MyFrame(wx.Frame):
 
         self.toolBar.SetBackgroundColour(cfgGui.tabBarBgColor)
         self.toolBar.Realize()
-        
 
         self.Bind(wx.EVT_MOVE, self.OnMove)
         self.Bind(wx.EVT_SIZE, self.OnSize)
@@ -2074,7 +2066,6 @@ class MyFrame(wx.Frame):
         self.Bind(wx.EVT_SET_FOCUS, self.OnFocus)
 
         self.Layout()
-        
 
     def init(self):
         self.updateKbdCommands()
@@ -2509,8 +2500,8 @@ class MyFrame(wx.Frame):
 
     def ShowHideToolbar(self, event=None):
         self.CheckToolbar = self.menuBar.IsChecked(ID_SHOW_HIDE_TOOLBAR)
-        
-        if (self.CheckToolbar == True):
+
+        if self.CheckToolbar == True:
             self.toolBar.Hide()
 
         else:
@@ -2810,6 +2801,5 @@ def main():
     opts.init()
 
     myApp = MyApp(0)
-    
+
     myApp.MainLoop()
-    
