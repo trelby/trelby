@@ -1,15 +1,15 @@
 # see fileformat.txt for more detailed information about the various
 # defines found here.
 
-from trelby.error import ConfigError
+import copy
+import os
+
 import trelby.misc as misc
 import trelby.mypickle as mypickle
 import trelby.pml as pml
 import trelby.screenplay as screenplay
 import trelby.util as util
-
-import copy
-import os
+from trelby.error import ConfigError
 
 if "TRELBY_TESTING" in os.environ:
     import unittest.mock as mock

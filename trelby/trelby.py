@@ -1,7 +1,17 @@
 # -*- coding: iso-8859-1 -*-
 
+import copy
+import os
+import os.path
+import signal
+import sys
+import time
+import webbrowser
+from functools import partial
+
+import wx
+
 import trelby
-from trelby.error import TrelbyError
 import trelby.autocompletiondlg as autocompletiondlg
 import trelby.cfgdlg as cfgdlg
 import trelby.charmapdlg as charmapdlg
@@ -28,18 +38,7 @@ import trelby.titlesdlg as titlesdlg
 import trelby.util as util
 import trelby.viewmode as viewmode
 import trelby.watermarkdlg as watermarkdlg
-import webbrowser
-
-import copy
-import os
-import os.path
-import os
-import signal
-import sys
-import time
-import wx
-
-from functools import partial
+from trelby.error import TrelbyError
 
 # Boolean to determine if toolbar should be shown or not.
 toolbarshown = True

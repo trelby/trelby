@@ -5,22 +5,18 @@
 # note that this is not part of the normal test run, this has to be run
 # manually.
 
+import os
 import random
 import sys
 import traceback
-
 # FIXME
 from typing import Optional
-
-import os
 
 location = os.path.dirname(__file__)
 sys.path.append(os.path.join(location, "../trelby"))
 
-from screenplay import Screenplay
-
-
 import u
+from screenplay import Screenplay
 
 
 # generates, stores, saves, loads, and runs operations against a

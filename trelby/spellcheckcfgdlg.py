@@ -1,8 +1,8 @@
+import wx
+
 import trelby.gutil as gutil
 import trelby.misc as misc
 import trelby.util as util
-
-import wx
 
 
 class SCDictDlg(wx.Dialog):

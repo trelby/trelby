@@ -24,7 +24,14 @@ SHOT = 7
 NOTE = 8
 ACTBREAK = 9
 
+import copy
+import difflib
+import re
+import sys
+import time
 from typing import Tuple
+
+from lxml import etree
 
 import trelby.autocompletion as autocompletion
 import trelby.config as config
@@ -38,14 +45,6 @@ import trelby.spellcheck as spellcheck
 import trelby.titles as titles
 import trelby.undo as undo
 import trelby.util as util
-
-import copy
-import difflib
-import re
-import sys
-import time
-
-from lxml import etree
 
 
 # screenplay

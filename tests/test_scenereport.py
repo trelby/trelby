@@ -1,5 +1,5 @@
-import trelby.scenereport as scenereport
 import tests.u as u
+import trelby.scenereport as scenereport
 import trelby.util as util
 
 # tests scene report (just that it runs without exceptions, for now)

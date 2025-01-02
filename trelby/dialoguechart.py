@@ -1,4 +1,7 @@
+import functools
 from typing import List
+
+import wx
 
 import trelby.gutil as gutil
 import trelby.misc as misc
@@ -6,9 +9,6 @@ import trelby.pdf as pdf
 import trelby.pml as pml
 import trelby.screenplay as screenplay
 import trelby.util as util
-import functools
-
-import wx
 
 
 def genDialogueChart(mainFrame, sp):

@@ -1,9 +1,9 @@
+import wx
+
 import trelby
 import trelby.misc as misc
 import trelby.namearray as namearray
 import trelby.util as util
-
-import wx
 
 # NameArray, or None if not loaded
 nameArr = None

@@ -1,10 +1,11 @@
+import functools
+from functools import reduce
+
 import trelby.misc as misc
 import trelby.pdf as pdf
 import trelby.pml as pml
 import trelby.screenplay as screenplay
 import trelby.util as util
-from functools import reduce
-import functools
 
 
 class CharacterReport:

@@ -1,6 +1,6 @@
-import trelby.screenplay as screenplay
-
 import zlib
+
+import trelby.screenplay as screenplay
 
 # Which command uses which undo object:
 #

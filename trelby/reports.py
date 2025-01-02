@@ -1,13 +1,12 @@
-import trelby.gutil as gutil
-import trelby.misc as misc
-import trelby.util as util
+import wx
 
 import trelby.characterreport as characterreport
+import trelby.gutil as gutil
 import trelby.locationreport as locationreport
+import trelby.misc as misc
 import trelby.scenereport as scenereport
 import trelby.scriptreport as scriptreport
-
-import wx
+import trelby.util as util
 
 
 def genSceneReport(mainFrame, sp):

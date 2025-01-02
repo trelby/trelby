@@ -1,10 +1,10 @@
-import trelby.config as config
-from trelby.error import MiscError, TrelbyError
-import trelby.misc as misc
-import trelby.util as util
-
 import os
 import tempfile
+
+import trelby.config as config
+import trelby.misc as misc
+import trelby.util as util
+from trelby.error import MiscError, TrelbyError
 
 if "TRELBY_TESTING" in os.environ:
     import unittest.mock as mock

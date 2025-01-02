@@ -1,9 +1,10 @@
-import trelby.pdf as pdf
-import trelby.pml as pml
 import random
-import trelby.util as util
 
 import wx
+
+import trelby.pdf as pdf
+import trelby.pml as pml
+import trelby.util as util
 
 
 # The watermark tool dialog.

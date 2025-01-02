@@ -1,6 +1,6 @@
+import tests.u as u
 import trelby.locationreport as locationreport
 import trelby.scenereport as scenereport
-import tests.u as u
 import trelby.util as util
 
 # tests location report (just that it runs without exceptions, for now)

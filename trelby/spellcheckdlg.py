@@ -1,9 +1,9 @@
+import wx
+
 import trelby.misc as misc
 import trelby.spellcheck as spellcheck
 import trelby.undo as undo
 import trelby.util as util
-
-import wx
 
 
 class SpellCheckDlg(wx.Dialog):

@@ -1,7 +1,7 @@
+import wx
+
 import trelby.gutil as gutil
 import trelby.util as util
-
-import wx
 
 
 class LocationsDlg(wx.Dialog):

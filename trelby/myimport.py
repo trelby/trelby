@@ -1,4 +1,10 @@
-from typing import Optional, List
+import io
+import re
+import zipfile
+from typing import List, Optional
+
+import wx
+from lxml import etree
 
 import trelby.config as config
 import trelby.gutil as gutil
@@ -6,13 +12,6 @@ import trelby.misc as misc
 import trelby.screenplay as screenplay
 import trelby.titles as titles
 import trelby.util as util
-
-from lxml import etree
-import wx
-
-import io
-import re
-import zipfile
 
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."

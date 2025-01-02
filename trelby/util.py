@@ -1,17 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from typing import Optional, AnyStr
-
+import functools
 import glob
 import gzip
-
-import trelby.config as config
-import trelby.misc as misc
 import os
 import re
 import tempfile
 import time
-import functools
+from typing import AnyStr, Optional
+
+import trelby.config as config
+import trelby.misc as misc
 
 if "TRELBY_TESTING" in os.environ:
     import unittest.mock as mock

@@ -1,8 +1,9 @@
-import trelby.util as util
-
 import xml.sax.saxutils as xss
+
 import wx
 import wx.html
+
+import trelby.util as util
 
 
 class CommandsDlg(wx.Frame):

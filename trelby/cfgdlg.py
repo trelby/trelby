@@ -1,14 +1,14 @@
+import functools
+import os.path
+
+import wx
+
 import trelby.config as config
 import trelby.gutil as gutil
 import trelby.misc as misc
 import trelby.screenplay as screenplay
 import trelby.truetype as truetype
 import trelby.util as util
-import functools
-
-import os.path
-
-import wx
 
 # stupid hack to get correct window modality stacking for dialogs
 cfgFrame = None

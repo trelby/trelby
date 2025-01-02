@@ -1,13 +1,12 @@
 # -*- coding: iso-8859-1 -*-
+import os
+import os.path
+import sys
 from typing import AnyStr
 
 import trelby.gutil as gutil
 import trelby.opts as opts
 import trelby.util as util
-
-import os
-import os.path
-import sys
 
 if "TRELBY_TESTING" in os.environ:
     import unittest.mock as mock

@@ -1,5 +1,5 @@
 import uuid
-from typing import Optional, Tuple, Dict, AnyStr
+from typing import AnyStr, Dict, Optional, Tuple
 
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont

@@ -1,11 +1,11 @@
+import wx
+
 import trelby.gutil as gutil
 import trelby.headers as headers
 import trelby.misc as misc
 import trelby.pdf as pdf
 import trelby.pml as pml
 import trelby.util as util
-
-import wx
 
 
 class HeadersDlg(wx.Dialog):

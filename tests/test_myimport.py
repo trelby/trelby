@@ -1,11 +1,10 @@
-import sys
 import os
+import sys
 from typing import Union
-
-import trelby.screenplay as screenplay
-import tests.u as u
-
 from unittest import mock
+
+import tests.u as u
+import trelby.screenplay as screenplay
 
 wxMock = mock.Mock()
 wxMock.ID_OK = 1

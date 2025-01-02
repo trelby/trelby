@@ -1,5 +1,5 @@
-import trelby.characterreport as characterreport
 import tests.u as u
+import trelby.characterreport as characterreport
 import trelby.util as util
 
 # tests character report (just that it runs without exceptions, for now)

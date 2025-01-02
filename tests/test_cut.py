@@ -1,5 +1,5 @@
-import trelby.screenplay as scr
 import tests.u as u
+import trelby.screenplay as scr
 
 # tests deleting selected areas of text
 

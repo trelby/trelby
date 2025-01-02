@@ -1,11 +1,11 @@
+import functools
+import operator
+
 import trelby.misc as misc
 import trelby.pdf as pdf
 import trelby.pml as pml
 import trelby.screenplay as screenplay
 import trelby.util as util
-import functools
-
-import operator
 
 
 class LocationReport:

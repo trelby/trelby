@@ -1,7 +1,8 @@
 #!/usr/bin/env python
-import icnsutil
 import glob
 import os
+
+import icnsutil
 
 IN_DIR = "../resources"
 OUT_DIR = "../resources_mac"

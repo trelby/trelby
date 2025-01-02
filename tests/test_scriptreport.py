@@ -1,5 +1,5 @@
-import trelby.scriptreport as scriptreport
 import tests.u as u
+import trelby.scriptreport as scriptreport
 import trelby.util as util
 
 # tests script report (just that it runs without exceptions, for now)

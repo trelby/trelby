@@ -1,6 +1,7 @@
+import functools
+
 import trelby.pml as pml
 import trelby.util as util
-import functools
 
 
 # a script's title pages.
