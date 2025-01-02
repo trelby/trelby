@@ -2426,7 +2426,7 @@ class MyFrame(wx.Frame):
             defaultDir=os.path.dirname(gd.confFilename),
             defaultFile=os.path.basename(gd.confFilename),
             wildcard="Setting files (*.conf)|*.conf|All files|*",
-            style=wx.SAVE | wx.OVERWRITE_PROMPT,
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
         )
 
         if dlg.ShowModal() == wx.ID_OK:
@@ -2597,7 +2597,7 @@ class MyFrame(wx.Frame):
             "Filename to save as",
             defaultDir=gd.scriptSettingsPath,
             wildcard="Script setting files (*.sconf)|*.sconf|All files|*",
-            style=wx.SAVE | wx.OVERWRITE_PROMPT,
+            style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
         )
 
         if dlg.ShowModal() == wx.ID_OK:
