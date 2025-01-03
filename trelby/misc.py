@@ -56,11 +56,11 @@ def init(doWX=True):
             default_confPath = str(os.environ["HOME"]) + "/.trelby"
 
             if os.environ.get("XDG_CONFIG_HOME"):
-                confPath = str(os.environ["XDG_CONFIG_HOME"]) + "trelby"
+                confPath = str(os.environ["XDG_CONFIG_HOME"]) + "/trelby"
             elif os.path.exists(default_confPath):
                 confPath = default_confPath
             else:
-                confPath = str(os.environ["HOME"]) + ".config/trelby"
+                confPath = str(os.environ["HOME"]) + "/.config/trelby"
 
         else:
             progPath = str(
