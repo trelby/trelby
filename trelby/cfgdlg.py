@@ -1564,6 +1564,7 @@ class PDFFontsPanel(wx.Panel):
         gsizer.AddGrowableCol(1)
 
         self.addEntry("nameEntry", "Name:", self, gsizer)
+        self.nameEntry.SetEditable(False)
         gsizer.Add((1, 1), 0)
 
         self.addEntry("fileEntry", "File:", self, gsizer)
@@ -1585,24 +1586,12 @@ class PDFFontsPanel(wx.Panel):
 
     # check that all embedded TrueType fonts are OK
     def checkForErrors(self):
-        userHasSetFontNameWithoutFile = False
 
         for pfi in self.cfg.getPDFFontIds():
             pf = self.cfg.getPDFFont(pfi)
 
-            if pf.name and not pf.filename:
-                userHasSetFontNameWithoutFile = True
-
             if pf.filename:
                 self.getFontPostscriptName(pf.filename)
-
-        if userHasSetFontNameWithoutFile:
-            wx.MessageBox(
-                "You need to select a file when specifying a custom font. Select a file or remove the font name you provided.",
-                "Error",
-                wx.OK,
-                cfgFrame,
-            )
 
     def addEntry(self, name, descr, parent, sizer):
         sizer.Add(wx.StaticText(parent, -1, descr), 0, wx.ALIGN_CENTER_VERTICAL)
