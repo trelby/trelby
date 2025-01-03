@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import wx
+import re
 
 # linebreak types
 
@@ -209,7 +210,7 @@ class Screenplay:
         output += "#Start-Script \n"
 
         for i in range(len(self.lines)):
-            output += str(self.lines[i]) + "\n"
+            output += str(self.lines[i]) + "    &0&\n"
 
         return output.encode("UTF-8")
 
@@ -284,6 +285,8 @@ class Screenplay:
 
         for i in range(index, len(lines)):
             s = lines[i]
+            
+            
 
             if len(s) < 2:
                 raise error.MiscError("Line %d is too short." % (i + 1))
@@ -328,7 +331,8 @@ class Screenplay:
 
                 lb = config.char2lb(s[0], False)
                 lt = config.char2lt(s[1], False)
-                text = util.toInputStr(util.fromUTF8(s[2:]))
+                text = util.toInputStr(util.fromUTF8(s[2:])).removesuffix("&0&")
+                
 
                 # convert unknown lb types into LB_SPACE
                 if lb == None:
@@ -346,7 +350,13 @@ class Screenplay:
                     )
 
                 line = Line(lb, lt, text)
+
+                
+                
+            
                 sp.lines.append(line)
+                
+                
 
                 if lb != LB_LAST:
                     prevType = lt
@@ -371,6 +381,8 @@ class Screenplay:
         sp.paginate()
         sp.titles.sort()
         sp.locations.refresh(sp.getSceneNames())
+
+        
 
         msgs = []
 
