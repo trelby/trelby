@@ -2649,7 +2649,7 @@ class MyFrame(wx.Frame):
         dlg.Show()
 
     def OnHelpManual(self, event=None):
-        webbrowser.open("file://" + misc.getFullPath("manual.html"))
+        webbrowser.open("file://" + misc.getFullPath("trelby/manual.html"))
 
     def OnAbout(self, event=None):
         win = splash.SplashWindow(self, -1)
