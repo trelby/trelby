@@ -321,6 +321,9 @@ def importFDX(fileName, frame):
 
         return None
 
+    # https://github.com/trelby/trelby/issues/61
+    data = data.replace("\u2028", "\n")
+
     try:
         root = etree.XML(data.encode("UTF-8"))
         lines = []
