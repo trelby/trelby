@@ -37,3 +37,11 @@ Updates in this fork:
 6. `make`
 
 7. `./trelby.py`
+
+#### Run instructions after build
+
+1. `cd trelby`
+
+2. `source venv/bin/activate`
+
+3. `./trelby.py`
