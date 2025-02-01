@@ -45,3 +45,17 @@ Updates in this fork:
 2. `source venv/bin/activate`
 
 3. `./trelby.py`
+
+Alternatively follow the below instructions to create an application version of Trelby.
+
+#### Build Trelby.app
+To build a application version of Trelby follow the below instructions
+
+1. Follow the 'Build from source on Mac' steps
+
+2. Run `pyinstaller --name 'Trelby' --icon 'trelby.ico' --windowed --add-data='trelby:trelby' trelby.py`
+
+3. Open the 'dist' folder and open 'Trelby.app'
+  - or run `open dist`
+
+4. Copy `Trelby.app` your applications folder

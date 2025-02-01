@@ -3,3 +3,4 @@ wxPython
 lxml
 reportlab
 pytest>=7.0
+pyinstaller

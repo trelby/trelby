@@ -17,7 +17,7 @@ trelby/trelby.1.gz: doc/*
 
 clean:
 	rm -f trelby/*.pyc tests/*.pyc trelby/names.txt.gz trelby/dict_en.dat.gz trelby/manual.html trelby/trelby.1.gz doc/trelby.1.gz
-	rm -rf build dist *.egg-info trelby/*.egg-info tests/__pycache__ trelby/__pycache__
+	rm -rf build dist Trelby.spec *.egg-info trelby/*.egg-info tests/__pycache__ trelby/__pycache__
 
 test:
 	pytest
