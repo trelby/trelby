@@ -7,3 +7,4 @@
 .tox/
 MANIFEST
 .pybuild/
+.DS_Store

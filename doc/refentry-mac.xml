@@ -1,0 +1,130 @@
+<?xml version="1.0"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.3//EN"
+"/opt/homebrew/opt/docbook/docbook/xml/4.3/docbookx.dtd"
+[
+<!ENTITY % vers   SYSTEM "version.xml">
+%vers;
+]>
+<refentry id="trelby-refentry">
+  <refmeta>
+    <refentrytitle>trelby</refentrytitle>
+    <refmiscinfo class="source">trelby</refmiscinfo>
+    <refmiscinfo class="version">&trelby.version;</refmiscinfo>
+    <refmiscinfo class="manual">Trelby Manual Page</refmiscinfo>
+    <manvolnum>1</manvolnum>
+  </refmeta>
+  <refnamediv>
+    <refname>trelby</refname>
+    <refpurpose>screenwriting software</refpurpose>
+  </refnamediv>
+  <refsynopsisdiv>
+    <cmdsynopsis>
+      <command>trelby</command>
+      <arg choice="opt">
+        <option>--conf
+        <replaceable>CONFFILE</replaceable></option>
+      </arg>
+      <arg choice="opt" rep="repeat">
+        <replaceable>FILE</replaceable>
+      </arg>
+    </cmdsynopsis>
+  </refsynopsisdiv>
+  <refsect1>
+    <title>Description</title>
+    <para>
+    <command>trelby</command> is a simple, powerful, full-featured,
+    multi-platform program for writing movie screenplays. It is
+    simple, fast and elegantly laid out to make screenwriting
+    simple, and it is infinitely configurable.</para>
+    <refsect2>
+      <title>Features</title>
+      <itemizedlist>
+        <listitem>
+          <para>Screenplay editor: Enforces correct script format
+          and pagination, auto-completion, and spell
+          checking.</para>
+        </listitem>
+        <listitem>
+          <para>Multiplatform: Behaves identically on all
+          platforms, generating the exact same output.</para>
+        </listitem>
+        <listitem>
+          <para>Choice of view: Multiple views, including draft
+          view, WYSIWYG mode, and fullscreen to suit your writing
+          style.</para>
+        </listitem>
+        <listitem>
+          <para>Name database: Character name database containing
+          over 200,000 names from various countries.</para>
+        </listitem>
+        <listitem>
+          <para>Reporting: Scene/location/character/dialogue
+          reports.</para>
+        </listitem>
+        <listitem>
+          <para>Compare: Ability to compare scripts, so you know
+          what changed between versions.</para>
+        </listitem>
+        <listitem>
+          <para>Import: Screenplay formatted text, Final Draft XML
+          (.fdx) and Celtx (.celtx).</para>
+        </listitem>
+        <listitem>
+          <para>Export: PDF, formatted text, HTML, RTF, Final Draft
+          XML (.fdx).</para>
+        </listitem>
+        <listitem>
+          <para>PDF: Built-in, highly configurable PDF generator.
+          Supports embedding your chosen font. Also supports
+          generating PDFs with custom watermarks, to help track
+          shared files.</para>
+        </listitem>
+        <listitem>
+          <para>Free software: Licensed under the GPL, Trelby
+          welcomes developers and screenwriters to contribute in
+          making it more useful.</para>
+        </listitem>
+      </itemizedlist>
+    </refsect2>
+  </refsect1>
+  <refsect1>
+    <title>Options</title>
+    <variablelist>
+      <varlistentry>
+        <term>
+          <option>--conf</option>
+          <replaceable>CONFFILE</replaceable>
+        </term>
+        <listitem>
+          <para>Read global settings from the given file instead of
+          "default.conf".</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+        <term>
+          <replaceable>FILE</replaceable>
+        </term>
+        <listitem>
+          <para>Open the given script file(s).</para>
+        </listitem>
+      </varlistentry>
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>Further Documentation</title>
+    <para>Trelby ships with a more complete manual that can be
+    accessed from its Help menu.</para>
+  </refsect1>
+  <refsect1 id='authors'>
+    <title>Authors</title>
+    <para>Trelby was written by Osku Salerma and Anil
+    Gulecha.</para>
+    <para>This manual page was written in Docbook XML by Bernhard
+    Reiter.</para>
+  </refsect1>
+  <refsect1 id='bugs'>
+    <title>Bugs</title>
+    <para>If you find a bug, please report it at
+    https://github.com/oskusalerma/trelby/issues.</para>
+  </refsect1>
+</refentry>
