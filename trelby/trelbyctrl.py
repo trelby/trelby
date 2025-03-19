@@ -31,6 +31,7 @@ import trelby.watermarkdlg as watermarkdlg
 
 from trelby.error import TrelbyError
 from trelby.ids import ID_EDIT_UNDO, ID_EDIT_REDO, idToLTMap
+from trelby.line import Line
 
 # Boolean to determine if toolbar should be shown or not.
 toolbarshown = True
@@ -797,7 +798,7 @@ class MyCtrl(wx.Control):
 
         for s in inLines:
             if s:
-                lines.append(screenplay.Line(screenplay.LB_LAST, screenplay.ACTION, s))
+                lines.append(Line(screenplay.LB_LAST, screenplay.ACTION, s))
 
         self.OnPaste(lines)
 

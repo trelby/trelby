@@ -6,6 +6,8 @@ from unittest import mock
 import tests.u as u
 import trelby.screenplay as screenplay
 
+from trelby.line import Line
+
 wxMock = mock.Mock()
 wxMock.ID_OK = 1
 wxMock.Dialog.ShowModal.return_value = wxMock.ID_OK
@@ -48,9 +50,9 @@ def testImportTextFile() -> None:
 
 
 class TextImportMatcher:
-    line: screenplay.Line
+    line: Line
 
-    def __init__(self, line: screenplay.Line):
+    def __init__(self, line: Line):
         self.line = line
 
     def __eq__(self, other):

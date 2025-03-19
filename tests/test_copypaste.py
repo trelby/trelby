@@ -1,6 +1,8 @@
 import tests.u as u
 import trelby.screenplay as scr
 
+from trelby.line import Line
+
 # tests delete commands
 
 
@@ -17,7 +19,7 @@ def testPasteAfterForcedLineBreak():
     assert sp.lines[0].lt != scr.CHARACTER
 
     sp.cmd("insertForcedLineBreak")
-    sp.paste([scr.Line(text="Tsashkataar", lt=scr.CHARACTER)])
+    sp.paste([Line(text="Tsashkataar", lt=scr.CHARACTER)])
 
     assert len(sp.lines) == 2
     assert (sp.line == 1) and (sp.column == 11)

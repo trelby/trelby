@@ -14,6 +14,7 @@ import trelby.titles as titles
 import trelby.util as util
 
 from trelby.indent import Indent
+from trelby.line import Line
 
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."
@@ -67,11 +68,11 @@ def importAstx(fileName, frame):
 
         for s in items[:-1]:
             lines.append(
-                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
             )
 
         lines.append(
-            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(items[-1]))
+            Line(screenplay.LB_LAST, eleType, util.cleanInput(items[-1]))
         )
 
     for para in root.xpath("/AdobeStory/document/stream/section/scene/paragraph"):
@@ -145,11 +146,11 @@ def importFadein(fileName, frame):
 
         for s in lns[:-1]:
             lines.append(
-                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
             )
 
         lines.append(
-            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+            Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
         )
 
     # removes html formatting from s, and returns list of lines.
@@ -275,11 +276,11 @@ def importCeltx(fileName, frame):
 
         for s in lns[:-1]:
             lines.append(
-                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
             )
 
         lines.append(
-            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+            Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
         )
 
     for para in root.xpath("/html/body/p"):
@@ -340,11 +341,11 @@ def importFDX(fileName, frame):
 
             for s in lns[:-1]:
                 lines.append(
-                    screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                    Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
                 )
 
             lines.append(
-                screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+                Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
             )
 
         for para in root.xpath("Content//Paragraph"):
@@ -659,7 +660,7 @@ def importFountain(fileName, frame, titlePages):
         s = lines[i]
         sl = s.lstrip()
         # mark as ACTION by default.
-        line = screenplay.Line(screenplay.LB_FORCED, screenplay.ACTION, s)
+        line = Line(screenplay.LB_FORCED, screenplay.ACTION, s)
 
         # Start testing lines for element type. Go in order:
         # Scene Character, Paren, Dialog, Transition, Note.
@@ -771,7 +772,7 @@ def importFountain(fileName, frame, titlePages):
 # import text file from fileName, return list of Line objects for the
 # screenplay or None if something went wrong. returned list always
 # contains at least one line.
-def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[screenplay.Line]]:
+def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[Line]]:
 
     data = util.loadFile(fileName, frame, -1)
 
