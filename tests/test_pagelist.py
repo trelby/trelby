@@ -1,12 +1,13 @@
 import tests.u as u
-import trelby.screenplay as scr
+
+from trelby.pagelist import PageList
 
 # test screenplay.PageList
 
 
 # helper test function.
 def ch(allPages, pages, res):
-    pl = scr.PageList(allPages)
+    pl = PageList(allPages)
 
     for p in pages:
         pl.addPage(p)
