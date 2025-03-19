@@ -356,7 +356,7 @@ class MyCtrl(wx.Control):
             misc.scriptDir = self.gd.cfgGl.scriptDir
 
         self.gd.cfgGl.recalc()
-        refreshGuiConfig()
+        self.refreshGuiConfig()
         self.gd.mainFrame.updateKbdCommands()
 
         for c in self.gd.mainFrame.getCtrls():
