@@ -1,11 +1,11 @@
 import wx
 
 # temporary until we can find out a way to separate MyCtrl
-from trelby.trelby import MyCtrl
+from trelby.trelbyctrl import MyCtrl
 
 class MyPanel(wx.Panel):
 
-    def __init__(self, parent, id):
+    def __init__(self, parent, id, gd):
         wx.Panel.__init__(
             self,
             parent,
@@ -18,7 +18,7 @@ class MyPanel(wx.Panel):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.scrollBar = wx.ScrollBar(self, -1, style=wx.SB_VERTICAL)
-        self.ctrl = MyCtrl(self, -1)
+        self.ctrl = MyCtrl(self, -1, gd)
 
         hsizer.Add(self.ctrl, 1, wx.EXPAND)
         hsizer.Add(self.scrollBar, 0, wx.EXPAND)
