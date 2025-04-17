@@ -8,3 +8,6 @@
 MANIFEST
 .pybuild/
 .DS_Store
+# virtual environment and IDE stuff
+/venv/
+/.vscode/

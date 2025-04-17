@@ -4,9 +4,9 @@ import operator
 import trelby.misc as misc
 import trelby.pdf as pdf
 import trelby.pml as pml
-import trelby.screenplay as screenplay
 import trelby.util as util
 
+from trelby.pagelist import PageList
 
 class LocationReport:
     # sr = SceneReport
@@ -129,7 +129,7 @@ class LocationInfo:
         self.actionLines = 0
 
         # page numbers
-        self.pages = screenplay.PageList(sp.getPageNumbers())
+        self.pages = PageList(sp.getPageNumbers())
 
         # key = character name (upper cased), value = number of dialogue
         # lines

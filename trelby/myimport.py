@@ -13,6 +13,10 @@ import trelby.screenplay as screenplay
 import trelby.titles as titles
 import trelby.util as util
 
+from trelby.indent import Indent
+from trelby.line import Line
+from trelby.importdlg import ImportDlg
+
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."
 SCENE_ACTION = -2
@@ -65,11 +69,11 @@ def importAstx(fileName, frame):
 
         for s in items[:-1]:
             lines.append(
-                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
             )
 
         lines.append(
-            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(items[-1]))
+            Line(screenplay.LB_LAST, eleType, util.cleanInput(items[-1]))
         )
 
     for para in root.xpath("/AdobeStory/document/stream/section/scene/paragraph"):
@@ -143,11 +147,11 @@ def importFadein(fileName, frame):
 
         for s in lns[:-1]:
             lines.append(
-                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
             )
 
         lines.append(
-            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+            Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
         )
 
     # removes html formatting from s, and returns list of lines.
@@ -273,11 +277,11 @@ def importCeltx(fileName, frame):
 
         for s in lns[:-1]:
             lines.append(
-                screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
             )
 
         lines.append(
-            screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+            Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
         )
 
     for para in root.xpath("/html/body/p"):
@@ -338,11 +342,11 @@ def importFDX(fileName, frame):
 
             for s in lns[:-1]:
                 lines.append(
-                    screenplay.Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
+                    Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
                 )
 
             lines.append(
-                screenplay.Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
+                Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
             )
 
         for para in root.xpath("Content//Paragraph"):
@@ -657,7 +661,7 @@ def importFountain(fileName, frame, titlePages):
         s = lines[i]
         sl = s.lstrip()
         # mark as ACTION by default.
-        line = screenplay.Line(screenplay.LB_FORCED, screenplay.ACTION, s)
+        line = Line(screenplay.LB_FORCED, screenplay.ACTION, s)
 
         # Start testing lines for element type. Go in order:
         # Scene Character, Paren, Dialog, Transition, Note.
@@ -769,7 +773,7 @@ def importFountain(fileName, frame, titlePages):
 # import text file from fileName, return list of Line objects for the
 # screenplay or None if something went wrong. returned list always
 # contains at least one line.
-def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[screenplay.Line]]:
+def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[Line]]:
 
     data = util.loadFile(fileName, frame, -1)
 
@@ -860,7 +864,7 @@ def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[screenplay.L
         if v.lt == -1:
             v.lt = screenplay.ACTION
 
-    dlg = ImportDlg(frame, list(indDict.values()))
+    dlg = ImportDlg(frame, list(indDict.values()), SCENE_ACTION, IGNORE)
 
     if dlg.ShowModal() != wx.ID_OK:
         dlg.Destroy()
@@ -945,111 +949,3 @@ def findIndent(indDict, func, *vars):
             return v.indent
 
     return -1
-
-
-# information about one indent level in imported text files.
-class Indent:
-    def __init__(self, indent):
-
-        # indent level, i.e. spaces at the beginning
-        self.indent = indent
-
-        # lines with this indent, leading spaces removed
-        self.lines = []
-
-        # assigned line type, or -1 if not assigned yet.
-        self.lt = -1
-
-        # how many of the lines start with "EXT." or "INT."
-        self.sceneStart = 0
-
-        # how many of the lines have "CUT TO:" or "DISSOLVE TO:"
-        self.trans = 0
-
-        # how many of the lines have a form of "^ +\(.*)$", i.e. are most
-        # likely parentheticals
-        self.paren = 0
-
-
-class ImportDlg(wx.Dialog):
-    def __init__(self, parent, indents):
-        wx.Dialog.__init__(
-            self, parent, -1, "Adjust styles", style=wx.DEFAULT_DIALOG_STYLE
-        )
-
-        indents.sort(key=lambda indent: indent.lines)
-
-        vsizer = wx.BoxSizer(wx.VERTICAL)
-
-        tmp = wx.StaticText(self, -1, "Input:")
-        vsizer.Add(tmp)
-
-        self.inputLb = wx.ListBox(self, -1, size=(400, 200))
-        for it in indents:
-            self.inputLb.Append(
-                "%d lines (indented %d characters)" % (len(it.lines), it.indent), it
-            )
-
-        vsizer.Add(self.inputLb, 0, wx.EXPAND)
-
-        hsizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        hsizer.Add(wx.StaticText(self, -1, "Style:"), 0, wx.ALIGN_CENTER_VERTICAL)
-        self.styleCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
-
-        self.styleCombo.Append("Scene / Action", SCENE_ACTION)
-        for t in config.getTIs():
-            self.styleCombo.Append(t.name, t.lt)
-
-        self.styleCombo.Append("Ignore", IGNORE)
-
-        util.setWH(self.styleCombo, w=150)
-
-        hsizer.Add(self.styleCombo, 0, wx.LEFT, 10)
-
-        vsizer.Add(hsizer, 0, wx.TOP | wx.BOTTOM, 10)
-
-        vsizer.Add(wx.StaticText(self, -1, "Lines:"))
-
-        self.linesEntry = wx.TextCtrl(
-            self, -1, size=(400, 200), style=wx.TE_MULTILINE | wx.TE_DONTWRAP
-        )
-        vsizer.Add(self.linesEntry, 0, wx.EXPAND)
-
-        hsizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        hsizer.Add((1, 1), 1)
-
-        cancelBtn = gutil.createStockButton(self, "Cancel")
-        hsizer.Add(cancelBtn)
-
-        okBtn = gutil.createStockButton(self, "OK")
-        hsizer.Add(okBtn, 0, wx.LEFT, 10)
-
-        vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 10)
-
-        util.finishWindow(self, vsizer)
-
-        self.Bind(wx.EVT_COMBOBOX, self.OnStyleCombo, id=self.styleCombo.GetId())
-        self.Bind(wx.EVT_LISTBOX, self.OnInputLb, id=self.inputLb.GetId())
-
-        self.Bind(wx.EVT_BUTTON, self.OnCancel, id=cancelBtn.GetId())
-        self.Bind(wx.EVT_BUTTON, self.OnOK, id=okBtn.GetId())
-
-        self.inputLb.SetSelection(0)
-        self.OnInputLb()
-
-    def OnOK(self, event):
-        self.EndModal(wx.ID_OK)
-
-    def OnCancel(self, event):
-        self.EndModal(wx.ID_CANCEL)
-
-    def OnInputLb(self, event=None):
-        self.selected = self.inputLb.GetClientData(self.inputLb.GetSelection())
-
-        util.reverseComboSelect(self.styleCombo, self.selected.lt)
-        self.linesEntry.SetValue("\n".join(self.selected.lines))
-
-    def OnStyleCombo(self, event):
-        self.selected.lt = self.styleCombo.GetClientData(self.styleCombo.GetSelection())
