@@ -1,6 +1,6 @@
 import zlib
 
-import trelby.screenplay as screenplay
+from trelby.line import Line
 
 # Which command uses which undo object:
 #
@@ -88,7 +88,7 @@ def storage2lines(storage):
     else:
         linesStr = storage[2].decode()
 
-    return [screenplay.Line.fromStr(s) for s in linesStr.split("\n")]
+    return [Line.fromStr(s) for s in linesStr.split("\n")]
 
 
 # how much memory is used by the given storage object
@@ -241,7 +241,7 @@ class AnyDifference(Base):
     def __init__(self, sp):
         Base.__init__(self, sp, CMD_MISC)
 
-        self.linesBefore = [screenplay.Line(ln.lb, ln.lt, ln.text) for ln in sp.lines]
+        self.linesBefore = [Line(ln.lb, ln.lt, ln.text) for ln in sp.lines]
 
     def setAfter(self, sp):
         self.a, self.b, self.x, self.y = mySequenceMatcher(self.linesBefore, sp.lines)

@@ -1,6 +1,7 @@
 import tests.u as u
 import trelby.config as config
 import trelby.screenplay as scr
+from trelby.line import Line
 
 # tests isModified updating
 
@@ -81,7 +82,7 @@ def testConvert():
 
 def testPaste():
     sp = u.load()
-    sp.paste([scr.Line(text="yo")])
+    sp.paste([Line(text="yo")])
     assert sp.isModified()
 
 

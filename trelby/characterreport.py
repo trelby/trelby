@@ -7,6 +7,7 @@ import trelby.pml as pml
 import trelby.screenplay as screenplay
 import trelby.util as util
 
+from trelby.pagelist import PageList
 
 class CharacterReport:
     def __init__(self, sp):
@@ -145,7 +146,7 @@ class CharInfo:
         self.wordCharCnt = 0
         self.scenes = {}
         self.include = True
-        self.pages = screenplay.PageList(sp.getPageNumbers())
+        self.pages = PageList(sp.getPageNumbers())
 
 
 def cmpfunc(a, b):

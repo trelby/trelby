@@ -46,6 +46,7 @@ import trelby.titles as titles
 import trelby.undo as undo
 import trelby.util as util
 
+from trelby.line import Line
 
 # screenplay
 class Screenplay:
@@ -3354,41 +3355,6 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 prevType = ln.lt
 
 
-# one line in a screenplay
-class Line:
-    def __init__(self, lb=LB_LAST, lt=ACTION, text=""):
-
-        # line break type
-        self.lb = lb
-
-        # line type
-        self.lt = lt
-
-        # text
-        self.text = text
-
-    def __str__(self):
-        return config.lb2char(self.lb) + config.lt2char(self.lt) + self.text
-
-    def __repr__(self) -> str:
-        return self.__str__()
-
-    def __ne__(self, other):
-        return (
-            (self.lt != other.lt) or (self.lb != other.lb) or (self.text != other.text)
-        )
-
-    def __eq__(self, other):
-        return not self.__ne__(other)
-
-    # opposite of __str__. NOTE: only meant for storing data internally by
-    # the program! NOT USABLE WITH EXTERNAL INPUT DUE TO COMPLETE LACK OF
-    # ERROR CHECKING!
-    @staticmethod
-    def fromStr(s):
-        return Line(config.char2lb(s[0]), config.char2lt(s[1]), s[2:])
-
-
 # used to keep track of selected area. this marks one of the end-points,
 # while the other one is the current position.
 class Mark:
@@ -3429,71 +3395,3 @@ class CommandState:
 
         # True if we need to make current line visible
         self.needsVisifying = True
-
-
-# keeps a collection of page numbers from a given screenplay, and allows
-# formatting of the list intelligently, e.g. "4-7, 9, 11-16".
-class PageList:
-    def __init__(self, allPages):
-        # list of all pages in the screenplay, in the format returned by
-        # Screenplay.getPageNumbers().
-        self.allPages = allPages
-
-        # key = page number (str), value = unused
-        self.pages = {}
-
-    # add page to page list if it's not already there
-    def addPage(self, page):
-        self.pages[str(page)] = True
-
-    def __len__(self):
-        return len(self.pages)
-
-    # merge two PageLists
-    def __iadd__(self, other):
-        for pg in list(other.pages.keys()):
-            self.addPage(pg)
-
-        return self
-
-    # return textual representation of pages where consecutive pages are
-    # formatted as "x-y". example: "3, 5-8, 11".
-    def __str__(self):
-        # one entry for each page from above, containing True if that page
-        # is contained in this PageList object
-        hasPage = []
-
-        for p in self.allPages:
-            hasPage.append(p in list(self.pages.keys()))
-
-        # finished string
-        s = ""
-
-        # start index of current range, or -1 if no range in progress
-        rangeStart = -1
-
-        for i in range(len(self.allPages)):
-            if rangeStart != -1:
-                if not hasPage[i]:
-
-                    # range ends
-
-                    if i != (rangeStart + 1):
-                        s += "-%s" % self.allPages[i - 1]
-
-                    rangeStart = -1
-            else:
-                if hasPage[i]:
-                    if s:
-                        s += ", "
-
-                    s += self.allPages[i]
-                    rangeStart = i
-
-        last = len(self.allPages) - 1
-
-        # finish last range if needed
-        if (rangeStart != -1) and (rangeStart != last):
-            s += "-%s" % self.allPages[last]
-
-        return s

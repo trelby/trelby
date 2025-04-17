@@ -7,3 +7,7 @@
 .tox/
 MANIFEST
 .pybuild/
+
+# virtual environment and IDE stuff
+/venv/
+/.vscode/
