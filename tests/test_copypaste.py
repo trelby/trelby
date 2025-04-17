@@ -1,6 +1,5 @@
 import tests.u as u
 import trelby.screenplay as scr
-
 from trelby.line import Line
 
 # tests delete commands

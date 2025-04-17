@@ -3,8 +3,8 @@
 import trelby.config as config
 
 # constants that could not be removed yet
-from trelby.screenplay import ACTION
-from trelby.screenplay import LB_LAST
+from trelby.screenplay import ACTION, LB_LAST
+
 
 # one line in a screenplay
 class Line:

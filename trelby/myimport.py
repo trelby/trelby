@@ -12,10 +12,9 @@ import trelby.misc as misc
 import trelby.screenplay as screenplay
 import trelby.titles as titles
 import trelby.util as util
-
+from trelby.importdlg import ImportDlg
 from trelby.indent import Indent
 from trelby.line import Line
-from trelby.importdlg import ImportDlg
 
 # special linetype that means that indent contains action and scene lines,
 # and scene lines are the ones that begin with "EXT." or "INT."
@@ -68,13 +67,9 @@ def importAstx(fileName, frame):
             items = items[:-1]
 
         for s in items[:-1]:
-            lines.append(
-                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
-            )
+            lines.append(Line(screenplay.LB_FORCED, eleType, util.cleanInput(s)))
 
-        lines.append(
-            Line(screenplay.LB_LAST, eleType, util.cleanInput(items[-1]))
-        )
+        lines.append(Line(screenplay.LB_LAST, eleType, util.cleanInput(items[-1])))
 
     for para in root.xpath("/AdobeStory/document/stream/section/scene/paragraph"):
         lt = elemMap.get(para.get("element"), screenplay.ACTION)
@@ -146,13 +141,9 @@ def importFadein(fileName, frame):
             lns = lns[:-1]
 
         for s in lns[:-1]:
-            lines.append(
-                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
-            )
+            lines.append(Line(screenplay.LB_FORCED, eleType, util.cleanInput(s)))
 
-        lines.append(
-            Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
-        )
+        lines.append(Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
 
     # removes html formatting from s, and returns list of lines.
     # if s is None, return a list with single empty string.
@@ -276,13 +267,9 @@ def importCeltx(fileName, frame):
             lns = lns[:-1]
 
         for s in lns[:-1]:
-            lines.append(
-                Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
-            )
+            lines.append(Line(screenplay.LB_FORCED, eleType, util.cleanInput(s)))
 
-        lines.append(
-            Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
-        )
+        lines.append(Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
 
     for para in root.xpath("/html/body/p"):
         items = []
@@ -341,13 +328,9 @@ def importFDX(fileName, frame):
                 lns = lns[:-1]
 
             for s in lns[:-1]:
-                lines.append(
-                    Line(screenplay.LB_FORCED, eleType, util.cleanInput(s))
-                )
+                lines.append(Line(screenplay.LB_FORCED, eleType, util.cleanInput(s)))
 
-            lines.append(
-                Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1]))
-            )
+            lines.append(Line(screenplay.LB_LAST, eleType, util.cleanInput(lns[-1])))
 
         for para in root.xpath("Content//Paragraph"):
             addedNote = False

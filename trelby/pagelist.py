@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+
 # keeps a collection of page numbers from a given screenplay, and allows
 # formatting of the list intelligently, e.g. "4-7, 9, 11-16".
 class PageList:

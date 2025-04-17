@@ -3,6 +3,7 @@ import wx
 # temporary until we can find out a way to separate MyCtrl
 from trelby.trelbyctrl import MyCtrl
 
+
 class MyPanel(wx.Panel):
 
     def __init__(self, parent, id, gd):

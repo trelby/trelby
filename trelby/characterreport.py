@@ -6,8 +6,8 @@ import trelby.pdf as pdf
 import trelby.pml as pml
 import trelby.screenplay as screenplay
 import trelby.util as util
-
 from trelby.pagelist import PageList
+
 
 class CharacterReport:
     def __init__(self, sp):

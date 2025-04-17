@@ -12,7 +12,6 @@ import trelby.misc as misc
 import trelby.opts as opts
 import trelby.splash as splash
 import trelby.util as util
-
 from trelby.globaldata import GlobalData
 from trelby.trelbyframe import MyFrame
 
@@ -28,6 +27,7 @@ KC_CTRL_F = 6
 KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
+
 
 class MyApp(wx.App):
 

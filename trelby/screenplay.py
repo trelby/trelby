@@ -45,8 +45,8 @@ import trelby.spellcheck as spellcheck
 import trelby.titles as titles
 import trelby.undo as undo
 import trelby.util as util
-
 from trelby.line import Line
+
 
 # screenplay
 class Screenplay:

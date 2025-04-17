@@ -5,8 +5,8 @@ import trelby.misc as misc
 import trelby.pdf as pdf
 import trelby.pml as pml
 import trelby.util as util
-
 from trelby.pagelist import PageList
+
 
 class LocationReport:
     # sr = SceneReport

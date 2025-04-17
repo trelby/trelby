@@ -12,6 +12,7 @@ import trelby.spellcheck as spellcheck
 import trelby.util as util
 import trelby.viewmode as viewmode
 
+
 # keeps (hopefully all) global data
 class GlobalData:
 

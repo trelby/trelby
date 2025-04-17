@@ -1,6 +1,7 @@
 import trelby.config as config
 import trelby.mypickle as mypickle
 
+
 # auto completion info for one element type
 class AutoCompletionType:
     cvars = None

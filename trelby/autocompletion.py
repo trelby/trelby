@@ -3,6 +3,7 @@ import trelby.screenplay as screenplay
 import trelby.util as util
 from trelby.autocompletiontype import AutoCompletionType as Type
 
+
 # manages auto completion information for a single script.
 class AutoCompletion:
     def __init__(self):

@@ -1,5 +1,7 @@
 import wx
+
 import trelby.util as util
+
 
 class TitlesPreview(wx.Window):
     def __init__(self, parent, ctrl, cfg):

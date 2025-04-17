@@ -1,4 +1,5 @@
 import wx
+
 import trelby.screenplay as screenplay
 
 ID_EDIT_UNDO = wx.NewId()
@@ -78,13 +79,13 @@ ID_ELEM_TO_ACTBREAK = wx.NewId()
 ID_ELEM_TO_TRANSITION = wx.NewId()
 
 idToLTMap = {
-        ID_ELEM_TO_SCENE: screenplay.SCENE,
-        ID_ELEM_TO_ACTION: screenplay.ACTION,
-        ID_ELEM_TO_CHARACTER: screenplay.CHARACTER,
-        ID_ELEM_TO_DIALOGUE: screenplay.DIALOGUE,
-        ID_ELEM_TO_PAREN: screenplay.PAREN,
-        ID_ELEM_TO_TRANSITION: screenplay.TRANSITION,
-        ID_ELEM_TO_SHOT: screenplay.SHOT,
-        ID_ELEM_TO_ACTBREAK: screenplay.ACTBREAK,
-        ID_ELEM_TO_NOTE: screenplay.NOTE,
-    }
+    ID_ELEM_TO_SCENE: screenplay.SCENE,
+    ID_ELEM_TO_ACTION: screenplay.ACTION,
+    ID_ELEM_TO_CHARACTER: screenplay.CHARACTER,
+    ID_ELEM_TO_DIALOGUE: screenplay.DIALOGUE,
+    ID_ELEM_TO_PAREN: screenplay.PAREN,
+    ID_ELEM_TO_TRANSITION: screenplay.TRANSITION,
+    ID_ELEM_TO_SHOT: screenplay.SHOT,
+    ID_ELEM_TO_ACTBREAK: screenplay.ACTBREAK,
+    ID_ELEM_TO_NOTE: screenplay.NOTE,
+}

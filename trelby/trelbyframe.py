@@ -18,12 +18,13 @@ import trelby.namesdlg as namesdlg
 import trelby.spellcheckcfgdlg as spellcheckcfgdlg
 import trelby.splash as splash
 import trelby.util as util
-
-from trelby.trelbypanel import MyPanel
 from trelby.ids import *
+from trelby.trelbypanel import MyPanel
+
 
 def getCfgGui():
     return cfgGui
+
 
 class MyFrame(wx.Frame):
 

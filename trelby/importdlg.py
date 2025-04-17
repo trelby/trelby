@@ -4,6 +4,7 @@ import trelby.config as config
 import trelby.gutil as gutil
 import trelby.util as util
 
+
 class ImportDlg(wx.Dialog):
     def __init__(self, parent, indents, SCENE_ACTION, IGNORE):
         wx.Dialog.__init__(

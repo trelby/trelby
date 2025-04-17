@@ -5,7 +5,6 @@ from unittest import mock
 
 import tests.u as u
 import trelby.screenplay as screenplay
-
 from trelby.line import Line
 
 wxMock = mock.Mock()

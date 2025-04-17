@@ -28,9 +28,8 @@ import trelby.spellcheckdlg as spellcheckdlg
 import trelby.titlesdlg as titlesdlg
 import trelby.util as util
 import trelby.watermarkdlg as watermarkdlg
-
 from trelby.error import TrelbyError
-from trelby.ids import ID_EDIT_UNDO, ID_EDIT_REDO, idToLTMap
+from trelby.ids import ID_EDIT_REDO, ID_EDIT_UNDO, idToLTMap
 from trelby.line import Line
 
 # Boolean to determine if toolbar should be shown or not.
@@ -45,6 +44,7 @@ KC_CTRL_F = 6
 KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
+
 
 class MyCtrl(wx.Control):
 
@@ -68,7 +68,7 @@ class MyCtrl(wx.Control):
 
         self.createEmptySp()
         self.updateScreen(redraw=False)
-    
+
     def refreshGuiConfig(self):
         self.gd.cfgGui = config.ConfigGui(self.gd.cfgGl)
 
@@ -130,7 +130,9 @@ class MyCtrl(wx.Control):
         try:
             (sp, msg) = screenplay.Screenplay.load(s, self.gd.cfgGl)
         except TrelbyError as e:
-            wx.MessageBox("Error loading file:\n\n%s" % e, "Error", wx.OK, self.gd.mainFrame)
+            wx.MessageBox(
+                "Error loading file:\n\n%s" % e, "Error", wx.OK, self.gd.mainFrame
+            )
 
             return
 
@@ -193,7 +195,9 @@ class MyCtrl(wx.Control):
         inf = []
         inf.append(misc.CheckBoxItem("Include page markers"))
 
-        dlg = misc.CheckBoxDlg(self.gd.mainFrame, "Output options", inf, "Options:", False)
+        dlg = misc.CheckBoxDlg(
+            self.gd.mainFrame, "Output options", inf, "Options:", False
+        )
 
         if dlg.ShowModal() != wx.ID_OK:
             dlg.Destroy()
@@ -206,7 +210,9 @@ class MyCtrl(wx.Control):
         inf = []
         inf.append(misc.CheckBoxItem("Include Notes"))
 
-        dlg = misc.CheckBoxDlg(self.gd.mainFrame, "Output options", inf, "Options:", False)
+        dlg = misc.CheckBoxDlg(
+            self.gd.mainFrame, "Output options", inf, "Options:", False
+        )
 
         if dlg.ShowModal() != wx.ID_OK:
             dlg.Destroy()
@@ -325,7 +331,9 @@ class MyCtrl(wx.Control):
         page = self.sp.line2page(self.sp.line)
         pageCnt = self.sp.line2page(len(self.sp.lines) - 1)
 
-        self.gd.mainFrame.statusCtrl.SetValues(page, pageCnt, cur.ti.name, tabNext, enterNext)
+        self.gd.mainFrame.statusCtrl.SetValues(
+            page, pageCnt, cur.ti.name, tabNext, enterNext
+        )
 
         canUndo = self.sp.canUndo()
         canRedo = self.sp.canRedo()
@@ -375,7 +383,9 @@ class MyCtrl(wx.Control):
         self.gd.mainFrame.toolBar.SetBackgroundColour(self.gd.cfgGui.tabBarBgColor)
 
         if writeCfg:
-            util.writeToFile(self.gd.confFilename, self.gd.cfgGl.save(), self.gd.mainFrame)
+            util.writeToFile(
+                self.gd.confFilename, self.gd.cfgGl.save(), self.gd.mainFrame
+            )
 
         self.gd.mainFrame.checkFonts()
 
@@ -612,7 +622,10 @@ class MyCtrl(wx.Control):
 
         if sel1 == sel2:
             wx.MessageBox(
-                "You can't compare a script to itself.", "Error", wx.OK, self.gd.mainFrame
+                "You can't compare a script to itself.",
+                "Error",
+                wx.OK,
+                self.gd.mainFrame,
             )
 
             return
@@ -637,7 +650,9 @@ class MyCtrl(wx.Control):
         if s:
             gutil.showTempPDF(s, self.gd.cfgGl, self.gd.mainFrame)
         else:
-            wx.MessageBox("The scripts are identical.", "Results", wx.OK, self.gd.mainFrame)
+            wx.MessageBox(
+                "The scripts are identical.", "Results", wx.OK, self.gd.mainFrame
+            )
 
     def canBeClosed(self):
         if self.sp.isModified():
@@ -936,7 +951,10 @@ class MyCtrl(wx.Control):
                     "the beginning of the script.)"
                 )
             wx.MessageBox(
-                "Spell checker found no errors." + s, "Results", wx.OK, self.gd.mainFrame
+                "Spell checker found no errors." + s,
+                "Results",
+                wx.OK,
+                self.gd.mainFrame,
             )
 
             return
@@ -964,7 +982,11 @@ class MyCtrl(wx.Control):
             types.append(misc.CheckBoxItem(t.name, False, t.lt))
 
         dlg = misc.CheckBoxDlg(
-            self.gd.mainFrame, "Delete elements", types, "Element types to delete:", True
+            self.gd.mainFrame,
+            "Delete elements",
+            types,
+            "Element types to delete:",
+            True,
         )
 
         ok = False
@@ -1067,7 +1089,9 @@ class MyCtrl(wx.Control):
         gutil.showTempPDF(s, self.gd.cfgGl, self.gd.mainFrame)
 
     def OnSettings(self):
-        dlg = cfgdlg.CfgDlg(self.gd.mainFrame, copy.deepcopy(self.gd.cfgGl), self.applyGlobalCfg, True)
+        dlg = cfgdlg.CfgDlg(
+            self.gd.mainFrame, copy.deepcopy(self.gd.cfgGl), self.applyGlobalCfg, True
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             self.applyGlobalCfg(dlg.cfg)
@@ -1075,7 +1099,9 @@ class MyCtrl(wx.Control):
         dlg.Destroy()
 
     def OnScriptSettings(self):
-        dlg = cfgdlg.CfgDlg(self.gd.mainFrame, copy.deepcopy(self.sp.cfg), self.applyCfg, False)
+        dlg = cfgdlg.CfgDlg(
+            self.gd.mainFrame, copy.deepcopy(self.sp.cfg), self.applyCfg, False
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             self.applyCfg(dlg.cfg)
@@ -1421,7 +1447,10 @@ class MyCtrl(wx.Control):
                             dc.SetPen(self.gd.cfgGui.pagebreakNoAdjustPen)
                             util.drawLine(dc, 0, y + lineh - 1, size.width, 0)
 
-                    if self.gd.cfgGl.pbi in (config.PBI_REAL, config.PBI_REAL_AND_UNADJ):
+                    if self.gd.cfgGl.pbi in (
+                        config.PBI_REAL,
+                        config.PBI_REAL_AND_UNADJ,
+                    ):
                         thisPage = self.sp.line2page(i)
 
                         if thisPage != self.sp.line2page(i + 1):
