@@ -17,7 +17,7 @@ else:
 
 TAB_BAR_HEIGHT = 24
 
-version = "2.4.14"
+version = "2.4.15"
 
 
 def init(doWX=True):

@@ -1,10 +1,16 @@
+trelby (2.4.15) unstable; urgency=low
+
+  * Fix Crtl_Left, Right; map to word move.
+
+ -- Gwyn Ciesla <gwync@protonmail.com>  Tue, 06 May 2025 09:45:00 +0000
+
 trelby (2.4.14) unstable; urgency=low
 
   * Fix config and manual paths.
   * Fix errors around script custom font selection.
   * Fix GH test run config.
 
- -- Gwyn Ciesla <gwync@protonmail.com>  Mon, 06 Dec 2025 09:45:00 +0000
+ -- Gwyn Ciesla <gwync@protonmail.com>  Mon, 06 Dec 2024 09:45:00 +0000
 
 trelby (2.4.13) unstable; urgency=low
 
@@ -14,7 +20,7 @@ trelby (2.4.13) unstable; urgency=low
   * Fix Fade In import.
   * Allow loading large scripts.
 
- -- Gwyn Ciesla <gwync@protonmail.com>  Sat, 04 Jan 2025 16:23:00 +0000
+ -- Gwyn Ciesla <gwync@protonmail.com>  Sat, 04 Jan 2024 16:23:00 +0000
 
 trelby (2.4.12) unstable; urgency=low
 
