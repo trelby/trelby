@@ -10,6 +10,9 @@ import trelby.screenplay as screenplay
 import trelby.truetype as truetype
 import trelby.util as util
 
+from trelby.configpages.globalaboutpanel import GlobalAboutPanel
+from trelby.configpages.scriptaboutpanel import ScriptAboutPanel
+
 # stupid hack to get correct window modality stacking for dialogs
 cfgFrame = None
 
@@ -170,47 +173,6 @@ class CfgDlg(wx.Dialog):
 
     def OnCancel(self, event):
         self.EndModal(wx.ID_CANCEL)
-
-
-class AboutPanel(wx.Panel):
-    def __init__(self, parent, id, cfg, text):
-        wx.Panel.__init__(self, parent, id)
-
-        vsizer = wx.BoxSizer(wx.VERTICAL)
-
-        vsizer.Add(wx.StaticText(self, -1, text))
-
-        util.finishWindow(self, vsizer, center=False)
-
-
-class GlobalAboutPanel(AboutPanel):
-    def __init__(self, parent, id, cfg):
-        s = """This is the config dialog for global settings, which means things
-that affect the user interface of the program like interface colors,
-keyboard shortcuts, display fonts, and so on.
-
-The settings here are independent of any script being worked on,
-and unique to this computer.
-
-None of the settings here have any effect on the generated PDF
-output for a script. See Script/Settings for those."""
-
-        AboutPanel.__init__(self, parent, id, cfg, s)
-
-
-class ScriptAboutPanel(AboutPanel):
-    def __init__(self, parent, id, cfg):
-        s = """This is the config dialog for script format settings, which means
-things that affect the generated PDF output of a script. Things like
-paper size, indendation/line widths/font styles for the different
-element types, and so on.
-
-The settings here are saved within the screenplay itself.
-
-If you're looking for the user interface settings (colors, keyboard
-shortcuts, etc.), those are found in File/Settings."""
-
-        AboutPanel.__init__(self, parent, id, cfg, s)
 
 
 class DisplayPanel(wx.Panel):
