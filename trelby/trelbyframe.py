@@ -22,11 +22,8 @@ from trelby.ids import *
 from trelby.trelbypanel import MyPanel
 
 
-def getCfgGui():
-    return cfgGui
-
-
 class MyFrame(wx.Frame):
+
 
     def __init__(self, parent, id, title, gd, myApp):
         wx.Frame.__init__(self, parent, id, title, name="Trelby")
@@ -39,9 +36,6 @@ class MyFrame(wx.Frame):
         self.showFormatting = False
         self.gd = gd
         self.myApp = myApp
-
-        global cfgGui
-        cfgGui = gd.cfgGui
 
         self.SetSizeHints(gd.cvars.getMin("width"), gd.cvars.getMin("height"))
 
@@ -225,17 +219,17 @@ class MyFrame(wx.Frame):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.noFSBtn = misc.MyFSButton(self, -1, getCfgGui)
+        self.noFSBtn = misc.MyFSButton(self, -1, self.getCfgGui)
         self.noFSBtn.SetToolTip("Exit fullscreen")
         self.noFSBtn.Show(False)
         hsizer.Add(self.noFSBtn)
 
         self.Bind(wx.EVT_BUTTON, self.ToggleFullscreen, id=self.noFSBtn.GetId())
 
-        self.tabCtrl = misc.MyTabCtrl(self, -1, getCfgGui)
+        self.tabCtrl = misc.MyTabCtrl(self, -1, self.getCfgGui)
         hsizer.Add(self.tabCtrl, 1, wx.EXPAND)
 
-        self.statusCtrl = misc.MyStatus(self, -1, getCfgGui)
+        self.statusCtrl = misc.MyStatus(self, -1, self.getCfgGui)
         hsizer.Add(self.statusCtrl)
 
         vsizer.Add(hsizer, 0, wx.EXPAND)
@@ -926,3 +920,6 @@ class MyFrame(wx.Frame):
     def OnSize(self, event):
         self.gd.width, self.gd.height = self.GetSize()
         event.Skip()
+
+    def getCfgGui(self):
+        return self.gd.cfgGui
