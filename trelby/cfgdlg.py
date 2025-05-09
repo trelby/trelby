@@ -1,8 +1,8 @@
 import wx
 
 import trelby.gutil as gutil
-import trelby.util as util
 
+# import config pages
 from trelby.configpages.globalaboutpanel import GlobalAboutPanel
 from trelby.configpages.scriptaboutpanel import ScriptAboutPanel
 from trelby.configpages.elementspanel import ElementsPanel
@@ -17,60 +17,6 @@ from trelby.configpages.pdffontspanel import PDFFontsPanel
 from trelby.configpages.stringspanel import StringsPanel
 from trelby.configpages.miscpanel import MiscPanel
 
-
-# WX2.6-FIXME: we can delete this when/if we switch to using wxListBook in
-# wxWidgets 2.6
-class MyListBook(wx.ListBox):
-    def __init__(self, parent):
-        wx.ListBox.__init__(self, parent, -1)
-
-        self.Bind(wx.EVT_LISTBOX, self.OnPageChange, id=self.GetId())
-
-    # get a list of all the pages
-    def GetPages(self):
-        ret = []
-
-        for i in range(self.GetCount()):
-            ret.append(self.GetClientData(i))
-
-        return ret
-
-    def AddPage(self, page, name):
-        self.Append(name, page)
-
-    # get (w,h) tuple that's big enough to cover all contained pages
-    def GetContainingSize(self):
-        w, h = 0, 0
-
-        for page in self.GetPages():
-            size = page.GetClientSize()
-            w = max(w, size.width)
-            h = max(h, size.height)
-
-        return (w, h)
-
-    # set all page sizes
-    def SetPageSizes(self, w, h):
-        for page in self.GetPages():
-            page.SetClientSize(w, h)
-
-    def OnPageChange(self, event=None):
-        for page in self.GetPages():
-            page.Hide()
-
-        panel = self.GetClientData(self.GetSelection())
-
-        # newer wxWidgets versions sometimes return None from the above
-        # for some reason when the dialog is closed.
-        if panel is None:
-            return
-
-        if hasattr(panel, "doForcedUpdate"):
-            panel.doForcedUpdate()
-
-        panel.Show()
-
-
 class CfgDlg(wx.Dialog):
     def __init__(self, parent, cfg, applyFunc, isGlobal):
         wx.Dialog.__init__(
@@ -81,17 +27,7 @@ class CfgDlg(wx.Dialog):
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        hsizer = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.listbook = MyListBook(self)
-        w = util.getTextExtent(self.listbook.GetFont(), "Formatting")[0]
-        util.setWH(self.listbook, w + 20, 200)
-
-        hsizer.Add(self.listbook, 0, wx.EXPAND)
-
-        self.panel = wx.Panel(self, -1)
-
-        hsizer.Add(self.panel, 1, wx.EXPAND)
+        self.listbook = wx.Listbook(self, -1)
 
         if isGlobal:
             self.SetTitle("Settings dialog")
@@ -113,18 +49,7 @@ class CfgDlg(wx.Dialog):
             self.AddPage(PDFFontsPanel, "PDF/Fonts")
             self.AddPage(StringsPanel, "Strings")
 
-        size = self.listbook.GetContainingSize()
-
-        hsizer.SetItemMinSize(self.panel, *size)
-        self.listbook.SetPageSizes(*size)
-
-        self.listbook.SetSelection(0)
-
-        # it's unclear whether SetSelection sends an event on all
-        # platforms or not, so force correct action.
-        self.listbook.OnPageChange()
-
-        vsizer.Add(hsizer, 1, wx.EXPAND)
+        vsizer.Add(self.listbook, 1, wx.EXPAND)
 
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
 
@@ -155,15 +80,16 @@ class CfgDlg(wx.Dialog):
         # stupid hack to get correct window modality stacking for dialogs
         needs_frame_ref = [DisplayPanel, KeyboardPanel, MiscPanel, PDFFontsPanel]
         if classObj in needs_frame_ref:
-            p = classObj(self.panel, -1, self.cfg, self)
+            p = classObj(self.listbook, -1, self.cfg, self)
         else:
-            p = classObj(self.panel, -1, self.cfg)
+            p = classObj(self.listbook, -1, self.cfg)
 
         self.listbook.AddPage(p, name)
 
     # check for errors in each panel
     def checkForErrors(self):
-        for panel in self.listbook.GetPages():
+        for pageNum in range(self.listbook.GetPageCount()):
+            panel = self.listbook.GetPage(pageNum)
             if hasattr(panel, "checkForErrors"):
                 panel.checkForErrors()
 
