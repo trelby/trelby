@@ -177,14 +177,6 @@ class MyFrame(wx.Frame):
         self.toolBar = self.CreateToolBar(wx.TB_VERTICAL)
 
         def addTB(id, iconFilename, toolTip):
-            self.toolBar.AddTool(
-                id,
-                "",
-                misc.getBitmap("trelby/resources/%s" % iconFilename),
-                shortHelp=toolTip,
-            )
-        
-        def addTBvector(id, iconFilename, toolTip):
             filepath = misc.getFullPath(("trelby/resources/%s" % iconFilename))
 
             # neat hack to change the color of the SVG
@@ -205,31 +197,31 @@ class MyFrame(wx.Frame):
                 shortHelp=toolTip,
             )
 
-        addTBvector(ID_FILE_NEW, "new.svg", "New script")
-        addTBvector(ID_FILE_OPEN, "open.svg", "Open Script..")
-        addTBvector(ID_FILE_SAVE, "save.svg", "Save..")
-        addTBvector(ID_FILE_SAVE_AS, "saveas.svg", "Save as..")
-        addTBvector(ID_FILE_CLOSE, "close.svg", "Close Script")
-        addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.png", "Script settings")
-        addTB(ID_FILE_PRINT, "pdf.png", "Print (via PDF)")
+        addTB(ID_FILE_NEW, "new.svg", "New script")
+        addTB(ID_FILE_OPEN, "open.svg", "Open Script..")
+        addTB(ID_FILE_SAVE, "save.svg", "Save..")
+        addTB(ID_FILE_SAVE_AS, "saveas.svg", "Save as..")
+        addTB(ID_FILE_CLOSE, "close.svg", "Close Script")
+        addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.svg", "Script settings")
+        addTB(ID_FILE_PRINT, "pdf.svg", "Print (via PDF)")
 
         self.toolBar.AddSeparator()
 
-        addTBvector(ID_FILE_IMPORT, "import.svg", "Import a text script")
-        addTBvector(ID_FILE_EXPORT, "export.svg", "Export script")
+        addTB(ID_FILE_IMPORT, "import.svg", "Import a text script")
+        addTB(ID_FILE_EXPORT, "export.svg", "Export script")
 
         self.toolBar.AddSeparator()
 
-        addTBvector(ID_EDIT_UNDO, "undo.svg", "Undo")
-        addTBvector(ID_EDIT_REDO, "redo.svg", "Redo")
+        addTB(ID_EDIT_UNDO, "undo.svg", "Undo")
+        addTB(ID_EDIT_REDO, "redo.svg", "Redo")
 
         self.toolBar.AddSeparator()
 
-        addTBvector(ID_EDIT_FIND, "find.svg", "Find / Replace")
-        addTBvector(ID_TOOLBAR_VIEWS, "view.svg", "View mode")
-        addTB(ID_TOOLBAR_REPORTS, "report.png", "Script reports")
-        addTBvector(ID_TOOLBAR_TOOLS, "tools.svg", "Tools")
-        addTB(ID_TOOLBAR_SETTINGS, "settings.png", "Global settings")
+        addTB(ID_EDIT_FIND, "find.svg", "Find / Replace")
+        addTB(ID_TOOLBAR_VIEWS, "view.svg", "View mode")
+        addTB(ID_TOOLBAR_REPORTS, "report.svg", "Script reports")
+        addTB(ID_TOOLBAR_TOOLS, "tools.svg", "Tools")
+        addTB(ID_TOOLBAR_SETTINGS, "settings.svg", "Global settings")
 
         self.toolBar.SetBackgroundColour(gd.cfgGui.tabBarBgColor)
         self.toolBar.Realize()
