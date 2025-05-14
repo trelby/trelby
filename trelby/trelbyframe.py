@@ -8,6 +8,8 @@ import webbrowser
 from functools import partial
 
 import wx
+import wx.svg
+import wx.svg
 
 import trelby
 import trelby.charmapdlg as charmapdlg
@@ -181,31 +183,52 @@ class MyFrame(wx.Frame):
                 misc.getBitmap("trelby/resources/%s" % iconFilename),
                 shortHelp=toolTip,
             )
+        
+        def addTBvector(id, iconFilename, toolTip):
+            filepath = misc.getFullPath(("trelby/resources/%s" % iconFilename))
 
-        addTB(ID_FILE_NEW, "new.png", "New script")
-        addTB(ID_FILE_OPEN, "open.png", "Open Script..")
-        addTB(ID_FILE_SAVE, "save.png", "Save..")
-        addTB(ID_FILE_SAVE_AS, "saveas.png", "Save as..")
-        addTB(ID_FILE_CLOSE, "close.png", "Close Script")
+            # neat hack to change the color of the SVG
+            with open(filepath, "r") as svg_file:
+                svg_content = svg_file.read()
+
+            if wx.SystemSettings.GetAppearance().IsDark():
+                svg_content = svg_content.replace('fill:#000000', 'fill:#CCCCCC')
+            svg_content = svg_content.encode()
+
+            #svg_image = wx.svg.SVGimage.CreateFromBytes(svg_content)
+            bitmap = wx.BitmapBundle.FromSVG(svg_content, wx.Size(32, 32))
+
+            self.toolBar.AddTool(
+                id,
+                "",
+                bitmap,
+                shortHelp=toolTip,
+            )
+
+        addTBvector(ID_FILE_NEW, "new.svg", "New script")
+        addTBvector(ID_FILE_OPEN, "open.svg", "Open Script..")
+        addTBvector(ID_FILE_SAVE, "save.svg", "Save..")
+        addTBvector(ID_FILE_SAVE_AS, "saveas.svg", "Save as..")
+        addTBvector(ID_FILE_CLOSE, "close.svg", "Close Script")
         addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.png", "Script settings")
         addTB(ID_FILE_PRINT, "pdf.png", "Print (via PDF)")
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_FILE_IMPORT, "import.png", "Import a text script")
-        addTB(ID_FILE_EXPORT, "export.png", "Export script")
+        addTBvector(ID_FILE_IMPORT, "import.svg", "Import a text script")
+        addTBvector(ID_FILE_EXPORT, "export.svg", "Export script")
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_EDIT_UNDO, "undo.png", "Undo")
-        addTB(ID_EDIT_REDO, "redo.png", "Redo")
+        addTBvector(ID_EDIT_UNDO, "undo.svg", "Undo")
+        addTBvector(ID_EDIT_REDO, "redo.svg", "Redo")
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_EDIT_FIND, "find.png", "Find / Replace")
-        addTB(ID_TOOLBAR_VIEWS, "layout.png", "View mode")
+        addTBvector(ID_EDIT_FIND, "find.svg", "Find / Replace")
+        addTBvector(ID_TOOLBAR_VIEWS, "view.svg", "View mode")
         addTB(ID_TOOLBAR_REPORTS, "report.png", "Script reports")
-        addTB(ID_TOOLBAR_TOOLS, "tools.png", "Tools")
+        addTBvector(ID_TOOLBAR_TOOLS, "tools.svg", "Tools")
         addTB(ID_TOOLBAR_SETTINGS, "settings.png", "Global settings")
 
         self.toolBar.SetBackgroundColour(gd.cfgGui.tabBarBgColor)
