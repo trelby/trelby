@@ -1,5 +1,6 @@
 from trelby.configpages.aboutpanel import AboutPanel
 
+
 class GlobalAboutPanel(AboutPanel):
     def __init__(self, parent, id, cfg):
         s = """This is the config dialog for global settings, which means things
@@ -13,4 +14,3 @@ None of the settings here have any effect on the generated PDF
 output for a script. See Script/Settings for those."""
 
         AboutPanel.__init__(self, parent, id, cfg, s)
-

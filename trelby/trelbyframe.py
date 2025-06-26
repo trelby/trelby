@@ -26,7 +26,6 @@ from trelby.trelbypanel import MyPanel
 
 class MyFrame(wx.Frame):
 
-
     def __init__(self, parent, id, title, gd, myApp):
         wx.Frame.__init__(self, parent, id, title, name="Trelby")
 
@@ -184,10 +183,10 @@ class MyFrame(wx.Frame):
                 svg_content = svg_file.read()
 
             if wx.SystemSettings.GetAppearance().IsDark():
-                svg_content = svg_content.replace('fill:#000000', 'fill:#CCCCCC')
+                svg_content = svg_content.replace("fill:#000000", "fill:#CCCCCC")
             svg_content = svg_content.encode()
 
-            #svg_image = wx.svg.SVGimage.CreateFromBytes(svg_content)
+            # svg_image = wx.svg.SVGimage.CreateFromBytes(svg_content)
             bitmap = wx.BitmapBundle.FromSVG(svg_content, wx.Size(32, 32))
 
             self.toolBar.AddTool(

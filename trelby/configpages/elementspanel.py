@@ -5,6 +5,7 @@ import trelby.misc as misc
 import trelby.screenplay as screenplay
 import trelby.util as util
 
+
 class ElementsPanel(wx.Panel):
     def __init__(self, parent, id, cfg):
         wx.Panel.__init__(self, parent, id)

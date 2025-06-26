@@ -5,6 +5,7 @@ import wx
 import trelby.misc as misc
 import trelby.util as util
 
+
 class MiscPanel(wx.Panel):
     def __init__(self, parent, id, cfg, cfgFrame):
         wx.Panel.__init__(self, parent, id)

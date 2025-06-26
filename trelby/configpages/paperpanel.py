@@ -2,6 +2,7 @@ import wx
 
 import trelby.util as util
 
+
 class PaperPanel(wx.Panel):
     def __init__(self, parent, id, cfg):
         wx.Panel.__init__(self, parent, id)

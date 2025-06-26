@@ -3,6 +3,7 @@ import wx
 import trelby.misc as misc
 import trelby.util as util
 
+
 class KeyboardPanel(wx.Panel):
     def __init__(self, parent, id, cfg, cfgFrame=None):
         wx.Panel.__init__(self, parent, id)

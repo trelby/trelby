@@ -1,5 +1,6 @@
 from trelby.configpages.aboutpanel import AboutPanel
 
+
 class ScriptAboutPanel(AboutPanel):
     def __init__(self, parent, id, cfg):
         s = """This is the config dialog for script format settings, which means

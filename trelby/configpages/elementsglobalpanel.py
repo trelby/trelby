@@ -3,6 +3,7 @@ import wx
 import trelby.config as config
 import trelby.util as util
 
+
 class ElementsGlobalPanel(wx.Panel):
     def __init__(self, parent, id, cfg):
         wx.Panel.__init__(self, parent, id)

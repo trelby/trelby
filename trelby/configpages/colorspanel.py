@@ -5,6 +5,7 @@ import wx
 import trelby.misc as misc
 import trelby.util as util
 
+
 class ColorsPanel(wx.Panel):
     def __init__(self, parent, id, cfg):
         wx.Panel.__init__(self, parent, id)
@@ -88,6 +89,7 @@ class ColorsPanel(wx.Panel):
 
         self.colorSample.SetBackgroundColour(getattr(self.cfg, self.color).toWx())
         self.colorSample.Refresh()
+
 
 def cmpfunc(a, b):
     return (a > b) - (a < b)

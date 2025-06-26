@@ -17,6 +17,7 @@ from trelby.configpages.pdffontspanel import PDFFontsPanel
 from trelby.configpages.stringspanel import StringsPanel
 from trelby.configpages.miscpanel import MiscPanel
 
+
 class CfgDlg(wx.Dialog):
     def __init__(self, parent, cfg, applyFunc, isGlobal):
         wx.Dialog.__init__(

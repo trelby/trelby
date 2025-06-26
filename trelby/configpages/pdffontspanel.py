@@ -6,6 +6,7 @@ import trelby.misc as misc
 import trelby.truetype as truetype
 import trelby.util as util
 
+
 class PDFFontsPanel(wx.Panel):
     def __init__(self, parent, id, cfg, cfgFrame):
         wx.Panel.__init__(self, parent, id)
