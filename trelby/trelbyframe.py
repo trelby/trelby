@@ -8,6 +8,8 @@ import webbrowser
 from functools import partial
 
 import wx
+import wx.svg
+import wx.svg
 
 import trelby
 import trelby.charmapdlg as charmapdlg
@@ -22,11 +24,8 @@ from trelby.ids import *
 from trelby.trelbypanel import MyPanel
 
 
-def getCfgGui():
-    return cfgGui
-
-
 class MyFrame(wx.Frame):
+
 
     def __init__(self, parent, id, title, gd, myApp):
         wx.Frame.__init__(self, parent, id, title, name="Trelby")
@@ -39,9 +38,6 @@ class MyFrame(wx.Frame):
         self.showFormatting = False
         self.gd = gd
         self.myApp = myApp
-
-        global cfgGui
-        cfgGui = gd.cfgGui
 
         self.SetSizeHints(gd.cvars.getMin("width"), gd.cvars.getMin("height"))
 
@@ -181,38 +177,51 @@ class MyFrame(wx.Frame):
         self.toolBar = self.CreateToolBar(wx.TB_VERTICAL)
 
         def addTB(id, iconFilename, toolTip):
+            filepath = misc.getFullPath(("trelby/resources/%s" % iconFilename))
+
+            # neat hack to change the color of the SVG
+            with open(filepath, "r") as svg_file:
+                svg_content = svg_file.read()
+
+            if wx.SystemSettings.GetAppearance().IsDark():
+                svg_content = svg_content.replace('fill:#000000', 'fill:#CCCCCC')
+            svg_content = svg_content.encode()
+
+            #svg_image = wx.svg.SVGimage.CreateFromBytes(svg_content)
+            bitmap = wx.BitmapBundle.FromSVG(svg_content, wx.Size(32, 32))
+
             self.toolBar.AddTool(
                 id,
                 "",
-                misc.getBitmap("trelby/resources/%s" % iconFilename),
+                bitmap,
                 shortHelp=toolTip,
             )
 
-        addTB(ID_FILE_NEW, "new.png", "New script")
-        addTB(ID_FILE_OPEN, "open.png", "Open Script..")
-        addTB(ID_FILE_SAVE, "save.png", "Save..")
-        addTB(ID_FILE_SAVE_AS, "saveas.png", "Save as..")
-        addTB(ID_FILE_CLOSE, "close.png", "Close Script")
-        addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.png", "Script settings")
-        addTB(ID_FILE_PRINT, "pdf.png", "Print (via PDF)")
+        addTB(ID_FILE_NEW, "new.svg", "New script")
+        addTB(ID_FILE_OPEN, "open.svg", "Open Script..")
+        addTB(ID_FILE_SAVE, "save.svg", "Save..")
+        addTB(ID_FILE_SAVE_AS, "saveas.svg", "Save as..")
+        addTB(ID_FILE_CLOSE, "close.svg", "Close Script")
+        addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.svg", "Script settings")
+        addTB(ID_FILE_PRINT, "pdf.svg", "Print (via PDF)")
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_FILE_IMPORT, "import.png", "Import a text script")
-        addTB(ID_FILE_EXPORT, "export.png", "Export script")
+        addTB(ID_FILE_IMPORT, "import.svg", "Import a text script")
+        addTB(ID_FILE_EXPORT, "export.svg", "Export script")
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_EDIT_UNDO, "undo.png", "Undo")
-        addTB(ID_EDIT_REDO, "redo.png", "Redo")
+        addTB(ID_EDIT_UNDO, "undo.svg", "Undo")
+        addTB(ID_EDIT_REDO, "redo.svg", "Redo")
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_EDIT_FIND, "find.png", "Find / Replace")
-        addTB(ID_TOOLBAR_VIEWS, "layout.png", "View mode")
-        addTB(ID_TOOLBAR_REPORTS, "report.png", "Script reports")
-        addTB(ID_TOOLBAR_TOOLS, "tools.png", "Tools")
-        addTB(ID_TOOLBAR_SETTINGS, "settings.png", "Global settings")
+        addTB(ID_EDIT_FIND, "find.svg", "Find / Replace")
+        addTB(ID_TOOLBAR_VIEWS, "view.svg", "View mode")
+        addTB(ID_TOOLBAR_REPORTS, "report.svg", "Script reports")
+        addTB(ID_TOOLBAR_TOOLS, "tools.svg", "Tools")
+        addTB(ID_TOOLBAR_SETTINGS, "settings.svg", "Global settings")
 
         self.toolBar.SetBackgroundColour(gd.cfgGui.tabBarBgColor)
         self.toolBar.Realize()
@@ -225,17 +234,17 @@ class MyFrame(wx.Frame):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.noFSBtn = misc.MyFSButton(self, -1, getCfgGui)
+        self.noFSBtn = misc.MyFSButton(self, -1, self.getCfgGui)
         self.noFSBtn.SetToolTip("Exit fullscreen")
         self.noFSBtn.Show(False)
         hsizer.Add(self.noFSBtn)
 
         self.Bind(wx.EVT_BUTTON, self.ToggleFullscreen, id=self.noFSBtn.GetId())
 
-        self.tabCtrl = misc.MyTabCtrl(self, -1, getCfgGui)
+        self.tabCtrl = misc.MyTabCtrl(self, -1, self.getCfgGui)
         hsizer.Add(self.tabCtrl, 1, wx.EXPAND)
 
-        self.statusCtrl = misc.MyStatus(self, -1, getCfgGui)
+        self.statusCtrl = misc.MyStatus(self, -1, self.getCfgGui)
         hsizer.Add(self.statusCtrl)
 
         vsizer.Add(hsizer, 0, wx.EXPAND)
@@ -926,3 +935,6 @@ class MyFrame(wx.Frame):
     def OnSize(self, event):
         self.gd.width, self.gd.height = self.GetSize()
         event.Skip()
+
+    def getCfgGui(self):
+        return self.gd.cfgGui
