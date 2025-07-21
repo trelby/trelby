@@ -69,8 +69,8 @@ def init(doWX=True):
 
             confPath = util.getWindowsUnicodeEnvVar("USERPROFILE") + r"\Trelby\conf"
 
-            if not os.path.exists(confPath):
-                os.makedirs(confPath)
+        if not os.path.exists(confPath):
+            os.makedirs(confPath)
 
 
 # convert s, which is returned from the wxWidgets GUI and is an Unicode
