@@ -114,7 +114,7 @@ class Font:
 
             offset += NAME_RECORD_SIZE
 
-        raise ParseError("No Postscript name found")
+        raise ParseError(_("No Postscript name found"))
 
     # parse a single name record. s2 is string storage. returns True if
     # this record is a valid Postscript name.

@@ -25,7 +25,7 @@ class SplashWindow(wx.Frame):
 
     def __init__(self, parent, delay):
         wx.Frame.__init__(
-            self, parent, -1, "Splash", style=wx.FRAME_FLOAT_ON_PARENT | wx.NO_BORDER
+            self, parent, -1, _("Splash"), style=wx.FRAME_FLOAT_ON_PARENT | wx.NO_BORDER
         )
 
         if not SplashWindow.inited:
@@ -154,9 +154,11 @@ class SplashWindow(wx.Frame):
                     tmp.append(line.strip())
 
             if tmp:
-                raise Exception("Last quote does not have source")
+                raise Exception(_("Last quote does not have source"))
 
             SplashWindow.quotes = quotes
 
         except Exception as e:
-            wx.MessageBox("Error loading quotes: %s" % str(e), "Error", wx.OK, parent)
+            wx.MessageBox(
+                "Error loading quotes: %s" % str(e), _("Error"), wx.OK, parent
+            )

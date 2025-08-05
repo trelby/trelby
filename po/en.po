@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: trelby 2.4.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-05 16:17-0500\n"
+"POT-Creation-Date: 2025-08-05 16:53-0500\n"
 "PO-Revision-Date: 2025-08-04 20:30-0500\n"
 "Last-Translator: Gwyn Ciesla <gwync@protonmail.com>\n"
 "Language-Team: \n"
@@ -200,7 +200,8 @@ msgstr "Default items:"
 
 #: trelby/autocompletiondlg.py:60 trelby/cfgdlg.py:64 trelby/headersdlg.py:160
 #: trelby/importdlg.py:57 trelby/locationsdlg.py:49 trelby/misc.py:649
-#: trelby/misc.py:741 trelby/misc.py:926
+#: trelby/misc.py:741 trelby/misc.py:926 trelby/spellcheckcfgdlg.py:38
+#: trelby/titlesdlg.py:197
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -305,7 +306,8 @@ msgstr "Command"
 msgid "No key defined"
 msgstr "No key defined"
 
-#: trelby/commandsdlg.py:92
+#: trelby/commandsdlg.py:92 trelby/trelbyctrl.py:1024 trelby/trelbyframe.py:665
+#: trelby/trelbyframe.py:837
 msgid "Filename to save as"
 msgstr "Filename to save as"
 
@@ -334,12 +336,12 @@ msgid "Keys:"
 msgstr "Keys:"
 
 #: trelby/configpages/keyboardpanel.py:36 trelby/headersdlg.py:55
-#: trelby/locationsdlg.py:29
+#: trelby/locationsdlg.py:29 trelby/titlesdlg.py:36 trelby/titlesdlg.py:72
 msgid "Add"
 msgstr "Add"
 
 #: trelby/configpages/keyboardpanel.py:41 trelby/headersdlg.py:60
-#: trelby/locationsdlg.py:33
+#: trelby/locationsdlg.py:33 trelby/titlesdlg.py:41 trelby/titlesdlg.py:77
 msgid "Delete"
 msgstr "Delete"
 
@@ -364,7 +366,10 @@ msgstr "The key is already bound to this command."
 #: trelby/myimport.py:262 trelby/myimport.py:292 trelby/myimport.py:317
 #: trelby/myimport.py:382 trelby/myimport.py:389 trelby/myimport.py:446
 #: trelby/myimport.py:773 trelby/myimport.py:816 trelby/namesdlg.py:48
-#: trelby/reports.py:58
+#: trelby/reports.py:58 trelby/splash.py:163 trelby/util.py:1001
+#: trelby/util.py:1035 trelby/util.py:1062 trelby/watermarkdlg.py:105
+#: trelby/watermarkdlg.py:158 trelby/watermarkdlg.py:171
+#: trelby/trelbyctrl.py:626 trelby/trelbyframe.py:869
 msgid "Error"
 msgstr "Error"
 
@@ -377,7 +382,7 @@ msgid "Default script directory"
 msgstr "Default script directory"
 
 #: trelby/configpages/miscpanel.py:25 trelby/configpages/miscpanel.py:49
-#: trelby/configpages/pdffontspanel.py:64
+#: trelby/configpages/pdffontspanel.py:64 trelby/watermarkdlg.py:33
 msgid "Browse"
 msgstr "Browse"
 
@@ -597,12 +602,12 @@ msgstr ""
 msgid "Empty lines after headers:"
 msgstr "Empty lines / 10 before:"
 
-#: trelby/headersdlg.py:47
+#: trelby/headersdlg.py:47 trelby/titlesdlg.py:64
 #, fuzzy
 msgid "Strings:"
 msgstr "Strings"
 
-#: trelby/headersdlg.py:69
+#: trelby/headersdlg.py:69 trelby/titlesdlg.py:94
 msgid "Text:"
 msgstr ""
 
@@ -621,7 +626,7 @@ msgstr "Underlined"
 msgid "X offset (characters):"
 msgstr " Insert character "
 
-#: trelby/headersdlg.py:114
+#: trelby/headersdlg.py:114 trelby/titlesdlg.py:113
 #, fuzzy
 msgid "Alignment:"
 msgstr "indent:"
@@ -630,11 +635,11 @@ msgstr "indent:"
 msgid "Center"
 msgstr ""
 
-#: trelby/headersdlg.py:130
+#: trelby/headersdlg.py:130 trelby/titlesdlg.py:170
 msgid "Style"
 msgstr ""
 
-#: trelby/headersdlg.py:154
+#: trelby/headersdlg.py:154 trelby/titlesdlg.py:194
 msgid "Preview"
 msgstr ""
 
@@ -815,3 +820,253 @@ msgstr ""
 #, fuzzy
 msgid "Characters to include:"
 msgstr "Character code: %d"
+
+#: trelby/spellcheckdlg.py:15
+msgid "Spell checker"
+msgstr ""
+
+#: trelby/spellcheckdlg.py:35
+msgid "Word:"
+msgstr ""
+
+#: trelby/spellcheckdlg.py:101
+msgid "No more incorrect words found."
+msgstr ""
+
+#: trelby/spellcheckdlg.py:101 trelby/spellcheckdlg.py:206
+#: trelby/trelbyctrl.py:654 trelby/trelbyctrl.py:955
+msgid "Results"
+msgstr ""
+
+#: trelby/spellcheckdlg.py:206
+msgid "No similar words found."
+msgstr ""
+
+#: trelby/spellcheckdlg.py:211
+msgid "Most similar words:"
+msgstr ""
+
+#: trelby/spellcheckdlg.py:211
+msgid "Suggestions"
+msgstr ""
+
+#: trelby/spellcheckcfgdlg.py:14
+msgid "Spell checker dictionary"
+msgstr ""
+
+#: trelby/spellcheckcfgdlg.py:23
+msgid "Global words:"
+msgstr ""
+
+#: trelby/spellcheckcfgdlg.py:25
+msgid "Script-specific words:"
+msgstr ""
+
+#: trelby/splash.py:28
+msgid "Splash"
+msgstr ""
+
+#: trelby/splash.py:157
+msgid "Last quote does not have source"
+msgstr ""
+
+#: trelby/titlesdlg.py:17
+msgid "Title pages"
+msgstr ""
+
+#: trelby/titlesdlg.py:46
+msgid "Move"
+msgstr ""
+
+#: trelby/titlesdlg.py:51
+msgid "Next"
+msgstr ""
+
+#: trelby/titlesdlg.py:146
+#, fuzzy
+msgid "Font / Size:"
+msgstr "Font size:"
+
+#: trelby/titlesdlg.py:358
+msgid "No pages."
+msgstr ""
+
+#: trelby/truetype.py:117
+msgid "No Postscript name found"
+msgstr ""
+
+#: trelby/util.py:363
+msgid "bools2flags: chars and bools are not equal length"
+msgstr ""
+
+#: trelby/viewmode.py:83 trelby/viewmode.py:87 trelby/viewmode.py:91
+#: trelby/viewmode.py:103 trelby/viewmode.py:108 trelby/viewmode.py:114
+msgid "not implemented"
+msgstr ""
+
+#: trelby/watermarkdlg.py:19
+msgid "Watermarked PDFs generator"
+msgstr ""
+
+#: trelby/watermarkdlg.py:28
+msgid "Directory to save in:"
+msgstr ""
+
+#: trelby/watermarkdlg.py:38
+msgid "Filename prefix:"
+msgstr ""
+
+#: trelby/watermarkdlg.py:42
+#, fuzzy
+msgid "Watermark font size:"
+msgstr "Font size:"
+
+#: trelby/watermarkdlg.py:50
+msgid "Common mark:"
+msgstr ""
+
+#: trelby/watermarkdlg.py:51
+msgid "Confidential"
+msgstr ""
+
+#: trelby/watermarkdlg.py:54
+msgid "Watermarks (one per line):"
+msgstr ""
+
+#: trelby/watermarkdlg.py:61
+msgid "Close"
+msgstr ""
+
+#: trelby/watermarkdlg.py:64
+msgid "Generate PDFs"
+msgstr ""
+
+#: trelby/watermarkdlg.py:105
+#, fuzzy
+msgid "Please set directory."
+msgstr "Default script directory"
+
+#: trelby/watermarkdlg.py:158
+msgid "PDF generation aborted."
+msgstr ""
+
+#: trelby/watermarkdlg.py:166
+msgid "PDFs generated"
+msgstr ""
+
+#: trelby/watermarkdlg.py:171
+msgid "No watermarks specified."
+msgstr ""
+
+#: trelby/trelbyctrl.py:140
+msgid "Warning"
+msgstr ""
+
+#: trelby/trelbyctrl.py:196
+#, fuzzy
+msgid "Include page markers"
+msgstr "Include scene numbers"
+
+#: trelby/trelbyctrl.py:199 trelby/trelbyctrl.py:214
+msgid "Output options"
+msgstr ""
+
+#: trelby/trelbyctrl.py:199 trelby/trelbyctrl.py:214
+#, fuzzy
+msgid "Options:"
+msgstr "Location list"
+
+#: trelby/trelbyctrl.py:211
+#, fuzzy
+msgid "Include Notes"
+msgstr "Include,"
+
+#: trelby/trelbyctrl.py:625
+msgid "You can't compare a script to itself."
+msgstr ""
+
+#: trelby/trelbyctrl.py:654
+msgid "The scripts are identical."
+msgstr ""
+
+#: trelby/trelbyctrl.py:842
+#, fuzzy
+msgid "Invalid scene number."
+msgstr "Include scene numbers"
+
+#: trelby/trelbyctrl.py:847
+msgid "Goto scene"
+msgstr ""
+
+#: trelby/trelbyctrl.py:874
+#, fuzzy
+msgid "Invalid page number."
+msgstr "Include scene numbers"
+
+#: trelby/trelbyctrl.py:879
+msgid "Goto page"
+msgstr ""
+
+#: trelby/trelbyctrl.py:909
+msgid "No errors found."
+msgstr ""
+
+#: trelby/trelbyctrl.py:954
+msgid "Spell checker found no errors."
+msgstr ""
+
+#: trelby/trelbyctrl.py:986
+#, fuzzy
+msgid "Delete elements"
+msgstr "Omit Note elements"
+
+#: trelby/trelbyctrl.py:988
+msgid "Element types to delete:"
+msgstr ""
+
+#: trelby/trelbyctrl.py:1042
+#, fuzzy
+msgid "Filename to export as"
+msgstr "Filename to save as"
+
+#: trelby/trelbyframe.py:236
+msgid "Exit fullscreen"
+msgstr ""
+
+#: trelby/trelbyframe.py:278
+#, fuzzy
+msgid "Element type"
+msgstr "Element:"
+
+#: trelby/trelbyframe.py:282
+msgid "Cut"
+msgstr ""
+
+#: trelby/trelbyframe.py:283
+msgid "Copy"
+msgstr ""
+
+#: trelby/trelbyframe.py:285
+msgid "Paste"
+msgstr ""
+
+#: trelby/trelbyframe.py:572 trelby/trelbyframe.py:643
+#: trelby/trelbyframe.py:816
+msgid "File to open"
+msgstr ""
+
+#: trelby/trelbyframe.py:869
+#, fuzzy
+msgid "Error opening name database."
+msgstr "Character map"
+
+#: trelby/trelbyframe.py:907
+msgid ""
+"You have unsaved changes. Do\n"
+"you want to save your changes?"
+msgstr ""
+
+#: trelby/trelbyframe.py:908
+#, fuzzy
+msgid "Save Changes"
+msgstr "Change"

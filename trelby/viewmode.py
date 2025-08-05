@@ -80,15 +80,15 @@ class ViewMode:
     # lines in 'texts' have to be in monotonically increasing order, and
     # this has to always return at least one line.
     def getScreen(self, ctrl, doExtra, partials=False, pageCache=None):
-        raise Exception("getScreen not implemented")
+        raise Exception("getScreen " + _("not implemented"))
 
     # return height for one line on screen
     def getLineHeight(self, ctrl):
-        raise Exception("getLineHeight not implemented")
+        raise Exception("getLineHeight " + _("not implemented"))
 
     # return width of one page in (floating point) pixels
     def getPageWidth(self, ctrl):
-        raise Exception("getPageWidth not implemented")
+        raise Exception("getPageWidth " + _("not implemented"))
 
     # see MyCtrl.OnPaint for what tl is. note: this is only a default
     # implementation, feel free to override this.
@@ -100,18 +100,18 @@ class ViewMode:
     # coordinates) and return that, or (None, None) if (x, y) points
     # outside a page.
     def pos2linecol(self, ctrl, x, y):
-        raise Exception("pos2linecol not implemented")
+        raise Exception("pos2linecol " + _("not implemented"))
 
     # make line, which is not currently visible, visible. texts =
     # self.getScreen(ctrl, False)[0].
     def makeLineVisible(self, ctrl, line, texts, direction=config.SCROLL_CENTER):
-        raise Exception("makeLineVisible not implemented")
+        raise Exception("makeLineVisible " + _("not implemented"))
 
     # handle page up (dir == -1) or page down (dir == 1) command. cursor
     # is guaranteed to be visible when this is called, and auto-completion
     # to be off. cs = CommandState. texts and dpages are the usual.
     def pageCmd(self, ctrl, cs, dir, texts, dpages):
-        raise Exception("pageCmd not implemented")
+        raise Exception("pageCmd " + _("not implemented"))
 
     # semi-generic implementation, for use by Draft and Layout modes.
     def pos2linecolGeneric(self, ctrl, x, y):

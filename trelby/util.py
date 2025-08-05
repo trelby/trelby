@@ -360,7 +360,7 @@ def bools2flags(chars, *bools):
     s = ""
 
     if len(chars) != len(bools):
-        raise TypeError("bools2flags: chars and bools are not equal length")
+        raise TypeError(_("bools2flags: chars and bools are not equal length"))
 
     for i in range(len(chars)):
         if bools[i]:
@@ -997,7 +997,10 @@ def loadFile(
     except IOError as xxx_todo_changeme:
         (errno, strerror) = xxx_todo_changeme.args
         wx.MessageBox(
-            "Error loading file '%s': %s" % (filename, strerror), "Error", wx.OK, frame
+            "Error loading file '%s': %s" % (filename, strerror),
+            _("Error"),
+            wx.OK,
+            frame,
         )
         ret = None
 
@@ -1029,7 +1032,7 @@ def loadMaybeCompressedFile(filename, frame):
     except:
         wx.MessageBox(
             "Error loading file '%s': Decompression failed" % filename,
-            "Error",
+            _("Error"),
             wx.OK,
             frame,
         )
@@ -1055,7 +1058,10 @@ def writeToFile(filename: str, data: AnyStr, frame: wx.TopLevelWindow) -> bool:
     except IOError as xxx_todo_changeme1:
         (errno, strerror) = xxx_todo_changeme1.args
         wx.MessageBox(
-            "Error writing file '%s': %s" % (filename, strerror), "Error", wx.OK, frame
+            "Error writing file '%s': %s" % (filename, strerror),
+            _("Error"),
+            wx.OK,
+            frame,
         )
 
         return False

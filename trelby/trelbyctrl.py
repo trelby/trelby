@@ -137,7 +137,7 @@ class MyCtrl(wx.Control):
             return
 
         if msg:
-            misc.showText(self.gd.mainFrame, msg, "Warning")
+            misc.showText(self.gd.mainFrame, msg, _("Warning"))
 
         self.clearVars()
         self.sp = sp
@@ -193,10 +193,10 @@ class MyCtrl(wx.Control):
     # generate exportable text from given screenplay, or None.
     def getExportText(self, sp):
         inf = []
-        inf.append(misc.CheckBoxItem("Include page markers"))
+        inf.append(misc.CheckBoxItem(_("Include page markers")))
 
         dlg = misc.CheckBoxDlg(
-            self.gd.mainFrame, "Output options", inf, "Options:", False
+            self.gd.mainFrame, _("Output options"), inf, _("Options:"), False
         )
 
         if dlg.ShowModal() != wx.ID_OK:
@@ -208,10 +208,10 @@ class MyCtrl(wx.Control):
 
     def getExportHtml(self, sp):
         inf = []
-        inf.append(misc.CheckBoxItem("Include Notes"))
+        inf.append(misc.CheckBoxItem(_("Include Notes")))
 
         dlg = misc.CheckBoxDlg(
-            self.gd.mainFrame, "Output options", inf, "Options:", False
+            self.gd.mainFrame, _("Output options"), inf, _("Options:"), False
         )
 
         if dlg.ShowModal() != wx.ID_OK:
@@ -622,8 +622,8 @@ class MyCtrl(wx.Control):
 
         if sel1 == sel2:
             wx.MessageBox(
-                "You can't compare a script to itself.",
-                "Error",
+                _("You can't compare a script to itself."),
+                _("Error"),
                 wx.OK,
                 self.gd.mainFrame,
             )
@@ -651,7 +651,7 @@ class MyCtrl(wx.Control):
             gutil.showTempPDF(s, self.gd.cfgGl, self.gd.mainFrame)
         else:
             wx.MessageBox(
-                "The scripts are identical.", "Results", wx.OK, self.gd.mainFrame
+                _("The scripts are identical."), _("Results"), wx.OK, self.gd.mainFrame
             )
 
     def canBeClosed(self):
@@ -839,12 +839,12 @@ class MyCtrl(wx.Control):
             if s in [x[0] for x in scenes]:
                 return ""
             else:
-                return "Invalid scene number."
+                return _("Invalid scene number.")
 
         dlg = misc.TextInputDlg(
             self.gd.mainFrame,
             "Enter scene number (%s - %s):" % (scenes[0][0], scenes[-1][0]),
-            "Goto scene",
+            _("Goto scene"),
             validateFunc,
         )
 
@@ -871,12 +871,12 @@ class MyCtrl(wx.Control):
             if s in pages:
                 return ""
             else:
-                return "Invalid page number."
+                return _("Invalid page number.")
 
         dlg = misc.TextInputDlg(
             self.gd.mainFrame,
             "Enter page number (%s - %s):" % (pages[0], pages[-1]),
-            "Goto page",
+            _("Goto page"),
             validateFunc,
         )
 
@@ -906,7 +906,7 @@ class MyCtrl(wx.Control):
             self.updateScreen()
 
         else:
-            msg = "No errors found."
+            msg = _("No errors found.")
 
         wx.MessageBox(msg, "Results", wx.OK, self.gd.mainFrame)
 
@@ -951,8 +951,8 @@ class MyCtrl(wx.Control):
                     "the beginning of the script.)"
                 )
             wx.MessageBox(
-                "Spell checker found no errors." + s,
-                "Results",
+                _("Spell checker found no errors.") + s,
+                _("Results"),
                 wx.OK,
                 self.gd.mainFrame,
             )
@@ -983,9 +983,9 @@ class MyCtrl(wx.Control):
 
         dlg = misc.CheckBoxDlg(
             self.gd.mainFrame,
-            "Delete elements",
+            _("Delete elements"),
             types,
-            "Element types to delete:",
+            _("Element types to delete:"),
             True,
         )
 
@@ -1021,7 +1021,7 @@ class MyCtrl(wx.Control):
 
         dlg = wx.FileDialog(
             self.gd.mainFrame,
-            "Filename to save as",
+            _("Filename to save as"),
             defaultDir=dDir,
             defaultFile=dFile,
             wildcard="Trelby files (*.trelby)|*.trelby|All files|*",
@@ -1039,7 +1039,7 @@ class MyCtrl(wx.Control):
 
         dlg = wx.FileDialog(
             self.gd.mainFrame,
-            "Filename to export as",
+            _("Filename to export as"),
             misc.scriptDir,
             wildcard="PDF|*.pdf|"
             "RTF|*.rtf|"

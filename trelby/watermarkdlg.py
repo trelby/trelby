@@ -16,7 +16,7 @@ class WatermarkDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Watermarked PDFs generator",
+            _("Watermarked PDFs generator"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
@@ -25,21 +25,21 @@ class WatermarkDlg(wx.Dialog):
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer.Add(wx.StaticText(self, -1, "Directory to save in:"), 0)
+        vsizer.Add(wx.StaticText(self, -1, _("Directory to save in:")), 0)
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
         self.dirEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.dirEntry, 1, wx.EXPAND)
 
-        btn = wx.Button(self, -1, "Browse")
+        btn = wx.Button(self, -1, _("Browse"))
         self.Bind(wx.EVT_BUTTON, self.OnBrowse, id=btn.GetId())
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
-        vsizer.Add(wx.StaticText(self, -1, "Filename prefix:"), 0)
+        vsizer.Add(wx.StaticText(self, -1, _("Filename prefix:")), 0)
         self.filenamePrefix = wx.TextCtrl(self, -1, prefix)
         vsizer.Add(self.filenamePrefix, 0, wx.EXPAND | wx.BOTTOM, 5)
 
-        vsizer.Add(wx.StaticText(self, -1, "Watermark font size:"), 0)
+        vsizer.Add(wx.StaticText(self, -1, _("Watermark font size:")), 0)
         self.markSize = wx.SpinCtrl(self, -1, size=(60, -1))
         self.markSize.SetRange(20, 80)
         self.markSize.SetValue(40)
@@ -47,21 +47,21 @@ class WatermarkDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 5)
 
-        vsizer.Add(wx.StaticText(self, -1, "Common mark:"), 0)
-        self.commonMark = wx.TextCtrl(self, -1, "Confidential")
+        vsizer.Add(wx.StaticText(self, -1, _("Common mark:")), 0)
+        self.commonMark = wx.TextCtrl(self, -1, _("Confidential"))
         vsizer.Add(self.commonMark, 0, wx.EXPAND | wx.BOTTOM, 5)
 
-        vsizer.Add(wx.StaticText(self, -1, "Watermarks (one per line):"))
+        vsizer.Add(wx.StaticText(self, -1, _("Watermarks (one per line):")))
         self.itemsEntry = wx.TextCtrl(
             self, -1, style=wx.TE_MULTILINE | wx.TE_DONTWRAP, size=(300, 200)
         )
         vsizer.Add(self.itemsEntry, 1, wx.EXPAND)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        closeBtn = wx.Button(self, -1, "Close")
+        closeBtn = wx.Button(self, -1, _("Close"))
         hsizer.Add(closeBtn, 0)
         hsizer.Add((1, 1), 1)
-        generateBtn = wx.Button(self, -1, "Generate PDFs")
+        generateBtn = wx.Button(self, -1, _("Generate PDFs"))
         hsizer.Add(generateBtn, 0)
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 10)
@@ -102,7 +102,7 @@ class WatermarkDlg(wx.Dialog):
         usedIds = set()
 
         if not directory:
-            wx.MessageBox("Please set directory.", "Error", wx.OK, self)
+            wx.MessageBox(_("Please set directory."), _("Error"), wx.OK, self)
             self.dirEntry.SetFocus()
             return
 
@@ -155,7 +155,7 @@ class WatermarkDlg(wx.Dialog):
             pdfdata = pdf.generate(pmldoc)
 
             if not util.writeToFile(fn, pdfdata, self):
-                wx.MessageBox("PDF generation aborted.", "Error", wx.OK, self)
+                wx.MessageBox(_("PDF generation aborted."), _("Error"), wx.OK, self)
                 return
             else:
                 count += 1
@@ -163,12 +163,12 @@ class WatermarkDlg(wx.Dialog):
         if count > 0:
             wx.MessageBox(
                 "Generated %d files in directory %s." % (count, directory),
-                "PDFs generated",
+                _("PDFs generated"),
                 wx.OK,
                 self,
             )
         else:
-            wx.MessageBox("No watermarks specified.", "Error", wx.OK, self)
+            wx.MessageBox(_("No watermarks specified."), _("Error"), wx.OK, self)
 
     def OnClose(self, event):
         self.EndModal(wx.OK)

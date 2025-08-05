@@ -14,7 +14,7 @@ from trelby.titlespreview import TitlesPreview
 class TitlesDlg(wx.Dialog):
     def __init__(self, parent, titles, cfg, cfgGl):
         wx.Dialog.__init__(
-            self, parent, -1, "Title pages", style=wx.DEFAULT_DIALOG_STYLE
+            self, parent, -1, _("Title pages"), style=wx.DEFAULT_DIALOG_STYLE
         )
 
         self.titles = titles
@@ -33,22 +33,22 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        tmp = wx.Button(self, -1, "Add")
+        tmp = wx.Button(self, -1, _("Add"))
         hsizer.Add(tmp)
         self.Bind(wx.EVT_BUTTON, self.OnAddPage, id=tmp.GetId())
         gutil.btnDblClick(tmp, self.OnAddPage)
 
-        self.delPageBtn = wx.Button(self, -1, "Delete")
+        self.delPageBtn = wx.Button(self, -1, _("Delete"))
         hsizer.Add(self.delPageBtn, 0, wx.LEFT, 10)
         self.Bind(wx.EVT_BUTTON, self.OnDeletePage, id=self.delPageBtn.GetId())
         gutil.btnDblClick(self.delPageBtn, self.OnDeletePage)
 
-        self.moveBtn = wx.Button(self, -1, "Move")
+        self.moveBtn = wx.Button(self, -1, _("Move"))
         hsizer.Add(self.moveBtn, 0, wx.LEFT, 10)
         self.Bind(wx.EVT_BUTTON, self.OnMovePage, id=self.moveBtn.GetId())
         gutil.btnDblClick(self.moveBtn, self.OnMovePage)
 
-        self.nextBtn = wx.Button(self, -1, "Next")
+        self.nextBtn = wx.Button(self, -1, _("Next"))
         hsizer.Add(self.nextBtn, 0, wx.LEFT, 10)
         self.Bind(wx.EVT_BUTTON, self.OnNextPage, id=self.nextBtn.GetId())
         gutil.btnDblClick(self.nextBtn, self.OnNextPage)
@@ -61,7 +61,7 @@ class TitlesDlg(wx.Dialog):
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        tmp = wx.StaticText(self, -1, "Strings:")
+        tmp = wx.StaticText(self, -1, _("Strings:"))
         vsizer2.Add(tmp)
 
         self.stringsLb = wx.ListBox(self, -1, size=(200, 150))
@@ -69,12 +69,12 @@ class TitlesDlg(wx.Dialog):
 
         hsizer2 = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.addBtn = gutil.createStockButton(self, "Add")
+        self.addBtn = gutil.createStockButton(self, _("Add"))
         hsizer2.Add(self.addBtn)
         self.Bind(wx.EVT_BUTTON, self.OnAddString, id=self.addBtn.GetId())
         gutil.btnDblClick(self.addBtn, self.OnAddString)
 
-        self.delBtn = gutil.createStockButton(self, "Delete")
+        self.delBtn = gutil.createStockButton(self, _("Delete"))
         hsizer2.Add(self.delBtn, 0, wx.LEFT, 10)
         self.Bind(wx.EVT_BUTTON, self.OnDeleteString, id=self.delBtn.GetId())
         gutil.btnDblClick(self.delBtn, self.OnDeleteString)
@@ -91,7 +91,7 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Text:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        hsizer.Add(wx.StaticText(self, -1, _("Text:")), 0, wx.ALIGN_CENTER_VERTICAL)
         self.textEntry = wx.TextCtrl(
             self, -1, style=wx.TE_MULTILINE | wx.TE_DONTWRAP, size=(200, 75)
         )
@@ -109,7 +109,9 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        hsizer.Add(
+            wx.StaticText(self, -1, _("Alignment:")), 0, wx.ALIGN_CENTER_VERTICAL
+        )
         self.alignCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
         for it in [
@@ -140,7 +142,9 @@ class TitlesDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Font / Size:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        hsizer.Add(
+            wx.StaticText(self, -1, _("Font / Size:")), 0, wx.ALIGN_CENTER_VERTICAL
+        )
         self.fontCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
         for it in [
@@ -163,7 +167,7 @@ class TitlesDlg(wx.Dialog):
 
         hsizerTop.Add(vsizer2)
 
-        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, "Style"), wx.HORIZONTAL)
+        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, _("Style")), wx.HORIZONTAL)
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
@@ -187,10 +191,10 @@ class TitlesDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        self.previewBtn = gutil.createStockButton(self, "Preview")
+        self.previewBtn = gutil.createStockButton(self, _("Preview"))
         hsizer.Add(self.previewBtn)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
 
         okBtn = gutil.createStockButton(self, "OK")
@@ -351,7 +355,7 @@ class TitlesDlg(wx.Dialog):
             if self.tsIndex != -1:
                 self.stringsLb.SetSelection(self.tsIndex)
         else:
-            self.pageLabel.SetLabel("No pages.")
+            self.pageLabel.SetLabel(_("No pages."))
             self.addBtn.Disable()
             self.delBtn.Disable()
 

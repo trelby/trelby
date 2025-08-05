@@ -12,7 +12,7 @@ class SpellCheckDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Spell checker",
+            _("Spell checker"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS,
         )
 
@@ -32,7 +32,10 @@ class SpellCheckDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Word:"), 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10
+            wx.StaticText(self, -1, _("Word:")),
+            0,
+            wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
+            10,
         )
         self.replaceEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         hsizer.Add(self.replaceEntry, 1, wx.EXPAND)
@@ -94,7 +97,9 @@ class SpellCheckDlg(wx.Dialog):
             self.sc.col += len(self.sc.word)
 
         if not self.sc.findNext():
-            wx.MessageBox("No more incorrect words found.", "Results", wx.OK, self)
+            wx.MessageBox(
+                _("No more incorrect words found."), _("Results"), wx.OK, self
+            )
 
             self.EndModal(wx.ID_OK)
 
@@ -198,11 +203,13 @@ class SpellCheckDlg(wx.Dialog):
         wx.EndBusyCursor()
 
         if len(items) == 0:
-            wx.MessageBox("No similar words found.", "Results", wx.OK, self)
+            wx.MessageBox(_("No similar words found."), _("Results"), wx.OK, self)
 
             return
 
-        dlg = wx.SingleChoiceDialog(self, "Most similar words:", "Suggestions", items)
+        dlg = wx.SingleChoiceDialog(
+            self, _("Most similar words:"), _("Suggestions"), items
+        )
 
         if dlg.ShowModal() == wx.ID_OK:
             sel = dlg.GetSelection()
