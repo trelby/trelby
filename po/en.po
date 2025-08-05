@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: trelby 2.4.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-05 12:10-0500\n"
+"POT-Creation-Date: 2025-08-05 12:27-0500\n"
 "PO-Revision-Date: 2025-08-04 20:30-0500\n"
 "Last-Translator: Gwyn Ciesla <gwync@protonmail.com>\n"
 "Language-Team: \n"
@@ -199,7 +199,8 @@ msgid "Default items:"
 msgstr "Default items:"
 
 #: trelby/autocompletiondlg.py:60 trelby/cfgdlg.py:64 trelby/headersdlg.py:160
-#: trelby/importdlg.py:57
+#: trelby/importdlg.py:57 trelby/locationsdlg.py:49 trelby/misc.py:649
+#: trelby/misc.py:741 trelby/misc.py:926
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -333,10 +334,12 @@ msgid "Keys:"
 msgstr "Keys:"
 
 #: trelby/configpages/keyboardpanel.py:36 trelby/headersdlg.py:55
+#: trelby/locationsdlg.py:29
 msgid "Add"
 msgstr "Add"
 
 #: trelby/configpages/keyboardpanel.py:41 trelby/headersdlg.py:60
+#: trelby/locationsdlg.py:33
 msgid "Delete"
 msgstr "Delete"
 
@@ -353,7 +356,8 @@ msgid "The key is already bound to this command."
 msgstr "The key is already bound to this command."
 
 #: trelby/configpages/keyboardpanel.py:87
-#: trelby/configpages/keyboardpanel.py:97
+#: trelby/configpages/keyboardpanel.py:97 trelby/locationsdlg.py:93
+#: trelby/locationsdlg.py:142 trelby/misc.py:972
 msgid "Error"
 msgstr "Error"
 
@@ -635,4 +639,53 @@ msgstr ""
 
 #: trelby/importdlg.py:46
 msgid "Lines:"
+msgstr ""
+
+#: trelby/locationsdlg.py:21
+#, fuzzy
+msgid "Locations:"
+msgstr "Location list"
+
+#: trelby/locationsdlg.py:39
+msgid "Scenes:"
+msgstr ""
+
+#: trelby/locationsdlg.py:93
+msgid "No scenes selected in the lower list."
+msgstr ""
+
+#: trelby/locationsdlg.py:142
+msgid "No scene selected in the upper list."
+msgstr ""
+
+#: trelby/misc.py:629
+msgid "Choose scripts"
+msgstr ""
+
+#: trelby/misc.py:636
+msgid "Compare script"
+msgstr ""
+
+#: trelby/misc.py:637
+msgid "to"
+msgstr ""
+
+#: trelby/misc.py:641
+msgid "Use same configuration"
+msgstr ""
+
+#: trelby/misc.py:767
+msgid "Set"
+msgstr ""
+
+#: trelby/misc.py:771
+msgid "Clear"
+msgstr ""
+
+#: trelby/misc.py:775
+msgid "Toggle"
+msgstr ""
+
+#: trelby/misc.py:986
+msgid "Key capture"
 msgstr ""

@@ -626,19 +626,19 @@ class MyTabCtrl2(wx.Window):
 class ScriptChooserDlg(wx.Dialog):
     def __init__(self, parent, items):
         wx.Dialog.__init__(
-            self, parent, -1, "Choose scripts", style=wx.DEFAULT_DIALOG_STYLE
+            self, parent, -1, _("Choose scripts"), style=wx.DEFAULT_DIALOG_STYLE
         )
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         gsizer = wx.FlexGridSizer(2, 2, 5, 0)
 
-        self.addCombo("first", "Compare script", self, gsizer, items, 0)
-        self.addCombo("second", "to", self, gsizer, items, 1)
+        self.addCombo("first", _("Compare script"), self, gsizer, items, 0)
+        self.addCombo("second", _("to"), self, gsizer, items, 1)
 
         vsizer.Add(gsizer)
 
-        self.forceCb = wx.CheckBox(self, -1, "Use same configuration")
+        self.forceCb = wx.CheckBox(self, -1, _("Use same configuration"))
         self.forceCb.SetValue(True)
         vsizer.Add(self.forceCb, 0, wx.TOP, 10)
 
@@ -646,7 +646,7 @@ class ScriptChooserDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn)
 
         okBtn = gutil.createStockButton(self, "OK")
@@ -738,7 +738,7 @@ class CheckBoxDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn)
 
         okBtn = gutil.createStockButton(self, "OK")
@@ -764,15 +764,15 @@ class CheckBoxDlg(wx.Dialog):
             else:
                 funcs = [self.OnSet2, self.OnClear2, self.OnToggle2]
 
-            tmp = wx.Button(parent, -1, "Set")
+            tmp = wx.Button(parent, -1, _("Set"))
             hsizer.Add(tmp)
             self.Bind(wx.EVT_BUTTON, funcs[0], id=tmp.GetId())
 
-            tmp = wx.Button(parent, -1, "Clear")
+            tmp = wx.Button(parent, -1, _("Clear"))
             hsizer.Add(tmp, 0, wx.LEFT, 10)
             self.Bind(wx.EVT_BUTTON, funcs[1], id=tmp.GetId())
 
-            tmp = wx.Button(parent, -1, "Toggle")
+            tmp = wx.Button(parent, -1, _("Toggle"))
             hsizer.Add(tmp, 0, wx.LEFT, 10)
             self.Bind(wx.EVT_BUTTON, funcs[2], id=tmp.GetId())
 
@@ -923,7 +923,7 @@ class TextInputDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn)
 
         okBtn = gutil.createStockButton(self, "OK")
@@ -969,7 +969,7 @@ class TextInputDlg(wx.Dialog):
             msg = self.validateFunc(self.input)
 
             if msg:
-                wx.MessageBox(msg, "Error", wx.OK, self)
+                wx.MessageBox(msg, _("Error"), wx.OK, self)
 
                 return
 
@@ -983,7 +983,7 @@ class TextInputDlg(wx.Dialog):
 class KeyDlg(wx.Dialog):
     def __init__(self, parent, cmdName):
         wx.Dialog.__init__(
-            self, parent, -1, "Key capture", style=wx.DEFAULT_DIALOG_STYLE
+            self, parent, -1, _("Key capture"), style=wx.DEFAULT_DIALOG_STYLE
         )
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
