@@ -1,7 +1,6 @@
-import wx
-
 import trelby.misc as misc
 import trelby.util as util
+import wx
 
 
 class DisplayPanel(wx.Panel):

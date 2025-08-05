@@ -1,6 +1,5 @@
-import wx
-
 import trelby.util as util
+import wx
 
 
 class PaperPanel(wx.Panel):
@@ -21,7 +20,10 @@ class PaperPanel(wx.Panel):
         gsizer = wx.FlexGridSizer(3, 2, 5, 5)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Type:"), 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10
+            wx.StaticText(self, -1, _("Type:")),
+            0,
+            wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
+            10,
         )
 
         self.paperCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
@@ -31,7 +33,7 @@ class PaperPanel(wx.Panel):
 
         gsizer.Add(self.paperCombo)
 
-        gsizer.Add(wx.StaticText(self, -1, "Width:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        gsizer.Add(wx.StaticText(self, -1, _("Width:")), 0, wx.ALIGN_CENTER_VERTICAL)
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
         self.widthEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.widthEntry)
@@ -40,7 +42,7 @@ class PaperPanel(wx.Panel):
         )
         gsizer.Add(hsizer)
 
-        gsizer.Add(wx.StaticText(self, -1, "Height:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        gsizer.Add(wx.StaticText(self, -1, _("Height:")), 0, wx.ALIGN_CENTER_VERTICAL)
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
         self.heightEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.heightEntry)
@@ -51,14 +53,14 @@ class PaperPanel(wx.Panel):
 
         vsizer.Add(gsizer, 0, wx.BOTTOM, 10)
 
-        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, "Margins"), wx.HORIZONTAL)
+        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, _("Margins")), wx.HORIZONTAL)
 
         gsizer = wx.FlexGridSizer(4, 5, 5, 5)
 
-        self.addMarginCtrl("Top", self, gsizer)
-        self.addMarginCtrl("Bottom", self, gsizer)
-        self.addMarginCtrl("Left", self, gsizer)
-        self.addMarginCtrl("Right", self, gsizer)
+        self.addMarginCtrl(_("Top"), self, gsizer)
+        self.addMarginCtrl(_("Bottom"), self, gsizer)
+        self.addMarginCtrl(_("Left"), self, gsizer)
+        self.addMarginCtrl(_("Right"), self, gsizer)
 
         bsizer.Add(gsizer, 0, wx.EXPAND | wx.ALL, 10)
 

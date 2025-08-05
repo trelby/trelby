@@ -1,9 +1,8 @@
 import functools
 
-import wx
-
 import trelby.misc as misc
 import trelby.util as util
+import wx
 
 
 class ColorsPanel(wx.Panel):

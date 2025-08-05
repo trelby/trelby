@@ -1,6 +1,5 @@
-import wx
-
 import trelby.util as util
+import wx
 
 
 class AboutPanel(wx.Panel):

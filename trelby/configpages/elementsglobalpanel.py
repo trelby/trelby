@@ -1,7 +1,6 @@
-import wx
-
 import trelby.config as config
 import trelby.util as util
+import wx
 
 
 class ElementsGlobalPanel(wx.Panel):

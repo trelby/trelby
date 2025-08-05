@@ -1,9 +1,8 @@
-import wx
-
 import trelby.config as config
 import trelby.misc as misc
 import trelby.screenplay as screenplay
 import trelby.util as util
+import wx
 
 
 class ElementsPanel(wx.Panel):
