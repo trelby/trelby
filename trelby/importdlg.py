@@ -8,14 +8,14 @@ import trelby.util as util
 class ImportDlg(wx.Dialog):
     def __init__(self, parent, indents, SCENE_ACTION, IGNORE):
         wx.Dialog.__init__(
-            self, parent, -1, "Adjust styles", style=wx.DEFAULT_DIALOG_STYLE
+            self, parent, -1, _("Adjust styles"), style=wx.DEFAULT_DIALOG_STYLE
         )
 
         indents.sort(key=lambda indent: indent.lines)
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        tmp = wx.StaticText(self, -1, "Input:")
+        tmp = wx.StaticText(self, -1, _("Input:"))
         vsizer.Add(tmp)
 
         self.inputLb = wx.ListBox(self, -1, size=(400, 200))
@@ -43,7 +43,7 @@ class ImportDlg(wx.Dialog):
 
         vsizer.Add(hsizer, 0, wx.TOP | wx.BOTTOM, 10)
 
-        vsizer.Add(wx.StaticText(self, -1, "Lines:"))
+        vsizer.Add(wx.StaticText(self, -1, _("Lines:")))
 
         self.linesEntry = wx.TextCtrl(
             self, -1, size=(400, 200), style=wx.TE_MULTILINE | wx.TE_DONTWRAP
@@ -54,7 +54,7 @@ class ImportDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn)
 
         okBtn = gutil.createStockButton(self, "OK")

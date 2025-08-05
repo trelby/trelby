@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: trelby 2.4.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-04 20:29-0500\n"
+"POT-Creation-Date: 2025-08-05 12:10-0500\n"
 "PO-Revision-Date: 2025-08-04 20:30-0500\n"
 "Last-Translator: Gwyn Ciesla <gwync@protonmail.com>\n"
 "Language-Team: \n"
@@ -198,7 +198,8 @@ msgstr "Auto-completion enabled"
 msgid "Default items:"
 msgstr "Default items:"
 
-#: trelby/autocompletiondlg.py:60 trelby/cfgdlg.py:64
+#: trelby/autocompletiondlg.py:60 trelby/cfgdlg.py:64 trelby/headersdlg.py:160
+#: trelby/importdlg.py:57
 msgid "Cancel"
 msgstr "Cancel"
 
@@ -250,7 +251,7 @@ msgstr "PDF/Fonts"
 msgid "Strings"
 msgstr "Strings"
 
-#: trelby/cfgdlg.py:61
+#: trelby/cfgdlg.py:61 trelby/headersdlg.py:157
 msgid "Apply"
 msgstr "Apply"
 
@@ -331,11 +332,11 @@ msgstr "Commands:"
 msgid "Keys:"
 msgstr "Keys:"
 
-#: trelby/configpages/keyboardpanel.py:36
+#: trelby/configpages/keyboardpanel.py:36 trelby/headersdlg.py:55
 msgid "Add"
 msgstr "Add"
 
-#: trelby/configpages/keyboardpanel.py:41
+#: trelby/configpages/keyboardpanel.py:41 trelby/headersdlg.py:60
 msgid "Delete"
 msgstr "Delete"
 
@@ -449,11 +450,11 @@ msgstr "Top"
 msgid "Bottom"
 msgstr "Bottom"
 
-#: trelby/configpages/paperpanel.py:62
+#: trelby/configpages/paperpanel.py:62 trelby/headersdlg.py:119
 msgid "Left"
 msgstr "Left"
 
-#: trelby/configpages/paperpanel.py:63
+#: trelby/configpages/paperpanel.py:63 trelby/headersdlg.py:121
 msgid "Right"
 msgstr "Right"
 
@@ -488,3 +489,150 @@ msgstr "  Draw rectangles around Note elements"
 #: trelby/configpages/pdfpanel.py:35
 msgid "Show margins (debug)"
 msgstr "Show margins (debug)"
+
+#: trelby/dialoguechart.py:22
+msgid "Characters with < 10 lines"
+msgstr ""
+
+#: trelby/dialoguechart.py:23
+msgid "Sorted by: First appearance"
+msgstr ""
+
+#: trelby/dialoguechart.py:24
+msgid "Sorted by: Last appearance"
+msgstr ""
+
+#: trelby/dialoguechart.py:25
+msgid "Sorted by: Number of lines spoken"
+msgstr ""
+
+#: trelby/dialoguechart.py:26
+msgid "Sorted by: Name"
+msgstr ""
+
+#: trelby/dialoguechart.py:31
+msgid "Report type"
+msgstr ""
+
+#: trelby/dialoguechart.py:31
+msgid "Information to include:"
+msgstr ""
+
+#: trelby/dialoguechart.py:48
+msgid "No characters speaking found."
+msgstr ""
+
+#: trelby/dialoguechart.py:55
+msgid "Can't disable all output."
+msgstr ""
+
+#: trelby/finddlg.py:16
+msgid "Find & Replace"
+msgstr ""
+
+#: trelby/finddlg.py:34
+msgid "Find what:"
+msgstr ""
+
+#: trelby/finddlg.py:40
+msgid "Replace with:"
+msgstr ""
+
+#: trelby/finddlg.py:57
+msgid "Match whole word only"
+msgstr ""
+
+#: trelby/finddlg.py:60
+msgid "Match case"
+msgstr ""
+
+#: trelby/finddlg.py:66
+#, fuzzy
+msgid "Direction"
+msgstr "Description:"
+
+#: trelby/finddlg.py:66
+msgid "Up"
+msgstr ""
+
+#: trelby/finddlg.py:66
+msgid "Down"
+msgstr ""
+
+#: trelby/finddlg.py:74
+msgid "Search in:"
+msgstr ""
+
+#: trelby/finddlg.py:227
+msgid "<<< Less"
+msgstr ""
+
+#: trelby/finddlg.py:240
+msgid "More >>>"
+msgstr ""
+
+#: trelby/finddlg.py:365
+msgid "Search finished without results."
+msgstr ""
+
+#: trelby/finddlg.py:366
+msgid "No matches"
+msgstr ""
+
+#: trelby/headersdlg.py:32
+#, fuzzy
+msgid "Empty lines after headers:"
+msgstr "Empty lines / 10 before:"
+
+#: trelby/headersdlg.py:47
+#, fuzzy
+msgid "Strings:"
+msgstr "Strings"
+
+#: trelby/headersdlg.py:69
+msgid "Text:"
+msgstr ""
+
+#: trelby/headersdlg.py:79
+#, python-brace-format
+msgid "'${PAGE}' will be replaced by the page number."
+msgstr ""
+
+#: trelby/headersdlg.py:91
+#, fuzzy
+msgid "Header line:"
+msgstr "Underlined"
+
+#: trelby/headersdlg.py:101
+#, fuzzy
+msgid "X offset (characters):"
+msgstr " Insert character "
+
+#: trelby/headersdlg.py:114
+#, fuzzy
+msgid "Alignment:"
+msgstr "indent:"
+
+#: trelby/headersdlg.py:120
+msgid "Center"
+msgstr ""
+
+#: trelby/headersdlg.py:130
+msgid "Style"
+msgstr ""
+
+#: trelby/headersdlg.py:154
+msgid "Preview"
+msgstr ""
+
+#: trelby/importdlg.py:11
+msgid "Adjust styles"
+msgstr ""
+
+#: trelby/importdlg.py:18
+msgid "Input:"
+msgstr ""
+
+#: trelby/importdlg.py:46
+msgid "Lines:"
+msgstr ""

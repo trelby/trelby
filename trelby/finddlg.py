@@ -13,7 +13,7 @@ class FindDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Find & Replace",
+            _("Find & Replace"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.WANTS_CHARS,
         )
 
@@ -30,12 +30,14 @@ class FindDlg(wx.Dialog):
         gsizer = wx.FlexGridSizer(2, 2, 5, 20)
         gsizer.AddGrowableCol(1)
 
-        gsizer.Add(wx.StaticText(self, -1, "Find what:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        gsizer.Add(
+            wx.StaticText(self, -1, _("Find what:")), 0, wx.ALIGN_CENTER_VERTICAL
+        )
         self.findEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         gsizer.Add(self.findEntry, 0, wx.EXPAND)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Replace with:"), 0, wx.ALIGN_CENTER_VERTICAL
+            wx.StaticText(self, -1, _("Replace with:")), 0, wx.ALIGN_CENTER_VERTICAL
         )
         self.replaceEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         gsizer.Add(self.replaceEntry, 0, wx.EXPAND)
@@ -52,22 +54,24 @@ class FindDlg(wx.Dialog):
         if misc.isWindows:
             pad = 5
 
-        self.matchWholeCb = wx.CheckBox(self, -1, "Match whole word only")
+        self.matchWholeCb = wx.CheckBox(self, -1, _("Match whole word only"))
         vsizer2.Add(self.matchWholeCb, 0, wx.TOP, pad)
 
-        self.matchCaseCb = wx.CheckBox(self, -1, "Match case")
+        self.matchCaseCb = wx.CheckBox(self, -1, _("Match case"))
         vsizer2.Add(self.matchCaseCb, 0, wx.TOP, pad)
 
         hsizer2.Add(vsizer2, 0, wx.EXPAND | wx.RIGHT, 10)
 
-        self.direction = wx.RadioBox(self, -1, "Direction", choices=["Up", "Down"])
+        self.direction = wx.RadioBox(
+            self, -1, _("Direction"), choices=[_("Up"), _("Down")]
+        )
         self.direction.SetSelection(1)
 
         hsizer2.Add(self.direction, 1, 0)
 
         vsizer.Add(hsizer2, 0, wx.EXPAND | wx.BOTTOM, 10)
 
-        self.extraLabel = wx.StaticText(self, -1, "Search in:")
+        self.extraLabel = wx.StaticText(self, -1, _("Search in:"))
         vsizer.Add(self.extraLabel)
 
         self.elements = wx.CheckListBox(self, -1)
@@ -220,7 +224,7 @@ class FindDlg(wx.Dialog):
         self.useExtra = flag
 
         if flag:
-            self.moreButton.SetLabel("<<< Less")
+            self.moreButton.SetLabel(_("<<< Less"))
             pos = self.elements.GetPosition()
 
             # don't know of a way to get the vertical spacing of items in
@@ -233,7 +237,7 @@ class FindDlg(wx.Dialog):
                 + 15
             )
         else:
-            self.moreButton.SetLabel("More >>>")
+            self.moreButton.SetLabel(_("More >>>"))
             h = max(
                 self.extraLabel.GetPosition().y,
                 self.moreButton.GetPosition().y
@@ -358,7 +362,10 @@ class FindDlg(wx.Dialog):
 
                 if fullSearch:
                     wx.MessageBox(
-                        "Search finished without results.", "No matches", wx.OK, self
+                        _("Search finished without results."),
+                        _("No matches"),
+                        wx.OK,
+                        self,
                     )
 
                     break

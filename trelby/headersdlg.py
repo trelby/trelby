@@ -29,7 +29,7 @@ class HeadersDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Empty lines after headers:"),
+            wx.StaticText(self, -1, _("Empty lines after headers:")),
             0,
             wx.ALIGN_CENTER_VERTICAL,
         )
@@ -44,7 +44,7 @@ class HeadersDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 10)
 
-        tmp = wx.StaticText(self, -1, "Strings:")
+        tmp = wx.StaticText(self, -1, _("Strings:"))
         vsizer.Add(tmp)
 
         self.stringsLb = wx.ListBox(self, -1, size=(200, 100))
@@ -52,12 +52,12 @@ class HeadersDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.addBtn = gutil.createStockButton(self, "Add")
+        self.addBtn = gutil.createStockButton(self, _("Add"))
         hsizer.Add(self.addBtn)
         self.Bind(wx.EVT_BUTTON, self.OnAddString, id=self.addBtn.GetId())
         gutil.btnDblClick(self.addBtn, self.OnAddString)
 
-        self.delBtn = gutil.createStockButton(self, "Delete")
+        self.delBtn = gutil.createStockButton(self, _("Delete"))
         hsizer.Add(self.delBtn, 0, wx.LEFT, 10)
         self.Bind(wx.EVT_BUTTON, self.OnDeleteString, id=self.delBtn.GetId())
         gutil.btnDblClick(self.delBtn, self.OnDeleteString)
@@ -66,7 +66,7 @@ class HeadersDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(wx.StaticText(self, -1, "Text:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        hsizer.Add(wx.StaticText(self, -1, _("Text:")), 0, wx.ALIGN_CENTER_VERTICAL)
 
         self.textEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.textEntry, 1, wx.LEFT, 10)
@@ -75,7 +75,9 @@ class HeadersDlg(wx.Dialog):
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.TOP, 20)
 
         vsizer.Add(
-            wx.StaticText(self, -1, "'${PAGE}' will be replaced by the page number."),
+            wx.StaticText(
+                self, -1, _("'${PAGE}' will be replaced by the page number.")
+            ),
             0,
             wx.ALIGN_CENTER | wx.TOP,
             5,
@@ -85,7 +87,9 @@ class HeadersDlg(wx.Dialog):
 
         gsizer = wx.FlexGridSizer(3, 2, 5, 0)
 
-        gsizer.Add(wx.StaticText(self, -1, "Header line:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        gsizer.Add(
+            wx.StaticText(self, -1, _("Header line:")), 0, wx.ALIGN_CENTER_VERTICAL
+        )
 
         self.lineEntry = wx.SpinCtrl(self, -1)
         self.lineEntry.SetRange(1, 5)
@@ -94,7 +98,7 @@ class HeadersDlg(wx.Dialog):
         gsizer.Add(self.lineEntry)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "X offset (characters):"),
+            wx.StaticText(self, -1, _("X offset (characters):")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -106,13 +110,15 @@ class HeadersDlg(wx.Dialog):
         self.xoffEntry.Bind(wx.EVT_KILL_FOCUS, self.OnKillFocus)
         gsizer.Add(self.xoffEntry)
 
-        gsizer.Add(wx.StaticText(self, -1, "Alignment:"), 0, wx.ALIGN_CENTER_VERTICAL)
+        gsizer.Add(
+            wx.StaticText(self, -1, _("Alignment:")), 0, wx.ALIGN_CENTER_VERTICAL
+        )
         self.alignCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
         for it in [
-            ("Left", util.ALIGN_LEFT),
-            ("Center", util.ALIGN_CENTER),
-            ("Right", util.ALIGN_RIGHT),
+            (_("Left"), util.ALIGN_LEFT),
+            (_("Center"), util.ALIGN_CENTER),
+            (_("Right"), util.ALIGN_RIGHT),
         ]:
             self.alignCombo.Append(it[0], it[1])
 
@@ -121,7 +127,7 @@ class HeadersDlg(wx.Dialog):
 
         hsizerTop.Add(gsizer)
 
-        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, "Style"), wx.HORIZONTAL)
+        bsizer = wx.StaticBoxSizer(wx.StaticBox(self, -1, _("Style")), wx.HORIZONTAL)
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
@@ -145,13 +151,13 @@ class HeadersDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        previewBtn = gutil.createStockButton(self, "Preview")
+        previewBtn = gutil.createStockButton(self, _("Preview"))
         hsizer.Add(previewBtn)
 
-        applyBtn = gutil.createStockButton(self, "Apply")
+        applyBtn = gutil.createStockButton(self, _("Apply"))
         hsizer.Add(applyBtn, 0, wx.LEFT, 10)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
 
         okBtn = gutil.createStockButton(self, "OK")
