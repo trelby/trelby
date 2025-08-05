@@ -1,0 +1,297 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR Gwyn Ciesla <gwync@protonmail.com>
+# This file is distributed under the same license as the trelby package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: trelby 2.4.15\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-04 19:38-0500\n"
+"PO-Revision-Date: 2025-08-04 19:39-0500\n"
+"Last-Translator: Gwyn Ciesla <gwync@protonmail.com>\n"
+"Language-Team: \n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.6\n"
+
+#: trelby/configpages/colorspanel.py:36 trelby/configpages/displaypanel.py:25
+msgid "Change"
+msgstr "Change"
+
+#: trelby/configpages/colorspanel.py:40
+msgid "Restore default"
+msgstr "Restore default"
+
+#: trelby/configpages/colorspanel.py:52
+msgid "Use per-element-type colors"
+msgstr "Use per-element-type colors"
+
+#: trelby/configpages/elementsglobalpanel.py:17
+#: trelby/configpages/elementspanel.py:19 trelby/autocompletiondlg.py:25
+msgid "Element:"
+msgstr "Element:"
+
+#: trelby/configpages/elementsglobalpanel.py:36
+msgid "Enter creates"
+msgstr "Enter creates"
+
+#: trelby/configpages/elementsglobalpanel.py:37
+msgid "Tab creates"
+msgstr "Tab creates"
+
+#: trelby/configpages/elementsglobalpanel.py:38
+msgid "Tab switches to"
+msgstr "Tab switches to"
+
+#: trelby/configpages/elementsglobalpanel.py:39
+msgid "Shift+Tab switches to"
+msgstr "Shift+Tab switches to"
+
+#: trelby/configpages/elementsglobalpanel.py:67
+msgid "Combo"
+msgstr "Combo"
+
+#: trelby/configpages/displaypanel.py:15
+msgid "Screen fonts:"
+msgstr "Screen fonts:"
+
+#: trelby/configpages/displaypanel.py:49
+msgid "Row spacing:"
+msgstr "Row spacing:"
+
+#: trelby/configpages/displaypanel.py:62
+msgid "pixels"
+msgstr "pixels"
+
+#: trelby/configpages/displaypanel.py:73
+msgid "Page break lines to show"
+msgstr "Page break lines to show"
+
+#: trelby/configpages/displaypanel.py:76
+msgid "None"
+msgstr "None"
+
+#: trelby/configpages/displaypanel.py:76
+msgid "Normal"
+msgstr "Normal"
+
+#: trelby/configpages/displaypanel.py:76
+msgid "Normal + unadjusted   "
+msgstr "Normal + unadjusted   "
+
+#: trelby/configpages/displaypanel.py:155
+msgid "Fonts have different widths"
+msgstr "Fonts have different widths"
+
+#: trelby/configpages/displaypanel.py:158
+msgid "Fonts have matching widths"
+msgstr "Fonts have matching widths"
+
+#: trelby/configpages/elementspanel.py:46
+msgid "Empty lines / 10 before:"
+msgstr "Empty lines / 10 before:"
+
+#: trelby/configpages/elementspanel.py:62
+msgid "Empty lines / 10 between:"
+msgstr "Empty lines / 10 between:"
+
+#: trelby/configpages/elementspanel.py:82
+msgid "Indent:"
+msgstr "Indent:"
+
+#: trelby/configpages/elementspanel.py:104
+msgid "Width:"
+msgstr "Width:"
+
+#: trelby/configpages/elementspanel.py:145
+msgid "Caps"
+msgstr "Caps"
+
+#: trelby/configpages/elementspanel.py:146
+msgid "Italic"
+msgstr "Italic"
+
+#: trelby/configpages/elementspanel.py:147
+msgid "Bold"
+msgstr "Bold"
+
+#: trelby/configpages/elementspanel.py:148
+msgid "Underlined"
+msgstr "Underlined"
+
+#: trelby/configpages/formattingpanel.py:28
+msgid "Action:"
+msgstr "Action:"
+
+#: trelby/configpages/formattingpanel.py:29
+msgid "Dialogue"
+msgstr "Dialogue"
+
+#: trelby/configpages/formattingpanel.py:34
+msgid "Font size:"
+msgstr "Font size:"
+
+#: trelby/configpages/formattingpanel.py:37
+msgid "Scene CONTINUEDs:"
+msgstr "Scene CONTINUEDs:"
+
+#: trelby/configpages/formattingpanel.py:40
+msgid "Include,"
+msgstr "Include,"
+
+#: trelby/configpages/formattingpanel.py:45
+msgid "indent:"
+msgstr "indent:"
+
+#: trelby/configpages/formattingpanel.py:48
+msgid "characters"
+msgstr "characters"
+
+#: trelby/configpages/formattingpanel.py:55
+msgid "Include scene numbers"
+msgstr "Include scene numbers"
+
+#: trelby/configpages/formattingpanel.py:65
+msgid "Show line numbers (debug)"
+msgstr "Show line numbers (debug)"
+
+#: trelby/autocompletiondlg.py:14
+msgid "Auto-completion"
+msgstr "Auto-completion"
+
+#: trelby/autocompletiondlg.py:44
+msgid "Auto-completion enabled"
+msgstr "Auto-completion enabled"
+
+#: trelby/autocompletiondlg.py:48
+msgid "Default items:"
+msgstr "Default items:"
+
+#: trelby/autocompletiondlg.py:60 trelby/cfgdlg.py:64
+msgid "Cancel"
+msgstr "Cancel"
+
+#: trelby/cfgdlg.py:34
+msgid "Settings dialog"
+msgstr "Settings dialog"
+
+#: trelby/cfgdlg.py:36 trelby/cfgdlg.py:45
+msgid "About"
+msgstr "About"
+
+#: trelby/cfgdlg.py:37
+msgid "Colors"
+msgstr "Colors"
+
+#: trelby/cfgdlg.py:38
+msgid "Display"
+msgstr "Display"
+
+#: trelby/cfgdlg.py:39 trelby/cfgdlg.py:46
+msgid "Elements"
+msgstr "Elements"
+
+#: trelby/cfgdlg.py:40
+msgid "Keyboard"
+msgstr "Keyboard"
+
+#: trelby/cfgdlg.py:41
+msgid "Misc"
+msgstr "Misc"
+
+#: trelby/cfgdlg.py:43
+msgid "Script settings dialog"
+msgstr "Script settings dialog"
+
+#: trelby/cfgdlg.py:47
+msgid "Formatting"
+msgstr "Formatting"
+
+#: trelby/cfgdlg.py:48
+msgid "Paper"
+msgstr "Paper"
+
+#: trelby/cfgdlg.py:50
+msgid "PDF/Fonts"
+msgstr "PDF/Fonts"
+
+#: trelby/cfgdlg.py:51
+msgid "Strings"
+msgstr "Strings"
+
+#: trelby/cfgdlg.py:61
+msgid "Apply"
+msgstr "Apply"
+
+#: trelby/charmapdlg.py:9
+msgid "Character map"
+msgstr "Character map"
+
+#: trelby/charmapdlg.py:18
+msgid " Insert character "
+msgstr " Insert character "
+
+#: trelby/charmapdlg.py:148
+msgid "Selected:"
+msgstr "Selected:"
+
+#: trelby/charmapdlg.py:159
+msgid "Opposite case:"
+msgstr "Opposite case:"
+
+#: trelby/charmapdlg.py:163
+#, python-format
+msgid "Character code: %d"
+msgstr "Character code: %d"
+
+#: trelby/charmapdlg.py:166
+msgid "Normal space"
+msgstr "Normal space"
+
+#: trelby/charmapdlg.py:168
+msgid "Non-breaking space"
+msgstr "Non-breaking space"
+
+#: trelby/charmapdlg.py:172
+msgid "Click on a character to select it."
+msgstr "Click on a character to select it."
+
+#: trelby/commandsdlg.py:12
+msgid "Commands"
+msgstr "Commands"
+
+#: trelby/commandsdlg.py:21
+msgid "Key(s)"
+msgstr "Key(s)"
+
+#: trelby/commandsdlg.py:22
+msgid "Command"
+msgstr "Command"
+
+#: trelby/commandsdlg.py:33
+msgid "No key defined"
+msgstr "No key defined"
+
+#: trelby/commandsdlg.py:92
+msgid "Filename to save as"
+msgstr "Filename to save as"
+
+#: trelby/commandsdlg.py:93
+msgid "HTML files (*.html)|*.html|All files|*"
+msgstr "HTML files (*.html)|*.html|All files|*"
+
+#: trelby/characterreport.py:82
+msgid "Basic information"
+msgstr "Basic information"
+
+#: trelby/characterreport.py:82
+msgid "Page list"
+msgstr "Page list"
+
+#: trelby/characterreport.py:82
+msgid "Location list"
+msgstr "Location list"

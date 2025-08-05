@@ -6,7 +6,7 @@ import trelby.util as util
 
 class CharMapDlg(wx.Dialog):
     def __init__(self, parent, ctrl):
-        wx.Dialog.__init__(self, parent, -1, "Character map")
+        wx.Dialog.__init__(self, parent, -1, _("Character map"))
 
         self.ctrl = ctrl
 
@@ -15,7 +15,7 @@ class CharMapDlg(wx.Dialog):
         self.charMap = MyCharMap(self)
         hsizer.Add(self.charMap)
 
-        self.insertButton = wx.Button(self, -1, " Insert character ")
+        self.insertButton = wx.Button(self, -1, _(" Insert character "))
         hsizer.Add(self.insertButton, 0, wx.ALL, 10)
         self.Bind(wx.EVT_BUTTON, self.OnInsert, id=self.insertButton.GetId())
         gutil.btnDblClick(self.insertButton, self.OnInsert)
@@ -144,7 +144,9 @@ class MyCharMap(wx.Window):
         if self.selected:
             code = ord(self.selected)
 
-            self.drawCharBox(dc, "Selected:", self.selected, self.offset, y + pad, 75)
+            self.drawCharBox(
+                dc, _("Selected:"), self.selected, self.offset, y + pad, 75
+            )
 
             c = util.upper(self.selected)
             if c == self.selected:
@@ -154,20 +156,20 @@ class MyCharMap(wx.Window):
 
             if c:
                 self.drawCharBox(
-                    dc, "Opposite case:", c, self.offset + 150, y + pad, 110
+                    dc, _("Opposite case:"), c, self.offset + 150, y + pad, 110
                 )
 
             dc.SetFont(self.smallFont)
-            dc.DrawText("Character code: %d" % code, 360, y + pad)
+            dc.DrawText(_("Character code: %d") % code, 360, y + pad)
 
             if code == 32:
-                dc.DrawText("Normal space", 360, y + pad + 30)
+                dc.DrawText(_("Normal space"), 360, y + pad + 30)
             elif code == 160:
-                dc.DrawText("Non-breaking space", 360, y + pad + 30)
+                dc.DrawText(_("Non-breaking space"), 360, y + pad + 30)
 
         else:
             dc.SetFont(self.smallFont)
-            dc.DrawText("Click on a character to select it.", self.offset, y + pad)
+            dc.DrawText(_("Click on a character to select it."), self.offset, y + pad)
 
     def drawCharBox(self, dc, text, char, x, y, xinc):
         dc.SetFont(self.smallFont)

@@ -33,11 +33,11 @@ class ColorsPanel(wx.Panel):
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        btn = wx.Button(self, -1, "Change")
+        btn = wx.Button(self, -1, _("Change"))
         self.Bind(wx.EVT_BUTTON, self.OnChangeColor, id=btn.GetId())
         vsizer2.Add(btn, 0, wx.BOTTOM, 10)
 
-        btn = wx.Button(self, -1, "Restore default")
+        btn = wx.Button(self, -1, _("Restore default"))
         self.Bind(wx.EVT_BUTTON, self.OnDefaultColor, id=btn.GetId())
         vsizer2.Add(btn)
 
@@ -48,7 +48,9 @@ class ColorsPanel(wx.Panel):
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.BOTTOM, 10)
 
-        self.useCustomElemColors = wx.CheckBox(self, -1, "Use per-element-type colors")
+        self.useCustomElemColors = wx.CheckBox(
+            self, -1, _("Use per-element-type colors")
+        )
         self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.useCustomElemColors.GetId())
         vsizer.Add(self.useCustomElemColors)
 

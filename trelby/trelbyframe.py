@@ -9,7 +9,6 @@ from functools import partial
 
 import wx
 import wx.svg
-import wx.svg
 
 import trelby
 import trelby.charmapdlg as charmapdlg

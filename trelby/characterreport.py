@@ -79,7 +79,7 @@ class CharacterReport:
         # information types and what to include
         self.INF_BASIC, self.INF_PAGES, self.INF_LOCATIONS = list(range(3))
         self.inf = []
-        for s in ["Basic information", "Page list", "Location list"]:
+        for s in [_("Basic information"), _("Page list"), _("Location list")]:
             self.inf.append(misc.CheckBoxItem(s))
 
     # calculate total sum of self.cinfo.{name} and return it.

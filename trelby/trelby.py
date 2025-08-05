@@ -1,5 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
+import gettext
 import os
 import os.path
 import sys
@@ -27,6 +28,19 @@ KC_CTRL_F = 6
 KC_CTRL_N = 14
 KC_CTRL_P = 16
 KC_CTRL_V = 22
+
+
+# load translations
+LOCALEDIR = os.path.dirname(trelby.__file__) + "/locales"
+LANGUAGE = os.environ["LANG"]
+
+if not os.path.isdir(LOCALEDIR + "/" + LANGUAGE):
+    LANGUAGE = "en"
+
+TRANS = gettext.translation("trelby", localedir=LOCALEDIR, languages=[LANGUAGE])
+TRANS.install()
+
+_ = TRANS.gettext
 
 
 class MyApp(wx.App):

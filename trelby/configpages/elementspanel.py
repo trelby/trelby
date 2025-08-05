@@ -16,7 +16,7 @@ class ElementsPanel(wx.Panel):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Element:"),
+            wx.StaticText(self, -1, _("Element:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -43,7 +43,7 @@ class ElementsPanel(wx.Panel):
         gsizer = wx.FlexGridSizer(2, 2, 5, 0)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Empty lines / 10 before:"),
+            wx.StaticText(self, -1, _("Empty lines / 10 before:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -59,7 +59,7 @@ class ElementsPanel(wx.Panel):
         self.beforeSpacingEntry = tmp
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Empty lines / 10 between:"),
+            wx.StaticText(self, -1, _("Empty lines / 10 between:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -79,7 +79,7 @@ class ElementsPanel(wx.Panel):
         gsizer = wx.FlexGridSizer(2, 3, 5, 0)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Indent:"),
+            wx.StaticText(self, -1, _("Indent:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -101,7 +101,7 @@ class ElementsPanel(wx.Panel):
         )
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Width:"),
+            wx.StaticText(self, -1, _("Width:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -142,10 +142,10 @@ class ElementsPanel(wx.Panel):
         if misc.isWindows:
             pad = 5
 
-        self.addCheckBox("Caps", prefix, parent, gsizer, pad)
-        self.addCheckBox("Italic", prefix, parent, gsizer, pad)
-        self.addCheckBox("Bold", prefix, parent, gsizer, pad)
-        self.addCheckBox("Underlined", prefix, parent, gsizer, pad)
+        self.addCheckBox(_("Caps"), prefix, parent, gsizer, pad)
+        self.addCheckBox(_("Italic"), prefix, parent, gsizer, pad)
+        self.addCheckBox(_("Bold"), prefix, parent, gsizer, pad)
+        self.addCheckBox(_("Underlined"), prefix, parent, gsizer, pad)
 
         hsizer.Add(gsizer, 0, wx.EXPAND)
 

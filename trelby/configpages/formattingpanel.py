@@ -25,34 +25,34 @@ class FormattingPanel(wx.Panel):
 
         gsizer = wx.FlexGridSizer(2, 2, 5, 0)
 
-        self.addSpin("action", "Action:", self, gsizer, "pbActionLines")
-        self.addSpin("dialogue", "Dialogue", self, gsizer, "pbDialogueLines")
+        self.addSpin("action", _("Action:"), self, gsizer, "pbActionLines")
+        self.addSpin("dialogue", _("Dialogue"), self, gsizer, "pbDialogueLines")
 
         vsizer.Add(gsizer, 0, wx.LEFT, 10)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.addSpin("fontSize", "Font size:", self, hsizer, "fontSize")
+        self.addSpin("fontSize", _("Font size:"), self, hsizer, "fontSize")
         vsizer.Add(hsizer, 0, wx.TOP, 20)
 
-        vsizer.Add(wx.StaticText(self, -1, "Scene CONTINUEDs:"), 0, wx.TOP, 20)
+        vsizer.Add(wx.StaticText(self, -1, _("Scene CONTINUEDs:")), 0, wx.TOP, 20)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        self.sceneContinuedsCb = wx.CheckBox(self, -1, "Include,")
+        self.sceneContinuedsCb = wx.CheckBox(self, -1, _("Include,"))
         self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.sceneContinuedsCb.GetId())
         hsizer.Add(self.sceneContinuedsCb, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
         self.addSpin(
-            "sceneContinuedIndent", "indent:", self, hsizer, "sceneContinuedIndent"
+            "sceneContinuedIndent", _("indent:"), self, hsizer, "sceneContinuedIndent"
         )
         hsizer.Add(
-            wx.StaticText(self, -1, "characters"),
+            wx.StaticText(self, -1, _("characters")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
             10,
         )
         vsizer.Add(hsizer, 0, wx.LEFT, 5)
 
-        self.scenesCb = wx.CheckBox(self, -1, "Include scene numbers")
+        self.scenesCb = wx.CheckBox(self, -1, _("Include scene numbers"))
         self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.scenesCb.GetId())
         vsizer.Add(self.scenesCb, 0, wx.TOP, 10)
 
@@ -62,7 +62,7 @@ class FormattingPanel(wx.Panel):
         if misc.isWindows:
             pad = 10
 
-        self.lineNumbersCb = wx.CheckBox(self, -1, "Show line numbers (debug)")
+        self.lineNumbersCb = wx.CheckBox(self, -1, _("Show line numbers (debug)"))
         self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.lineNumbersCb.GetId())
         vsizer.Add(self.lineNumbersCb, 0, wx.TOP, pad)
 
