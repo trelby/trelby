@@ -30,14 +30,14 @@ class PDFDrawOp:
     def draw(
         self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas: Canvas
     ) -> None:
-        raise Exception("draw not implemented")
+        raise Exception(_("draw not implemented"))
 
 
 class PDFTextOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.TextOp):
             raise Exception(
-                "PDFTextOp is only compatible with pml.TextOp, got "
+                _("PDFTextOp is only compatible with pml.TextOp, got ")
                 + type(pmlOp).__name__
             )
 
@@ -105,7 +105,7 @@ class PDFLineOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas):
         if not isinstance(pmlOp, pml.LineOp):
             raise Exception(
-                "PDFLineOp is only compatible with pml.LineOp, got "
+                _("PDFLineOp is only compatible with pml.LineOp, got ")
                 + type(pmlOp).__name__
             )
 
@@ -133,7 +133,7 @@ class PDFRectOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.RectOp):
             raise Exception(
-                "PDFRectOp is only compatible with pml.RectOp, got "
+                _("PDFRectOp is only compatible with pml.RectOp, got ")
                 + type(pmlOp).__name__
             )
 
@@ -154,7 +154,9 @@ class PDFQuarterCircleOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.QuarterCircleOp):
             raise Exception(
-                "PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "
+                _(
+                    "PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "
+                )
                 + type(pmlOp).__name__
             )
 
@@ -186,7 +188,7 @@ class PDFArbitraryOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.PDFOp):
             raise Exception(
-                "PDFArbitraryOp is only compatible with pml.PDFOp, got "
+                _("PDFArbitraryOp is only compatible with pml.PDFOp, got ")
                 + type(pmlOp).__name__
             )
 

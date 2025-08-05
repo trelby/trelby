@@ -44,7 +44,9 @@ def readNames(frame):
         return True
 
     except Exception as e:
-        wx.MessageBox("Error loading name database: %s" % str(e), "Error", wx.OK, frame)
+        wx.MessageBox(
+            "Error loading name database: %s" % str(e), _("Error"), wx.OK, frame
+        )
 
         return False
 
@@ -55,7 +57,7 @@ class NamesDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Character name database",
+            _("Character name database"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
@@ -65,7 +67,7 @@ class NamesDlg(wx.Dialog):
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer.Add(wx.StaticText(self, -1, "Search in:"))
+        vsizer.Add(wx.StaticText(self, -1, _("Search in:")))
 
         self.typeList = wx.ListCtrl(
             self, -1, style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES
@@ -94,7 +96,7 @@ class NamesDlg(wx.Dialog):
         self.selectAllTypes()
         vsizer.Add(self.typeList, 1, wx.EXPAND | wx.BOTTOM, 5)
 
-        selectAllBtn = wx.Button(self, -1, "Select all")
+        selectAllBtn = wx.Button(self, -1, _("Select all"))
         vsizer.Add(selectAllBtn)
 
         hsizer.Add(vsizer, 0, wx.EXPAND)
@@ -105,14 +107,14 @@ class NamesDlg(wx.Dialog):
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        searchBtn = wx.Button(self, -1, "Search")
+        searchBtn = wx.Button(self, -1, _("Search"))
         self.Bind(wx.EVT_BUTTON, self.OnSearch, id=searchBtn.GetId())
         vsizer2.Add(searchBtn, 0, wx.BOTTOM | wx.TOP, 10)
 
         self.searchEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         vsizer2.Add(self.searchEntry, 0, wx.EXPAND)
 
-        tmp = wx.Button(self, -1, "Insert")
+        tmp = wx.Button(self, -1, _("Insert"))
         self.Bind(wx.EVT_BUTTON, self.OnInsertName, id=tmp.GetId())
         vsizer2.Add(tmp, 0, wx.BOTTOM | wx.TOP, 10)
 
@@ -121,7 +123,7 @@ class NamesDlg(wx.Dialog):
         self.nameRb = wx.RadioBox(
             self,
             -1,
-            "Name",
+            _("Name"),
             style=wx.RA_SPECIFY_COLS,
             majorDimension=1,
             choices=["begins with", "contains", "ends in"],
@@ -131,7 +133,7 @@ class NamesDlg(wx.Dialog):
         self.sexRb = wx.RadioBox(
             self,
             -1,
-            "Sex",
+            _("Sex"),
             style=wx.RA_SPECIFY_COLS,
             majorDimension=1,
             choices=["Male", "Female", "Both"],
@@ -141,7 +143,7 @@ class NamesDlg(wx.Dialog):
 
         vsizer.Add(hsizer2, 0, wx.EXPAND)
 
-        vsizer.Add(wx.StaticText(self, -1, "Results:"))
+        vsizer.Add(wx.StaticText(self, -1, _("Results:")))
 
         self.list = MyListCtrl(self)
         vsizer.Add(self.list, 1, wx.EXPAND | wx.BOTTOM, 5)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: trelby 2.4.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-05 12:27-0500\n"
+"POT-Creation-Date: 2025-08-05 16:17-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -234,7 +234,8 @@ msgid "Default items:"
 msgstr ""
 
 #: trelby/autocompletiondlg.py:60 trelby/cfgdlg.py:64 trelby/headersdlg.py:160
-#: trelby/importdlg.py:57 trelby/autocompletiondlg.py:60
+#: trelby/importdlg.py:57 trelby/locationsdlg.py:49 trelby/misc.py:649
+#: trelby/misc.py:741 trelby/misc.py:926 trelby/autocompletiondlg.py:60
 #: trelby/headersdlg.py:160 trelby/importdlg.py:57 trelby/cfgdlg.py:64
 #: trelby/locationsdlg.py:49 trelby/misc.py:649 trelby/misc.py:741
 #: trelby/misc.py:926
@@ -376,14 +377,14 @@ msgid "Keys:"
 msgstr ""
 
 #: trelby/configpages/keyboardpanel.py:36 trelby/headersdlg.py:55
-#: trelby/configpages/keyboardpanel.py:36 trelby/headersdlg.py:55
-#: trelby/locationsdlg.py:29
+#: trelby/locationsdlg.py:29 trelby/configpages/keyboardpanel.py:36
+#: trelby/headersdlg.py:55 trelby/locationsdlg.py:29
 msgid "Add"
 msgstr ""
 
 #: trelby/configpages/keyboardpanel.py:41 trelby/headersdlg.py:60
-#: trelby/configpages/keyboardpanel.py:41 trelby/headersdlg.py:60
-#: trelby/locationsdlg.py:33
+#: trelby/locationsdlg.py:33 trelby/configpages/keyboardpanel.py:41
+#: trelby/headersdlg.py:60 trelby/locationsdlg.py:33
 msgid "Delete"
 msgstr ""
 
@@ -403,10 +404,18 @@ msgid "The key is already bound to this command."
 msgstr ""
 
 #: trelby/configpages/keyboardpanel.py:87
-#: trelby/configpages/keyboardpanel.py:97
-#: trelby/configpages/keyboardpanel.py:87
 #: trelby/configpages/keyboardpanel.py:97 trelby/locationsdlg.py:93
 #: trelby/locationsdlg.py:142 trelby/misc.py:972
+#: trelby/configpages/keyboardpanel.py:87
+#: trelby/configpages/keyboardpanel.py:97 trelby/locationsdlg.py:93
+#: trelby/locationsdlg.py:142 trelby/misc.py:972 trelby/myimport.py:41
+#: trelby/myimport.py:58 trelby/myimport.py:92 trelby/myimport.py:109
+#: trelby/myimport.py:116 trelby/myimport.py:132 trelby/myimport.py:211
+#: trelby/myimport.py:226 trelby/myimport.py:235 trelby/myimport.py:244
+#: trelby/myimport.py:262 trelby/myimport.py:292 trelby/myimport.py:317
+#: trelby/myimport.py:382 trelby/myimport.py:389 trelby/myimport.py:446
+#: trelby/myimport.py:773 trelby/myimport.py:816 trelby/namesdlg.py:48
+#: trelby/reports.py:58
 msgid "Error"
 msgstr ""
 
@@ -570,15 +579,17 @@ msgstr ""
 msgid "Sorted by: Name"
 msgstr ""
 
-#: trelby/dialoguechart.py:31 trelby/dialoguechart.py:31
+#: trelby/dialoguechart.py:31 trelby/dialoguechart.py:31 trelby/reports.py:16
+#: trelby/reports.py:37 trelby/reports.py:68
 msgid "Report type"
 msgstr ""
 
-#: trelby/dialoguechart.py:31 trelby/dialoguechart.py:31
+#: trelby/dialoguechart.py:31 trelby/dialoguechart.py:31 trelby/reports.py:16
+#: trelby/reports.py:37 trelby/reports.py:70
 msgid "Information to include:"
 msgstr ""
 
-#: trelby/dialoguechart.py:48 trelby/dialoguechart.py:48
+#: trelby/dialoguechart.py:48 trelby/dialoguechart.py:48 trelby/reports.py:58
 msgid "No characters speaking found."
 msgstr ""
 
@@ -618,7 +629,7 @@ msgstr ""
 msgid "Down"
 msgstr ""
 
-#: trelby/finddlg.py:74 trelby/finddlg.py:74
+#: trelby/finddlg.py:74 trelby/finddlg.py:74 trelby/namesdlg.py:70
 msgid "Search in:"
 msgstr ""
 
@@ -691,50 +702,163 @@ msgstr ""
 msgid "Lines:"
 msgstr ""
 
-#: trelby/locationsdlg.py:21
+#: trelby/locationsdlg.py:21 trelby/locationsdlg.py:21
 msgid "Locations:"
 msgstr ""
 
-#: trelby/locationsdlg.py:39
+#: trelby/locationsdlg.py:39 trelby/locationsdlg.py:39
 msgid "Scenes:"
 msgstr ""
 
-#: trelby/locationsdlg.py:93
+#: trelby/locationsdlg.py:93 trelby/locationsdlg.py:93
 msgid "No scenes selected in the lower list."
 msgstr ""
 
-#: trelby/locationsdlg.py:142
+#: trelby/locationsdlg.py:142 trelby/locationsdlg.py:142
 msgid "No scene selected in the upper list."
 msgstr ""
 
-#: trelby/misc.py:629
+#: trelby/misc.py:629 trelby/misc.py:629
 msgid "Choose scripts"
 msgstr ""
 
-#: trelby/misc.py:636
+#: trelby/misc.py:636 trelby/misc.py:636
 msgid "Compare script"
 msgstr ""
 
-#: trelby/misc.py:637
+#: trelby/misc.py:637 trelby/misc.py:637
 msgid "to"
 msgstr ""
 
-#: trelby/misc.py:641
+#: trelby/misc.py:641 trelby/misc.py:641
 msgid "Use same configuration"
 msgstr ""
 
-#: trelby/misc.py:767
+#: trelby/misc.py:767 trelby/misc.py:767
 msgid "Set"
 msgstr ""
 
-#: trelby/misc.py:771
+#: trelby/misc.py:771 trelby/misc.py:771
 msgid "Clear"
 msgstr ""
 
-#: trelby/misc.py:775
+#: trelby/misc.py:775 trelby/misc.py:775
 msgid "Toggle"
 msgstr ""
 
-#: trelby/misc.py:986
+#: trelby/misc.py:986 trelby/misc.py:986
 msgid "Key capture"
+msgstr ""
+
+#: trelby/myimport.py:41 trelby/myimport.py:116 trelby/myimport.py:317
+#: trelby/myimport.py:446 trelby/myimport.py:773
+msgid "File is empty."
+msgstr ""
+
+#: trelby/myimport.py:92
+msgid "File has no content."
+msgstr ""
+
+#: trelby/myimport.py:109
+msgid "File is not a valid .fadein file."
+msgstr ""
+
+#: trelby/myimport.py:211 trelby/myimport.py:292 trelby/myimport.py:382
+msgid "The file contains no importable lines"
+msgstr ""
+
+#: trelby/myimport.py:226
+msgid "File is not a valid Celtx script file."
+msgstr ""
+
+#: trelby/myimport.py:235
+msgid "Unable to find script in this Celtx file."
+msgstr ""
+
+#: trelby/myimport.py:244
+msgid "Script seems to be empty."
+msgstr ""
+
+#: trelby/myimport.py:450
+msgid "Import titles to title page."
+msgstr ""
+
+#: trelby/myimport.py:451
+msgid "Import titles as action lines."
+msgstr ""
+
+#: trelby/myimport.py:452
+msgid "Remove unsupported formatting markup."
+msgstr ""
+
+#: trelby/myimport.py:453
+msgid "Import section/synopsis as notes."
+msgstr ""
+
+#: trelby/myimport.py:456
+msgid "Fountain import options"
+msgstr ""
+
+#: trelby/myimport.py:456
+msgid "Import options:"
+msgstr ""
+
+#: trelby/myimport.py:816
+msgid "File contains only empty lines."
+msgstr ""
+
+#: trelby/namesdlg.py:60
+msgid "Character name database"
+msgstr ""
+
+#: trelby/namesdlg.py:99
+msgid "Select all"
+msgstr ""
+
+#: trelby/namesdlg.py:110
+msgid "Search"
+msgstr ""
+
+#: trelby/namesdlg.py:117
+msgid "Insert"
+msgstr ""
+
+#: trelby/namesdlg.py:126
+msgid "Name"
+msgstr ""
+
+#: trelby/namesdlg.py:136
+msgid "Sex"
+msgstr ""
+
+#: trelby/namesdlg.py:146
+msgid "Results:"
+msgstr ""
+
+#: trelby/pdf.py:33
+msgid "draw not implemented"
+msgstr ""
+
+#: trelby/pdf.py:40
+msgid "PDFTextOp is only compatible with pml.TextOp, got "
+msgstr ""
+
+#: trelby/pdf.py:108
+msgid "PDFLineOp is only compatible with pml.LineOp, got "
+msgstr ""
+
+#: trelby/pdf.py:136
+msgid "PDFRectOp is only compatible with pml.RectOp, got "
+msgstr ""
+
+#: trelby/pdf.py:158
+msgid "PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "
+msgstr ""
+
+#: trelby/pdf.py:191
+msgid "PDFArbitraryOp is only compatible with pml.PDFOp, got "
+msgstr ""
+
+#: trelby/reports.py:73
+msgid "Characters to include:"
 msgstr ""

@@ -38,7 +38,7 @@ def importAstx(fileName, frame):
         return None
 
     if len(data) == 0:
-        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+        wx.MessageBox(_("File is empty."), _("Error"), wx.OK, frame)
 
         return None
 
@@ -55,7 +55,7 @@ def importAstx(fileName, frame):
     try:
         root = etree.XML(data)
     except etree.XMLSyntaxError as e:
-        wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
+        wx.MessageBox("Error parsing file: %s" % e, _("Error"), wx.OK, frame)
         return None
 
     lines = []
@@ -89,7 +89,7 @@ def importAstx(fileName, frame):
         addElem(lt, items)
 
     if not lines:
-        wx.MessageBox("File has no content.", "Error", wx.OK, frame)
+        wx.MessageBox(_("File has no content."), _("Error"), wx.OK, frame)
         return None
 
     return lines
@@ -106,14 +106,14 @@ def importFadein(fileName, frame):
             with fadein_file.open("document.xml") as fadein_document:
                 data = fadein_document.read()
     except:
-        wx.MessageBox("File is not a valid .fadein file.", "Error", wx.OK, frame)
+        wx.MessageBox(_("File is not a valid .fadein file."), _("Error"), wx.OK, frame)
         return None
 
     if data == None:
         return None
 
     if len(data) == 0:
-        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+        wx.MessageBox(_("File is empty."), _("Error"), wx.OK, frame)
         return None
 
     elemMap = {
@@ -129,7 +129,7 @@ def importFadein(fileName, frame):
     try:
         root = etree.XML(data)
     except etree.XMLSyntaxError as e:
-        wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
+        wx.MessageBox("Error parsing file: %s" % e, _("Error"), wx.OK, frame)
         return None
 
     lines = []
@@ -207,7 +207,9 @@ def importFadein(fileName, frame):
         addElem(lt, items)
 
     if len(lines) == 0:
-        wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
+        wx.MessageBox(
+            _("The file contains no importable lines"), _("Error"), wx.OK, frame
+        )
         return None
 
     return lines
@@ -220,7 +222,9 @@ def importCeltx(fileName, frame):
     try:
         z = zipfile.ZipFile(fileName)
     except:
-        wx.MessageBox("File is not a valid Celtx script file.", "Error", wx.OK, frame)
+        wx.MessageBox(
+            _("File is not a valid Celtx script file."), _("Error"), wx.OK, frame
+        )
         return None
 
     files = z.namelist()
@@ -228,7 +232,7 @@ def importCeltx(fileName, frame):
 
     if len(scripts) == 0:
         wx.MessageBox(
-            "Unable to find script in this Celtx file.", "Error", wx.OK, frame
+            _("Unable to find script in this Celtx file."), _("Error"), wx.OK, frame
         )
         return None
 
@@ -237,7 +241,7 @@ def importCeltx(fileName, frame):
     z.close()
 
     if not content:
-        wx.MessageBox("Script seems to be empty.", "Error", wx.OK, frame)
+        wx.MessageBox(_("Script seems to be empty."), _("Error"), wx.OK, frame)
         return None
 
     elemMap = {
@@ -255,7 +259,7 @@ def importCeltx(fileName, frame):
         parser = etree.HTMLParser()
         root = etree.XML(content, parser)
     except etree.XMLSyntaxError as e:
-        wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
+        wx.MessageBox("Error parsing file: %s" % e, _("Error"), wx.OK, frame)
         return None
 
     lines = []
@@ -284,7 +288,9 @@ def importCeltx(fileName, frame):
             addElem(lt, items)
 
     if len(lines) == 0:
-        wx.MessageBox("The file contains no importable lines", "Error", wx.OK, frame)
+        wx.MessageBox(
+            _("The file contains no importable lines"), _("Error"), wx.OK, frame
+        )
         return None
 
     return lines
@@ -308,7 +314,7 @@ def importFDX(fileName, frame):
         return None
 
     if len(data) == 0:
-        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+        wx.MessageBox(_("File is empty."), _("Error"), wx.OK, frame)
 
         return None
 
@@ -373,14 +379,14 @@ def importFDX(fileName, frame):
 
         if len(lines) == 0:
             wx.MessageBox(
-                "The file contains no importable lines", "Error", wx.OK, frame
+                _("The file contains no importable lines"), _("Error"), wx.OK, frame
             )
             return None
 
         return lines
 
     except etree.XMLSyntaxError as e:
-        wx.MessageBox("Error parsing file: %s" % e, "Error", wx.OK, frame)
+        wx.MessageBox("Error parsing file: %s" % e, _("Error"), wx.OK, frame)
         return None
 
 
@@ -437,17 +443,17 @@ def importFountain(fileName, frame, titlePages):
         return None
 
     if len(data) == 0:
-        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+        wx.MessageBox(_("File is empty."), _("Error"), wx.OK, frame)
         return None
 
     inf = []
-    inf.append(misc.CheckBoxItem("Import titles to title page."))
-    inf.append(misc.CheckBoxItem("Import titles as action lines.", selected=False))
-    inf.append(misc.CheckBoxItem("Remove unsupported formatting markup."))
-    inf.append(misc.CheckBoxItem("Import section/synopsis as notes."))
+    inf.append(misc.CheckBoxItem(_("Import titles to title page.")))
+    inf.append(misc.CheckBoxItem(_("Import titles as action lines."), selected=False))
+    inf.append(misc.CheckBoxItem(_("Remove unsupported formatting markup.")))
+    inf.append(misc.CheckBoxItem(_("Import section/synopsis as notes.")))
 
     dlg = misc.CheckBoxDlg(
-        frame, "Fountain import options", inf, "Import options:", False
+        frame, _("Fountain import options"), inf, _("Import options:"), False
     )
 
     if dlg.ShowModal() != wx.ID_OK:
@@ -764,7 +770,7 @@ def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[Line]]:
         return None
 
     if len(data) == 0:
-        wx.MessageBox("File is empty.", "Error", wx.OK, frame)
+        wx.MessageBox(_("File is empty."), _("Error"), wx.OK, frame)
 
         return None
 
@@ -807,7 +813,7 @@ def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[Line]]:
         lines[i] = s
 
     if len(indDict) == 0:
-        wx.MessageBox("File contains only empty lines.", "Error", wx.OK, frame)
+        wx.MessageBox(_("File contains only empty lines."), _("Error"), wx.OK, frame)
 
         return None
 
