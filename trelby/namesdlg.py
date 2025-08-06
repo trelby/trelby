@@ -34,17 +34,24 @@ def readNames(frame):
                 nameType = line[1:]
             elif ch in ("M", "F"):
                 if not nameType:
-                    raise Exception("No name type set before line: '%s'" % line)
+                    raise Exception(
+                        _("No name type set before line: '{}'".format(line))
+                    )
                 res.append(line[1:], nameType, ch)
             else:
-                raise Exception("Unknown linetype for line: '%s'" % line)
+                raise Exception(_("Unknown linetype for line: '{}'".format(line)))
 
         nameArr = res
 
         return True
 
     except Exception as e:
-        wx.MessageBox("Error loading name database: %s" % str(e), "Error", wx.OK, frame)
+        wx.MessageBox(
+            _("Error loading name database: {}".format(str(e))),
+            _("Error"),
+            wx.OK,
+            frame,
+        )
 
         return False
 
@@ -55,7 +62,7 @@ class NamesDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Character name database",
+            _("Character name database"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
@@ -65,14 +72,14 @@ class NamesDlg(wx.Dialog):
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer.Add(wx.StaticText(self, -1, "Search in:"))
+        vsizer.Add(wx.StaticText(self, -1, _("Search in:")))
 
         self.typeList = wx.ListCtrl(
             self, -1, style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES
         )
 
-        self.typeList.InsertColumn(0, "Count")
-        self.typeList.InsertColumn(1, "Type")
+        self.typeList.InsertColumn(0, _("Count"))
+        self.typeList.InsertColumn(1, _("Type"))
 
         for i in range(len(nameArr.typeNamesById)):
             typeName = nameArr.typeNamesById[i]
@@ -94,7 +101,7 @@ class NamesDlg(wx.Dialog):
         self.selectAllTypes()
         vsizer.Add(self.typeList, 1, wx.EXPAND | wx.BOTTOM, 5)
 
-        selectAllBtn = wx.Button(self, -1, "Select all")
+        selectAllBtn = wx.Button(self, -1, _("Select all"))
         vsizer.Add(selectAllBtn)
 
         hsizer.Add(vsizer, 0, wx.EXPAND)
@@ -105,14 +112,14 @@ class NamesDlg(wx.Dialog):
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        searchBtn = wx.Button(self, -1, "Search")
+        searchBtn = wx.Button(self, -1, _("Search"))
         self.Bind(wx.EVT_BUTTON, self.OnSearch, id=searchBtn.GetId())
         vsizer2.Add(searchBtn, 0, wx.BOTTOM | wx.TOP, 10)
 
         self.searchEntry = wx.TextCtrl(self, -1, style=wx.TE_PROCESS_ENTER)
         vsizer2.Add(self.searchEntry, 0, wx.EXPAND)
 
-        tmp = wx.Button(self, -1, "Insert")
+        tmp = wx.Button(self, -1, _("Insert"))
         self.Bind(wx.EVT_BUTTON, self.OnInsertName, id=tmp.GetId())
         vsizer2.Add(tmp, 0, wx.BOTTOM | wx.TOP, 10)
 
@@ -121,7 +128,7 @@ class NamesDlg(wx.Dialog):
         self.nameRb = wx.RadioBox(
             self,
             -1,
-            "Name",
+            _("Name"),
             style=wx.RA_SPECIFY_COLS,
             majorDimension=1,
             choices=["begins with", "contains", "ends in"],
@@ -131,7 +138,7 @@ class NamesDlg(wx.Dialog):
         self.sexRb = wx.RadioBox(
             self,
             -1,
-            "Sex",
+            _("Sex"),
             style=wx.RA_SPECIFY_COLS,
             majorDimension=1,
             choices=["Male", "Female", "Both"],
@@ -141,7 +148,7 @@ class NamesDlg(wx.Dialog):
 
         vsizer.Add(hsizer2, 0, wx.EXPAND)
 
-        vsizer.Add(wx.StaticText(self, -1, "Results:"))
+        vsizer.Add(wx.StaticText(self, -1, _("Results:")))
 
         self.list = MyListCtrl(self)
         vsizer.Add(self.list, 1, wx.EXPAND | wx.BOTTOM, 5)
@@ -254,7 +261,7 @@ class NamesDlg(wx.Dialog):
 
         wx.EndBusyCursor()
 
-        self.foundLabel.SetLabel("%d names found." % len(l))
+        self.foundLabel.SetLabel(_("{} names found.".format(len(l))))
 
 
 class MyListCtrl(wx.ListCtrl):

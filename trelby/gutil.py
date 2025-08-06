@@ -52,11 +52,11 @@ def createStockButton(parent, label):
     if misc.isUnix:
         ids = {
             "OK": wx.ID_OK,
-            "Cancel": wx.ID_CANCEL,
-            "Apply": wx.ID_APPLY,
-            "Add": wx.ID_ADD,
-            "Delete": wx.ID_DELETE,
-            "Preview": wx.ID_PREVIEW,
+            _("Cancel"): wx.ID_CANCEL,
+            _("Apply"): wx.ID_APPLY,
+            _("Add"): wx.ID_ADD,
+            _("Delete"): wx.ID_DELETE,
+            _("Preview"): wx.ID_PREVIEW,
         }
 
         return wx.Button(parent, ids[label])
@@ -104,5 +104,8 @@ def showTempPDF(
 
     except TrelbyError as e:
         wx.MessageBox(
-            "Error writing temporary PDF file: %s" % e, "Error", wx.OK, mainFrame
+            _("Error writing temporary PDF file: {}".format(e)),
+            _("Error"),
+            wx.OK,
+            mainFrame,
         )

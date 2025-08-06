@@ -11,7 +11,7 @@ class SCDictDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Spell checker dictionary",
+            _("Spell checker dictionary"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
@@ -20,9 +20,9 @@ class SCDictDlg(wx.Dialog):
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         if isGlobal:
-            s = "Global words:"
+            s = _("Global words:")
         else:
-            s = "Script-specific words:"
+            s = _("Script-specific words:")
 
         vsizer.Add(wx.StaticText(self, -1, s))
 
@@ -35,7 +35,7 @@ class SCDictDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
 
         okBtn = gutil.createStockButton(self, "OK")

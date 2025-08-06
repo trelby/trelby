@@ -1,7 +1,6 @@
-import wx
-
 import trelby.misc as misc
 import trelby.util as util
+import wx
 
 
 class PDFPanel(wx.Panel):
@@ -17,19 +16,23 @@ class PDFPanel(wx.Panel):
         if misc.isWindows:
             pad = 10
 
-        self.includeTOCCb = self.addCb("Add table of contents", vsizer, pad)
+        self.includeTOCCb = self.addCb(_("Add table of contents"), vsizer, pad)
 
-        self.showTOCCb = self.addCb("Show table of contents on PDF open", vsizer, pad)
-
-        self.openOnCurrentPageCb = self.addCb("Open PDF on current page", vsizer, pad)
-
-        self.removeNotesCb = self.addCb("Omit Note elements", vsizer, pad)
-
-        self.outlineNotesCb = self.addCb(
-            "  Draw rectangles around Note elements", vsizer, pad
+        self.showTOCCb = self.addCb(
+            _("Show table of contents on PDF open"), vsizer, pad
         )
 
-        self.marginsCb = self.addCb("Show margins (debug)", vsizer, pad)
+        self.openOnCurrentPageCb = self.addCb(
+            _("Open PDF on current page"), vsizer, pad
+        )
+
+        self.removeNotesCb = self.addCb(_("Omit Note elements"), vsizer, pad)
+
+        self.outlineNotesCb = self.addCb(
+            _("  Draw rectangles around Note elements"), vsizer, pad
+        )
+
+        self.marginsCb = self.addCb(_("Show margins (debug)"), vsizer, pad)
 
         self.cfg2gui()
 

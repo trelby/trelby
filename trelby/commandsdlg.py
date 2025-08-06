@@ -9,7 +9,7 @@ import trelby.util as util
 class CommandsDlg(wx.Frame):
     def __init__(self, cfgGl):
         wx.Frame.__init__(
-            self, None, -1, "Commands", size=(650, 600), style=wx.DEFAULT_FRAME_STYLE
+            self, None, -1, _("Commands"), size=(650, 600), style=wx.DEFAULT_FRAME_STYLE
         )
 
         # self.Center()
@@ -18,8 +18,8 @@ class CommandsDlg(wx.Frame):
         self.SetSizer(vsizer)
 
         s = (
-            '<table border="1"><tr><td><b>Key(s)</b></td>'
-            "<td><b>Command</b></td></tr>"
+            '<table border="1"><tr><td><b>' + _("Key(s)") + "</b></td>"
+            "<td><b>" + _("Command") + "</b></td></tr>"
         )
 
         for cmd in cfgGl.commands:
@@ -30,7 +30,7 @@ class CommandsDlg(wx.Frame):
                     k = util.Key.fromInt(key)
                     s += "%s<br>" % xss.escape(k.toStr())
             else:
-                s += "No key defined<br>"
+                s += _("No key defined") + "<br>"
 
             s += '</td><td valign="top">'
             s += "%s" % xss.escape(cmd.desc)
@@ -89,8 +89,8 @@ R                      Replace
     def OnSave(self, event):
         dlg = wx.FileDialog(
             self,
-            "Filename to save as",
-            wildcard="HTML files (*.html)|*.html|All files|*",
+            _("Filename to save as"),
+            wildcard=_("HTML files (*.html)|*.html|All files|*"),
             style=wx.FD_SAVE | wx.OVERWRITE_PROMPT,
         )
 

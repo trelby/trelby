@@ -1,9 +1,8 @@
-import wx
-
 import trelby.config as config
 import trelby.misc as misc
 import trelby.screenplay as screenplay
 import trelby.util as util
+import wx
 
 
 class ElementsPanel(wx.Panel):
@@ -16,7 +15,7 @@ class ElementsPanel(wx.Panel):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Element:"),
+            wx.StaticText(self, -1, _("Element:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -43,7 +42,7 @@ class ElementsPanel(wx.Panel):
         gsizer = wx.FlexGridSizer(2, 2, 5, 0)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Empty lines / 10 before:"),
+            wx.StaticText(self, -1, _("Empty lines / 10 before:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -59,7 +58,7 @@ class ElementsPanel(wx.Panel):
         self.beforeSpacingEntry = tmp
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Empty lines / 10 between:"),
+            wx.StaticText(self, -1, _("Empty lines / 10 between:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -79,7 +78,7 @@ class ElementsPanel(wx.Panel):
         gsizer = wx.FlexGridSizer(2, 3, 5, 0)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Indent:"),
+            wx.StaticText(self, -1, _("Indent:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -94,14 +93,14 @@ class ElementsPanel(wx.Panel):
         gsizer.Add(self.indentEntry, 0)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "characters (10 characters" " = 1 inch)"),
+            wx.StaticText(self, -1, _("characters (10 characters = 1 inch)")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
             10,
         )
 
         gsizer.Add(
-            wx.StaticText(self, -1, "Width:"),
+            wx.StaticText(self, -1, _("Width:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -116,7 +115,7 @@ class ElementsPanel(wx.Panel):
         gsizer.Add(self.widthEntry, 0)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "characters (10 characters" " = 1 inch)"),
+            wx.StaticText(self, -1, _("characters (10 characters = 1 inch)")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
             10,
@@ -142,10 +141,10 @@ class ElementsPanel(wx.Panel):
         if misc.isWindows:
             pad = 5
 
-        self.addCheckBox("Caps", prefix, parent, gsizer, pad)
-        self.addCheckBox("Italic", prefix, parent, gsizer, pad)
-        self.addCheckBox("Bold", prefix, parent, gsizer, pad)
-        self.addCheckBox("Underlined", prefix, parent, gsizer, pad)
+        self.addCheckBox(_("Caps"), prefix, parent, gsizer, pad)
+        self.addCheckBox(_("Italic"), prefix, parent, gsizer, pad)
+        self.addCheckBox(_("Bold"), prefix, parent, gsizer, pad)
+        self.addCheckBox(_("Underlined"), prefix, parent, gsizer, pad)
 
         hsizer.Add(gsizer, 0, wx.EXPAND)
 

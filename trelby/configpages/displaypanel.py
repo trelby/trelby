@@ -1,7 +1,6 @@
-import wx
-
 import trelby.misc as misc
 import trelby.util as util
+import wx
 
 
 class DisplayPanel(wx.Panel):
@@ -12,7 +11,7 @@ class DisplayPanel(wx.Panel):
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer.Add(wx.StaticText(self, -1, "Screen fonts:"))
+        vsizer.Add(wx.StaticText(self, -1, _("Screen fonts:")))
 
         self.fontsLb = wx.ListBox(self, -1, size=(300, 100))
 
@@ -22,7 +21,7 @@ class DisplayPanel(wx.Panel):
         vsizer.Add(self.fontsLb, 0, wx.BOTTOM, 10)
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
-        btn = wx.Button(self, -1, "Change")
+        btn = wx.Button(self, -1, _("Change"))
         self.Bind(wx.EVT_LISTBOX_DCLICK, self.OnChangeFont, id=self.fontsLb.GetId())
         self.Bind(wx.EVT_BUTTON, self.OnChangeFont, id=btn.GetId())
 
@@ -36,7 +35,7 @@ class DisplayPanel(wx.Panel):
 
         vsizer.Add(
             wx.StaticText(
-                self, -1, "The settings below apply only" " to 'Draft' view mode."
+                self, -1, _("The settings below apply only to 'Draft' view mode.")
             ),
             0,
             wx.BOTTOM,
@@ -46,7 +45,7 @@ class DisplayPanel(wx.Panel):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Row spacing:"),
+            wx.StaticText(self, -1, _("Row spacing:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -59,7 +58,10 @@ class DisplayPanel(wx.Panel):
         hsizer.Add(self.spacingEntry, 0)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "pixels"), 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10
+            wx.StaticText(self, -1, _("pixels")),
+            0,
+            wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
+            10,
         )
 
         vsizer.Add(hsizer, 0, wx.EXPAND | wx.BOTTOM, 15)
@@ -67,10 +69,10 @@ class DisplayPanel(wx.Panel):
         self.pbRb = wx.RadioBox(
             self,
             -1,
-            "Page break lines to show",
+            _("Page break lines to show"),
             style=wx.RA_SPECIFY_COLS,
             majorDimension=1,
-            choices=["None", "Normal", "Normal + unadjusted   "],
+            choices=[_("None"), _("Normal"), _("Normal + unadjusted   ")],
         )
         vsizer.Add(self.pbRb)
 
@@ -112,8 +114,8 @@ class DisplayPanel(wx.Panel):
                 self.updateFontLb()
             else:
                 wx.MessageBox(
-                    "The selected font is not fixed width and" " can not be used.",
-                    "Error",
+                    _("The selected font is not fixed width and can not be used."),
+                    _("Error"),
                     wx.OK,
                     self.cfgFrame,
                 )
@@ -149,10 +151,10 @@ class DisplayPanel(wx.Panel):
             widths.add(util.getTextExtent(f, "iw")[0])
 
         if len(widths) > 1:
-            self.errText.SetLabel("Fonts have different widths")
+            self.errText.SetLabel(_("Fonts have different widths"))
             self.errText.SetForegroundColour((255, 0, 0))
         else:
-            self.errText.SetLabel("Fonts have matching widths")
+            self.errText.SetLabel(_("Fonts have matching widths"))
             self.errText.SetForegroundColour(self.origColor)
 
     def cfg2gui(self):

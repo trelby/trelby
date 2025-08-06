@@ -78,7 +78,7 @@ class Font:
 
         for name, func in self.parseFuncs.items():
             if not func[1]:
-                raise ParseError("Table %s missing/invalid" % name)
+                raise ParseError(_("Table {} missing/invalid".format(name)))
 
     # parse a single tag
     def parseTag(self, offset, s):
@@ -114,7 +114,7 @@ class Font:
 
             offset += NAME_RECORD_SIZE
 
-        raise ParseError("No Postscript name found")
+        raise ParseError(_("No Postscript name found"))
 
     # parse a single name record. s2 is string storage. returns True if
     # this record is a valid Postscript name.

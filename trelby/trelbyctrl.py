@@ -131,13 +131,16 @@ class MyCtrl(wx.Control):
             (sp, msg) = screenplay.Screenplay.load(s, self.gd.cfgGl)
         except TrelbyError as e:
             wx.MessageBox(
-                "Error loading file:\n\n%s" % e, "Error", wx.OK, self.gd.mainFrame
+                _("Error loading file:\n\n{}".format(e)),
+                _("Error"),
+                wx.OK,
+                self.gd.mainFrame,
             )
 
             return
 
         if msg:
-            misc.showText(self.gd.mainFrame, msg, "Warning")
+            misc.showText(self.gd.mainFrame, msg, _("Warning"))
 
         self.clearVars()
         self.sp = sp
@@ -193,10 +196,10 @@ class MyCtrl(wx.Control):
     # generate exportable text from given screenplay, or None.
     def getExportText(self, sp):
         inf = []
-        inf.append(misc.CheckBoxItem("Include page markers"))
+        inf.append(misc.CheckBoxItem(_("Include page markers")))
 
         dlg = misc.CheckBoxDlg(
-            self.gd.mainFrame, "Output options", inf, "Options:", False
+            self.gd.mainFrame, _("Output options"), inf, _("Options:"), False
         )
 
         if dlg.ShowModal() != wx.ID_OK:
@@ -208,10 +211,10 @@ class MyCtrl(wx.Control):
 
     def getExportHtml(self, sp):
         inf = []
-        inf.append(misc.CheckBoxItem("Include Notes"))
+        inf.append(misc.CheckBoxItem(_("Include Notes")))
 
         dlg = misc.CheckBoxDlg(
-            self.gd.mainFrame, "Output options", inf, "Options:", False
+            self.gd.mainFrame, _("Output options"), inf, _("Options:"), False
         )
 
         if dlg.ShowModal() != wx.ID_OK:
@@ -405,9 +408,12 @@ class MyCtrl(wx.Control):
             if line != -1:
                 if (
                     wx.MessageBox(
-                        "The script seems to contain errors.\n"
-                        "Are you sure you want to %s it?" % action,
-                        "Confirm",
+                        _(
+                            "The script seems to contain errors.\nAre you sure you want to {} it?".format(
+                                action
+                            )
+                        ),
+                        _("Confirm"),
                         wx.YES_NO | wx.NO_DEFAULT,
                         self.gd.mainFrame,
                     )
@@ -594,8 +600,8 @@ class MyCtrl(wx.Control):
     def OnCompareScripts(self):
         if self.gd.mainFrame.tabCtrl.getPageCount() < 2:
             wx.MessageBox(
-                "You need at least two scripts open to" " compare them.",
-                "Error",
+                _("You need at least two scripts open to compare them."),
+                _("Error"),
                 wx.OK,
                 self.gd.mainFrame,
             )
@@ -622,8 +628,8 @@ class MyCtrl(wx.Control):
 
         if sel1 == sel2:
             wx.MessageBox(
-                "You can't compare a script to itself.",
-                "Error",
+                _("You can't compare a script to itself."),
+                _("Error"),
                 wx.OK,
                 self.gd.mainFrame,
             )
@@ -651,16 +657,17 @@ class MyCtrl(wx.Control):
             gutil.showTempPDF(s, self.gd.cfgGl, self.gd.mainFrame)
         else:
             wx.MessageBox(
-                "The scripts are identical.", "Results", wx.OK, self.gd.mainFrame
+                _("The scripts are identical."), _("Results"), wx.OK, self.gd.mainFrame
             )
 
     def canBeClosed(self):
         if self.sp.isModified():
             if (
                 wx.MessageBox(
-                    "The script has been modified. Are you sure\n"
-                    "you want to discard the changes?",
-                    "Confirm",
+                    _(
+                        "The script has been modified. Are you sure\nyou want to discard the changes?"
+                    ),
+                    _("Confirm"),
                     wx.YES_NO | wx.NO_DEFAULT,
                     self.gd.mainFrame,
                 )
@@ -839,12 +846,12 @@ class MyCtrl(wx.Control):
             if s in [x[0] for x in scenes]:
                 return ""
             else:
-                return "Invalid scene number."
+                return _("Invalid scene number.")
 
         dlg = misc.TextInputDlg(
             self.gd.mainFrame,
-            "Enter scene number (%s - %s):" % (scenes[0][0], scenes[-1][0]),
-            "Goto scene",
+            _("Enter scene number ({} - {}):".format(scenes[0][0], scenes[-1][0])),
+            _("Goto scene"),
             validateFunc,
         )
 
@@ -871,12 +878,12 @@ class MyCtrl(wx.Control):
             if s in pages:
                 return ""
             else:
-                return "Invalid page number."
+                return _("Invalid page number.")
 
         dlg = misc.TextInputDlg(
             self.gd.mainFrame,
-            "Enter page number (%s - %s):" % (pages[0], pages[-1]),
-            "Goto page",
+            _("Enter page number ({} - {}):".format(pages[0], pages[-1])),
+            _("Goto page"),
             validateFunc,
         )
 
@@ -906,9 +913,9 @@ class MyCtrl(wx.Control):
             self.updateScreen()
 
         else:
-            msg = "No errors found."
+            msg = _("No errors found.")
 
-        wx.MessageBox(msg, "Results", wx.OK, self.gd.mainFrame)
+        wx.MessageBox(msg, _("Results"), wx.OK, self.gd.mainFrame)
 
     def OnFind(self):
         self.sp.clearMark()
@@ -946,13 +953,12 @@ class MyCtrl(wx.Control):
             s = ""
 
             if not wasAtStart:
-                s = (
-                    "\n\n(Starting position was not at\n"
-                    "the beginning of the script.)"
+                s = _(
+                    "\n\n(Starting position was not at\nthe beginning of the script.)"
                 )
             wx.MessageBox(
-                "Spell checker found no errors." + s,
-                "Results",
+                _("Spell checker found no errors.") + s,
+                _("Results"),
                 wx.OK,
                 self.gd.mainFrame,
             )
@@ -983,9 +989,9 @@ class MyCtrl(wx.Control):
 
         dlg = misc.CheckBoxDlg(
             self.gd.mainFrame,
-            "Delete elements",
+            _("Delete elements"),
             types,
-            "Element types to delete:",
+            _("Element types to delete:"),
             True,
         )
 
@@ -1021,7 +1027,7 @@ class MyCtrl(wx.Control):
 
         dlg = wx.FileDialog(
             self.gd.mainFrame,
-            "Filename to save as",
+            _("Filename to save as"),
             defaultDir=dDir,
             defaultFile=dFile,
             wildcard="Trelby files (*.trelby)|*.trelby|All files|*",
@@ -1039,7 +1045,7 @@ class MyCtrl(wx.Control):
 
         dlg = wx.FileDialog(
             self.gd.mainFrame,
-            "Filename to export as",
+            _("Filename to export as"),
             misc.scriptDir,
             wildcard="PDF|*.pdf|"
             "RTF|*.rtf|"
@@ -1254,7 +1260,7 @@ class MyCtrl(wx.Control):
 
             t = time.time() - t
 
-            print("%.5f seconds per %s" % (t / count, name))
+            print(_("{.5f} seconds per {}".format(t / count, name)))
 
         print("-" * 20)
 

@@ -1,5 +1,6 @@
 # -*- coding: iso-8859-1 -*-
 
+import gettext
 import os
 import os.path
 import sys
@@ -12,6 +13,7 @@ import trelby.misc as misc
 import trelby.opts as opts
 import trelby.splash as splash
 import trelby.util as util
+import trelby.translations as translations
 from trelby.globaldata import GlobalData
 from trelby.trelbyframe import MyFrame
 
@@ -29,16 +31,21 @@ KC_CTRL_P = 16
 KC_CTRL_V = 22
 
 
+_ = translations.trelby_translations_load()
+
+
 class MyApp(wx.App):
 
     def OnInit(self):
 
         if (wx.MAJOR_VERSION != 4) or (wx.MINOR_VERSION < 0):
             wx.MessageBox(
-                "You seem to have an invalid version\n"
-                "(%s) of wxWidgets installed. This\n"
-                "program needs version 4.x." % wx.VERSION_STRING,
-                "Error",
+                _(
+                    "You seem to have an invalid version\n({}) of wxWidgets installed. This\nprogram needs version 4.x.".format(
+                        wx.VERSION_STRING
+                    )
+                ),
+                _("Error"),
                 wx.OK,
             )
             sys.exit()
@@ -52,19 +59,20 @@ class MyApp(wx.App):
             major = sys.getwindowsversion()[0]
             if major < 5:
                 wx.MessageBox(
-                    "You seem to have a version of Windows\n"
-                    "older than Windows 2000, which is the minimum\n"
-                    "requirement for this program.",
-                    "Error",
+                    _(
+                        "You seem to have a version of Windows\nolder than Windows 2000, which is the minimum\nrequirement for this program."
+                    ),
+                    _("Error"),
                     wx.OK,
                 )
                 sys.exit()
 
         if not "unicode" in wx.PlatformInfo:
             wx.MessageBox(
-                "You seem to be using a non-Unicode build of\n"
-                "wxWidgets. This is not supported.",
-                "Error",
+                _(
+                    "You seem to be using a non-Unicode build of\n wxWidgets. This is not supported."
+                ),
+                _("Error"),
                 wx.OK,
             )
             sys.exit()

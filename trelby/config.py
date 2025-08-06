@@ -690,120 +690,124 @@ class ConfigGlobal:
             else [
                 Command(
                     "Abort",
-                    "Abort something, e.g. selection," " auto-completion, etc.",
+                    _("Abort something, e.g. selection, auto-completion, etc."),
                     [wx.WXK_ESCAPE],
                     isFixed=True,
                 ),
-                Command("About", "Show the about dialog.", isMenu=True),
+                Command("About", _("Show the about dialog."), isMenu=True),
                 Command(
-                    "AutoCompletionDlg", "Open the auto-completion dialog.", isMenu=True
+                    "AutoCompletionDlg",
+                    _("Open the auto-completion dialog."),
+                    isMenu=True,
                 ),
                 Command(
                     "ChangeToActBreak",
-                    "Change current element's style to" " act break.",
+                    _("Change current element's style to act break."),
                     [util.Key(ord("B"), alt=True).toInt()],
                 ),
                 Command(
                     "ChangeToAction",
-                    "Change current element's style to" " action.",
+                    _("Change current element's style to action."),
                     [util.Key(ord("A"), alt=True).toInt()],
                 ),
                 Command(
                     "ChangeToCharacter",
-                    "Change current element's style to" " character.",
+                    _("Change current element's style to character."),
                     [util.Key(ord("C"), alt=True).toInt()],
                 ),
                 Command(
                     "ChangeToDialogue",
-                    "Change current element's style to" " dialogue.",
+                    _("Change current element's style to dialogue."),
                     [util.Key(ord("D"), alt=True).toInt()],
                 ),
                 Command(
                     "ChangeToNote",
-                    "Change current element's style to note.",
+                    _("Change current element's style to note."),
                     [util.Key(ord("N"), alt=True).toInt()],
                 ),
                 Command(
                     "ChangeToParenthetical",
-                    "Change current element's" " style to parenthetical.",
+                    _("Change current element's style to parenthetical."),
                     [util.Key(ord("P"), alt=True).toInt()],
                 ),
                 Command(
                     "ChangeToScene",
-                    "Change current element's style to" " scene.",
+                    _("Change current element's style to" " scene."),
                     [util.Key(ord("S"), alt=True).toInt()],
                 ),
-                Command("ChangeToShot", "Change current element's style to" " shot."),
+                Command("ChangeToShot", _("Change current element's style to shot.")),
                 Command(
                     "ChangeToTransition",
-                    "Change current element's style to" " transition.",
+                    _("Change current element's style to transition."),
                     [util.Key(ord("T"), alt=True).toInt()],
                 ),
-                Command("CharacterMap", "Open the character map.", isMenu=True),
+                Command("CharacterMap", _("Open the character map."), isMenu=True),
                 Command(
                     "CloseScript",
-                    "Close the current script.",
+                    _("Close the current script."),
                     [util.Key(23, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
-                Command("CompareScripts", "Compare two scripts.", isMenu=True),
+                Command("CompareScripts", _("Compare two scripts."), isMenu=True),
                 Command(
                     "Copy",
-                    "Copy selected text to the internal clipboard.",
+                    _("Copy selected text to the internal clipboard."),
                     [util.Key(3, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "CopySystemCb",
-                    "Copy selected text to the system's" " clipboard, unformatted.",
+                    _("Copy selected text to the system's clipboard, unformatted."),
                     isMenu=True,
                 ),
                 Command(
                     "CopySystemCbFormatted",
-                    "Copy selected text to the system's" " clipboard, formatted.",
+                    _("Copy selected text to the system's clipboard, formatted."),
                     isMenu=True,
                 ),
                 Command(
                     "Cut",
-                    "Cut selected text to internal clipboard.",
+                    _("Cut selected text to internal clipboard."),
                     [util.Key(24, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "Delete",
-                    "Delete the character under the cursor," " or selected text.",
+                    _("Delete the character under the cursor, or selected text."),
                     [wx.WXK_DELETE],
                     isFixed=True,
                 ),
                 Command(
                     "DeleteBackward",
-                    "Delete the character behind the" " cursor.",
+                    _("Delete the character behind the cursor."),
                     [wx.WXK_BACK, util.Key(wx.WXK_BACK, shift=True).toInt()],
                     isFixed=True,
                 ),
                 Command(
-                    "DeleteElements", "Open the 'Delete elements' dialog.", isMenu=True
+                    "DeleteElements",
+                    _("Open the 'Delete elements' dialog."),
+                    isMenu=True,
                 ),
-                Command("ExportScript", "Export the current script.", isMenu=True),
+                Command("ExportScript", _("Export the current script."), isMenu=True),
                 Command(
                     "FindAndReplaceDlg",
-                    "Open the 'Find & Replace' dialog.",
+                    _("Open the 'Find & Replace' dialog."),
                     [util.Key(6, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "FindNextError",
-                    "Find next error in the current script.",
+                    _("Find next error in the current script."),
                     [util.Key(5, ctrl=True).toInt()],
                     isMenu=True,
                 ),
                 Command(
                     "ForcedLineBreak",
-                    "Insert a forced line break.",
+                    _("Insert a forced line break."),
                     [
                         util.Key(wx.WXK_RETURN, ctrl=True).toInt(),
                         util.Key(wx.WXK_RETURN, shift=True).toInt(),
@@ -814,210 +818,222 @@ class ConfigGlobal:
                 ),
                 Command(
                     "Fullscreen",
-                    "Toggle fullscreen.",
+                    _("Toggle fullscreen."),
                     [util.Key(wx.WXK_F11).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "GotoPage",
-                    "Goto to a given page.",
+                    _("Goto to a given page."),
                     [util.Key(7, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "GotoScene",
-                    "Goto to a given scene.",
+                    _("Goto to a given scene."),
                     [util.Key(ord("G"), alt=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
-                Command("HeadersDlg", "Open the headers dialog.", isMenu=True),
+                Command("HeadersDlg", _("Open the headers dialog."), isMenu=True),
                 Command(
                     "HelpCommands",
-                    "Show list of commands and their key" " bindings.",
+                    _("Show list of commands and their key bindings."),
                     isMenu=True,
                 ),
-                Command("HelpManual", "Open the manual.", isMenu=True),
-                Command("ImportScript", "Import a script.", isMenu=True),
+                Command("HelpManual", _("Open the manual."), isMenu=True),
+                Command("ImportScript", _("Import a script."), isMenu=True),
                 Command(
                     "InsertNbsp",
-                    "Insert non-breaking space.",
+                    _("Insert non-breaking space."),
                     [util.Key(wx.WXK_SPACE, shift=True, ctrl=True).toInt()],
                     isMenu=True,
                 ),
                 Command(
-                    "LoadScriptSettings", "Load script-specific settings.", isMenu=True
+                    "LoadScriptSettings",
+                    _("Load script-specific settings."),
+                    isMenu=True,
                 ),
-                Command("LoadSettings", "Load global settings.", isMenu=True),
-                Command("LocationsDlg", "Open the locations dialog.", isMenu=True),
+                Command("LoadSettings", _("Load global settings."), isMenu=True),
+                Command("LocationsDlg", _("Open the locations dialog."), isMenu=True),
                 Command(
                     "MoveDown",
-                    "Move down.",
+                    _("Move down."),
                     [wx.WXK_DOWN],
                     isMovement=True,
                     scrollDirection=SCROLL_DOWN,
                 ),
                 Command(
                     "MoveEndOfLine",
-                    "Move to the end of the line or" " finish auto-completion.",
+                    _("Move to the end of the line or finish auto-completion."),
                     [wx.WXK_END],
                     isMovement=True,
                 ),
                 Command(
                     "MoveEndOfScript",
-                    "Move to the end of the script.",
+                    _("Move to the end of the script."),
                     [util.Key(wx.WXK_END, ctrl=True).toInt()],
                     isMovement=True,
                 ),
-                Command("MoveLeft", "Move left.", [wx.WXK_LEFT], isMovement=True),
+                Command("MoveLeft", _("Move left."), [wx.WXK_LEFT], isMovement=True),
                 Command(
                     "MoveNextWord",
-                    "Move to start of next word.",
+                    _("Move to start of next word."),
                     [util.Key(wx.WXK_RIGHT, ctrl=True).toInt()],
                     isMovement=True,
                     isFixed=True,
                 ),
                 Command(
                     "MovePageDown",
-                    "Move one page down.",
+                    _("Move one page down."),
                     [wx.WXK_PAGEDOWN],
                     isMovement=True,
                 ),
                 Command(
-                    "MovePageUp", "Move one page up.", [wx.WXK_PAGEUP], isMovement=True
+                    "MovePageUp",
+                    _("Move one page up."),
+                    [wx.WXK_PAGEUP],
+                    isMovement=True,
                 ),
                 Command(
                     "MovePrevWord",
-                    "Move to start of previous word.",
+                    _("Move to start of previous word."),
                     [util.Key(wx.WXK_LEFT, ctrl=True).toInt()],
                     isMovement=True,
                     isFixed=True,
                 ),
-                Command("MoveRight", "Move right.", [wx.WXK_RIGHT], isMovement=True),
+                Command("MoveRight", _("Move right."), [wx.WXK_RIGHT], isMovement=True),
                 Command(
                     "MoveSceneDown",
-                    "Move one scene down.",
+                    _("Move one scene down."),
                     [util.Key(wx.WXK_DOWN, ctrl=True).toInt()],
                     isMovement=True,
                 ),
                 Command(
                     "MoveSceneUp",
-                    "Move one scene up.",
+                    _("Move one scene up."),
                     [util.Key(wx.WXK_UP, ctrl=True).toInt()],
                     isMovement=True,
                 ),
                 Command(
                     "MoveStartOfLine",
-                    "Move to the start of the line.",
+                    _("Move to the start of the line."),
                     [wx.WXK_HOME],
                     isMovement=True,
                 ),
                 Command(
                     "MoveStartOfScript",
-                    "Move to the start of the" " script.",
+                    _("Move to the start of the" " script."),
                     [util.Key(wx.WXK_HOME, ctrl=True).toInt()],
                     isMovement=True,
                 ),
                 Command(
                     "MoveUp",
-                    "Move up.",
+                    _("Move up."),
                     [wx.WXK_UP],
                     isMovement=True,
                     scrollDirection=SCROLL_UP,
                 ),
                 Command(
-                    "NameDatabase", "Open the character name database.", isMenu=True
+                    "NameDatabase", _("Open the character name database."), isMenu=True
                 ),
                 Command(
-                    "NewElement", "Create a new element.", [wx.WXK_RETURN], isFixed=True
+                    "NewElement",
+                    _("Create a new element."),
+                    [wx.WXK_RETURN],
+                    isFixed=True,
                 ),
                 Command(
                     "NewScript",
-                    "Create a new script.",
+                    _("Create a new script."),
                     [util.Key(14, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "OpenScript",
-                    "Open a script.",
+                    _("Open a script."),
                     [util.Key(15, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
-                Command("Paginate", "Paginate current script.", isMenu=True),
+                Command("Paginate", _("Paginate current script."), isMenu=True),
                 Command(
                     "Paste",
-                    "Paste text from the internal clipboard.",
+                    _("Paste text from the internal clipboard."),
                     [util.Key(22, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "PasteSystemCb",
-                    "Paste text from the system's" " clipboard.",
+                    _("Paste text from the system's clipboard."),
                     isMenu=True,
                 ),
                 Command(
                     "PrintScript",
-                    "Print current script.",
+                    _("Print current script."),
                     [util.Key(16, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "Quit",
-                    "Quit the program.",
+                    _("Quit the program."),
                     [util.Key(17, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "Redo",
-                    "Redo a change that was reverted through undo.",
+                    _("Redo a change that was reverted through undo."),
                     [util.Key(25, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
-                Command("ReportCharacter", "Generate character report.", isMenu=True),
+                Command(
+                    "ReportCharacter", _("Generate character report."), isMenu=True
+                ),
                 Command(
                     "ReportDialogueChart",
-                    "Generate dialogue chart report.",
+                    _("Generate dialogue chart report."),
                     isMenu=True,
                 ),
-                Command("ReportLocation", "Generate location report.", isMenu=True),
-                Command("ReportScene", "Generate scene report.", isMenu=True),
-                Command("ReportScript", "Generate script report.", isMenu=True),
+                Command("ReportLocation", _("Generate location report."), isMenu=True),
+                Command("ReportScene", _("Generate scene report."), isMenu=True),
+                Command("ReportScript", _("Generate script report."), isMenu=True),
                 Command(
                     "RevertScript",
-                    "Revert current script to the" " version on disk.",
+                    _("Revert current script to the version on disk."),
                     isMenu=True,
                 ),
                 Command(
                     "SaveScript",
-                    "Save the current script.",
+                    _("Save the current script."),
                     [util.Key(19, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
                 Command(
                     "SaveScriptAs",
-                    "Save the current script to a new file.",
+                    _("Save the current script to a new file."),
                     isMenu=True,
                 ),
                 Command(
                     "SaveScriptSettingsAs",
-                    "Save script-specific settings" " to a new file.",
+                    _("Save script-specific settings to a new file."),
                     isMenu=True,
                 ),
                 Command(
-                    "SaveSettingsAs", "Save global settings to a new file.", isMenu=True
+                    "SaveSettingsAs",
+                    _("Save global settings to a new file."),
+                    isMenu=True,
                 ),
                 Command(
                     "ScriptNext",
-                    "Change to next open script.",
+                    _("Change to next open script."),
                     [
                         util.Key(wx.WXK_TAB, ctrl=True).toInt(),
                         util.Key(wx.WXK_PAGEDOWN, ctrl=True).toInt(),
@@ -1026,7 +1042,7 @@ class ConfigGlobal:
                 ),
                 Command(
                     "ScriptPrev",
-                    "Change to previous open script.",
+                    _("Change to previous open script."),
                     [
                         util.Key(wx.WXK_TAB, shift=True, ctrl=True).toInt(),
                         util.Key(wx.WXK_PAGEUP, ctrl=True).toInt(),
@@ -1034,71 +1050,74 @@ class ConfigGlobal:
                     isMenu=True,
                 ),
                 Command(
-                    "ScriptSettings", "Change script-specific settings.", isMenu=True
+                    "ScriptSettings", _("Change script-specific settings."), isMenu=True
                 ),
-                Command("SelectAll", "Select the entire script.", isMenu=True),
+                Command("SelectAll", _("Select the entire script."), isMenu=True),
                 Command(
                     "SelectScene",
-                    "Select the current scene.",
+                    _("Select the current scene."),
                     [util.Key(1, ctrl=True).toInt()],
                     isMenu=True,
                 ),
                 Command(
                     "SetMark",
-                    "Set mark at current cursor position.",
+                    _("Set mark at current cursor position."),
                     [util.Key(wx.WXK_SPACE, ctrl=True).toInt()],
                 ),
-                Command("Settings", "Change global settings.", isMenu=True),
+                Command("Settings", _("Change global settings."), isMenu=True),
                 Command(
                     "SpellCheckerDictionaryDlg",
-                    "Open the global spell checker dictionary dialog.",
+                    _("Open the global spell checker dictionary dialog."),
                     isMenu=True,
                 ),
                 Command(
                     "SpellCheckerDlg",
-                    "Spell check the script.",
+                    _("Spell check the script."),
                     [util.Key(wx.WXK_F8).toInt()],
                     isMenu=True,
                 ),
                 Command(
                     "SpellCheckerScriptDictionaryDlg",
-                    "Open the script-specific spell checker dictionary" " dialog.",
+                    _("Open the script-specific spell checker dictionary dialog."),
                     isMenu=True,
                 ),
                 Command(
                     "Tab",
-                    "Change current element to the next style or"
-                    " create a new element.",
+                    _(
+                        "Change current element to the next style or create a new element."
+                    ),
                     [wx.WXK_TAB],
                     isFixed=True,
                 ),
                 Command(
                     "TabPrev",
-                    "Change current element to the previous" " style.",
+                    _("Change current element to the previous style."),
                     [util.Key(wx.WXK_TAB, shift=True).toInt()],
                     isFixed=True,
                 ),
-                Command("TitlesDlg", "Open the titles dialog.", isMenu=True),
+                Command("TitlesDlg", _("Open the titles dialog."), isMenu=True),
                 Command(
                     "ToggleShowFormatting",
-                    "Toggle 'Show formatting'" " display.",
+                    _("Toggle 'Show formatting' display."),
                     isMenu=True,
                 ),
                 Command(
                     "Undo",
-                    "Undo the last change.",
+                    _("Undo the last change."),
                     [util.Key(26, ctrl=True).toInt()],
                     isFixed=True,
                     isMenu=True,
                 ),
-                Command("ViewModeDraft", "Change view mode to draft.", isMenu=True),
-                Command("ViewModeLayout", "Change view mode to layout.", isMenu=True),
+                Command("ViewModeDraft", _("Change view mode to draft."), isMenu=True),
+                Command(
+                    "ViewModeLayout", _("Change view mode to layout."), isMenu=True
+                ),
                 Command(
                     "ViewModeSideBySide",
-                    "Change view mode to side by" " side.",
+                    _("Change view mode to side by side."),
                     isMenu=True,
                 ),
-                Command("Watermark", "Generate watermarked PDFs.", isMenu=True),
+                Command("Watermark", _("Generate watermarked PDFs."), isMenu=True),
             ]
         )
 
@@ -1159,18 +1178,18 @@ class ConfigGlobal:
         v.addStrUnicode("scriptDir", misc.progPath, "DefaultScriptDirectory")
 
         # colors
-        v.addColor("text", 0, 0, 0, "TextFG", "Text foreground")
+        v.addColor("text", 0, 0, 0, "TextFG", _("Text foreground"))
         v.addColor(
-            "textHdr", 128, 128, 128, "TextHeadersFG", "Text foreground (headers)"
+            "textHdr", 128, 128, 128, "TextHeadersFG", _("Text foreground (headers)")
         )
-        v.addColor("textBg", 255, 255, 255, "TextBG", "Text background")
-        v.addColor("workspace", 237, 237, 237, "Workspace", "Workspace")
-        v.addColor("pageBorder", 202, 202, 202, "PageBorder", "Page border")
-        v.addColor("pageShadow", 153, 153, 153, "PageShadow", "Page shadow")
-        v.addColor("selected", 200, 200, 200, "Selected", "Selection")
-        v.addColor("cursor", 135, 135, 253, "Cursor", "Cursor")
+        v.addColor("textBg", 255, 255, 255, "TextBG", _("Text background"))
+        v.addColor("workspace", 237, 237, 237, "Workspace", _("Workspace"))
+        v.addColor("pageBorder", 202, 202, 202, "PageBorder", _("Page border"))
+        v.addColor("pageShadow", 153, 153, 153, "PageShadow", _("Page shadow"))
+        v.addColor("selected", 200, 200, 200, "Selected", _("Selection"))
+        v.addColor("cursor", 135, 135, 253, "Cursor", _("Cursor"))
         v.addColor(
-            "autoCompFg", 0, 0, 0, "AutoCompletionFG", "Auto-completion foreground"
+            "autoCompFg", 0, 0, 0, "AutoCompletionFG", _("Auto-completion foreground")
         )
         v.addColor(
             "autoCompBg",
@@ -1178,23 +1197,25 @@ class ConfigGlobal:
             240,
             168,
             "AutoCompletionBG",
-            "Auto-completion background",
+            _("Auto-completion background"),
         )
-        v.addColor("note", 255, 237, 223, "ScriptNote", "Script note")
-        v.addColor("pagebreak", 221, 221, 221, "PageBreakLine", "Page-break line")
+        v.addColor("note", 255, 237, 223, "ScriptNote", _("Script note"))
+        v.addColor("pagebreak", 221, 221, 221, "PageBreakLine", _("Page-break line"))
         v.addColor(
             "pagebreakNoAdjust",
             221,
             221,
             221,
             "PageBreakNoAdjustLine",
-            "Page-break (original, not adjusted) line",
+            _("Page-break (original, not adjusted) line"),
         )
 
-        v.addColor("tabText", 50, 50, 50, "TabText", "Tab text")
-        v.addColor("tabBorder", 202, 202, 202, "TabBorder", "Tab border")
-        v.addColor("tabBarBg", 221, 217, 215, "TabBarBG", "Tab bar background")
-        v.addColor("tabNonActiveBg", 180, 180, 180, "TabNonActiveBg", "Tab, non-active")
+        v.addColor("tabText", 50, 50, 50, "TabText", _("Tab text"))
+        v.addColor("tabBorder", 202, 202, 202, "TabBorder", _("Tab border"))
+        v.addColor("tabBarBg", 221, 217, 215, "TabBarBG", _("Tab bar background"))
+        v.addColor(
+            "tabNonActiveBg", 180, 180, 180, "TabNonActiveBg", _("Tab, non-active")
+        )
 
         for t in getTIs():
             v.addColor(
@@ -1203,7 +1224,7 @@ class ConfigGlobal:
                 0,
                 0,
                 "Text%sFG" % t.name,
-                "Text foreground for %s" % t.name,
+                _("Text foreground for {}".format(t.name)),
             )
 
         v.makeDicts()
@@ -1315,7 +1336,7 @@ class ConfigGlobal:
             # if you get this error, you've put a new command you've added
             # in an incorrect place in the command list. uncomment the
             # above lines to figure out where it should be.
-            raise ConfigError("Commands not listed in correct order")
+            raise ConfigError(_("Commands not listed in correct order"))
 
         self.setDefaultFonts()
         self.findPDFViewer()
@@ -1337,7 +1358,7 @@ class ConfigGlobal:
             fn[3] = "0;-13;0;0;0;700;255;0;0;0;3;2;1;49;Courier New"
 
         else:
-            raise ConfigError("Unknown platform")
+            raise ConfigError(_("Unknown platform"))
 
         self.fontNormal = fn[0]
         self.fontBold = fn[1]
@@ -1485,7 +1506,7 @@ class ConfigGui:
 def _conv(dict, key, raiseException=True):
     val = dict.get(key)
     if (val == None) and raiseException:
-        raise ConfigError("key '%s' not found from '%s'" % (key, dict))
+        raise ConfigError(_("key '{}' not found from '{}'".format(key, dict)))
 
     return val
 

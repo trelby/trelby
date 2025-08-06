@@ -35,7 +35,7 @@ class SceneReport:
         # to unpack the list)
         (self.INF_SPEAKERS,) = list(range(1))
         self.inf = []
-        for s in ["Speakers"]:
+        for s in [_("Speakers")]:
             self.inf.append(misc.CheckBoxItem(s))
 
     def generate(self) -> bytes:
@@ -51,13 +51,13 @@ class SceneReport:
             tf.addSpace(1.0)
 
             tf.addText(
-                "     Lines: %d (%s%% action), Pages: %d"
-                " (%s)"
-                % (
-                    si.lines,
-                    util.pct(si.actionLines, si.lines),
-                    len(si.pages),
-                    si.pages,
+                _(
+                    "     Lines: {} (%{} action), Pages: {} ({})".format(
+                        si.lines,
+                        util.pct(si.actionLines, si.lines),
+                        len(si.pages),
+                        si.pages,
+                    )
                 )
             )
 

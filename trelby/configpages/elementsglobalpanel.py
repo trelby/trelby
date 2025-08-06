@@ -1,7 +1,6 @@
-import wx
-
 import trelby.config as config
 import trelby.util as util
+import wx
 
 
 class ElementsGlobalPanel(wx.Panel):
@@ -14,7 +13,7 @@ class ElementsGlobalPanel(wx.Panel):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Element:"),
+            wx.StaticText(self, -1, _("Element:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -33,10 +32,10 @@ class ElementsGlobalPanel(wx.Panel):
 
         gsizer = wx.FlexGridSizer(0, 2, 5, 0)
 
-        self.addTypeCombo("newEnter", "Enter creates", self, gsizer)
-        self.addTypeCombo("newTab", "Tab creates", self, gsizer)
-        self.addTypeCombo("nextTab", "Tab switches to", self, gsizer)
-        self.addTypeCombo("prevTab", "Shift+Tab switches to", self, gsizer)
+        self.addTypeCombo("newEnter", _("Enter creates"), self, gsizer)
+        self.addTypeCombo("newTab", _("Tab creates"), self, gsizer)
+        self.addTypeCombo("nextTab", _("Tab switches to"), self, gsizer)
+        self.addTypeCombo("prevTab", _("Shift+Tab switches to"), self, gsizer)
 
         vsizer.Add(gsizer)
 
@@ -64,7 +63,7 @@ class ElementsGlobalPanel(wx.Panel):
 
         self.Bind(wx.EVT_COMBOBOX, self.OnMisc, id=combo.GetId())
 
-        setattr(self, name + "Combo", combo)
+        setattr(self, name + _("Combo"), combo)
 
     def OnElementCombo(self, event=None):
         self.lt = self.elementsCombo.GetClientData(self.elementsCombo.GetSelection())

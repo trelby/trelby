@@ -1,21 +1,21 @@
 import wx
 
 import trelby.gutil as gutil
+from trelby.configpages.colorspanel import ColorsPanel
+from trelby.configpages.displaypanel import DisplayPanel
+from trelby.configpages.elementsglobalpanel import ElementsGlobalPanel
+from trelby.configpages.elementspanel import ElementsPanel
+from trelby.configpages.formattingpanel import FormattingPanel
 
 # import config pages
 from trelby.configpages.globalaboutpanel import GlobalAboutPanel
-from trelby.configpages.scriptaboutpanel import ScriptAboutPanel
-from trelby.configpages.elementspanel import ElementsPanel
-from trelby.configpages.elementsglobalpanel import ElementsGlobalPanel
-from trelby.configpages.colorspanel import ColorsPanel
-from trelby.configpages.displaypanel import DisplayPanel
 from trelby.configpages.keyboardpanel import KeyboardPanel
-from trelby.configpages.formattingpanel import FormattingPanel
-from trelby.configpages.paperpanel import PaperPanel
-from trelby.configpages.pdfpanel import PDFPanel
-from trelby.configpages.pdffontspanel import PDFFontsPanel
-from trelby.configpages.stringspanel import StringsPanel
 from trelby.configpages.miscpanel import MiscPanel
+from trelby.configpages.paperpanel import PaperPanel
+from trelby.configpages.pdffontspanel import PDFFontsPanel
+from trelby.configpages.pdfpanel import PDFPanel
+from trelby.configpages.scriptaboutpanel import ScriptAboutPanel
+from trelby.configpages.stringspanel import StringsPanel
 
 
 class CfgDlg(wx.Dialog):
@@ -31,24 +31,24 @@ class CfgDlg(wx.Dialog):
         self.listbook = wx.Listbook(self, -1)
 
         if isGlobal:
-            self.SetTitle("Settings dialog")
+            self.SetTitle(_("Settings dialog"))
 
-            self.AddPage(GlobalAboutPanel, "About")
-            self.AddPage(ColorsPanel, "Colors")
-            self.AddPage(DisplayPanel, "Display")
-            self.AddPage(ElementsGlobalPanel, "Elements")
-            self.AddPage(KeyboardPanel, "Keyboard")
-            self.AddPage(MiscPanel, "Misc")
+            self.AddPage(GlobalAboutPanel, _("About"))
+            self.AddPage(ColorsPanel, _("Colors"))
+            self.AddPage(DisplayPanel, _("Display"))
+            self.AddPage(ElementsGlobalPanel, _("Elements"))
+            self.AddPage(KeyboardPanel, _("Keyboard"))
+            self.AddPage(MiscPanel, _("Misc"))
         else:
-            self.SetTitle("Script settings dialog")
+            self.SetTitle(_("Script settings dialog"))
 
-            self.AddPage(ScriptAboutPanel, "About")
-            self.AddPage(ElementsPanel, "Elements")
-            self.AddPage(FormattingPanel, "Formatting")
-            self.AddPage(PaperPanel, "Paper")
+            self.AddPage(ScriptAboutPanel, _("About"))
+            self.AddPage(ElementsPanel, _("Elements"))
+            self.AddPage(FormattingPanel, _("Formatting"))
+            self.AddPage(PaperPanel, _("Paper"))
             self.AddPage(PDFPanel, "PDF")
-            self.AddPage(PDFFontsPanel, "PDF/Fonts")
-            self.AddPage(StringsPanel, "Strings")
+            self.AddPage(PDFFontsPanel, _("PDF/Fonts"))
+            self.AddPage(StringsPanel, _("Strings"))
 
         vsizer.Add(self.listbook, 1, wx.EXPAND)
 
@@ -58,10 +58,10 @@ class CfgDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        applyBtn = gutil.createStockButton(self, "Apply")
+        applyBtn = gutil.createStockButton(self, _("Apply"))
         hsizer.Add(applyBtn, 0, wx.ALL, 5)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn, 0, wx.ALL, 5)
 
         okBtn = gutil.createStockButton(self, "OK")

@@ -9,7 +9,6 @@ from functools import partial
 
 import wx
 import wx.svg
-import wx.svg
 
 import trelby
 import trelby.charmapdlg as charmapdlg
@@ -196,31 +195,31 @@ class MyFrame(wx.Frame):
                 shortHelp=toolTip,
             )
 
-        addTB(ID_FILE_NEW, "new.svg", "New script")
-        addTB(ID_FILE_OPEN, "open.svg", "Open Script..")
-        addTB(ID_FILE_SAVE, "save.svg", "Save..")
-        addTB(ID_FILE_SAVE_AS, "saveas.svg", "Save as..")
-        addTB(ID_FILE_CLOSE, "close.svg", "Close Script")
-        addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.svg", "Script settings")
-        addTB(ID_FILE_PRINT, "pdf.svg", "Print (via PDF)")
+        addTB(ID_FILE_NEW, "new.svg", _("New script"))
+        addTB(ID_FILE_OPEN, "open.svg", _("Open Script.."))
+        addTB(ID_FILE_SAVE, "save.svg", _("Save.."))
+        addTB(ID_FILE_SAVE_AS, "saveas.svg", _("Save as.."))
+        addTB(ID_FILE_CLOSE, "close.svg", _("Close Script"))
+        addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.svg", _("Script settings"))
+        addTB(ID_FILE_PRINT, "pdf.svg", _("Print (via PDF)"))
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_FILE_IMPORT, "import.svg", "Import a text script")
-        addTB(ID_FILE_EXPORT, "export.svg", "Export script")
+        addTB(ID_FILE_IMPORT, "import.svg", _("Import a text script"))
+        addTB(ID_FILE_EXPORT, "export.svg", _("Export script"))
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_EDIT_UNDO, "undo.svg", "Undo")
-        addTB(ID_EDIT_REDO, "redo.svg", "Redo")
+        addTB(ID_EDIT_UNDO, "undo.svg", _("Undo"))
+        addTB(ID_EDIT_REDO, "redo.svg", _("Redo"))
 
         self.toolBar.AddSeparator()
 
-        addTB(ID_EDIT_FIND, "find.svg", "Find / Replace")
-        addTB(ID_TOOLBAR_VIEWS, "view.svg", "View mode")
-        addTB(ID_TOOLBAR_REPORTS, "report.svg", "Script reports")
-        addTB(ID_TOOLBAR_TOOLS, "tools.svg", "Tools")
-        addTB(ID_TOOLBAR_SETTINGS, "settings.svg", "Global settings")
+        addTB(ID_EDIT_FIND, "find.svg", _("Find / Replace"))
+        addTB(ID_TOOLBAR_VIEWS, "view.svg", _("View mode"))
+        addTB(ID_TOOLBAR_REPORTS, "report.svg", _("Script reports"))
+        addTB(ID_TOOLBAR_TOOLS, "tools.svg", _("Tools"))
+        addTB(ID_TOOLBAR_SETTINGS, "settings.svg", _("Global settings"))
 
         self.toolBar.SetBackgroundColour(gd.cfgGui.tabBarBgColor)
         self.toolBar.Realize()
@@ -234,7 +233,7 @@ class MyFrame(wx.Frame):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         self.noFSBtn = misc.MyFSButton(self, -1, self.getCfgGui)
-        self.noFSBtn.SetToolTip("Exit fullscreen")
+        self.noFSBtn.SetToolTip(_("Exit fullscreen"))
         self.noFSBtn.Show(False)
         hsizer.Add(self.noFSBtn)
 
@@ -276,14 +275,14 @@ class MyFrame(wx.Frame):
             tmp.Append(ID_ELEM_TO_ACTBREAK, "Act &break")
             tmp.Append(ID_ELEM_TO_NOTE, "&Note")
 
-            m.AppendSubMenu(tmp, "Element type")
+            m.AppendSubMenu(tmp, _("Element type"))
             m.AppendSeparator()
 
             if m is self.rightClickMenuWithCut:
-                m.Append(ID_EDIT_CUT, "Cut")
-                m.Append(ID_EDIT_COPY, "Copy")
+                m.Append(ID_EDIT_CUT, _("Cut"))
+                m.Append(ID_EDIT_COPY, _("Copy"))
 
-            m.Append(ID_EDIT_PASTE, "Paste")
+            m.Append(ID_EDIT_PASTE, _("Paste"))
 
             self.Bind(wx.EVT_MENU, self.OnNewScript, id=ID_FILE_NEW)
             self.Bind(wx.EVT_MENU, self.OnOpen, id=ID_FILE_OPEN)
@@ -475,10 +474,10 @@ class MyFrame(wx.Frame):
 
         if self.gd.cfgGl.getConflictingKeys() != None:
             wx.MessageBox(
-                "You have at least one key bound to more than one\n"
-                "command. The program will not work correctly until\n"
-                "you fix this.",
-                "Warning",
+                _(
+                    "You have at least one key bound to more than one\ncommand. The program will not work correctly until\nyou fix this."
+                ),
+                _("Warning"),
                 wx.OK,
                 self,
             )
@@ -510,11 +509,10 @@ class MyFrame(wx.Frame):
 
         if failed:
             wx.MessageBox(
-                "The fonts listed below are not fixed width and\n"
-                "will cause the program not to function correctly.\n"
-                "Please change the fonts at File/Settings/Change.\n\n"
-                + "\n".join(failed),
-                "Error",
+                _(
+                    "The fonts listed below are not fixed width and\nwill cause the program not to function correctly.\nPlease change the fonts at File/Settings/Change.\n\n\n"
+                ).join(failed),
+                _("Error"),
                 wx.OK,
                 self,
             )
@@ -570,7 +568,7 @@ class MyFrame(wx.Frame):
     def OnOpen(self, event=None):
         dlg = wx.FileDialog(
             self,
-            "File to open",
+            _("File to open"),
             misc.scriptDir,
             wildcard="Trelby files (*.trelby)|*.trelby|All files|*",
             style=wx.FD_OPEN,
@@ -591,7 +589,7 @@ class MyFrame(wx.Frame):
     def OnImportScript(self, event=None):
         dlg = wx.FileDialog(
             self,
-            "File to import",
+            _("File to import"),
             misc.scriptDir,
             wildcard="Importable files (*.txt;*.fdx;*.celtx;*.astx;*.fountain;*.fadein)|"
             + "*.fdx;*.txt;*.celtx;*.astx;*.fountain;*.fadein|"
@@ -641,7 +639,7 @@ class MyFrame(wx.Frame):
     def OnLoadSettings(self, event=None):
         dlg = wx.FileDialog(
             self,
-            "File to open",
+            _("File to open"),
             defaultDir=os.path.dirname(self.gd.confFilename),
             defaultFile=os.path.basename(self.gd.confFilename),
             wildcard="Setting files (*.conf)|*.conf|All files|*",
@@ -663,7 +661,7 @@ class MyFrame(wx.Frame):
     def OnSaveSettingsAs(self, event=None):
         dlg = wx.FileDialog(
             self,
-            "Filename to save as",
+            _("Filename to save as"),
             defaultDir=os.path.dirname(self.gd.confFilename),
             defaultFile=os.path.basename(self.gd.confFilename),
             wildcard="Setting files (*.conf)|*.conf|All files|*",
@@ -814,7 +812,7 @@ class MyFrame(wx.Frame):
     def OnLoadScriptSettings(self, event=None):
         dlg = wx.FileDialog(
             self,
-            "File to open",
+            _("File to open"),
             defaultDir=self.gd.scriptSettingsPath,
             wildcard="Script setting files (*.sconf)|*.sconf|All files|*",
             style=wx.FD_OPEN,
@@ -835,7 +833,7 @@ class MyFrame(wx.Frame):
     def OnSaveScriptSettingsAs(self, event=None):
         dlg = wx.FileDialog(
             self,
-            "Filename to save as",
+            _("Filename to save as"),
             defaultDir=self.gd.scriptSettingsPath,
             wildcard="Script setting files (*.sconf)|*.sconf|All files|*",
             style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
@@ -867,7 +865,7 @@ class MyFrame(wx.Frame):
 
     def OnNameDatabase(self, event=None):
         if not namesdlg.readNames(self):
-            wx.MessageBox("Error opening name database.", "Error", wx.OK, self)
+            wx.MessageBox(_("Error opening name database."), _("Error"), wx.OK, self)
 
             return
 
@@ -905,8 +903,8 @@ class MyFrame(wx.Frame):
         if event.CanVeto() and self.isModifications():
             close_msg_box = wx.MessageDialog(
                 self,
-                "You have unsaved changes. Do\nyou want to save your changes?",
-                "Save Changes",
+                _("You have unsaved changes. Do\nyou want to save your changes?"),
+                _("Save Changes"),
                 wx.YES_NO | wx.CANCEL | wx.YES_DEFAULT,
             )
             close_msg_box.SetYesNoLabels(wx.ID_SAVE, "&Don't save")

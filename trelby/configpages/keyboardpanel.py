@@ -1,7 +1,6 @@
-import wx
-
 import trelby.misc as misc
 import trelby.util as util
+import wx
 
 
 class KeyboardPanel(wx.Panel):
@@ -16,7 +15,7 @@ class KeyboardPanel(wx.Panel):
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer2.Add(wx.StaticText(self, -1, "Commands:"))
+        vsizer2.Add(wx.StaticText(self, -1, _("Commands:")))
 
         self.commandsLb = wx.ListBox(self, -1, size=(175, 50))
 
@@ -29,22 +28,22 @@ class KeyboardPanel(wx.Panel):
 
         vsizer2 = wx.BoxSizer(wx.VERTICAL)
 
-        vsizer2.Add(wx.StaticText(self, -1, "Keys:"))
+        vsizer2.Add(wx.StaticText(self, -1, _("Keys:")))
 
         self.keysLb = wx.ListBox(self, -1, size=(150, 60))
         vsizer2.Add(self.keysLb, 1, wx.BOTTOM, 10)
 
-        btn = wx.Button(self, -1, "Add")
+        btn = wx.Button(self, -1, _("Add"))
         self.Bind(wx.EVT_BUTTON, self.OnAdd, id=btn.GetId())
         vsizer2.Add(btn, 0, wx.ALIGN_CENTER | wx.BOTTOM, 10)
         self.addBtn = btn
 
-        btn = wx.Button(self, -1, "Delete")
+        btn = wx.Button(self, -1, _("Delete"))
         self.Bind(wx.EVT_BUTTON, self.OnDelete, id=btn.GetId())
         vsizer2.Add(btn, 0, wx.ALIGN_CENTER | wx.BOTTOM, 10)
         self.deleteBtn = btn
 
-        vsizer2.Add(wx.StaticText(self, -1, "Description:"))
+        vsizer2.Add(wx.StaticText(self, -1, _("Description:")))
 
         self.descEntry = wx.TextCtrl(
             self, -1, style=wx.TE_MULTILINE | wx.TE_READONLY, size=(150, 75)
@@ -55,7 +54,7 @@ class KeyboardPanel(wx.Panel):
 
         vsizer.Add(hsizer)
 
-        vsizer.Add(wx.StaticText(self, -1, "Conflicting keys:"), 0, wx.TOP, 10)
+        vsizer.Add(wx.StaticText(self, -1, _("Conflicting keys:")), 0, wx.TOP, 10)
 
         self.conflictsEntry = wx.TextCtrl(
             self, -1, style=wx.TE_MULTILINE | wx.TE_READONLY, size=(50, 75)
@@ -84,8 +83,8 @@ class KeyboardPanel(wx.Panel):
             kint = key.toInt()
             if kint in self.cmd.keys:
                 wx.MessageBox(
-                    "The key is already bound to this command.",
-                    "Error",
+                    _("The key is already bound to this command."),
+                    _("Error"),
                     wx.OK,
                     self.cfgFrame,
                 )
@@ -94,8 +93,8 @@ class KeyboardPanel(wx.Panel):
 
             if key.isValidInputChar():
                 wx.MessageBox(
-                    "You can't bind input characters to commands.",
-                    "Error",
+                    _("You can't bind input characters to commands."),
+                    _("Error"),
                     wx.OK,
                     self.cfgFrame,
                 )

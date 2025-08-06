@@ -19,16 +19,16 @@ def genDialogueChart(mainFrame, sp):
 
     inf = []
     for it in [
-        ("Characters with < 10 lines", None),
-        ("Sorted by: First appearance", cmpFirst),
-        ("Sorted by: Last appearance", cmpLast),
-        ("Sorted by: Number of lines spoken", cmpCount),
-        ("Sorted by: Name", cmpName),
+        (_("Characters with < 10 lines"), None),
+        (_("Sorted by: First appearance"), cmpFirst),
+        (_("Sorted by: Last appearance"), cmpLast),
+        (_("Sorted by: Number of lines spoken"), cmpCount),
+        (_("Sorted by: Name"), cmpName),
     ]:
         inf.append(misc.CheckBoxItem(it[0], cdata=it[1]))
 
     dlg = misc.CheckBoxDlg(
-        mainFrame, "Report type", inf, "Information to include:", False
+        mainFrame, _("Report type"), inf, _("Information to include:"), False
     )
 
     if dlg.ShowModal() != wx.ID_OK:
@@ -45,14 +45,14 @@ def genDialogueChart(mainFrame, sp):
     chart = DialogueChart(sp, minLines)
 
     if not chart.cinfo:
-        wx.MessageBox("No characters speaking found.", "Error", wx.OK, mainFrame)
+        wx.MessageBox(_("No characters speaking found."), "Error", wx.OK, mainFrame)
 
         return
 
     del inf[0]
 
     if len(misc.CheckBoxItem.getClientData(inf)) == 0:
-        wx.MessageBox("Can't disable all output.", "Error", wx.OK, mainFrame)
+        wx.MessageBox(_("Can't disable all output."), "Error", wx.OK, mainFrame)
 
         return
 

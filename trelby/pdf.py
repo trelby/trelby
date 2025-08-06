@@ -30,14 +30,14 @@ class PDFDrawOp:
     def draw(
         self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas: Canvas
     ) -> None:
-        raise Exception("draw not implemented")
+        raise Exception(_("draw not implemented"))
 
 
 class PDFTextOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.TextOp):
             raise Exception(
-                "PDFTextOp is only compatible with pml.TextOp, got "
+                _("PDFTextOp is only compatible with pml.TextOp, got ")
                 + type(pmlOp).__name__
             )
 
@@ -105,7 +105,7 @@ class PDFLineOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas):
         if not isinstance(pmlOp, pml.LineOp):
             raise Exception(
-                "PDFLineOp is only compatible with pml.LineOp, got "
+                _("PDFLineOp is only compatible with pml.LineOp, got ")
                 + type(pmlOp).__name__
             )
 
@@ -113,7 +113,7 @@ class PDFLineOp(PDFDrawOp):
         numberOfPoints = len(points)
 
         if numberOfPoints < 2:
-            print("LineOp contains only %d points" % numberOfPoints)
+            print(_("LineOp contains only {} points".format(numberOfPoints)))
 
             return
 
@@ -133,7 +133,7 @@ class PDFRectOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.RectOp):
             raise Exception(
-                "PDFRectOp is only compatible with pml.RectOp, got "
+                _("PDFRectOp is only compatible with pml.RectOp, got ")
                 + type(pmlOp).__name__
             )
 
@@ -154,7 +154,9 @@ class PDFQuarterCircleOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.QuarterCircleOp):
             raise Exception(
-                "PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "
+                _(
+                    "PDFQuarterCircleOp is only compatible with pml.QuarterCircleOp, got "
+                )
                 + type(pmlOp).__name__
             )
 
@@ -186,7 +188,7 @@ class PDFArbitraryOp(PDFDrawOp):
     def draw(self, pmlOp: "pml.DrawOp", pageNr: int, pe: "PDFExporter", canvas) -> None:
         if not isinstance(pmlOp, pml.PDFOp):
             raise Exception(
-                "PDFArbitraryOp is only compatible with pml.PDFOp, got "
+                _("PDFArbitraryOp is only compatible with pml.PDFOp, got ")
                 + type(pmlOp).__name__
             )
 
@@ -312,7 +314,7 @@ class PDFExporter:
         fontInfo = self.fonts.get(flags & 15)
 
         if not fontInfo:
-            raise Exception("PDF.getfontNr: invalid flags %d" % flags)
+            raise Exception(_("PDF.getfontNr: invalid flags {}".format(flags)))
 
         # the "& 15" gets rid of the underline flag
         customFontInfo = self.doc.fonts.get(flags & 15)
@@ -323,8 +325,11 @@ class PDFExporter:
         if not customFontInfo.name in pdfmetrics.getRegisteredFontNames():
             if not customFontInfo.fontFileName:
                 raise Exception(
-                    'Font name "%s" is not known and no font file name provided. Please provide a file name for this font in the settings or use the default font.'
-                    % customFontInfo.name
+                    _(
+                        'Font name "{}" is not known and no font file name provided. Please provide a file name for this font in the settings or use the default font.'.format(
+                            customFontInfo.name
+                        )
+                    )
                 )
             pdfmetrics.registerFont(
                 TTFont(customFontInfo.name, customFontInfo.fontFileName)

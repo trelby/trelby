@@ -1,9 +1,8 @@
 import os.path
 
-import wx
-
 import trelby.misc as misc
 import trelby.util as util
+import wx
 
 
 class MiscPanel(wx.Panel):
@@ -15,7 +14,7 @@ class MiscPanel(wx.Panel):
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
         bsizer = wx.StaticBoxSizer(
-            wx.StaticBox(self, -1, "Default script directory"), wx.VERTICAL
+            wx.StaticBox(self, -1, _("Default script directory")), wx.VERTICAL
         )
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
@@ -23,7 +22,7 @@ class MiscPanel(wx.Panel):
         self.scriptDirEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.scriptDirEntry, 1, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
-        btn = wx.Button(self, -1, "Browse")
+        btn = wx.Button(self, -1, _("Browse"))
         self.Bind(wx.EVT_BUTTON, self.OnBrowse, id=btn.GetId())
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
@@ -32,23 +31,26 @@ class MiscPanel(wx.Panel):
         vsizer.Add(bsizer, 0, wx.EXPAND | wx.BOTTOM, 10)
 
         bsizer = wx.StaticBoxSizer(
-            wx.StaticBox(self, -1, "PDF viewer application"), wx.VERTICAL
+            wx.StaticBox(self, -1, _("PDF viewer application")), wx.VERTICAL
         )
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Path:"), 0, wx.ALIGN_CENTER_VERTICAL | wx.RIGHT, 10
+            wx.StaticText(self, -1, _("Path:")),
+            0,
+            wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
+            10,
         )
 
         self.progEntry = wx.TextCtrl(self, -1)
         hsizer.Add(self.progEntry, 1, wx.ALIGN_CENTER_VERTICAL)
 
-        btn = wx.Button(self, -1, "Browse")
+        btn = wx.Button(self, -1, _("Browse"))
         self.Bind(wx.EVT_BUTTON, self.OnBrowsePDF, id=btn.GetId())
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
-        btn = wx.Button(self, -1, "Guess")
+        btn = wx.Button(self, -1, _("Guess"))
         self.Bind(wx.EVT_BUTTON, self.OnGuessPDF, id=btn.GetId())
         hsizer.Add(btn, 0, wx.ALIGN_CENTER_VERTICAL | wx.LEFT, 10)
 
@@ -57,7 +59,7 @@ class MiscPanel(wx.Panel):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Arguments:"),
+            wx.StaticText(self, -1, _("Arguments:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -77,14 +79,14 @@ class MiscPanel(wx.Panel):
             pad = 10
 
         self.checkListItems = [
-            ("capitalize", "Auto-capitalize sentences"),
-            ("capitalizeI", "Auto-capitalize i -> I"),
-            ("honorSavedPos", "When opening a script, start at last saved position"),
-            ("recenterOnScroll", "Recenter screen on scrolling"),
-            ("overwriteSelectionOnInsert", "Typing replaces selected text"),
+            ("capitalize", _("Auto-capitalize sentences")),
+            ("capitalizeI", _("Auto-capitalize i -> I")),
+            ("honorSavedPos", _("When opening a script, start at last saved position")),
+            ("recenterOnScroll", _("Recenter screen on scrolling")),
+            ("overwriteSelectionOnInsert", _("Typing replaces selected text")),
             (
                 "checkOnExport",
-                "Check script for errors before print, export or compare",
+                _("Check script for errors before print, export or compare"),
             ),
         ]
 
@@ -100,7 +102,7 @@ class MiscPanel(wx.Panel):
 
         self.addSpin(
             "splashTime",
-            "Show splash screen for X seconds:\n" " (0 = disable)",
+            _("Show splash screen for X seconds:\n (0 = disable)"),
             self,
             vsizer,
             "splashTime",
@@ -108,7 +110,7 @@ class MiscPanel(wx.Panel):
 
         self.addSpin(
             "paginate",
-            "Auto-paginate interval in seconds:\n" " (0 = disable)",
+            _("Auto-paginate interval in seconds:\n (0 = disable)"),
             self,
             vsizer,
             "paginateInterval",
@@ -116,7 +118,7 @@ class MiscPanel(wx.Panel):
 
         self.addSpin(
             "wheelScroll",
-            "Lines to scroll per mouse wheel event:",
+            _("Lines to scroll per mouse wheel event:"),
             self,
             vsizer,
             "mouseWheelLines",
@@ -145,7 +147,7 @@ class MiscPanel(wx.Panel):
 
         sizer.Add(hsizer, 0, wx.BOTTOM, 10)
 
-        setattr(self, name + "Entry", tmp)
+        setattr(self, name + _("Entry"), tmp)
 
     def OnKillFocus(self, event):
         self.OnMisc()
@@ -179,7 +181,7 @@ class MiscPanel(wx.Panel):
     def OnBrowsePDF(self, event):
         dlg = wx.FileDialog(
             self.cfgFrame,
-            "Choose program",
+            _("Choose program"),
             os.path.dirname(self.cfg.pdfViewerPath),
             self.cfg.pdfViewerPath,
             style=wx.FD_OPEN,
@@ -197,8 +199,8 @@ class MiscPanel(wx.Panel):
             self.progEntry.SetValue(viewer)
         else:
             wx.MessageBox(
-                "Unable to guess. Please set the path manually.",
-                "PDF Viewer",
+                _("Unable to guess. Please set the path manually."),
+                _("PDF Viewer"),
                 wx.OK,
                 self.cfgFrame,
             )

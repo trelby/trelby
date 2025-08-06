@@ -1,5 +1,8 @@
 import tests.u as u
 import trelby.screenplay as scr
+import trelby.translations as translations
+
+_ = translations.trelby_translations_load()
 
 # tests that Screenplay._validate() finds all errors it's supposed to
 

@@ -13,7 +13,7 @@ def genSceneReport(mainFrame, sp):
     report = scenereport.SceneReport(sp)
 
     dlg = misc.CheckBoxDlg(
-        mainFrame, "Report type", report.inf, "Information to include:", False
+        mainFrame, _("Report type"), report.inf, _("Information to include:"), False
     )
 
     ok = False
@@ -34,7 +34,7 @@ def genLocationReport(mainFrame, sp):
     report = locationreport.LocationReport(scenereport.SceneReport(sp))
 
     dlg = misc.CheckBoxDlg(
-        mainFrame, "Report type", report.inf, "Information to include:", False
+        mainFrame, _("Report type"), report.inf, _("Information to include:"), False
     )
 
     ok = False
@@ -55,7 +55,7 @@ def genCharacterReport(mainFrame, sp):
     report = characterreport.CharacterReport(sp)
 
     if not report.cinfo:
-        wx.MessageBox("No characters speaking found.", "Error", wx.OK, mainFrame)
+        wx.MessageBox(_("No characters speaking found."), _("Error"), wx.OK, mainFrame)
 
         return
 
@@ -65,12 +65,12 @@ def genCharacterReport(mainFrame, sp):
 
     dlg = misc.CheckBoxDlg(
         mainFrame,
-        "Report type",
+        _("Report type"),
         report.inf,
-        "Information to include:",
+        _("Information to include:"),
         False,
         charNames,
-        "Characters to include:",
+        _("Characters to include:"),
         True,
     )
 

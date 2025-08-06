@@ -11,7 +11,7 @@ class AutoCompletionDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Auto-completion",
+            _("Auto-completion"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
@@ -22,7 +22,7 @@ class AutoCompletionDlg(wx.Dialog):
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
         hsizer.Add(
-            wx.StaticText(self, -1, "Element:"),
+            wx.StaticText(self, -1, _("Element:")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.RIGHT,
             10,
@@ -41,11 +41,11 @@ class AutoCompletionDlg(wx.Dialog):
 
         vsizer.Add(wx.StaticLine(self, -1), 0, wx.EXPAND | wx.TOP | wx.BOTTOM, 10)
 
-        self.enabledCb = wx.CheckBox(self, -1, "Auto-completion enabled")
+        self.enabledCb = wx.CheckBox(self, -1, _("Auto-completion enabled"))
         self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=self.enabledCb.GetId())
         vsizer.Add(self.enabledCb, 0, wx.BOTTOM, 10)
 
-        vsizer.Add(wx.StaticText(self, -1, "Default items:"))
+        vsizer.Add(wx.StaticText(self, -1, _("Default items:")))
 
         self.itemsEntry = wx.TextCtrl(
             self, -1, style=wx.TE_MULTILINE | wx.TE_DONTWRAP, size=(400, 200)
@@ -57,7 +57,7 @@ class AutoCompletionDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
 
         okBtn = gutil.createStockButton(self, "OK")

@@ -10,7 +10,7 @@ class LocationsDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Locations",
+            _("Locations"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 
@@ -18,7 +18,7 @@ class LocationsDlg(wx.Dialog):
 
         vsizer = wx.BoxSizer(wx.VERTICAL)
 
-        tmp = wx.StaticText(self, -1, "Locations:")
+        tmp = wx.StaticText(self, -1, _("Locations:"))
         vsizer.Add(tmp)
 
         self.locationsLb = wx.ListBox(self, -1, size=(450, 200))
@@ -26,17 +26,17 @@ class LocationsDlg(wx.Dialog):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.addBtn = gutil.createStockButton(self, "Add")
+        self.addBtn = gutil.createStockButton(self, _("Add"))
         hsizer.Add(self.addBtn)
         self.Bind(wx.EVT_BUTTON, self.OnAdd, id=self.addBtn.GetId())
 
-        self.delBtn = gutil.createStockButton(self, "Delete")
+        self.delBtn = gutil.createStockButton(self, _("Delete"))
         hsizer.Add(self.delBtn, 0, wx.LEFT, 10)
         self.Bind(wx.EVT_BUTTON, self.OnDelete, id=self.delBtn.GetId())
 
         vsizer.Add(hsizer, 0, wx.ALIGN_CENTER | wx.TOP, 10)
 
-        tmp = wx.StaticText(self, -1, "Scenes:")
+        tmp = wx.StaticText(self, -1, _("Scenes:"))
         vsizer.Add(tmp)
 
         self.scenesLb = wx.ListBox(self, -1, size=(450, 200), style=wx.LB_EXTENDED)
@@ -46,7 +46,7 @@ class LocationsDlg(wx.Dialog):
 
         hsizer.Add((1, 1), 1)
 
-        cancelBtn = gutil.createStockButton(self, "Cancel")
+        cancelBtn = gutil.createStockButton(self, _("Cancel"))
         hsizer.Add(cancelBtn, 0, wx.LEFT, 10)
 
         okBtn = gutil.createStockButton(self, "OK")
@@ -89,7 +89,9 @@ class LocationsDlg(wx.Dialog):
         selected = self.scenesLb.GetSelections()
 
         if not selected:
-            wx.MessageBox("No scenes selected in the lower list.", "Error", wx.OK, self)
+            wx.MessageBox(
+                _("No scenes selected in the lower list."), _("Error"), wx.OK, self
+            )
 
             return
 
@@ -136,7 +138,9 @@ class LocationsDlg(wx.Dialog):
             scene = self.locationsLb.GetClientData(idx)
 
         if scene == None:
-            wx.MessageBox("No scene selected in the upper list.", "Error", wx.OK, self)
+            wx.MessageBox(
+                _("No scene selected in the upper list."), _("Error"), wx.OK, self
+            )
 
             return
 
