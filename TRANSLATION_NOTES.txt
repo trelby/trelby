@@ -1,3 +1,5 @@
+Requirements: gettext, and a po file editor.
+
 If you make code changes, please run the following before commiting and submitting a pull request:
 ./t_01_update_pot.sh
 ./t_01_update_pot.sh
