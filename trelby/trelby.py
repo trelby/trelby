@@ -49,10 +49,12 @@ class MyApp(wx.App):
 
         if (wx.MAJOR_VERSION != 4) or (wx.MINOR_VERSION < 0):
             wx.MessageBox(
-                "You seem to have an invalid version\n"
-                "(%s) of wxWidgets installed. This\n"
-                "program needs version 4.x." % wx.VERSION_STRING,
-                "Error",
+                _(
+                    "You seem to have an invalid version\n({}) of wxWidgets installed. This\nprogram needs version 4.x.".format(
+                        wx.VERSION_STRING
+                    )
+                ),
+                _("Error"),
                 wx.OK,
             )
             sys.exit()
@@ -66,19 +68,20 @@ class MyApp(wx.App):
             major = sys.getwindowsversion()[0]
             if major < 5:
                 wx.MessageBox(
-                    "You seem to have a version of Windows\n"
-                    "older than Windows 2000, which is the minimum\n"
-                    "requirement for this program.",
-                    "Error",
+                    _(
+                        "You seem to have a version of Windows\nolder than Windows 2000, which is the minimum\nrequirement for this program."
+                    ),
+                    _("Error"),
                     wx.OK,
                 )
                 sys.exit()
 
         if not "unicode" in wx.PlatformInfo:
             wx.MessageBox(
-                "You seem to be using a non-Unicode build of\n"
-                "wxWidgets. This is not supported.",
-                "Error",
+                _(
+                    "You seem to be using a non-Unicode build of\n wxWidgets. This is not supported."
+                ),
+                _("Error"),
                 wx.OK,
             )
             sys.exit()

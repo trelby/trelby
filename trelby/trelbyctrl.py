@@ -131,7 +131,10 @@ class MyCtrl(wx.Control):
             (sp, msg) = screenplay.Screenplay.load(s, self.gd.cfgGl)
         except TrelbyError as e:
             wx.MessageBox(
-                "Error loading file:\n\n%s" % e, "Error", wx.OK, self.gd.mainFrame
+                _("Error loading file:\n\n{}".format(e)),
+                _("Error"),
+                wx.OK,
+                self.gd.mainFrame,
             )
 
             return
@@ -405,9 +408,12 @@ class MyCtrl(wx.Control):
             if line != -1:
                 if (
                     wx.MessageBox(
-                        "The script seems to contain errors.\n"
-                        "Are you sure you want to %s it?" % action,
-                        "Confirm",
+                        _(
+                            "The script seems to contain errors.\nAre you sure you want to {} it?".format(
+                                action
+                            )
+                        ),
+                        _("Confirm"),
                         wx.YES_NO | wx.NO_DEFAULT,
                         self.gd.mainFrame,
                     )
@@ -594,8 +600,8 @@ class MyCtrl(wx.Control):
     def OnCompareScripts(self):
         if self.gd.mainFrame.tabCtrl.getPageCount() < 2:
             wx.MessageBox(
-                "You need at least two scripts open to" " compare them.",
-                "Error",
+                _("You need at least two scripts open to compare them."),
+                _("Error"),
                 wx.OK,
                 self.gd.mainFrame,
             )
@@ -658,9 +664,10 @@ class MyCtrl(wx.Control):
         if self.sp.isModified():
             if (
                 wx.MessageBox(
-                    "The script has been modified. Are you sure\n"
-                    "you want to discard the changes?",
-                    "Confirm",
+                    _(
+                        "The script has been modified. Are you sure\nyou want to discard the changes?"
+                    ),
+                    _("Confirm"),
                     wx.YES_NO | wx.NO_DEFAULT,
                     self.gd.mainFrame,
                 )
@@ -843,7 +850,7 @@ class MyCtrl(wx.Control):
 
         dlg = misc.TextInputDlg(
             self.gd.mainFrame,
-            "Enter scene number (%s - %s):" % (scenes[0][0], scenes[-1][0]),
+            _("Enter scene number ({} - {}):".format(scenes[0][0], scenes[-1][0])),
             _("Goto scene"),
             validateFunc,
         )
@@ -875,7 +882,7 @@ class MyCtrl(wx.Control):
 
         dlg = misc.TextInputDlg(
             self.gd.mainFrame,
-            "Enter page number (%s - %s):" % (pages[0], pages[-1]),
+            _("Enter page number ({} - {}):".format(pages[0], pages[-1])),
             _("Goto page"),
             validateFunc,
         )
@@ -908,7 +915,7 @@ class MyCtrl(wx.Control):
         else:
             msg = _("No errors found.")
 
-        wx.MessageBox(msg, "Results", wx.OK, self.gd.mainFrame)
+        wx.MessageBox(msg, _("Results"), wx.OK, self.gd.mainFrame)
 
     def OnFind(self):
         self.sp.clearMark()
@@ -946,9 +953,8 @@ class MyCtrl(wx.Control):
             s = ""
 
             if not wasAtStart:
-                s = (
-                    "\n\n(Starting position was not at\n"
-                    "the beginning of the script.)"
+                s = _(
+                    "\n\n(Starting position was not at\nthe beginning of the script.)"
                 )
             wx.MessageBox(
                 _("Spell checker found no errors.") + s,
@@ -1254,7 +1260,7 @@ class MyCtrl(wx.Control):
 
             t = time.time() - t
 
-            print("%.5f seconds per %s" % (t / count, name))
+            print(_("{.5f} seconds per {}".format(t / count, name)))
 
         print("-" * 20)
 

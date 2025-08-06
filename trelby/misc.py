@@ -992,8 +992,11 @@ class KeyDlg(wx.Dialog):
             wx.StaticText(
                 self,
                 -1,
-                "Press the key combination you\n"
-                "want to bind to the command\n'%s'." % cmdName,
+                _(
+                    "Press the key combination you\nwant to bind to the command\n'{}'.".format(
+                        cmdName
+                    )
+                ),
             )
         )
 

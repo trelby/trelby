@@ -115,9 +115,9 @@ class TitlesDlg(wx.Dialog):
         self.alignCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
         for it in [
-            ("Left", util.ALIGN_LEFT),
-            ("Center", util.ALIGN_CENTER),
-            ("Right", util.ALIGN_RIGHT),
+            (_("Left"), util.ALIGN_LEFT),
+            (_("Center"), util.ALIGN_CENTER),
+            (_("Right"), util.ALIGN_RIGHT),
         ]:
             self.alignCombo.Append(it[0], it[1])
 

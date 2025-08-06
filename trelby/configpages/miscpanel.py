@@ -102,7 +102,7 @@ class MiscPanel(wx.Panel):
 
         self.addSpin(
             "splashTime",
-            "Show splash screen for X seconds:\n" " (0 = disable)",
+            _("Show splash screen for X seconds:\n (0 = disable)"),
             self,
             vsizer,
             "splashTime",
@@ -110,7 +110,7 @@ class MiscPanel(wx.Panel):
 
         self.addSpin(
             "paginate",
-            "Auto-paginate interval in seconds:\n" " (0 = disable)",
+            _("Auto-paginate interval in seconds:\n (0 = disable)"),
             self,
             vsizer,
             "paginateInterval",

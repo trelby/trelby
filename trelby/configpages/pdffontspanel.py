@@ -23,12 +23,9 @@ class PDFFontsPanel(wx.Panel):
             wx.StaticText(
                 self,
                 -1,
-                "Leave all the fields empty to use the default PDF Courier\n"
-                "fonts. This is highly recommended.\n"
-                "\n"
-                "Otherwise, fill in the the font filename to use\n"
-                "the specified TrueType font. \n"
-                "See the manual for the full details.\n",
+                _(
+                    "Leave all the fields empty to use the default PDF Courier\nfonts. This is highly recommended.\n\nOtherwise, fill in the the font filename to use\nthe specified TrueType font. \nSee the manual for the full details.\n"
+                ),
             )
         )
 
@@ -160,8 +157,12 @@ class PDFFontsPanel(wx.Panel):
 
         if not f.isOK():
             wx.MessageBox(
-                "File '%s'\n" "does not appear to be a valid TrueType font." % filename,
-                "Error",
+                _(
+                    "File '{}'\ndoes not appear to be a valid TrueType font.".format(
+                        filename
+                    )
+                ),
+                _("Error"),
                 wx.OK,
                 self.cfgFrame,
             )
@@ -170,11 +171,12 @@ class PDFFontsPanel(wx.Panel):
 
         if not f.allowsEmbedding():
             wx.MessageBox(
-                "Font '%s'\n"
-                "does not allow embedding in its license terms.\n"
-                "You may encounter problems using this font"
-                " embedded." % filename,
-                "Error",
+                _(
+                    "Font '{}'\ndoes not allow embedding in its license terms.\nYou may encounter problems using this font embedded.".format(
+                        filename
+                    )
+                ),
+                _("Error"),
                 wx.OK,
                 self.cfgFrame,
             )

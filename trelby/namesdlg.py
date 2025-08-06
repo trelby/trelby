@@ -34,10 +34,12 @@ def readNames(frame):
                 nameType = line[1:]
             elif ch in ("M", "F"):
                 if not nameType:
-                    raise Exception("No name type set before line: '%s'" % line)
+                    raise Exception(
+                        _("No name type set before line: '{}'".format(line))
+                    )
                 res.append(line[1:], nameType, ch)
             else:
-                raise Exception("Unknown linetype for line: '%s'" % line)
+                raise Exception(_("Unknown linetype for line: '{}'".format(line)))
 
         nameArr = res
 
@@ -45,7 +47,10 @@ def readNames(frame):
 
     except Exception as e:
         wx.MessageBox(
-            "Error loading name database: %s" % str(e), _("Error"), wx.OK, frame
+            _("Error loading name database: {}".format(str(e))),
+            _("Error"),
+            wx.OK,
+            frame,
         )
 
         return False
@@ -73,8 +78,8 @@ class NamesDlg(wx.Dialog):
             self, -1, style=wx.LC_REPORT | wx.LC_HRULES | wx.LC_VRULES
         )
 
-        self.typeList.InsertColumn(0, "Count")
-        self.typeList.InsertColumn(1, "Type")
+        self.typeList.InsertColumn(0, _("Count"))
+        self.typeList.InsertColumn(1, _("Type"))
 
         for i in range(len(nameArr.typeNamesById)):
             typeName = nameArr.typeNamesById[i]
@@ -256,7 +261,7 @@ class NamesDlg(wx.Dialog):
 
         wx.EndBusyCursor()
 
-        self.foundLabel.SetLabel("%d names found." % len(l))
+        self.foundLabel.SetLabel(_("{} names found.".format(len(l))))
 
 
 class MyListCtrl(wx.ListCtrl):

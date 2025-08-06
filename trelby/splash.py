@@ -140,12 +140,16 @@ class SplashWindow(wx.Frame):
                 if line.startswith("  "):
                     if not tmp:
                         raise Exception(
-                            "No lines defined for quote at line %d" % (i + 1)
+                            _("No lines defined for quote at line {}".format(i + 1))
                         )
 
                     if len(tmp) > 3:
                         raise Exception(
-                            "Too many lines defined for quote at line %d" % (i + 1)
+                            _(
+                                "Too many lines defined for quote at line {}".format(
+                                    i + 1
+                                )
+                            )
                         )
 
                     quotes.append(Quote(line.strip(), tmp))
@@ -160,5 +164,5 @@ class SplashWindow(wx.Frame):
 
         except Exception as e:
             wx.MessageBox(
-                "Error loading quotes: %s" % str(e), _("Error"), wx.OK, parent
+                _("Error loading quotes: {}".format(str(e))), _("Error"), wx.OK, parent
             )

@@ -17,7 +17,7 @@ class Locations:
             v.addList(
                 "locations",
                 [],
-                "Locations",
+                ("Locations"),
                 mypickle.ListVar("", [], "", mypickle.StrLatin1Var("", "", "")),
             )
 

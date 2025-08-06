@@ -10,7 +10,7 @@ class LocationsDlg(wx.Dialog):
             self,
             parent,
             -1,
-            "Locations",
+            _("Locations"),
             style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER,
         )
 

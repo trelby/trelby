@@ -93,7 +93,7 @@ class ElementsPanel(wx.Panel):
         gsizer.Add(self.indentEntry, 0)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "characters (10 characters" " = 1 inch)"),
+            wx.StaticText(self, -1, _("characters (10 characters = 1 inch)")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
             10,
@@ -115,7 +115,7 @@ class ElementsPanel(wx.Panel):
         gsizer.Add(self.widthEntry, 0)
 
         gsizer.Add(
-            wx.StaticText(self, -1, "characters (10 characters" " = 1 inch)"),
+            wx.StaticText(self, -1, _("characters (10 characters = 1 inch)")),
             0,
             wx.ALIGN_CENTER_VERTICAL | wx.LEFT,
             10,

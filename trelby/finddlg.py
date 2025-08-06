@@ -381,9 +381,12 @@ class FindDlg(wx.Dialog):
 
                 if (
                     wx.MessageBox(
-                        "Search finished at the %s of the script. Do\n"
-                        "you want to continue at the %s of the script?" % (s1, s2),
-                        "Continue?",
+                        _(
+                            "Search finished at the {} of the script. Do\nyou want to continue at the {} of the script?".format(
+                                s1, s2
+                            )
+                        ),
+                        _("Continue?"),
                         wx.YES_NO | wx.YES_DEFAULT,
                         self,
                     )
@@ -459,4 +462,4 @@ class FindDlg(wx.Dialog):
             self.ctrl.makeLineVisible(self.ctrl.sp.line)
             self.ctrl.updateScreen()
 
-        wx.MessageBox("Replaced %d matches" % count, "Results", wx.OK, self)
+        wx.MessageBox(_("Replaced {} matches".format(count)), _("Results"), wx.OK, self)

@@ -35,7 +35,7 @@ class DisplayPanel(wx.Panel):
 
         vsizer.Add(
             wx.StaticText(
-                self, -1, "The settings below apply only" " to 'Draft' view mode."
+                self, -1, _("The settings below apply only to 'Draft' view mode.")
             ),
             0,
             wx.BOTTOM,
@@ -114,8 +114,8 @@ class DisplayPanel(wx.Panel):
                 self.updateFontLb()
             else:
                 wx.MessageBox(
-                    "The selected font is not fixed width and" " can not be used.",
-                    "Error",
+                    _("The selected font is not fixed width and can not be used."),
+                    _("Error"),
                     wx.OK,
                     self.cfgFrame,
                 )

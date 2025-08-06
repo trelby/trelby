@@ -14,8 +14,9 @@ class FormattingPanel(wx.Panel):
             wx.StaticText(
                 self,
                 -1,
-                "Leave at least this many lines at the end of a page when\n"
-                "breaking in the middle of an element:",
+                _(
+                    "Leave at least this many lines at the end of a page when\nbreaking in the middle of an element:"
+                ),
             ),
             0,
             wx.BOTTOM,

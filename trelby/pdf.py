@@ -113,7 +113,7 @@ class PDFLineOp(PDFDrawOp):
         numberOfPoints = len(points)
 
         if numberOfPoints < 2:
-            print("LineOp contains only %d points" % numberOfPoints)
+            print(_("LineOp contains only {} points".format(numberOfPoints)))
 
             return
 
@@ -314,7 +314,7 @@ class PDFExporter:
         fontInfo = self.fonts.get(flags & 15)
 
         if not fontInfo:
-            raise Exception("PDF.getfontNr: invalid flags %d" % flags)
+            raise Exception(_("PDF.getfontNr: invalid flags {}".format(flags)))
 
         # the "& 15" gets rid of the underline flag
         customFontInfo = self.doc.fonts.get(flags & 15)
@@ -325,8 +325,11 @@ class PDFExporter:
         if not customFontInfo.name in pdfmetrics.getRegisteredFontNames():
             if not customFontInfo.fontFileName:
                 raise Exception(
-                    'Font name "%s" is not known and no font file name provided. Please provide a file name for this font in the settings or use the default font.'
-                    % customFontInfo.name
+                    _(
+                        'Font name "{}" is not known and no font file name provided. Please provide a file name for this font in the settings or use the default font.'.format(
+                            customFontInfo.name
+                        )
+                    )
                 )
             pdfmetrics.registerFont(
                 TTFont(customFontInfo.name, customFontInfo.fontFileName)

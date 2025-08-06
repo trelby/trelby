@@ -78,7 +78,7 @@ class Font:
 
         for name, func in self.parseFuncs.items():
             if not func[1]:
-                raise ParseError("Table %s missing/invalid" % name)
+                raise ParseError(_("Table {} missing/invalid".format(name)))
 
     # parse a single tag
     def parseTag(self, offset, s):

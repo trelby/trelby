@@ -990,14 +990,14 @@ def loadFile(
         try:
             ret = f.read(maxSize)
         except MemoryError as error:
-            print(f"File too large: {error}")
+            print(_("File too large: {}".format(error)))
         finally:
             f.close()
 
     except IOError as xxx_todo_changeme:
         (errno, strerror) = xxx_todo_changeme.args
         wx.MessageBox(
-            "Error loading file '%s': %s" % (filename, strerror),
+            _("Error loading file '{}': {}".format(filename, strerror)),
             _("Error"),
             wx.OK,
             frame,
@@ -1031,7 +1031,7 @@ def loadMaybeCompressedFile(filename, frame):
         return f.read().decode("utf-8")
     except:
         wx.MessageBox(
-            "Error loading file '%s': Decompression failed" % filename,
+            _("Error loading file '{}': Decompression failed".format(filename)),
             _("Error"),
             wx.OK,
             frame,
@@ -1058,7 +1058,7 @@ def writeToFile(filename: str, data: AnyStr, frame: wx.TopLevelWindow) -> bool:
     except IOError as xxx_todo_changeme1:
         (errno, strerror) = xxx_todo_changeme1.args
         wx.MessageBox(
-            "Error writing file '%s': %s" % (filename, strerror),
+            _("Error writing file '{}': {}".format(filename, strerror)),
             _("Error"),
             wx.OK,
             frame,
@@ -1136,8 +1136,11 @@ class TimerDev:
         self.t = time.time() - self.t
         self.__class__.nestingLevel -= 1
         print(
-            "%s%s took %.5f seconds"
-            % (" " * self.__class__.nestingLevel, self.msg, self.t)
+            _(
+                "{}{} took {.5f} seconds".format(
+                    " " * self.__class__.nestingLevel, self.msg, self.t
+                )
+            )
         )
 
 
@@ -1242,10 +1245,10 @@ def showPDF(
 ) -> None:
     def complain():
         wx.MessageBox(
-            "PDF viewer application not found.\n\n"
-            "You can change your PDF viewer\n"
-            "settings at File/Settings/Change/Misc.",
-            "Error",
+            _(
+                "PDF viewer application not found.\n\nYou can change your PDF viewer\nsettings at File/Settings/Change/Misc."
+            ),
+            _("Error"),
             wx.OK,
             frame,
         )
@@ -1262,11 +1265,12 @@ def showPDF(
 
         if regPDF:
             wx.MessageBox(
-                "Currently set PDF viewer (%s) was not found.\n"
-                "Change this in File/Settings/Change/Misc.\n\n"
-                "Using the default PDF viewer instead:\n"
-                "%s" % (pdfProgram, regPDF),
-                "Warning",
+                _(
+                    "Currently set PDF viewer ({}) was not found.\nChange this in File/Settings/Change/Misc.\n\nUsing the default PDF viewer instead:\n%s".format(
+                        pdfProgram, regPDF
+                    )
+                ),
+                _("Warning"),
                 wx.OK,
                 frame,
             )

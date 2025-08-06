@@ -162,7 +162,7 @@ class WatermarkDlg(wx.Dialog):
 
         if count > 0:
             wx.MessageBox(
-                "Generated %d files in directory %s." % (count, directory),
+                _("Generated {} files in directory {}.".format(count, directory)),
                 _("PDFs generated"),
                 wx.OK,
                 self,

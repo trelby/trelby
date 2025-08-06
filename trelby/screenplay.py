@@ -229,20 +229,22 @@ class Screenplay:
 
         if len(lines) < 2:
             raise error.MiscError(
-                "File has too few lines to be a valid\n" "screenplay file."
+                _("File has too few lines to be a valid\nscreenplay file.")
             )
 
         key, version = Screenplay.parseConfigLine(lines[0])
         if not key or (key != "Version"):
             raise error.MiscError(
-                "File doesn't seem to be a proper\n" "screenplay file."
+                _("File doesn't seem to be a proper\nscreenplay file.")
             )
 
         if version not in ("1", "2", "3"):
             raise error.MiscError(
-                "File uses fileformat version '%s',\n"
-                "which is not supported by this version\n"
-                "of the program." % version
+                _(
+                    "File uses fileformat version '{}',\nwhich is not supported by this version\nof the program.".format(
+                        version
+                    )
+                )
             )
 
         version = int(version)
@@ -287,13 +289,13 @@ class Screenplay:
             s = lines[i]
 
             if len(s) < 2:
-                raise error.MiscError("Line %d is too short." % (i + 1))
+                raise error.MiscError(_("Line {} is too short.".format(i + 1)))
 
             if s[0] == "#":
                 key, val = Screenplay.parseConfigLine(s)
                 if not key:
                     raise error.MiscError(
-                        "Line %d has invalid syntax for\n" "config line." % (i + 1)
+                        _("Line {} has invalid syntax for\nconfig line.".format(i + 1))
                     )
 
                 if key == "Title-Page":
@@ -343,7 +345,7 @@ class Screenplay:
 
                 if prevType and (lt != prevType):
                     raise error.MiscError(
-                        "Line %d has invalid element" " type." % (i + 1)
+                        _("Line {} has invalid element type.".format(i + 1))
                     )
 
                 line = Line(lb, lt, text)
@@ -355,13 +357,13 @@ class Screenplay:
                     prevType = None
 
         if not startSeen:
-            raise error.MiscError("Start-Script line not found.")
+            raise error.MiscError(_("Start-Script line not found."))
 
         if len(sp.lines) == 0:
-            raise error.MiscError("File doesn't contain any screenplay" " lines.")
+            raise error.MiscError(_("File doesn't contain any screenplay lines."))
 
         if sp.lines[-1].lb != LB_LAST:
-            raise error.MiscError("Last line doesn't end an element.")
+            raise error.MiscError(_("Last line doesn't end an element."))
 
         if cfgGl.honorSavedPos:
             sp.line = sp.cfg.cursorLine
@@ -376,21 +378,20 @@ class Screenplay:
         msgs = []
 
         if unknownLb:
-            msgs.append("Screenplay contained unknown linebreak types.")
+            msgs.append(_("Screenplay contained unknown linebreak types."))
 
         if unknownTypes:
             msgs.append(
-                "Screenplay contained unknown element types. These"
-                " have been converted to Action elements."
+                _(
+                    "Screenplay contained unknown element types. These have been converted to Action elements."
+                )
             )
 
         if unknownConfigs:
             msgs.append(
-                "Screenplay contained unknown information. This"
-                " probably means that the file was created with a"
-                " newer version of this program.\n\n"
-                "  You'll lose that information if you save over"
-                " the existing file."
+                _(
+                    "Screenplay contained unknown information. This probably means that the file was created with a newer version of this program.\n\n  You'll lose that information if you save over the existing file."
+                )
             )
 
         return (sp, "\n\n".join(msgs))
@@ -410,7 +411,7 @@ class Screenplay:
         try:
             endIndex = lines.index("#End-%s " % name, startIndex)
         except ValueError:
-            raise error.MiscError("#End-%s not found" % name)
+            raise error.MiscError("#End-{} ".format(name) + _("not found"))
 
         return ("\n".join(lines[startIndex + 1 : endIndex]), endIndex + 1)
 
@@ -831,7 +832,7 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                     break
                 else:
                     raise error.MiscError(
-                        "Unknown line break style %d" " in generateRTF" % lb
+                        _("Unknown line break style {} in generateRTF".format(lb))
                     )
 
             s += (
@@ -2484,52 +2485,55 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
             # however they want
 
             if (len(ln.text) == 0) and (ln.lt != NOTE):
-                msg = "Empty line."
+                msg = _("Empty line.")
                 break
 
             if (len(ln.text.strip("  ")) == 0) and (ln.lt != NOTE):
-                msg = "Empty line (contains only spaces)."
+                msg = _("Empty line (contains only spaces).")
                 break
 
             if (ln.lt == PAREN) and isOnly and (ln.text == "()"):
-                msg = "Empty parenthetical."
+                msg = _("Empty parenthetical.")
                 break
 
             if ln.text != util.toInputStr(ln.text):
-                msg = "Line contains invalid characters (BUG)."
+                msg = _("Line contains invalid characters (BUG).")
                 break
 
             if len(ln.text.rstrip(" ")) > tcfg.width:
-                msg = "Line is too long (BUG)."
+                msg = _("Line is too long (BUG).")
                 break
 
             if ln.lt == CHARACTER:
                 if isLast and next and next not in (PAREN, DIALOGUE):
-                    msg = "Element type '%s' can not follow type '%s'." % (
-                        cfg.getType(next).ti.name,
-                        tcfg.ti.name,
+                    msg = _(
+                        "Element type '{}' can not follow type '{}'.".format(
+                            cfg.getType(next).ti.name, tcfg.ti.name
+                        )
                     )
                     break
 
             if ln.lt == PAREN:
                 if isFirst and prev and prev not in (CHARACTER, DIALOGUE):
-                    msg = "Element type '%s' can not follow type '%s'." % (
-                        tcfg.ti.name,
-                        cfg.getType(prev).ti.name,
+                    msg = _(
+                        "Element type '{}' can not follow type '{}'.".format(
+                            tcfg.ti.name, cfg.getType(prev).ti.name
+                        )
                     )
                     break
 
             if ln.lt == DIALOGUE:
                 if isFirst and prev and prev not in (CHARACTER, PAREN):
-                    msg = "Element type '%s' can not follow type '%s'." % (
-                        tcfg.ti.name,
-                        cfg.getType(prev).ti.name,
+                    msg = _(
+                        "Element type '{}' can not follow type '{}'.".format(
+                            tcfg.ti.name, cfg.getType(prev).ti.name
+                        )
                     )
                     break
 
             if prevType:
                 if ln.lt != prevType:
-                    msg = "Element contains lines with different line" " types (BUG)."
+                    msg = _("Element contains lines with different line types (BUG).")
                     break
 
             if ln.lb == LB_LAST:
