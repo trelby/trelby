@@ -1,6 +1,6 @@
 Requirements: gettext, and a po file editor.
 
-If you make code changes, please run the following before commiting and submitting a pull request:
+If you make code changes, please run the following before committing and submitting a pull request:
 ./t_01_update_pot.sh
 ./t_01_update_pot.sh
 ./t_03_build.sh
@@ -10,7 +10,7 @@ and build new .mo files from the .po files.
 
 To start a translation of a new language (German in this example):
 Using the po editing tool of your choice (I like poedit), create a new .po from the .pot file. Name the file with 
-the appropriate two-digit langauge code. For German, you'd create po/de.po from po/trelby.po.
+the appropriate two-digit language code. For German, you'd create po/de.po from po/trelby.po.
 
 Then populate the translations for all the strings in the new .po.
 
