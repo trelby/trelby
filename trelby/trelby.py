@@ -13,6 +13,7 @@ import trelby.misc as misc
 import trelby.opts as opts
 import trelby.splash as splash
 import trelby.util as util
+import trelby.translations as translations
 from trelby.globaldata import GlobalData
 from trelby.trelbyframe import MyFrame
 
@@ -30,17 +31,7 @@ KC_CTRL_P = 16
 KC_CTRL_V = 22
 
 
-# load translations
-LOCALEDIR = os.path.dirname(trelby.__file__) + "/locales"
-LANGUAGE = os.environ["LANG"]
-
-if not os.path.isdir(LOCALEDIR + "/" + LANGUAGE):
-    LANGUAGE = "en"
-
-TRANS = gettext.translation("trelby", localedir=LOCALEDIR, languages=[LANGUAGE])
-TRANS.install()
-
-_ = TRANS.gettext
+_ = translations.trelby_translations_load()
 
 
 class MyApp(wx.App):
