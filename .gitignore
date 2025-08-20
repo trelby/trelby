@@ -11,3 +11,6 @@ MANIFEST
 # virtual environment and IDE stuff
 /venv/
 /.vscode/
+
+#Choco
+*.nupkg
