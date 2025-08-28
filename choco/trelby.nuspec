@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>trelby</id>
+    <version>2.4.15</version>
+    <packageSourceUrl>https://github.com/trelby/trelby/choco</packageSourceUrl>
+    <owners>Gwyn Ciesla</owners>
+    <title>trelby (Install)</title>
+    <authors>Osku Salerma, Gwyn Ciesla, Trelby Contributors</authors>
+    <projectUrl>https://www.trelby.org</projectUrl>
+    <iconUrl>https://www.trelby.org/assets/logo32.png</iconUrl>
+    <copyright>2025 Trelby Contributors</copyright>
+    <licenseUrl>https://github.com/trelby/trelby/blob/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/trelby/trelby/</projectSourceUrl>
+    <bugTrackerUrl>https://github.com/trelby/trelby/issues/</bugTrackerUrl>
+    <tags>trelby</tags>
+    <summary>The free, multiplatform, feature-rich screenwriting program!</summary>
+    <description>Trelby is a screenplay writing program. See https://www.trelby.org/ for more details.</description>
+    <dependencies>
+      <dependency id="python3" />
+    </dependencies>
+  </metadata>
+  <files>
+    <!-- this section controls what actually gets packaged into the Chocolatey package -->
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
