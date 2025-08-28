@@ -17,6 +17,10 @@ Updates include:
 
 sudo dnf install trelby
 
+#### Flatpak
+
+`flatpak install trelby`
+
 #### From PyPi
 
 `pip (or pip3) install trelby`
