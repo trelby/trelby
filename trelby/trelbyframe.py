@@ -48,68 +48,70 @@ class MyFrame(wx.Frame):
         # self.allocIds()
 
         fileMenu = wx.Menu()
-        fileMenu.Append(ID_FILE_NEW, "&New\tCTRL-N")
-        fileMenu.Append(ID_FILE_OPEN, "&Open...\tCTRL-O")
-        fileMenu.Append(ID_FILE_SAVE, "&Save\tCTRL-S")
-        fileMenu.Append(ID_FILE_SAVE_AS, "Save &As...")
-        fileMenu.Append(ID_FILE_CLOSE, "&Close\tCTRL-W")
-        fileMenu.Append(ID_FILE_REVERT, "&Revert")
+        fileMenu.Append(ID_FILE_NEW, "(&N) " + _("New") + "\tCTRL-N")
+        fileMenu.Append(ID_FILE_OPEN, "(&O) " + _("Open") + "...\tCTRL-O")
+        fileMenu.Append(ID_FILE_SAVE, "(&S) " + _("Save") + "\tCTRL-S")
+        fileMenu.Append(ID_FILE_SAVE_AS, "(&A) " + _("Save As") + "...")
+        fileMenu.Append(ID_FILE_CLOSE, "(&C) " + _("Close\tCTRL-W"))
+        fileMenu.Append(ID_FILE_REVERT, "(&R) " + _("Revert"))
         fileMenu.AppendSeparator()
-        fileMenu.Append(ID_FILE_IMPORT, "&Import...")
-        fileMenu.Append(ID_FILE_EXPORT, "&Export...")
+        fileMenu.Append(ID_FILE_IMPORT, "(&I) " + _("Import") + "...")
+        fileMenu.Append(ID_FILE_EXPORT, "(&E) " + _("Export") + "...")
         fileMenu.AppendSeparator()
-        fileMenu.Append(ID_FILE_PRINT, "&Print (via PDF)\tCTRL-P")
+        fileMenu.Append(ID_FILE_PRINT, "(&P) " + _("Print (via PDF)") + "\tCTRL-P")
         fileMenu.AppendSeparator()
 
         tmp = wx.Menu()
 
-        tmp.Append(ID_SETTINGS_CHANGE, "&Change...")
+        tmp.Append(ID_SETTINGS_CHANGE, "(&C) " + _("Change") + "...")
         tmp.AppendSeparator()
-        tmp.Append(ID_SETTINGS_LOAD, "Load...")
-        tmp.Append(ID_SETTINGS_SAVE_AS, "Save as...")
+        tmp.Append(ID_SETTINGS_LOAD, _("Load") + "...")
+        tmp.Append(ID_SETTINGS_SAVE_AS, _("Save as") + "...")
         tmp.AppendSeparator()
-        tmp.Append(ID_SETTINGS_SC_DICT, "&Spell checker dictionary...")
+        tmp.Append(ID_SETTINGS_SC_DICT, "(&S) " + _("Spell checker dictionary") + "...")
         settingsMenu = tmp
 
-        fileMenu.Append(ID_FILE_SETTINGS, "Se&ttings", tmp)
+        fileMenu.Append(ID_FILE_SETTINGS, "(&t) " + _("Settings"), tmp)
 
         fileMenu.AppendSeparator()
         # "most recently used" list comes in here
         fileMenu.AppendSeparator()
-        fileMenu.Append(ID_FILE_EXIT, "E&xit\tCTRL-Q")
+        fileMenu.Append(ID_FILE_EXIT, "(x) " + _("Exit") + "\tCTRL-Q")
 
         editMenu = wx.Menu()
-        editMenu.Append(ID_EDIT_UNDO, "&Undo\tCTRL-Z")
-        editMenu.Append(ID_EDIT_REDO, "&Redo\tCTRL-Y")
+        editMenu.Append(ID_EDIT_UNDO, "(&U) " + _("Undo") + "\tCTRL-Z")
+        editMenu.Append(ID_EDIT_REDO, "(&R) " + _("Redo") + "\tCTRL-Y")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_CUT, "Cu&t\tCTRL-X")
-        editMenu.Append(ID_EDIT_COPY, "&Copy\tCTRL-C")
-        editMenu.Append(ID_EDIT_PASTE, "&Paste\tCTRL-V")
+        editMenu.Append(ID_EDIT_CUT, "(&t) " + _("Cut") + "\tCTRL-X")
+        editMenu.Append(ID_EDIT_COPY, "(&C) " + _("Copy") + "\tCTRL-C")
+        editMenu.Append(ID_EDIT_PASTE, "(&P) " + _("Paste") + "\tCTRL-V")
         editMenu.AppendSeparator()
 
         tmp = wx.Menu()
-        tmp.Append(ID_EDIT_COPY_TO_CB, "&Unformatted")
-        tmp.Append(ID_EDIT_COPY_TO_CB_FMT, "&Formatted")
+        tmp.Append(ID_EDIT_COPY_TO_CB, "(&U) " + _("Unformatted"))
+        tmp.Append(ID_EDIT_COPY_TO_CB_FMT, "(&F) " + _("Formatted"))
 
-        editMenu.Append(ID_EDIT_COPY_SYSTEM, "C&opy (system)", tmp)
-        editMenu.Append(ID_EDIT_PASTE_FROM_CB, "P&aste (system)")
+        editMenu.Append(ID_EDIT_COPY_SYSTEM, "(&o) " + _("Copy (system)"), tmp)
+        editMenu.Append(ID_EDIT_PASTE_FROM_CB, "(&a) " + _("Paste (system)"))
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_SELECT_SCENE, "&Select scene")
-        editMenu.Append(ID_EDIT_SELECT_ALL, "Select a&ll")
-        editMenu.Append(ID_EDIT_GOTO_PAGE, "&Goto page...\tCTRL-G")
-        editMenu.Append(ID_EDIT_GOTO_SCENE, "Goto sc&ene...\tALT-G")
+        editMenu.Append(ID_EDIT_SELECT_SCENE, "(&S) " + _("Select scene"))
+        editMenu.Append(ID_EDIT_SELECT_ALL, "(&l) " + _("Select all"))
+        editMenu.Append(ID_EDIT_GOTO_PAGE, "(&G) " + _("Goto page") + "...\tCTRL-G")
+        editMenu.Append(ID_EDIT_GOTO_SCENE, "(&e) " + _("Goto scene") + "...\tALT-G")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_INSERT_NBSP, "Insert non-breaking space")
+        editMenu.Append(ID_EDIT_INSERT_NBSP, _("Insert non-breaking space"))
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_FIND, "&Find && Replace...\tCTRL-F")
+        editMenu.Append(ID_EDIT_FIND, "(&F) " + _("Find && Replace") + "...\tCTRL-F")
         editMenu.AppendSeparator()
-        editMenu.Append(ID_EDIT_DELETE_ELEMENTS, "&Delete elements...")
+        editMenu.Append(ID_EDIT_DELETE_ELEMENTS, "(&D) " + _("Delete elements") + "...")
 
         viewMenu = wx.Menu()
-        viewMenu.AppendRadioItem(ID_VIEW_STYLE_DRAFT, "&Draft")
-        viewMenu.AppendRadioItem(ID_VIEW_STYLE_LAYOUT, "&Layout")
-        viewMenu.AppendRadioItem(ID_VIEW_STYLE_SIDE_BY_SIDE, "&Side by side")
-        viewMenu.AppendCheckItem(ID_SHOW_HIDE_TOOLBAR, "&Show/Hide Toolbar")
+        viewMenu.AppendRadioItem(ID_VIEW_STYLE_DRAFT, "(&D) " + _("Draft"))
+        viewMenu.AppendRadioItem(ID_VIEW_STYLE_LAYOUT, "(&L) " + _("Layout"))
+        viewMenu.AppendRadioItem(
+            ID_VIEW_STYLE_SIDE_BY_SIDE, "(&S) " + _("Side by side")
+        )
+        viewMenu.AppendCheckItem(ID_SHOW_HIDE_TOOLBAR, "(&S) " + _("Show/Hide Toolbar"))
 
         if gd.viewMode == gd.VIEWMODE_DRAFT:
             viewMenu.Check(ID_VIEW_STYLE_DRAFT, True)
@@ -119,57 +121,71 @@ class MyFrame(wx.Frame):
             viewMenu.Check(ID_VIEW_STYLE_SIDE_BY_SIDE, True)
 
         viewMenu.AppendSeparator()
-        viewMenu.AppendCheckItem(ID_VIEW_SHOW_FORMATTING, "&Show formatting")
-        viewMenu.Append(ID_VIEW_FULL_SCREEN, "&Fullscreen\tF11")
+        viewMenu.AppendCheckItem(
+            ID_VIEW_SHOW_FORMATTING, "(&S) " + _("Show formatting")
+        )
+        viewMenu.Append(ID_VIEW_FULL_SCREEN, "(&F) " + _("Fullscreen") + "\tF11")
 
         scriptMenu = wx.Menu()
-        scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "&Find next error")
-        scriptMenu.Append(ID_SCRIPT_PAGINATE, "&Paginate")
+        scriptMenu.Append(ID_SCRIPT_FIND_ERROR, "(&F) " + _("Find next error"))
+        scriptMenu.Append(ID_SCRIPT_PAGINATE, "(&P) " + _("Paginate"))
         scriptMenu.AppendSeparator()
-        scriptMenu.Append(ID_SCRIPT_AUTO_COMPLETION, "&Auto-completion...")
-        scriptMenu.Append(ID_SCRIPT_HEADERS, "&Headers...")
-        scriptMenu.Append(ID_SCRIPT_LOCATIONS, "&Locations...")
-        scriptMenu.Append(ID_SCRIPT_TITLES, "&Title pages...")
-        scriptMenu.Append(ID_SCRIPT_SC_DICT, "&Spell checker dictionary...")
+        scriptMenu.Append(
+            ID_SCRIPT_AUTO_COMPLETION, "(&A) " + _("Auto-completion") + "..."
+        )
+        scriptMenu.Append(ID_SCRIPT_HEADERS, "(&H) " + _("Headers") + "...")
+        scriptMenu.Append(ID_SCRIPT_LOCATIONS, "(&L) " + _("Locations") + "...")
+        scriptMenu.Append(ID_SCRIPT_TITLES, "(&T) " + _("Title pages") + "...")
+        scriptMenu.Append(ID_SCRIPT_SC_DICT, "(&S) " + _("Spell checker dictionary..."))
         scriptMenu.AppendSeparator()
 
         tmp = wx.Menu()
 
-        tmp.Append(ID_SCRIPT_SETTINGS_CHANGE, "&Change...")
+        tmp.Append(ID_SCRIPT_SETTINGS_CHANGE, "(&C) " + _("Change") + "...")
         tmp.AppendSeparator()
-        tmp.Append(ID_SCRIPT_SETTINGS_LOAD, "&Load...")
-        tmp.Append(ID_SCRIPT_SETTINGS_SAVE_AS, "&Save as...")
-        scriptMenu.Append(ID_SCRIPT_SETTINGS, "&Settings", tmp)
+        tmp.Append(ID_SCRIPT_SETTINGS_LOAD, "(&L) " + _("Load") + "...")
+        tmp.Append(ID_SCRIPT_SETTINGS_SAVE_AS, "(&S) " + _("Save as") + "...")
+        scriptMenu.Append(ID_SCRIPT_SETTINGS, "(&S) " + _("Settings"), tmp)
         scriptSettingsMenu = tmp
 
         reportsMenu = wx.Menu()
-        reportsMenu.Append(ID_REPORTS_SCRIPT_REP, "Sc&ript report")
-        reportsMenu.Append(ID_REPORTS_LOCATION_REP, "&Location report...")
-        reportsMenu.Append(ID_REPORTS_SCENE_REP, "&Scene report...")
-        reportsMenu.Append(ID_REPORTS_CHARACTER_REP, "&Character report...")
-        reportsMenu.Append(ID_REPORTS_DIALOGUE_CHART, "&Dialogue chart...")
+        reportsMenu.Append(ID_REPORTS_SCRIPT_REP, "(&r) " + _("Script report"))
+        reportsMenu.Append(
+            ID_REPORTS_LOCATION_REP, "(&L) " + _("Location report") + "..."
+        )
+        reportsMenu.Append(ID_REPORTS_SCENE_REP, "(&S) " + _("Scene report") + "...")
+        reportsMenu.Append(
+            ID_REPORTS_CHARACTER_REP, "(&C) " + _("Character report") + "..."
+        )
+        reportsMenu.Append(
+            ID_REPORTS_DIALOGUE_CHART, "(&D) " + _("Dialogue chart") + "..."
+        )
 
         toolsMenu = wx.Menu()
-        toolsMenu.Append(ID_TOOLS_SPELL_CHECK, "&Spell checker...")
-        toolsMenu.Append(ID_TOOLS_NAME_DB, "&Name database...")
-        toolsMenu.Append(ID_TOOLS_CHARMAP, "&Character map...")
-        toolsMenu.Append(ID_TOOLS_COMPARE_SCRIPTS, "C&ompare scripts...")
-        toolsMenu.Append(ID_TOOLS_WATERMARK, "&Generate watermarked PDFs...")
+        toolsMenu.Append(ID_TOOLS_SPELL_CHECK, "(&S) " + _("Spell checker") + "...")
+        toolsMenu.Append(ID_TOOLS_NAME_DB, "(&N) " + _("Name database") + "...")
+        toolsMenu.Append(ID_TOOLS_CHARMAP, "(&C) " + _("Character map") + "...")
+        toolsMenu.Append(
+            ID_TOOLS_COMPARE_SCRIPTS, "(&o) " + _("Compare scripts") + "..."
+        )
+        toolsMenu.Append(
+            ID_TOOLS_WATERMARK, "(&G) " + _("Generate watermarked PDFs") + "..."
+        )
 
         helpMenu = wx.Menu()
-        helpMenu.Append(ID_HELP_COMMANDS, "&Commands...")
-        helpMenu.Append(ID_HELP_MANUAL, "&Manual")
+        helpMenu.Append(ID_HELP_COMMANDS, "(&C) " + _("Commands") + "...")
+        helpMenu.Append(ID_HELP_MANUAL, "(&M) " + _("Manual"))
         helpMenu.AppendSeparator()
-        helpMenu.Append(ID_HELP_ABOUT, "&About...")
+        helpMenu.Append(ID_HELP_ABOUT, "(&A) " + _("About") + "...")
 
         self.menuBar = wx.MenuBar()
-        self.menuBar.Append(fileMenu, "&File")
-        self.menuBar.Append(editMenu, "&Edit")
-        self.menuBar.Append(viewMenu, "&View")
-        self.menuBar.Append(scriptMenu, "Scr&ipt")
-        self.menuBar.Append(reportsMenu, "&Reports")
-        self.menuBar.Append(toolsMenu, "Too&ls")
-        self.menuBar.Append(helpMenu, "&Help")
+        self.menuBar.Append(fileMenu, "(&F) " + _("File"))
+        self.menuBar.Append(editMenu, "(&E) " + _("Edit"))
+        self.menuBar.Append(viewMenu, "(&V) " + _("View"))
+        self.menuBar.Append(scriptMenu, "(&i) " + _("Script"))
+        self.menuBar.Append(reportsMenu, "(&R) " + _("Reports"))
+        self.menuBar.Append(toolsMenu, "(&l) " + _("Tools"))
+        self.menuBar.Append(helpMenu, "(&H) " + _("Help"))
         self.SetMenuBar(self.menuBar)
 
         self.toolBar = self.CreateToolBar(wx.TB_VERTICAL)
@@ -196,9 +212,9 @@ class MyFrame(wx.Frame):
             )
 
         addTB(ID_FILE_NEW, "new.svg", _("New script"))
-        addTB(ID_FILE_OPEN, "open.svg", _("Open Script.."))
-        addTB(ID_FILE_SAVE, "save.svg", _("Save.."))
-        addTB(ID_FILE_SAVE_AS, "saveas.svg", _("Save as.."))
+        addTB(ID_FILE_OPEN, "open.svg", _("Open Script") + "..")
+        addTB(ID_FILE_SAVE, "save.svg", _("Save") + "..")
+        addTB(ID_FILE_SAVE_AS, "saveas.svg", _("Save as") + "..")
         addTB(ID_FILE_CLOSE, "close.svg", _("Close Script"))
         addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.svg", _("Script settings"))
         addTB(ID_FILE_PRINT, "pdf.svg", _("Print (via PDF)"))
@@ -265,15 +281,15 @@ class MyFrame(wx.Frame):
         for m in (self.rightClickMenu, self.rightClickMenuWithCut):
             tmp = wx.Menu()
 
-            tmp.Append(ID_ELEM_TO_SCENE, "&Scene")
-            tmp.Append(ID_ELEM_TO_ACTION, "&Action")
-            tmp.Append(ID_ELEM_TO_CHARACTER, "&Character")
-            tmp.Append(ID_ELEM_TO_PAREN, "&Parenthetical")
-            tmp.Append(ID_ELEM_TO_DIALOGUE, "&Dialogue")
-            tmp.Append(ID_ELEM_TO_TRANSITION, "&Transition")
-            tmp.Append(ID_ELEM_TO_SHOT, "Sh&ot")
-            tmp.Append(ID_ELEM_TO_ACTBREAK, "Act &break")
-            tmp.Append(ID_ELEM_TO_NOTE, "&Note")
+            tmp.Append(ID_ELEM_TO_SCENE, "(&S) " + _("Scene"))
+            tmp.Append(ID_ELEM_TO_ACTION, "(&A) " + _("Action"))
+            tmp.Append(ID_ELEM_TO_CHARACTER, "(&C) " + _("Character"))
+            tmp.Append(ID_ELEM_TO_PAREN, "(&P) " + _("Parenthetical"))
+            tmp.Append(ID_ELEM_TO_DIALOGUE, "(&D) " + _("Dialogue"))
+            tmp.Append(ID_ELEM_TO_TRANSITION, "(&T) " + _("Transition"))
+            tmp.Append(ID_ELEM_TO_SHOT, "(&o) " + _("Shot"))
+            tmp.Append(ID_ELEM_TO_ACTBREAK, "(&b) " + _("Act break"))
+            tmp.Append(ID_ELEM_TO_NOTE, "(&N) " + _("Note"))
 
             m.AppendSubMenu(tmp, _("Element type"))
             m.AppendSeparator()
@@ -570,7 +586,11 @@ class MyFrame(wx.Frame):
             self,
             _("File to open"),
             misc.scriptDir,
-            wildcard="Trelby files (*.trelby)|*.trelby|All files|*",
+            wildcard="Trelby "
+            + _("files")
+            + " (*.trelby)|*.trelby|"
+            + _("All files")
+            + "|*",
             style=wx.FD_OPEN,
         )
 
@@ -591,15 +611,32 @@ class MyFrame(wx.Frame):
             self,
             _("File to import"),
             misc.scriptDir,
-            wildcard="Importable files (*.txt;*.fdx;*.celtx;*.astx;*.fountain;*.fadein)|"
+            wildcard=_("Importable")
+            + " "
+            + _("files")
+            + "(*.txt;*.fdx;*.celtx;*.astx;*.fountain;*.fadein)|"
             + "*.fdx;*.txt;*.celtx;*.astx;*.fountain;*.fadein|"
-            + "Formatted text files (*.txt)|*.txt|"
+            + _("Formatted")
+            + " "
+            + _("text")
+            + " "
+            + _("files")
+            + "(*.txt)|*.txt|"
             + "Final Draft XML(*.fdx)|*.fdx|"
-            + "Celtx files (*.celtx)|*.celtx|"
-            + "Adobe Story XML files (*.astx)|*.astx|"
-            + "Fountain files (*.fountain)|*.fountain|"
-            + "Fadein files (*.fadein)|*.fadein|"
-            + "All files|*",
+            + "Celtx "
+            + _("files")
+            + " (*.celtx)|*.celtx|"
+            + "Adobe Story XML "
+            + _("files")
+            + " (*.astx)|*.astx|"
+            + "Fountain "
+            + _("files")
+            + " (*.fountain)|*.fountain|"
+            + "Fadein "
+            + _("files")
+            + " (*.fadein)|*.fadein|"
+            + _("All files")
+            + "|*",
             style=wx.FD_OPEN,
         )
 
@@ -642,7 +679,12 @@ class MyFrame(wx.Frame):
             _("File to open"),
             defaultDir=os.path.dirname(self.gd.confFilename),
             defaultFile=os.path.basename(self.gd.confFilename),
-            wildcard="Setting files (*.conf)|*.conf|All files|*",
+            wildcard=_("Setting")
+            + " "
+            + _("files")
+            + " (*.conf)|*.conf|"
+            + _("All files")
+            + "|*",
             style=wx.FD_OPEN,
         )
 
@@ -664,7 +706,12 @@ class MyFrame(wx.Frame):
             _("Filename to save as"),
             defaultDir=os.path.dirname(self.gd.confFilename),
             defaultFile=os.path.basename(self.gd.confFilename),
-            wildcard="Setting files (*.conf)|*.conf|All files|*",
+            wildcard=_("Setting")
+            + " "
+            + _("files")
+            + " (*.conf)|*.conf|"
+            + _("All files")
+            + "|*",
             style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
         )
 
@@ -814,7 +861,14 @@ class MyFrame(wx.Frame):
             self,
             _("File to open"),
             defaultDir=self.gd.scriptSettingsPath,
-            wildcard="Script setting files (*.sconf)|*.sconf|All files|*",
+            wildcard=_("Script")
+            + " "
+            + _("setting")
+            + " "
+            + _("files")
+            + " (*.sconf)|*.sconf|"
+            + _("All files")
+            + "|*",
             style=wx.FD_OPEN,
         )
 
@@ -835,7 +889,13 @@ class MyFrame(wx.Frame):
             self,
             _("Filename to save as"),
             defaultDir=self.gd.scriptSettingsPath,
-            wildcard="Script setting files (*.sconf)|*.sconf|All files|*",
+            wildcard=_("Script")
+            + " "
+            + _("setting")
+            + _("files")
+            + " (*.sconf)|*.sconf|"
+            + _("All files")
+            + "|*",
             style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
         )
 
@@ -907,7 +967,7 @@ class MyFrame(wx.Frame):
                 _("Save Changes"),
                 wx.YES_NO | wx.CANCEL | wx.YES_DEFAULT,
             )
-            close_msg_box.SetYesNoLabels(wx.ID_SAVE, "&Don't save")
+            close_msg_box.SetYesNoLabels(wx.ID_SAVE, "(&D) " + _("Don't save"))
             response = close_msg_box.ShowModal()
             if response == wx.ID_YES:
                 self.OnSave()
