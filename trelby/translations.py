@@ -1,21 +1,28 @@
+"""Translation related functions"""
+
 import os
 import gettext
+import re
 
 import trelby
 
 
 def trelby_translations_load():
     """load translations"""
-    LOCALEDIR = os.path.dirname(trelby.__file__) + "/locales"
+    localedir = os.path.dirname(trelby.__file__) + "/locales"
     if "LANG" in os.environ:
-        LANGUAGE = os.environ["LANG"]
+        language = os.environ["LANG"]
     else:
-        LANGUAGE = "en"
+        language = "en"
 
-    if not os.path.isdir(LOCALEDIR + "/" + LANGUAGE):
-        LANGUAGE = "en"
+    if not os.path.isdir(localedir + "/" + language):
+        base_language = re.split("[^a-zA-Z]", language)[0]
+        if os.path.isdir(localedir + "/" + base_language):
+            language = base_language
+        else:
+            language = "en"
 
-    TRANS = gettext.translation("trelby", localedir=LOCALEDIR, languages=[LANGUAGE])
-    TRANS.install()
+    trans = gettext.translation("trelby", localedir=localedir, languages=[language])
+    trans.install()
 
-    return TRANS.gettext
+    return trans.gettext
