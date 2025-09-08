@@ -17,6 +17,12 @@ Updates include:
 
 sudo dnf install trelby
 
+#### Windows (Chocolatey)
+
+Once chocolatey is set up (https://chocolatey.org/install):
+
+`choco install trelby`
+
 #### Flatpak
 
 `flatpak install trelby`
