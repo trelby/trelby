@@ -3,7 +3,7 @@
   <metadata>
     <id>trelby</id>
     <version>2.4.15</version>
-    <packageSourceUrl>https://github.com/trelby/trelby/choco</packageSourceUrl>
+    <packageSourceUrl>https://github.com/trelby/trelby/tree/master/choco</packageSourceUrl>
     <owners>Gwyn Ciesla</owners>
     <title>trelby (Install)</title>
     <authors>Osku Salerma, Gwyn Ciesla, Trelby Contributors</authors>
