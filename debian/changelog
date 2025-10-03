@@ -1,3 +1,11 @@
+trelby (2.4.16) unstable; urgency=low
+
+  * Translation support
+  * Italian translation
+  * New icons
+
+ -- Gwyn Ciesla <gwync@protonmail.com>  Fri, 03 Oct 2025 09:45:00 +0000
+
 trelby (2.4.15) unstable; urgency=low
 
   * Fix Crtl_Left, Right; map to word move.
