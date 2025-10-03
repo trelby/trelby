@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>trelby</id>
-    <version>2.4.16</version>
+    <version>2.4.16.1</version>
     <packageSourceUrl>https://github.com/trelby/trelby/tree/master/choco</packageSourceUrl>
     <owners>Gwyn Ciesla</owners>
     <title>trelby (Install)</title>
