@@ -40,6 +40,8 @@ Once chocolatey is set up (https://chocolatey.org/install):
 3. pip3 install -r requirements.txt  
    *Depending on your python version, you might run into https://github.com/wxWidgets/Phoenix/issues/2296. We recommend executing `pip3 install attrdict3` before installing the requirements in that case. If that still doesn't work, we recommend upgrading your python version.*
 
+   *If you are using Mac, you need to `brew install docbook-xsl`*
+
 4. make
 
 5. ./trelby.py
