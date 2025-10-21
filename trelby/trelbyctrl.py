@@ -1272,7 +1272,7 @@ class MyCtrl(wx.Control):
         pass
 
     def OnKeyChar(self, ev):
-        kc = ev.GetKeyCode()
+        kc = ev.GetUnicodeKey()
 
         cs = screenplay.CommandState()
         cs.mark = bool(ev.ShiftDown())
