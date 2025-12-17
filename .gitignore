@@ -11,6 +11,15 @@ MANIFEST
 # virtual environment and IDE stuff
 /venv/
 /.vscode/
+build/*
+dist/*
+.DS_Store
 
 #Choco
 *.nupkg
+
+# Generated build files (created by make dist)
+trelby/*.gz
+trelby/manual.html
+doc/manual.html
+doc/*.gz

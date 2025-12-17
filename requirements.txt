@@ -3,3 +3,4 @@ wxPython>=4.1.0
 lxml
 reportlab
 pytest>=7.0
+py2app

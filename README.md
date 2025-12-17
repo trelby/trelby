@@ -43,3 +43,13 @@ Once chocolatey is set up (https://chocolatey.org/install):
 4. make
 
 5. ./trelby.py
+
+#### Building macOS DMG
+
+To create a macOS application bundle and DMG:
+
+1. Install py2app: `pip3 install py2app`
+2. Build DMG: `make dmg`
+3. The DMG file will be created in the `dist/` directory
+
+**Note:** Automated DMG builds are available from the [Releases](https://github.com/trelby/trelby/releases) page, built automatically on every commit to master.

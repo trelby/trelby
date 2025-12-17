@@ -11,7 +11,10 @@ MANPAGE_SOURCE = refentry.xml
 MANPAGE = trelby.1
 MANPAGE_GZIP_TARGET = $(MANPAGE).gz
 
-ifneq ($(wildcard /usr/share/sgml/docbook/stylesheet/xsl/),)
+ifneq ($(wildcard /opt/homebrew/opt/docbook-xsl/),)
+  XSL_MANPAGE = /opt/homebrew/opt/docbook-xsl/docbook-xsl/manpages/docbook.xsl
+  XSL_HTML = html-stylesheet-macos.xsl
+else ifneq ($(wildcard /usr/share/sgml/docbook/stylesheet/xsl/),)
   XSL_MANPAGE = /usr/share/sgml/docbook/stylesheet/xsl/docbook-xsl/manpages/docbook.xsl
   XSL_HTML = html-stylesheet-deb.xsl
 else
