@@ -1,10 +1,10 @@
 /**
- * Trelby Web - Configuration System
+ * Courius - Configuration System
  */
 
 class Config {
     constructor(defaults = {}) {
-        const { DEFAULT_CONFIG } = window.TrelbyConstants;
+        const { DEFAULT_CONFIG } = window.CouriusConstants;
 
         // Paper settings
         this.paperSize = defaults.paperSize || DEFAULT_CONFIG.paperSize;
@@ -51,7 +51,7 @@ class Config {
     }
 
     _initElementFormat(customFormat = {}) {
-        const { LINE_TYPE, ELEMENT_FORMAT } = window.TrelbyConstants;
+        const { LINE_TYPE, ELEMENT_FORMAT } = window.CouriusConstants;
         const format = {};
 
         for (const type of Object.values(LINE_TYPE)) {
@@ -65,12 +65,12 @@ class Config {
     }
 
     getPageWidth() {
-        const { PAPER_SIZES } = window.TrelbyConstants;
+        const { PAPER_SIZES } = window.CouriusConstants;
         return PAPER_SIZES[this.paperSize].width;
     }
 
     getPageHeight() {
-        const { PAPER_SIZES } = window.TrelbyConstants;
+        const { PAPER_SIZES } = window.CouriusConstants;
         return PAPER_SIZES[this.paperSize].height;
     }
 
@@ -111,7 +111,7 @@ class Config {
     }
 
     // Save to localStorage
-    save(key = 'trelby-config') {
+    save(key = 'courius-config') {
         try {
             localStorage.setItem(key, JSON.stringify(this.toJSON()));
             return true;
@@ -122,7 +122,7 @@ class Config {
     }
 
     // Load from localStorage
-    static load(key = 'trelby-config') {
+    static load(key = 'courius-config') {
         try {
             const data = localStorage.getItem(key);
             if (data) {
@@ -136,4 +136,4 @@ class Config {
 }
 
 // Global configuration instance
-window.TrelbyConfig = Config;
+window.CouriusConfig = Config;

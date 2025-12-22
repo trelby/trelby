@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Undo/Redo System
+ * Courius - Undo/Redo System
  * Implements undo/redo with state snapshots
  */
 
@@ -30,7 +30,7 @@ class UndoManager {
 
         // Add new state
         this.states.push({
-            state: window.TrelbyUtils.deepClone(state),
+            state: window.CouriusUtils.deepClone(state),
             description,
             timestamp: Date.now()
         });
@@ -55,7 +55,7 @@ class UndoManager {
     undo() {
         if (!this.canUndo()) return null;
         this.currentIndex--;
-        return window.TrelbyUtils.deepClone(this.states[this.currentIndex].state);
+        return window.CouriusUtils.deepClone(this.states[this.currentIndex].state);
     }
 
     /**
@@ -64,7 +64,7 @@ class UndoManager {
     redo() {
         if (!this.canRedo()) return null;
         this.currentIndex++;
-        return window.TrelbyUtils.deepClone(this.states[this.currentIndex].state);
+        return window.CouriusUtils.deepClone(this.states[this.currentIndex].state);
     }
 
     /**
@@ -88,7 +88,7 @@ class UndoManager {
         if (this.currentIndex < 0 || this.currentIndex >= this.states.length) {
             return null;
         }
-        return window.TrelbyUtils.deepClone(this.states[this.currentIndex].state);
+        return window.CouriusUtils.deepClone(this.states[this.currentIndex].state);
     }
 
     /**
@@ -184,7 +184,7 @@ class ScreenplayUndoState {
      * Apply this state to a screenplay
      */
     apply(screenplay) {
-        const Line = window.TrelbyLine;
+        const Line = window.CouriusLine;
         screenplay.lines = this.lines.map(l => Line.fromJSON(l));
         screenplay.cursorLine = this.cursorLine;
         screenplay.cursorColumn = this.cursorColumn;
@@ -215,5 +215,5 @@ class ScreenplayUndoState {
     }
 }
 
-window.TrelbyUndoManager = UndoManager;
-window.TrelbyScreenplayUndoState = ScreenplayUndoState;
+window.CouriusUndoManager = UndoManager;
+window.CouriusScreenplayUndoState = ScreenplayUndoState;

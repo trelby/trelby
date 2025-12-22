@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Export Functionality
+ * Courius - Export Functionality
  * Exports screenplays to various formats
  */
 
@@ -42,7 +42,7 @@ class Exporter {
         }
 
         const { jsPDF } = window.jspdf;
-        const { LINE_TYPE, ELEMENT_FORMAT, PAPER_SIZES } = window.TrelbyConstants;
+        const { LINE_TYPE, ELEMENT_FORMAT, PAPER_SIZES } = window.CouriusConstants;
 
         const config = screenplay.config;
         const paperSize = PAPER_SIZES[config.paperSize] || PAPER_SIZES.letter;
@@ -202,7 +202,7 @@ class Exporter {
         const pdfBlob = doc.output('blob');
         const filename = options.filename || 'screenplay.pdf';
 
-        window.TrelbyUtils.downloadFile(pdfBlob, filename, 'application/pdf');
+        window.CouriusUtils.downloadFile(pdfBlob, filename, 'application/pdf');
 
         return true;
     }
@@ -211,7 +211,7 @@ class Exporter {
      * Export to HTML
      */
     exportHTML(screenplay, options = {}) {
-        const { LINE_TYPE, ELEMENT_FORMAT } = window.TrelbyConstants;
+        const { LINE_TYPE, ELEMENT_FORMAT } = window.CouriusConstants;
 
         let html = `<!DOCTYPE html>
 <html lang="en">
@@ -315,7 +315,7 @@ class Exporter {
 </html>`;
 
         const filename = options.filename || 'screenplay.html';
-        window.TrelbyUtils.downloadFile(html, filename, 'text/html');
+        window.CouriusUtils.downloadFile(html, filename, 'text/html');
 
         return html;
     }
@@ -324,7 +324,7 @@ class Exporter {
      * Export to plain text
      */
     exportText(screenplay, options = {}) {
-        const { LINE_TYPE, ELEMENT_FORMAT } = window.TrelbyConstants;
+        const { LINE_TYPE, ELEMENT_FORMAT } = window.CouriusConstants;
         const lines = [];
         const pageWidth = 60;
 
@@ -378,7 +378,7 @@ class Exporter {
 
         const text = lines.join('\n');
         const filename = options.filename || 'screenplay.txt';
-        window.TrelbyUtils.downloadFile(text, filename, 'text/plain');
+        window.CouriusUtils.downloadFile(text, filename, 'text/plain');
 
         return text;
     }
@@ -387,7 +387,7 @@ class Exporter {
      * Export to Final Draft XML
      */
     exportFDX(screenplay, options = {}) {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
 
         // Map Trelby types to FDX types
         const typeMap = {
@@ -425,7 +425,7 @@ class Exporter {
 </FinalDraft>`;
 
         const filename = options.filename || 'screenplay.fdx';
-        window.TrelbyUtils.downloadFile(xml, filename, 'application/xml');
+        window.CouriusUtils.downloadFile(xml, filename, 'application/xml');
 
         return xml;
     }
@@ -434,7 +434,7 @@ class Exporter {
      * Export to Fountain format
      */
     exportFountain(screenplay, options = {}) {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         const lines = [];
 
         // Add title page if present
@@ -514,7 +514,7 @@ class Exporter {
 
         const fountain = lines.join('\n');
         const filename = options.filename || 'screenplay.fountain';
-        window.TrelbyUtils.downloadFile(fountain, filename, 'text/plain');
+        window.CouriusUtils.downloadFile(fountain, filename, 'text/plain');
 
         return fountain;
     }
@@ -523,7 +523,7 @@ class Exporter {
      * Export to RTF format
      */
     exportRTF(screenplay, options = {}) {
-        const { LINE_TYPE, ELEMENT_FORMAT } = window.TrelbyConstants;
+        const { LINE_TYPE, ELEMENT_FORMAT } = window.CouriusConstants;
 
         let rtf = `{\\rtf1\\ansi\\deff0
 {\\fonttbl{\\f0\\fmodern Courier New;}}
@@ -579,7 +579,7 @@ class Exporter {
         rtf += '}';
 
         const filename = options.filename || 'screenplay.rtf';
-        window.TrelbyUtils.downloadFile(rtf, filename, 'application/rtf');
+        window.CouriusUtils.downloadFile(rtf, filename, 'application/rtf');
 
         return rtf;
     }
@@ -588,14 +588,14 @@ class Exporter {
      * Word wrap text to specified width
      */
     _wordWrap(text, width) {
-        return window.TrelbyUtils.wordWrap(text, width);
+        return window.CouriusUtils.wordWrap(text, width);
     }
 
     /**
      * Escape HTML special characters
      */
     _escapeHtml(text) {
-        return window.TrelbyUtils.escapeHtml(text);
+        return window.CouriusUtils.escapeHtml(text);
     }
 
     /**
@@ -634,4 +634,4 @@ class Exporter {
     }
 }
 
-window.TrelbyExporter = Exporter;
+window.CouriusExporter = Exporter;

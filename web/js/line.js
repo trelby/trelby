@@ -1,11 +1,11 @@
 /**
- * Trelby Web - Line Model
+ * Courius - Line Model
  * Represents a single line in the screenplay
  */
 
 class Line {
     constructor(lb = null, type = null, text = '') {
-        const { LB, LINE_TYPE } = window.TrelbyConstants;
+        const { LB, LINE_TYPE } = window.CouriusConstants;
 
         this.lb = lb ?? LB.LAST;
         this.type = type ?? LINE_TYPE.ACTION;
@@ -30,7 +30,7 @@ class Line {
      * Check if this is the last line of a paragraph
      */
     isLastInParagraph() {
-        const { LB } = window.TrelbyConstants;
+        const { LB } = window.CouriusConstants;
         return this.lb === LB.LAST || this.lb === LB.FORCED;
     }
 
@@ -56,7 +56,7 @@ class Line {
      * Convert to Trelby file format line
      */
     toTrelbyFormat() {
-        const { LB_TO_CHAR, LT_TO_CHAR } = window.TrelbyConstants;
+        const { LB_TO_CHAR, LT_TO_CHAR } = window.CouriusConstants;
         const lbChar = LB_TO_CHAR[this.lb] || '.';
         const ltChar = LT_TO_CHAR[this.type] || '.';
         return lbChar + ltChar + this.text;
@@ -66,7 +66,7 @@ class Line {
      * Parse from Trelby file format line
      */
     static fromTrelbyFormat(line) {
-        const { LB_CHARS, LT_CHARS, LB, LINE_TYPE } = window.TrelbyConstants;
+        const { LB_CHARS, LT_CHARS, LB, LINE_TYPE } = window.CouriusConstants;
 
         if (line.length < 2) {
             return new Line(LB.LAST, LINE_TYPE.ACTION, line);
@@ -86,7 +86,7 @@ class Line {
      * Get display text (with formatting applied)
      */
     getDisplayText(config) {
-        const { ELEMENT_FORMAT } = window.TrelbyConstants;
+        const { ELEMENT_FORMAT } = window.CouriusConstants;
         const format = config?.elementFormat?.[this.type] || ELEMENT_FORMAT[this.type];
 
         let text = this.text;
@@ -100,7 +100,7 @@ class Line {
      * Check if this is a scene heading
      */
     isSceneHeading() {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         return this.type === LINE_TYPE.SCENE;
     }
 
@@ -108,7 +108,7 @@ class Line {
      * Check if this is dialogue
      */
     isDialogue() {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         return this.type === LINE_TYPE.DIALOGUE;
     }
 
@@ -116,7 +116,7 @@ class Line {
      * Check if this is a character name
      */
     isCharacter() {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         return this.type === LINE_TYPE.CHARACTER;
     }
 
@@ -132,7 +132,7 @@ class Line {
      * Check if this is a transition
      */
     isTransition() {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         return this.type === LINE_TYPE.TRANSITION;
     }
 
@@ -147,4 +147,4 @@ class Line {
     }
 }
 
-window.TrelbyLine = Line;
+window.CouriusLine = Line;

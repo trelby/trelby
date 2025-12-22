@@ -1,9 +1,9 @@
 /**
- * Trelby Web - Main Application
+ * Courius - Main Application
  * Entry point that initializes and coordinates all components
  */
 
-class TrelbyApp {
+class CouriusApp {
     constructor() {
         this.editor = null;
         this.dialogs = null;
@@ -19,18 +19,18 @@ class TrelbyApp {
      * Initialize the application
      */
     async init() {
-        console.log('Initializing Trelby Web...');
+        console.log('Initializing Courius...');
 
         // Load configuration
-        this.config = window.TrelbyConfig.load();
+        this.config = window.CouriusConfig.load();
         this.applyConfig(this.config);
 
         // Initialize components
-        this.dialogs = new window.TrelbyDialogs();
-        this.fileIO = new window.TrelbyFileIO();
-        this.exporter = new window.TrelbyExporter();
-        this.editor = new window.TrelbyEditor('#main-content');
-        this.menu = new window.TrelbyMenuManager(this);
+        this.dialogs = new window.CouriusDialogs();
+        this.fileIO = new window.CouriusFileIO();
+        this.exporter = new window.CouriusExporter();
+        this.editor = new window.CouriusEditor('#main-content');
+        this.menu = new window.CouriusMenuManager(this);
 
         // Set up callbacks
         this.editor.onModified = () => this._onEditorModified();
@@ -55,7 +55,7 @@ class TrelbyApp {
         // Update title
         this._updateTitle();
 
-        console.log('Trelby Web initialized successfully!');
+        console.log('Courius initialized successfully!');
         document.getElementById('status-message').textContent = 'Ready';
     }
 
@@ -71,7 +71,7 @@ class TrelbyApp {
         document.documentElement.style.setProperty('--screenplay-font-size', config.fontSize + 'pt');
 
         // Apply page settings
-        const { PAPER_SIZES } = window.TrelbyConstants;
+        const { PAPER_SIZES } = window.CouriusConstants;
         const paper = PAPER_SIZES[config.paperSize];
         if (paper) {
             document.documentElement.style.setProperty('--page-width', (paper.width / 72) + 'in');
@@ -109,7 +109,7 @@ class TrelbyApp {
         const screenplay = this.fileIO.createNew();
         this.editor.loadScreenplay(screenplay);
         this._updateTitle();
-        window.TrelbyUtils.toast('New screenplay created', 'success');
+        window.CouriusUtils.toast('New screenplay created', 'success');
     }
 
     /**
@@ -129,11 +129,11 @@ class TrelbyApp {
             if (screenplay) {
                 this.editor.loadScreenplay(screenplay);
                 this._updateTitle();
-                window.TrelbyUtils.toast('File opened successfully', 'success');
+                window.CouriusUtils.toast('File opened successfully', 'success');
             }
         } catch (e) {
             console.error('Error opening file:', e);
-            window.TrelbyUtils.toast('Error opening file: ' + e.message, 'error');
+            window.CouriusUtils.toast('Error opening file: ' + e.message, 'error');
         }
     }
 
@@ -157,21 +157,21 @@ class TrelbyApp {
                 'trelby': '.trelby'
             };
 
-            const file = await window.TrelbyUtils.pickFile(extensions[format] || '*');
+            const file = await window.CouriusUtils.pickFile(extensions[format] || '*');
             if (!file) return;
 
-            const content = await window.TrelbyUtils.readFile(file);
+            const content = await window.CouriusUtils.readFile(file);
             const screenplay = this.fileIO.parseFile(content, file.name);
 
             if (screenplay) {
                 this.editor.loadScreenplay(screenplay);
                 this.fileIO.setFilename(file.name.replace(/\.[^.]+$/, '.trelby'));
                 this._updateTitle();
-                window.TrelbyUtils.toast('File imported successfully', 'success');
+                window.CouriusUtils.toast('File imported successfully', 'success');
             }
         } catch (e) {
             console.error('Error importing file:', e);
-            window.TrelbyUtils.toast('Error importing file: ' + e.message, 'error');
+            window.CouriusUtils.toast('Error importing file: ' + e.message, 'error');
         }
     }
 
@@ -185,11 +185,11 @@ class TrelbyApp {
                 this.editor.screenplay.clearModified();
                 document.getElementById('status-modified').textContent = '';
                 this._updateTitle();
-                window.TrelbyUtils.toast('File saved', 'success');
+                window.CouriusUtils.toast('File saved', 'success');
             }
         } catch (e) {
             console.error('Error saving file:', e);
-            window.TrelbyUtils.toast('Error saving file: ' + e.message, 'error');
+            window.CouriusUtils.toast('Error saving file: ' + e.message, 'error');
         }
     }
 
@@ -203,11 +203,11 @@ class TrelbyApp {
                 this.editor.screenplay.clearModified();
                 document.getElementById('status-modified').textContent = '';
                 this._updateTitle();
-                window.TrelbyUtils.toast('File saved', 'success');
+                window.CouriusUtils.toast('File saved', 'success');
             }
         } catch (e) {
             console.error('Error saving file:', e);
-            window.TrelbyUtils.toast('Error saving file: ' + e.message, 'error');
+            window.CouriusUtils.toast('Error saving file: ' + e.message, 'error');
         }
     }
 
@@ -220,10 +220,10 @@ class TrelbyApp {
             await this.exporter.export(this.editor.screenplay, format, {
                 filename: filename + this.fileIO.getExtension(format)
             });
-            window.TrelbyUtils.toast(`Exported as ${format.toUpperCase()}`, 'success');
+            window.CouriusUtils.toast(`Exported as ${format.toUpperCase()}`, 'success');
         } catch (e) {
             console.error('Error exporting file:', e);
-            window.TrelbyUtils.toast('Error exporting: ' + e.message, 'error');
+            window.CouriusUtils.toast('Error exporting: ' + e.message, 'error');
         }
     }
 
@@ -231,7 +231,7 @@ class TrelbyApp {
      * Run spell check
      */
     async runSpellCheck() {
-        const spellDialog = new window.TrelbySpellCheckDialog(
+        const spellDialog = new window.CouriusSpellCheckDialog(
             this.editor.spellChecker,
             this.editor
         );
@@ -250,12 +250,12 @@ class TrelbyApp {
                 content: `
                     <div class="spellcheck-content">
                         <div class="spellcheck-word">
-                            <span class="misspelled">${window.TrelbyUtils.escapeHtml(wordInfo.word)}</span>
+                            <span class="misspelled">${window.CouriusUtils.escapeHtml(wordInfo.word)}</span>
                         </div>
                         <div class="spellcheck-suggestions">
                             <label>Suggestions:</label>
                             <select id="spell-suggestions" size="5">
-                                ${wordInfo.suggestions.map(s => `<option value="${window.TrelbyUtils.escapeHtml(s)}">${window.TrelbyUtils.escapeHtml(s)}</option>`).join('')}
+                                ${wordInfo.suggestions.map(s => `<option value="${window.CouriusUtils.escapeHtml(s)}">${window.CouriusUtils.escapeHtml(s)}</option>`).join('')}
                             </select>
                         </div>
                         <p style="color: var(--text-muted); font-size: 12px;">${wordInfo.remaining} words remaining</p>
@@ -318,7 +318,7 @@ class TrelbyApp {
                     this.editor.loadScreenplay(data.screenplay);
                     this.fileIO.setFilename(data.filename || 'Recovered.trelby');
                     this._updateTitle();
-                    window.TrelbyUtils.toast('Auto-save recovered', 'success');
+                    window.CouriusUtils.toast('Auto-save recovered', 'success');
                 }
             }
 
@@ -372,14 +372,14 @@ class TrelbyApp {
     _updateTitle() {
         const filename = this.fileIO.getFilename();
         const modified = this.editor.hasUnsavedChanges() ? ' *' : '';
-        document.title = `${filename}${modified} - Trelby`;
+        document.title = `${filename}${modified} - Courius`;
     }
 }
 
 // Initialize application when DOM is ready
 document.addEventListener('DOMContentLoaded', async () => {
-    window.trelbyApp = new TrelbyApp();
-    await window.trelbyApp.init();
+    window.couriusApp = new CouriusApp();
+    await window.couriusApp.init();
 });
 
-window.TrelbyApp = TrelbyApp;
+window.CouriusApp = CouriusApp;

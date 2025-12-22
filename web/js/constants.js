@@ -1,6 +1,6 @@
 /**
- * Trelby Web - Constants
- * Core constants matching the Python desktop version
+ * Courius - Screenwriting Software
+ * Constants module
  */
 
 // Line break types
@@ -229,11 +229,11 @@ const SHORTCUTS = {
 
 // Version info
 const VERSION = {
-    major: 3,
+    major: 1,
     minor: 0,
     patch: 0,
-    string: '3.0.0-web',
-    name: 'Trelby Web'
+    string: '1.0.0',
+    name: 'Courius'
 };
 
 // File format markers
@@ -285,7 +285,7 @@ const LT_TO_CHAR = {
 };
 
 // Export all constants
-window.TrelbyConstants = {
+window.CouriusConstants = {
     LB,
     LINE_TYPE,
     LINE_TYPE_NUM,

@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Dialog System
+ * Courius - Dialog System
  * Manages all modal dialogs in the application
  */
 
@@ -146,7 +146,7 @@ class DialogManager {
         return new Promise((resolve) => {
             this.show({
                 title,
-                content: `<p>${window.TrelbyUtils.escapeHtml(message)}</p>`,
+                content: `<p>${window.CouriusUtils.escapeHtml(message)}</p>`,
                 buttons: [{ text: 'OK', primary: true, action: () => { resolve(); return true; } }]
             });
         });
@@ -159,7 +159,7 @@ class DialogManager {
         return new Promise((resolve) => {
             this.show({
                 title,
-                content: `<p>${window.TrelbyUtils.escapeHtml(message)}</p>`,
+                content: `<p>${window.CouriusUtils.escapeHtml(message)}</p>`,
                 buttons: [
                     { text: 'Cancel', action: () => { resolve(false); return true; } },
                     { text: 'OK', primary: true, action: () => { resolve(true); return true; } }
@@ -176,8 +176,8 @@ class DialogManager {
             const dialog = this.show({
                 title,
                 content: `
-                    <p>${window.TrelbyUtils.escapeHtml(message)}</p>
-                    <input type="text" id="prompt-input" value="${window.TrelbyUtils.escapeHtml(defaultValue)}" style="width: 100%">
+                    <p>${window.CouriusUtils.escapeHtml(message)}</p>
+                    <input type="text" id="prompt-input" value="${window.CouriusUtils.escapeHtml(defaultValue)}" style="width: 100%">
                 `,
                 buttons: [
                     { text: 'Cancel', action: () => { resolve(null); return true; } },
@@ -534,7 +534,7 @@ class DialogManager {
         const template = document.getElementById('report-template');
         const content = template.content.cloneNode(true).firstElementChild;
 
-        const reports = new window.TrelbyReports();
+        const reports = new window.CouriusReports();
         const html = reports.renderAsHTML(report);
 
         return this.show({
@@ -572,7 +572,7 @@ class DialogManager {
         const template = document.getElementById('name-database-template');
         const content = template.content.cloneNode(true).firstElementChild;
 
-        const nameDb = new window.TrelbyNameDatabase();
+        const nameDb = new window.CouriusNameDatabase();
         nameDb.load();
 
         const dialog = this.show({
@@ -628,7 +628,7 @@ class DialogManager {
                     const selected = nameList.value;
                     if (selected) {
                         navigator.clipboard.writeText(selected.toUpperCase());
-                        window.TrelbyUtils.toast('Name copied to clipboard', 'success');
+                        window.CouriusUtils.toast('Name copied to clipboard', 'success');
                     }
                 });
 
@@ -651,14 +651,14 @@ class DialogManager {
      * Show About dialog
      */
     showAbout() {
-        const { VERSION } = window.TrelbyConstants;
+        const { VERSION } = window.CouriusConstants;
 
         return this.show({
-            title: 'About Trelby',
+            title: 'About Courius',
             content: `
                 <div class="about-content">
                     <div class="about-logo">📝</div>
-                    <div class="about-title">Trelby Web</div>
+                    <div class="about-title">Courius</div>
                     <div class="about-version">Version ${VERSION.string}</div>
                     <div class="about-description">
                         <p>A free, multiplatform, feature-rich screenwriting program.</p>
@@ -678,7 +678,7 @@ class DialogManager {
      * Show keyboard shortcuts help
      */
     showKeyboardShortcuts() {
-        const { SHORTCUTS } = window.TrelbyConstants;
+        const { SHORTCUTS } = window.CouriusConstants;
 
         let html = '<div class="shortcuts-table"><table>';
         for (const [shortcut, action] of Object.entries(SHORTCUTS)) {
@@ -695,4 +695,4 @@ class DialogManager {
     }
 }
 
-window.TrelbyDialogs = DialogManager;
+window.CouriusDialogs = DialogManager;

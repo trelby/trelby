@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Screenplay Editor
+ * Courius - Screenplay Editor
  * Main editor component handling all text editing operations
  */
 
@@ -11,10 +11,10 @@ class ScreenplayEditor {
         this.layoutView = document.getElementById('layout-view');
 
         // Core state
-        this.screenplay = new window.TrelbyScreenplay();
-        this.undoManager = new window.TrelbyUndoManager();
-        this.autoCompletion = new window.TrelbyAutoCompletion();
-        this.spellChecker = new window.TrelbySpellChecker();
+        this.screenplay = new window.CouriusScreenplay();
+        this.undoManager = new window.CouriusUndoManager();
+        this.autoCompletion = new window.CouriusAutoCompletion();
+        this.spellChecker = new window.CouriusSpellChecker();
 
         // View state
         this.viewMode = 'draft'; // 'draft', 'layout', 'sidebyside'
@@ -84,7 +84,7 @@ class ScreenplayEditor {
      * Handle keyboard shortcuts and special keys
      */
     _handleKeyDown(e) {
-        const { LINE_TYPE, TAB_CYCLE, ELEMENT_NEXT } = window.TrelbyConstants;
+        const { LINE_TYPE, TAB_CYCLE, ELEMENT_NEXT } = window.CouriusConstants;
 
         // Handle auto-completion navigation first
         if (this.autoCompletion.visible) {
@@ -152,7 +152,7 @@ class ScreenplayEditor {
 
         // Backspace at start of line - merge with previous
         if (e.key === 'Backspace') {
-            const { line, offset } = window.TrelbyUtils.getCaretPosition(this.editorElement);
+            const { line, offset } = window.CouriusUtils.getCaretPosition(this.editorElement);
             if (offset === 0 && line > 0) {
                 e.preventDefault();
                 this._mergeLinesUp(line);
@@ -166,7 +166,7 @@ class ScreenplayEditor {
             const lineElement = this._getLineElement(lineIndex);
             if (lineElement) {
                 const text = this.screenplay.getLineText(lineIndex);
-                const { offset } = window.TrelbyUtils.getCaretPosition(this.editorElement);
+                const { offset } = window.CouriusUtils.getCaretPosition(this.editorElement);
                 if (offset >= text.length && lineIndex < this.screenplay.lineCount - 1) {
                     e.preventDefault();
                     this._mergeLinesDown(lineIndex);
@@ -180,14 +180,14 @@ class ScreenplayEditor {
      * Handle Enter key - smart line break
      */
     _handleEnter() {
-        const { LINE_TYPE, ELEMENT_NEXT, LB } = window.TrelbyConstants;
-        const Line = window.TrelbyLine;
+        const { LINE_TYPE, ELEMENT_NEXT, LB } = window.CouriusConstants;
+        const Line = window.CouriusLine;
 
         const lineIndex = this._getCurrentLineIndex();
         if (lineIndex < 0) return;
 
         const currentLine = this.screenplay.getLine(lineIndex);
-        const { offset } = window.TrelbyUtils.getCaretPosition(this.editorElement);
+        const { offset } = window.CouriusUtils.getCaretPosition(this.editorElement);
         const text = currentLine.text;
 
         // Get the next element type
@@ -269,8 +269,8 @@ class ScreenplayEditor {
                 this.screenplay.setLineText(lineIndex, lineElement.textContent);
             } else {
                 // Multiple lines - insert multiple lines
-                const { LB, LINE_TYPE } = window.TrelbyConstants;
-                const Line = window.TrelbyLine;
+                const { LB, LINE_TYPE } = window.CouriusConstants;
+                const Line = window.CouriusLine;
                 const currentType = this.screenplay.getLineType(lineIndex);
 
                 // Insert first line at cursor
@@ -356,7 +356,7 @@ class ScreenplayEditor {
         const lineElement = this._getLineElement(lineIndex);
         if (lineElement) {
             // Remove all type classes
-            for (const t of Object.values(window.TrelbyConstants.LINE_TYPE)) {
+            for (const t of Object.values(window.CouriusConstants.LINE_TYPE)) {
                 lineElement.classList.remove(t);
             }
             lineElement.classList.add(type);
@@ -440,7 +440,7 @@ class ScreenplayEditor {
 
         if (lineElement && line) {
             // Update class
-            for (const t of Object.values(window.TrelbyConstants.LINE_TYPE)) {
+            for (const t of Object.values(window.CouriusConstants.LINE_TYPE)) {
                 lineElement.classList.remove(t);
             }
             lineElement.classList.add(line.type);
@@ -478,7 +478,7 @@ class ScreenplayEditor {
      * Update cursor info in status bar
      */
     _updateCursorInfo() {
-        const { line, offset } = window.TrelbyUtils.getCaretPosition(this.editorElement);
+        const { line, offset } = window.CouriusUtils.getCaretPosition(this.editorElement);
         const page = this.screenplay.getPageForLine(line);
 
         document.getElementById('page-info').textContent = `Page ${page}`;
@@ -517,7 +517,7 @@ class ScreenplayEditor {
         if (lineIndex < 0) return;
 
         const line = this.screenplay.getLine(lineIndex);
-        const { offset } = window.TrelbyUtils.getCaretPosition(this.editorElement);
+        const { offset } = window.CouriusUtils.getCaretPosition(this.editorElement);
 
         if (this.autoCompletion.shouldTrigger(line.type, line.text, offset)) {
             const prefix = this.autoCompletion.getPrefix(line.text, offset);
@@ -560,7 +560,7 @@ class ScreenplayEditor {
         pageContainer.innerHTML = '';
 
         const pageBreaks = this.screenplay.calculatePageBreaks();
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
 
         for (let p = 0; p < pageBreaks.length; p++) {
             const startLine = pageBreaks[p];
@@ -622,10 +622,10 @@ class ScreenplayEditor {
      * Save undo state
      */
     _saveUndoState(description) {
-        const state = new window.TrelbyScreenplayUndoState(
+        const state = new window.CouriusScreenplayUndoState(
             this.screenplay,
             this._getCurrentLineIndex(),
-            window.TrelbyUtils.getCaretPosition(this.editorElement).offset,
+            window.CouriusUtils.getCaretPosition(this.editorElement).offset,
             description
         );
         this.undoManager.push(state.toJSON(), description);
@@ -655,7 +655,7 @@ class ScreenplayEditor {
      * Restore editor state
      */
     _restoreState(state) {
-        const undoState = window.TrelbyScreenplayUndoState.fromJSON(state);
+        const undoState = window.CouriusScreenplayUndoState.fromJSON(state);
         undoState.apply(this.screenplay);
 
         this._render();
@@ -923,4 +923,4 @@ class ScreenplayEditor {
     }
 }
 
-window.TrelbyEditor = ScreenplayEditor;
+window.CouriusEditor = ScreenplayEditor;

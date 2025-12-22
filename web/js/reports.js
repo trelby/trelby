@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Reports
+ * Courius - Reports
  * Generate various screenplay analysis reports
  */
 
@@ -154,7 +154,7 @@ class Reports {
      * Generate a full script report
      */
     generateScriptReport(screenplay) {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
 
         const report = {
             title: 'Script Report',
@@ -216,7 +216,7 @@ class Reports {
             for (let j = startLine; j <= endLine; j++) {
                 const line = screenplay.getLine(j);
                 if (line) {
-                    pageWords += window.TrelbyUtils.countWords(line.text);
+                    pageWords += window.CouriusUtils.countWords(line.text);
                     if (line.type === LINE_TYPE.DIALOGUE) pageDialogue++;
                     if (line.type === LINE_TYPE.ACTION) pageAction++;
                 }
@@ -281,7 +281,7 @@ class Reports {
      */
     renderAsHTML(report) {
         let html = `<div class="report">
-            <h2>${window.TrelbyUtils.escapeHtml(report.title)}</h2>
+            <h2>${window.CouriusUtils.escapeHtml(report.title)}</h2>
             <div class="report-summary">`;
 
         // Render summary
@@ -312,7 +312,7 @@ class Reports {
                 html += `<tr>`;
                 for (const [key, value] of Object.entries(row)) {
                     if (Array.isArray(value)) continue;
-                    html += `<td>${window.TrelbyUtils.escapeHtml(String(value))}</td>`;
+                    html += `<td>${window.CouriusUtils.escapeHtml(String(value))}</td>`;
                 }
                 html += `</tr>`;
             }
@@ -373,7 +373,7 @@ class Reports {
 
         if (format === 'csv') {
             const csv = this.exportAsCSV(report);
-            window.TrelbyUtils.downloadFile(csv, `${filename}.csv`, 'text/csv');
+            window.CouriusUtils.downloadFile(csv, `${filename}.csv`, 'text/csv');
         } else {
             const html = this.renderAsHTML(report);
             const fullHtml = `<!DOCTYPE html>
@@ -394,9 +394,9 @@ class Reports {
 </head>
 <body>${html}</body>
 </html>`;
-            window.TrelbyUtils.downloadFile(fullHtml, `${filename}.html`, 'text/html');
+            window.CouriusUtils.downloadFile(fullHtml, `${filename}.html`, 'text/html');
         }
     }
 }
 
-window.TrelbyReports = Reports;
+window.CouriusReports = Reports;

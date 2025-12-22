@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Auto-completion System
+ * Courius - Auto-completion System
  */
 
 class AutoCompletion {
@@ -186,7 +186,7 @@ class AutoCompletion {
      * Check if auto-completion should trigger
      */
     shouldTrigger(lineType, text, cursorPos) {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
 
         // Only trigger for certain element types
         const triggerTypes = [
@@ -344,5 +344,5 @@ class NameDatabase {
     }
 }
 
-window.TrelbyAutoCompletion = AutoCompletion;
-window.TrelbyNameDatabase = NameDatabase;
+window.CouriusAutoCompletion = AutoCompletion;
+window.CouriusNameDatabase = NameDatabase;

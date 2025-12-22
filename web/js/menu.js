@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Menu System
+ * Courius - Menu System
  * Handles menu bar and keyboard shortcuts
  */
 
@@ -92,7 +92,7 @@ class MenuManager {
      * Handle keyboard shortcuts
      */
     _handleKeyboard(e) {
-        const { SHORTCUTS } = window.TrelbyConstants;
+        const { SHORTCUTS } = window.CouriusConstants;
 
         // Build shortcut string
         let shortcut = '';
@@ -241,7 +241,7 @@ class MenuManager {
                 });
                 break;
             case 'compareScripts':
-                window.TrelbyUtils.toast('Compare scripts coming soon', 'info');
+                window.CouriusUtils.toast('Compare scripts coming soon', 'info');
                 break;
 
             // Tools menu
@@ -341,9 +341,9 @@ class MenuManager {
                 const matches = editor.find(query, options);
                 if (matches.length > 0) {
                     editor.findNext();
-                    window.TrelbyUtils.toast(`Found ${matches.length} matches`, 'success');
+                    window.CouriusUtils.toast(`Found ${matches.length} matches`, 'success');
                 } else {
-                    window.TrelbyUtils.toast('No matches found', 'warning');
+                    window.CouriusUtils.toast('No matches found', 'warning');
                 }
             },
             onReplace: (find, replace, options) => {
@@ -357,7 +357,7 @@ class MenuManager {
             onReplaceAll: (find, replace, options) => {
                 editor.find(find, options);
                 const count = editor.replaceAll(replace);
-                window.TrelbyUtils.toast(`Replaced ${count} occurrences`, 'success');
+                window.CouriusUtils.toast(`Replaced ${count} occurrences`, 'success');
             }
         });
     }
@@ -366,7 +366,7 @@ class MenuManager {
      * Show report dialog
      */
     _showReport(type) {
-        const reports = new window.TrelbyReports();
+        const reports = new window.CouriusReports();
         const screenplay = this.app.editor.screenplay;
         let report;
 
@@ -405,11 +405,11 @@ class MenuManager {
                 <div class="headers-content">
                     <div class="headers-section">
                         <h4>First Page Header</h4>
-                        <input type="text" id="header-first" value="${window.TrelbyUtils.escapeHtml(screenplay.headers.firstPage)}" style="width: 100%">
+                        <input type="text" id="header-first" value="${window.CouriusUtils.escapeHtml(screenplay.headers.firstPage)}" style="width: 100%">
                     </div>
                     <div class="headers-section">
                         <h4>Other Pages Header</h4>
-                        <input type="text" id="header-other" value="${window.TrelbyUtils.escapeHtml(screenplay.headers.otherPages)}" style="width: 100%">
+                        <input type="text" id="header-other" value="${window.CouriusUtils.escapeHtml(screenplay.headers.otherPages)}" style="width: 100%">
                         <p style="color: var(--text-muted); font-size: 12px; margin-top: 8px;">Use %p for page number</p>
                     </div>
                     <div class="form-group">
@@ -446,7 +446,7 @@ class MenuManager {
         for (const [name, loc] of locations) {
             html += `
                 <div class="location-item">
-                    <span>${window.TrelbyUtils.escapeHtml(name)}</span>
+                    <span>${window.CouriusUtils.escapeHtml(name)}</span>
                     <span style="color: var(--text-muted); margin-left: auto;">${loc.scenes.length} scene(s)</span>
                 </div>
             `;
@@ -476,7 +476,7 @@ class MenuManager {
                     </div>
                     <div class="form-group">
                         <label>Text:</label>
-                        <input type="text" id="wm-text" value="${window.TrelbyUtils.escapeHtml(config.watermark.text)}" style="width: 100%">
+                        <input type="text" id="wm-text" value="${window.CouriusUtils.escapeHtml(config.watermark.text)}" style="width: 100%">
                     </div>
                     <div class="form-group">
                         <label>Font Size:</label>
@@ -491,7 +491,7 @@ class MenuManager {
                         <input type="number" id="wm-angle" value="${config.watermark.angle}" min="-90" max="90">
                     </div>
                     <div class="watermark-preview">
-                        <span class="watermark-text" id="wm-preview">${window.TrelbyUtils.escapeHtml(config.watermark.text) || 'Preview'}</span>
+                        <span class="watermark-text" id="wm-preview">${window.CouriusUtils.escapeHtml(config.watermark.text) || 'Preview'}</span>
                     </div>
                 </div>
             `,
@@ -543,4 +543,4 @@ class MenuManager {
     }
 }
 
-window.TrelbyMenuManager = MenuManager;
+window.CouriusMenuManager = MenuManager;

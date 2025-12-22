@@ -1,6 +1,6 @@
-# Trelby Web
+# Courius
 
-A fully functioning HTML/JavaScript port of the Trelby screenwriting application.
+A fully functioning HTML/JavaScript screenwriting application, originally ported from Trelby.
 
 ## Features
 
@@ -98,4 +98,4 @@ The app is built with vanilla JavaScript (no frameworks) for maximum portability
 
 ## License
 
-Same license as Trelby - GPL v2.
+GPL v2.

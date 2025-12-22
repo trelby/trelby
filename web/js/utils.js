@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Utility Functions
+ * Courius - Utility Functions
  */
 
 const Utils = {
@@ -57,7 +57,7 @@ const Utils = {
      * Format text for element type
      */
     formatText(text, elementType, config) {
-        const { LINE_TYPE, ELEMENT_FORMAT } = window.TrelbyConstants;
+        const { LINE_TYPE, ELEMENT_FORMAT } = window.CouriusConstants;
         const format = config?.elementFormat?.[elementType] || ELEMENT_FORMAT[elementType];
 
         if (!format) return text;
@@ -399,4 +399,4 @@ const Utils = {
     }
 };
 
-window.TrelbyUtils = Utils;
+window.CouriusUtils = Utils;

@@ -1,5 +1,5 @@
 /**
- * Trelby Web - Spell Checking System
+ * Courius - Spell Checking System
  * Uses browser's built-in spell checking or a custom dictionary
  */
 
@@ -19,7 +19,7 @@ class SpellChecker {
      */
     _loadCustomDictionary() {
         try {
-            const saved = localStorage.getItem('trelby-custom-dictionary');
+            const saved = localStorage.getItem('courius-custom-dictionary');
             if (saved) {
                 const words = JSON.parse(saved);
                 this.customDictionary = new Set(words);
@@ -35,7 +35,7 @@ class SpellChecker {
     _saveCustomDictionary() {
         try {
             const words = Array.from(this.customDictionary);
-            localStorage.setItem('trelby-custom-dictionary', JSON.stringify(words));
+            localStorage.setItem('courius-custom-dictionary', JSON.stringify(words));
         } catch (e) {
             console.warn('Failed to save custom dictionary:', e);
         }
@@ -278,7 +278,7 @@ class SpellCheckDialog {
         }
 
         if (this.misspelledWords.length === 0) {
-            window.TrelbyUtils.toast('No spelling errors found!', 'success');
+            window.CouriusUtils.toast('No spelling errors found!', 'success');
             return null;
         }
 
@@ -290,7 +290,7 @@ class SpellCheckDialog {
      */
     showNext() {
         if (this.wordIndex >= this.misspelledWords.length) {
-            window.TrelbyUtils.toast('Spell check complete!', 'success');
+            window.CouriusUtils.toast('Spell check complete!', 'success');
             return null;
         }
 
@@ -408,5 +408,5 @@ class SpellCheckDialog {
     }
 }
 
-window.TrelbySpellChecker = SpellChecker;
-window.TrelbySpellCheckDialog = SpellCheckDialog;
+window.CouriusSpellChecker = SpellChecker;
+window.CouriusSpellCheckDialog = SpellCheckDialog;

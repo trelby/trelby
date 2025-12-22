@@ -1,15 +1,15 @@
 /**
- * Trelby Web - Screenplay Model
+ * Courius - Screenplay Model
  * Main data structure for a screenplay
  */
 
 class Screenplay {
     constructor(config = null) {
-        const { LB, LINE_TYPE } = window.TrelbyConstants;
-        const Line = window.TrelbyLine;
+        const { LB, LINE_TYPE } = window.CouriusConstants;
+        const Line = window.CouriusLine;
 
         // Configuration
-        this.config = config || new window.TrelbyConfig();
+        this.config = config || new window.CouriusConfig();
 
         // Content
         this.lines = [new Line(LB.LAST, LINE_TYPE.ACTION, '')];
@@ -29,7 +29,7 @@ class Screenplay {
         this.autoCompletion = {
             scenes: new Set(['INT.', 'EXT.', 'INT./EXT.']),
             characters: new Set(),
-            transitions: new Set(window.TrelbyConstants.TRANSITIONS),
+            transitions: new Set(window.CouriusConstants.TRANSITIONS),
             shots: new Set()
         };
 
@@ -87,7 +87,7 @@ class Screenplay {
      * Insert a line at index
      */
     insertLine(index, line) {
-        const Line = window.TrelbyLine;
+        const Line = window.CouriusLine;
         if (index < 0) index = 0;
         if (index > this.lines.length) index = this.lines.length;
 
@@ -104,7 +104,7 @@ class Screenplay {
         if (index < 0 || index >= this.lines.length) return false;
         if (this.lines.length === 1) {
             // Keep at least one line
-            this.lines[0] = new window.TrelbyLine();
+            this.lines[0] = new window.CouriusLine();
             this.markModified();
             return true;
         }
@@ -182,7 +182,7 @@ class Screenplay {
     getWordCount() {
         let count = 0;
         for (const line of this.lines) {
-            count += window.TrelbyUtils.countWords(line.text);
+            count += window.CouriusUtils.countWords(line.text);
         }
         return count;
     }
@@ -201,7 +201,7 @@ class Screenplay {
     calculatePageBreaks() {
         if (this._pageBreaks) return this._pageBreaks;
 
-        const { LINE_TYPE, ELEMENT_FORMAT } = window.TrelbyConstants;
+        const { LINE_TYPE, ELEMENT_FORMAT } = window.CouriusConstants;
         const linesPerPage = this.config.linesPerPage || 55;
 
         const pageBreaks = [0]; // First page starts at line 0
@@ -252,7 +252,7 @@ class Screenplay {
      * Get all scenes
      */
     getScenes() {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         const scenes = [];
 
         for (let i = 0; i < this.lines.length; i++) {
@@ -273,7 +273,7 @@ class Screenplay {
      * Get all characters
      */
     getCharacters() {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         const characters = new Map();
 
         for (let i = 0; i < this.lines.length; i++) {
@@ -303,7 +303,7 @@ class Screenplay {
                         if (nextLine.type === LINE_TYPE.DIALOGUE ||
                             nextLine.type === LINE_TYPE.PAREN) {
                             char.dialogueLines++;
-                            char.wordCount += window.TrelbyUtils.countWords(nextLine.text);
+                            char.wordCount += window.CouriusUtils.countWords(nextLine.text);
                             j++;
                         } else {
                             break;
@@ -324,7 +324,7 @@ class Screenplay {
      * Find the previous scene heading
      */
     _findPreviousScene(lineIndex) {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         for (let i = lineIndex - 1; i >= 0; i--) {
             if (this.lines[i].type === LINE_TYPE.SCENE) {
                 return this.lines[i].text;
@@ -362,7 +362,7 @@ class Screenplay {
      * Update auto-completion data from content
      */
     updateAutoCompletion() {
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
 
         // Clear existing (except defaults)
         this.autoCompletion.characters.clear();
@@ -406,7 +406,7 @@ class Screenplay {
         const line = this.getLine(lineIndex);
         if (!line) return [];
 
-        const { LINE_TYPE } = window.TrelbyConstants;
+        const { LINE_TYPE } = window.CouriusConstants;
         const upperPrefix = prefix.toUpperCase();
         let suggestions = [];
 
@@ -452,7 +452,7 @@ class Screenplay {
         copy.lines = this.lines.map(line => line.clone());
         copy.cursorLine = this.cursorLine;
         copy.cursorColumn = this.cursorColumn;
-        copy.titlePages = window.TrelbyUtils.deepClone(this.titlePages);
+        copy.titlePages = window.CouriusUtils.deepClone(this.titlePages);
         copy.autoCompletion = {
             scenes: new Set(this.autoCompletion.scenes),
             characters: new Set(this.autoCompletion.characters),
@@ -471,7 +471,7 @@ class Screenplay {
      */
     toJSON() {
         return {
-            version: window.TrelbyConstants.VERSION.major,
+            version: window.CouriusConstants.VERSION.major,
             config: this.config.toJSON(),
             lines: this.lines.map(line => line.toJSON()),
             titlePages: this.titlePages,
@@ -491,10 +491,10 @@ class Screenplay {
      */
     static fromJSON(json) {
         const sp = new Screenplay();
-        const Line = window.TrelbyLine;
+        const Line = window.CouriusLine;
 
         if (json.config) {
-            sp.config = window.TrelbyConfig.fromJSON(json.config);
+            sp.config = window.CouriusConfig.fromJSON(json.config);
         }
 
         if (json.lines && json.lines.length > 0) {
@@ -527,7 +527,7 @@ class Screenplay {
      * Convert to Trelby native file format
      */
     toTrelbyFormat() {
-        const { FILE_MARKERS, VERSION } = window.TrelbyConstants;
+        const { FILE_MARKERS, VERSION } = window.CouriusConstants;
         const lines = [];
 
         // BOM and version
@@ -565,8 +565,8 @@ class Screenplay {
      * Parse from Trelby native file format
      */
     static fromTrelbyFormat(content) {
-        const { FILE_MARKERS, LB, LINE_TYPE } = window.TrelbyConstants;
-        const Line = window.TrelbyLine;
+        const { FILE_MARKERS, LB, LINE_TYPE } = window.CouriusConstants;
+        const Line = window.CouriusLine;
         const sp = new Screenplay();
 
         const lines = content.split('\n');
@@ -651,4 +651,4 @@ class Screenplay {
     }
 }
 
-window.TrelbyScreenplay = Screenplay;
+window.CouriusScreenplay = Screenplay;

@@ -1,5 +1,5 @@
 /**
- * Trelby Web - File I/O Operations
+ * Courius - File I/O Operations
  * Handles loading and saving screenplays in various formats
  */
 
@@ -13,7 +13,7 @@ class FileIO {
      * Create a new screenplay
      */
     createNew() {
-        const screenplay = new window.TrelbyScreenplay();
+        const screenplay = new window.CouriusScreenplay();
         this.currentFilename = 'Untitled.trelby';
         this.currentHandle = null;
         return screenplay;
@@ -61,10 +61,10 @@ class FileIO {
         }
 
         // Fallback to file input
-        const file = await window.TrelbyUtils.pickFile('.trelby,.fdx,.fountain,.txt');
+        const file = await window.CouriusUtils.pickFile('.trelby,.fdx,.fountain,.txt');
         if (!file) return null;
 
-        const content = await window.TrelbyUtils.readFile(file);
+        const content = await window.CouriusUtils.readFile(file);
         this.currentFilename = file.name;
         this.currentHandle = null;
 
@@ -102,16 +102,16 @@ class FileIO {
      * Parse Trelby native format
      */
     parseTrelby(content) {
-        return window.TrelbyScreenplay.fromTrelbyFormat(content);
+        return window.CouriusScreenplay.fromTrelbyFormat(content);
     }
 
     /**
      * Parse Final Draft XML format
      */
     parseFDX(content) {
-        const { LINE_TYPE, LB } = window.TrelbyConstants;
-        const Line = window.TrelbyLine;
-        const screenplay = new window.TrelbyScreenplay();
+        const { LINE_TYPE, LB } = window.CouriusConstants;
+        const Line = window.CouriusLine;
+        const screenplay = new window.CouriusScreenplay();
         screenplay.lines = [];
 
         try {
@@ -165,9 +165,9 @@ class FileIO {
      * Parse Fountain format
      */
     parseFountain(content) {
-        const { LINE_TYPE, LB } = window.TrelbyConstants;
-        const Line = window.TrelbyLine;
-        const screenplay = new window.TrelbyScreenplay();
+        const { LINE_TYPE, LB } = window.CouriusConstants;
+        const Line = window.CouriusLine;
+        const screenplay = new window.CouriusScreenplay();
         screenplay.lines = [];
 
         const lines = content.split('\n');
@@ -328,7 +328,7 @@ class FileIO {
         }
 
         // Fall back to download
-        window.TrelbyUtils.downloadFile(content, filename, this.getMimeType(format));
+        window.CouriusUtils.downloadFile(content, filename, this.getMimeType(format));
         screenplay.clearModified();
         return true;
     }
@@ -424,7 +424,7 @@ class FileIO {
      */
     autoSave(screenplay) {
         try {
-            const key = 'trelby-autosave';
+            const key = 'courius-autosave';
             const data = {
                 content: screenplay.toJSON(),
                 filename: this.currentFilename,
@@ -443,11 +443,11 @@ class FileIO {
      */
     loadAutoSave() {
         try {
-            const key = 'trelby-autosave';
+            const key = 'courius-autosave';
             const data = localStorage.getItem(key);
             if (data) {
                 const parsed = JSON.parse(data);
-                const screenplay = window.TrelbyScreenplay.fromJSON(parsed.content);
+                const screenplay = window.CouriusScreenplay.fromJSON(parsed.content);
                 this.currentFilename = parsed.filename || 'Recovered.trelby';
                 return {
                     screenplay,
@@ -464,15 +464,15 @@ class FileIO {
      * Clear auto-save
      */
     clearAutoSave() {
-        localStorage.removeItem('trelby-autosave');
+        localStorage.removeItem('courius-autosave');
     }
 
     /**
      * Check if auto-save exists
      */
     hasAutoSave() {
-        return localStorage.getItem('trelby-autosave') !== null;
+        return localStorage.getItem('courius-autosave') !== null;
     }
 }
 
-window.TrelbyFileIO = FileIO;
+window.CouriusFileIO = FileIO;
