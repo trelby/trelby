@@ -1,0 +1,437 @@
+/* Trelby Web - Editor Styles */
+
+/* Element Type Bar */
+#element-bar {
+    display: flex;
+    align-items: center;
+    padding: 4px 12px;
+    background-color: var(--bg-primary);
+    border-bottom: 1px solid var(--border-color);
+    gap: 16px;
+}
+
+#element-type {
+    min-width: 150px;
+    font-weight: 500;
+}
+
+.element-shortcuts {
+    display: flex;
+    gap: 16px;
+    font-size: var(--font-size-small);
+    color: var(--text-muted);
+}
+
+.shortcut-hint {
+    padding: 2px 6px;
+    background-color: var(--bg-tertiary);
+    border-radius: 3px;
+}
+
+#cursor-info {
+    margin-left: auto;
+    display: flex;
+    gap: 12px;
+    font-size: var(--font-size-small);
+    color: var(--text-secondary);
+}
+
+/* Editor Container */
+#editor-container {
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+}
+
+#editor-container.view-draft #draft-view {
+    display: block;
+    flex: 1;
+}
+
+#editor-container.view-draft #layout-view {
+    display: none;
+}
+
+#editor-container.view-layout #draft-view {
+    display: none;
+}
+
+#editor-container.view-layout #layout-view {
+    display: block;
+    flex: 1;
+}
+
+#editor-container.view-sidebyside #draft-view,
+#editor-container.view-sidebyside #layout-view {
+    display: block;
+    flex: 1;
+}
+
+#editor-container.view-sidebyside #draft-view {
+    border-right: 1px solid var(--border-color);
+}
+
+/* Editor Views */
+.editor-view {
+    height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Draft View */
+#draft-view {
+    padding: var(--spacing-lg);
+    background-color: var(--bg-primary);
+}
+
+#screenplay-editor {
+    max-width: 700px;
+    margin: 0 auto;
+    font-family: var(--font-mono);
+    font-size: var(--screenplay-font-size);
+    line-height: var(--screenplay-line-height);
+    outline: none;
+    min-height: 100%;
+    padding-bottom: 50vh;
+}
+
+/* Line Styles - Base */
+.line {
+    min-height: 1em;
+    padding: 2px 0;
+    position: relative;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.line:empty::before {
+    content: '\200B'; /* Zero-width space to maintain line height */
+}
+
+.line:focus {
+    outline: none;
+}
+
+/* Scene Heading */
+.line.scene {
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-top: 24px;
+    margin-bottom: 12px;
+}
+
+.line.scene:first-child {
+    margin-top: 0;
+}
+
+/* Action */
+.line.action {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 12px;
+}
+
+/* Character */
+.line.character {
+    text-transform: uppercase;
+    margin-left: 170px;
+    margin-top: 12px;
+    margin-bottom: 0;
+}
+
+/* Dialogue */
+.line.dialogue {
+    margin-left: 100px;
+    margin-right: 100px;
+    margin-bottom: 0;
+}
+
+/* Parenthetical */
+.line.paren {
+    margin-left: 140px;
+    margin-right: 140px;
+    margin-bottom: 0;
+}
+
+.line.paren::before {
+    content: '(';
+}
+
+.line.paren::after {
+    content: ')';
+}
+
+/* Transition */
+.line.transition {
+    text-transform: uppercase;
+    text-align: right;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+/* Shot */
+.line.shot {
+    text-transform: uppercase;
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+/* Note */
+.line.note {
+    color: var(--text-muted);
+    font-style: italic;
+    margin-left: 40px;
+    padding: 8px;
+    background-color: var(--bg-secondary);
+    border-left: 3px solid var(--warning-color);
+    margin-bottom: 12px;
+}
+
+/* Act Break */
+.line.actbreak {
+    text-transform: uppercase;
+    text-align: center;
+    font-weight: bold;
+    margin-top: 24px;
+    margin-bottom: 24px;
+    padding: 12px 0;
+    border-top: 2px solid var(--text-primary);
+    border-bottom: 2px solid var(--text-primary);
+}
+
+/* Page Break Indicator */
+.line.page-break::before {
+    content: '';
+    position: absolute;
+    left: -100px;
+    right: -100px;
+    top: -6px;
+    border-top: 1px dashed var(--border-color);
+}
+
+.line.page-break::after {
+    content: attr(data-page);
+    position: absolute;
+    left: -80px;
+    top: -6px;
+    font-size: 10px;
+    color: var(--text-muted);
+    background: var(--bg-primary);
+    padding: 0 4px;
+}
+
+/* Selection */
+.line ::selection {
+    background-color: var(--accent-light);
+}
+
+/* Current Line Highlight */
+.line.current {
+    background-color: rgba(33, 150, 243, 0.05);
+}
+
+/* Layout View */
+#layout-view {
+    background-color: var(--bg-secondary);
+    padding: var(--spacing-lg);
+}
+
+#page-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-lg);
+}
+
+.page {
+    width: var(--page-width);
+    min-height: var(--page-height);
+    background-color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    position: relative;
+    padding: var(--margin-top) var(--margin-right) var(--margin-bottom) var(--margin-left);
+    font-family: var(--font-mono);
+    font-size: 12pt;
+    line-height: 1;
+}
+
+.page-content {
+    position: relative;
+}
+
+.page-number {
+    position: absolute;
+    top: 0.5in;
+    right: 0.75in;
+    font-size: 12pt;
+    color: var(--text-primary);
+}
+
+/* Page Elements in Layout Mode */
+.page .scene {
+    text-transform: uppercase;
+    font-weight: bold;
+    margin-bottom: 12pt;
+}
+
+.page .action {
+    margin-bottom: 12pt;
+}
+
+.page .character {
+    text-transform: uppercase;
+    margin-left: 2in;
+    margin-bottom: 0;
+}
+
+.page .dialogue {
+    margin-left: 1in;
+    margin-right: 1.5in;
+    margin-bottom: 0;
+}
+
+.page .paren {
+    margin-left: 1.5in;
+    margin-right: 2in;
+}
+
+.page .transition {
+    text-transform: uppercase;
+    text-align: right;
+    margin-bottom: 12pt;
+}
+
+/* Auto-completion Popup */
+#autocomplete-popup {
+    position: fixed;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: var(--z-dropdown);
+    min-width: 150px;
+}
+
+#autocomplete-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#autocomplete-list li {
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: var(--font-mono);
+    font-size: var(--font-size-small);
+}
+
+#autocomplete-list li:hover,
+#autocomplete-list li.selected {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+#autocomplete-list li .type {
+    float: right;
+    font-size: 10px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+#autocomplete-list li:hover .type,
+#autocomplete-list li.selected .type {
+    color: rgba(255,255,255,0.7);
+}
+
+/* Spell Check Underline */
+.misspelled {
+    text-decoration: wavy underline var(--error-color);
+    text-underline-offset: 2px;
+}
+
+/* Line Numbers (optional) */
+.show-line-numbers .line::before {
+    content: attr(data-line);
+    position: absolute;
+    left: -50px;
+    width: 40px;
+    text-align: right;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+/* Print Layout */
+@media print {
+    #draft-view {
+        display: none !important;
+    }
+
+    #layout-view {
+        display: block !important;
+        padding: 0;
+        background: white;
+        overflow: visible;
+    }
+
+    .page {
+        box-shadow: none;
+        page-break-after: always;
+        margin: 0;
+    }
+
+    .page:last-child {
+        page-break-after: avoid;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    #element-bar {
+        flex-wrap: wrap;
+    }
+
+    .element-shortcuts {
+        display: none;
+    }
+
+    .line.character {
+        margin-left: 100px;
+    }
+
+    .line.dialogue {
+        margin-left: 40px;
+        margin-right: 40px;
+    }
+
+    .line.paren {
+        margin-left: 60px;
+        margin-right: 60px;
+    }
+}
+
+/* Focus Mode */
+.focus-mode #menubar,
+.focus-mode #toolbar,
+.focus-mode #element-bar,
+.focus-mode #statusbar {
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.focus-mode:hover #menubar,
+.focus-mode:hover #toolbar,
+.focus-mode:hover #element-bar,
+.focus-mode:hover #statusbar {
+    opacity: 1;
+}
+
+/* Cursor blinking */
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+}
+
+.cursor-blink {
+    animation: blink 1s step-end infinite;
+}
