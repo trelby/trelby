@@ -1,0 +1,103 @@
+{
+  "name": "Courius",
+  "short_name": "Courius",
+  "description": "A free, feature-rich screenwriting application",
+  "start_url": "/web/index.html",
+  "display": "standalone",
+  "background_color": "#1a1a2e",
+  "theme_color": "#4a90d9",
+  "orientation": "any",
+  "scope": "/web/",
+  "icons": [
+    {
+      "src": "icons/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "utilities"],
+  "shortcuts": [
+    {
+      "name": "New Screenplay",
+      "short_name": "New",
+      "description": "Create a new screenplay",
+      "url": "/web/index.html?action=new",
+      "icons": [{ "src": "icons/new-icon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Open File",
+      "short_name": "Open",
+      "description": "Open an existing screenplay",
+      "url": "/web/index.html?action=open",
+      "icons": [{ "src": "icons/open-icon.png", "sizes": "96x96" }]
+    }
+  ],
+  "file_handlers": [
+    {
+      "action": "/web/index.html",
+      "accept": {
+        "application/x-trelby": [".trelby"],
+        "application/x-fountain": [".fountain"],
+        "application/xml": [".fdx"]
+      }
+    }
+  ],
+  "share_target": {
+    "action": "/web/index.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        {
+          "name": "screenplay",
+          "accept": [".trelby", ".fountain", ".fdx", ".txt"]
+        }
+      ]
+    }
+  },
+  "related_applications": [],
+  "prefer_related_applications": false
+}
