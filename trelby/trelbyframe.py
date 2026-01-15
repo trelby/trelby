@@ -201,8 +201,8 @@ class MyFrame(wx.Frame):
                 svg_content = svg_content.replace("fill:#000000", "fill:#CCCCCC")
             svg_content = svg_content.encode()
 
-            # svg_image = wx.svg.SVGimage.CreateFromBytes(svg_content)
-            bitmap = wx.BitmapBundle.FromSVG(svg_content, wx.Size(32, 32))
+            #svg_image = wx.svg.SVGimage.CreateFromBytes(svg_content)
+            bitmap = wx.BitmapBundle.FromSVG(svg_content, wx.Size(24, 24))
 
             self.toolBar.AddTool(
                 id,

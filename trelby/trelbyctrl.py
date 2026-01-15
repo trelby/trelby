@@ -64,6 +64,7 @@ class MyCtrl(wx.Control):
         self.Bind(wx.EVT_RIGHT_DOWN, self.OnRightDown)
         self.Bind(wx.EVT_MOTION, self.OnMotion)
         self.Bind(wx.EVT_MOUSEWHEEL, self.OnMouseWheel)
+        self.Bind(wx.EVT_KEY_DOWN, self.OnKeyDown)
         self.Bind(wx.EVT_CHAR, self.OnKeyChar)
 
         self.createEmptySp()
@@ -78,12 +79,8 @@ class MyCtrl(wx.Control):
         lt = idToLTMap[event.GetId()]
 
         self.sp.convertTypeTo(lt, True)
-        self.sp.cmdPost(cs)
-
-        if cs.needsVisifying:
-            self.makeLineVisible(self.sp.line)
-
-        self.updateScreen()
+        
+        self.post_update(cs, config.SCROLL_CENTER)
 
     def clearVars(self):
         self.mouseSelectActive = False
@@ -1271,14 +1268,38 @@ class MyCtrl(wx.Control):
     def cmdTest(self, cs):
         pass
 
+    def OnKeyDown(self, ev):
+        kc = ev.GetKeyCode()
+        ctrl = ev.ControlDown()
+        alt = ev.AltDown()
+        shift = ev.ShiftDown()
+
+        cmd = self.gd.mainFrame.kbdCommands.get(
+            util.Key(kc, ctrl, alt, shift).toInt()
+        )
+
+        if cmd:
+            scrollDirection = cmd.scrollDirection
+            if cmd.isMenu:
+                getattr(self.gd.mainFrame, "On" + cmd.name)()
+            else:
+                cs = screenplay.CommandState()
+                cs.mark = bool(shift)
+                getattr(self, "cmd" + cmd.name)(cs)
+                self.post_update(cs, scrollDirection)
+        else:
+            ev.Skip()
+
     def OnKeyChar(self, ev):
         kc = ev.GetUnicodeKey()
+        ctrl = ev.ControlDown()
+        alt = ev.AltDown()
+        shift = ev.ShiftDown()
 
-        cs = screenplay.CommandState()
-        cs.mark = bool(ev.ShiftDown())
-        scrollDirection = config.SCROLL_CENTER
+        if not ctrl and not alt and util.isValidInputChar(kc):
+            cs = screenplay.CommandState()
+            cs.mark = bool(shift)
 
-        if not ev.ControlDown() and not ev.AltDown() and util.isValidInputChar(kc):
             # WX2.6-FIXME: we should probably use GetUnicodeKey() (dunno
             # how to get around the isValidInputChar test in the preceding
             # line, need to test what GetUnicodeKey() returns on
@@ -1303,23 +1324,13 @@ class MyCtrl(wx.Control):
                     self.cmdSpeedTest(cs)
                 else:
                     self.sp.addCharCmd(cs)
-
+            
+            scrollDirection = config.SCROLL_CENTER
+            self.post_update(cs, scrollDirection)
         else:
-            cmd = self.gd.mainFrame.kbdCommands.get(
-                util.Key(kc, ev.ControlDown(), ev.AltDown(), ev.ShiftDown()).toInt()
-            )
+            ev.Skip()
 
-            if cmd:
-                scrollDirection = cmd.scrollDirection
-                if cmd.isMenu:
-                    getattr(self.gd.mainFrame, "On" + cmd.name)()
-                    return
-                else:
-                    getattr(self, "cmd" + cmd.name)(cs)
-            else:
-                ev.Skip()
-                return
-
+    def post_update(self, cs, scrollDirection):
         self.sp.cmdPost(cs)
 
         if self.gd.cfgGl.paginateInterval > 0:
