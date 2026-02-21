@@ -5,6 +5,7 @@ import glob
 import gzip
 import os
 import re
+import subprocess
 import tempfile
 import time
 from typing import AnyStr, Optional
@@ -1191,7 +1192,15 @@ def getPDFViewer():
         # Need to check for Mac before Unix as macOS is a Unix
         progs = [("/System/Applications/Preview.app", "")]
     elif misc.isUnix:
-        progs = [("/usr/bin/xdg-open/", "")]
+        progs = [
+            ("/usr/bin/xdg-open", ""),
+            ("xdg-open", ""),
+            ("evince", ""),
+            ("okular", ""),
+            ("xreader", ""),
+            ("atril", ""),
+            ("mupdf", ""),
+        ]
     elif misc.isWindows:
         # get value via registry if possible, or fallback to old method.
         viewer = _getWindowsPDFViewer()
@@ -1266,7 +1275,7 @@ def showPDF(
         if regPDF:
             wx.MessageBox(
                 _(
-                    "Currently set PDF viewer ({}) was not found.\nChange this in File/Settings/Change/Misc.\n\nUsing the default PDF viewer instead:\n%s".format(
+                    "Currently set PDF viewer ({}) was not found.\nChange this in File/Settings/Change/Misc.\n\nUsing the default PDF viewer instead:\n{}".format(
                         pdfProgram, regPDF
                     )
                 ),
@@ -1297,13 +1306,7 @@ def showPDF(
         # dummy arg.
         args = ["pdf"] + pdfArgs.split() + [filename]
 
-    # there's a race condition in checking if the path exists, above, and
-    # using it, below. if the file disappears between those two we get an
-    # OSError exception from spawnv, so we need to catch it and handle it.
-
-    # TODO: spawnv does not support Unicode paths as of this moment
-    # (Python 2.4). for now, convert it to UTF-8 and hope for the best.
     try:
-        os.spawnv(os.P_NOWAIT, pdfProgram.encode("UTF-8"), args)
+        subprocess.Popen([pdfProgram] + args[1:])
     except OSError:
         complain()
