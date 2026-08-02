@@ -229,7 +229,9 @@ class ViewModeDraft(ViewMode):
             l = ls[i]
             tcfg = cfg.getType(l.lt)
 
-            if tcfg.screen.isCaps:
+            if ctrl.sp._isCharacterElementStart(i):
+                text = ctrl.sp.getCharacterTextForDisplay(i, forExportCaps=False)
+            elif tcfg.screen.isCaps:
                 text = util.upper(l.text)
             else:
                 text = l.text

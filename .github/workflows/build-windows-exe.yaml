@@ -1,0 +1,61 @@
+name: Build Windows EXE
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref (branch/tag/SHA) to build"
+        required: false
+        default: ""
+      upload_artifact_name:
+        description: "Artifact name"
+        required: false
+        default: "trelby-windows-exe"
+
+permissions:
+  contents: read
+
+jobs:
+  build-windows-exe:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref != '' && inputs.ref || github.ref }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller==6.10.0 wxPython reportlab lxml pillow
+
+      - name: Build EXE
+        shell: pwsh
+        run: |
+          python -m PyInstaller `
+            --noconfirm `
+            --clean `
+            --windowed `
+            --name trelby `
+            --add-data "trelby\resources;trelby\resources" `
+            --add-data "trelby;trelby" `
+            trelby.py
+
+      - name: Package artifact
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist\trelby\* -DestinationPath "${{ inputs.upload_artifact_name }}.zip" -Force
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.upload_artifact_name }}
+          path: ${{ inputs.upload_artifact_name }}.zip
+          if-no-files-found: error

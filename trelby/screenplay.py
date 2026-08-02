@@ -988,10 +988,17 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 else:
                     tt = tcfg.screen
 
-                if tt.isCaps:
-                    text = util.upper(line.text)
+                if self._isCharacterElementStart(i):
+                    text = self.getCharacterTextForDisplay(i, tt.isCaps)
+                elif (line.lt == CHARACTER) and self.isFirstLineOfElem(i):
+                    text = self.getCharacterTextForDisplay(
+                        i, forExportCaps=forPDF or tt.isCaps
+                    )
                 else:
-                    text = line.text
+                    if tt.isCaps:
+                        text = util.upper(line.text)
+                    else:
+                        text = line.text
 
                 if tt.isBold:
                     typ |= pml.BOLD
@@ -1546,6 +1553,77 @@ Generated with <a href="http://www.trelby.org">Trelby</a>.</p>
                 return s
 
             line -= 1
+
+    def _hasDialogueContinuationSuffix(self, s):
+        s = util.upper(s).strip()
+        return bool(re.search(r"\((?:CONT'D|CONTINUED)\)$", s))
+
+    def _normalizeSpeakerName(self, s):
+        s = util.upper(s).strip()
+
+        while self._hasDialogueContinuationSuffix(s):
+            s = re.sub(r"\s*\((?:CONT'D|CONTINUED)\)$", "", s).rstrip()
+
+        return s
+
+    def _isCharacterElementStart(self, line):
+        return (
+            (line >= 0)
+            and (line < len(self.lines))
+            and (self.lines[line].lt == CHARACTER)
+            and self.isFirstLineOfElem(line)
+        )
+
+    def _findPreviousCharacterInScene(self, line):
+        curr = self.getElemFirstIndexFromLine(line)
+        prev = curr - 1
+
+        while prev >= 0:
+            prev = self.getElemFirstIndexFromLine(prev)
+            lt = self.lines[prev].lt
+
+            if lt in (SCENE, ACTBREAK):
+                return None
+
+            if lt == CHARACTER:
+                return prev
+
+            prev -= 1
+
+        return None
+
+    def shouldAddDialogueContinuedForCharacter(self, line):
+        if not self._isCharacterElementStart(line):
+            return False
+
+        currText = self.lines[line].text
+        if self._hasDialogueContinuationSuffix(currText):
+            return False
+
+        prevLine = self._findPreviousCharacterInScene(line)
+        if prevLine is None:
+            return False
+
+        if self.elemsDistance(prevLine, line) <= 1:
+            return False
+
+        return self._normalizeSpeakerName(currText) == self._normalizeSpeakerName(
+            self.lines[prevLine].text
+        )
+
+    def getCharacterTextForDisplay(self, line, forExportCaps=False):
+        text = self.lines[line].text
+
+        if self._hasDialogueContinuationSuffix(text):
+            text = self._normalizeSpeakerName(text)
+            text = util.upper(text) + self.cfg.strDialogueContinued
+        else:
+            text = util.upper(text)
+
+        if self.shouldAddDialogueContinuedForCharacter(line):
+            text += self.cfg.strDialogueContinued
+
+        return text
 
     # return total number of characters in script
     def getCharCount(self):
