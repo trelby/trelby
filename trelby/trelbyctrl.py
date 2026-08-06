@@ -1214,7 +1214,7 @@ class MyCtrl(wx.Control):
         self.sp.toPrevTypeTabCmd(cs)
 
     def cmdSpeedTest(self, cs):
-        import undo
+        from trelby import undo
 
         self.speedTestUndo = []
 
@@ -1295,11 +1295,11 @@ class MyCtrl(wx.Control):
             if addChar:
                 cs.char = chr(kc)
 
-                if opts.isTest and (cs.char == "ï¿½"):
+                if opts.is_test_mode and (cs.char == "å"):
                     self.loadFile("sample.trelby")
-                elif opts.isTest and (cs.char == "ï¿½"):
+                elif opts.is_test_mode and (cs.char == "¤"):
                     self.cmdTest(cs)
-                elif opts.isTest and (cs.char == "ï¿½"):
+                elif opts.is_test_mode and (cs.char == "½"):
                     self.cmdSpeedTest(cs)
                 else:
                     self.sp.addCharCmd(cs)

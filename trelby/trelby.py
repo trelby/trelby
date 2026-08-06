@@ -140,8 +140,11 @@ class MyApp(wx.App):
 
 
 def main():
-    opts.init()
+    """Create the application and run the main loop.
 
+    Command-Line-Interpreter arguments have already been parsed
+    -- when `opts` module was imported.
+
+    """
     myApp = MyApp(0)
-
     myApp.MainLoop()

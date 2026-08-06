@@ -46,7 +46,7 @@ def init(doWX=True):
 
     # stupid hack to keep testcases working, since they don't initialize
     # opts (the doWX name is just for similarity with util)
-    if not doWX or opts.isTest:
+    if not doWX or opts.is_test_mode:
         progPath = "."
         confPath = ".trelby"
     else:

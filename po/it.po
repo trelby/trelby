@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: trelby 2.4.15\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-30 10:12+0200\n"
+"POT-Creation-Date: 2026-08-06 13:49+0200\n"
 "PO-Revision-Date: 2025-08-30 10:11+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1094,6 +1094,7 @@ msgid "Speeches: {}, Lines: {:.2f}, per speech: {:.2f}"
 msgstr "Dialoghi: {}, Righe: {:.2f}, per diaologo: {:.2f}"
 
 #: trelby/characterreport.py:103
+#, python-brace-format
 msgid "Speeches: {}, Lines: {} %{:.2f}, per speech: {:.2f}"
 msgstr "Dialoghi: {}, Righe: {} %{:.2f}, per dialogo: {:.2f}"
 
@@ -1102,10 +1103,12 @@ msgid "Words: {}, per speech: %{:.2f}, characters per: %{:.2f}"
 msgstr "Parole: {}, per dialogo: %{:.2f}, caratteri per: %{:.2f}"
 
 #: trelby/characterreport.py:114
+#, python-brace-format
 msgid "Words: {}, per speech: {:.2f}, characters per: {:.2f}"
 msgstr "Parole: {}, per dialogo: {:.2f}, caratteri per: {:.2f}"
 
 #: trelby/characterreport.py:124
+#, python-brace-format
 msgid "Pages: {}, list: {}"
 msgstr "Pagine: {}, elenco: {}"
 
@@ -1171,6 +1174,7 @@ msgstr ""
 " (0 = disabilita)"
 
 #: trelby/configpages/paperpanel.py:130
+#, python-brace-format
 msgid "Lines per page: {}"
 msgstr "Righe per pagina: {}"
 
@@ -1190,6 +1194,7 @@ msgstr ""
 "Vedi il manuale per i dettagli completi.\n"
 
 #: trelby/configpages/pdffontspanel.py:161
+#, python-brace-format
 msgid ""
 "File '{}'\n"
 "does not appear to be a valid TrueType font."
@@ -1198,6 +1203,7 @@ msgstr ""
 "non sembra essere un font TrueType valido."
 
 #: trelby/configpages/pdffontspanel.py:175
+#, python-brace-format
 msgid ""
 "Font '{}'\n"
 "does not allow embedding in its license terms.\n"
@@ -1659,6 +1665,7 @@ msgid "Tab, non-active"
 msgstr "Tab non attivo"
 
 #: trelby/config.py:1227
+#, python-brace-format
 msgid "Text foreground for {}"
 msgstr "Colore primo piano testo per {}"
 
@@ -1671,10 +1678,12 @@ msgid "Unknown platform"
 msgstr "Piattaforma sconosciuta"
 
 #: trelby/config.py:1509
+#, python-brace-format
 msgid "key '{}' not found from '{}'"
 msgstr "chiave '{}' non trovata in '{}'"
 
 #: trelby/finddlg.py:385
+#, python-brace-format
 msgid ""
 "Search finished at the {} of the script. Do\n"
 "you want to continue at the {} of the script?"
@@ -1687,6 +1696,7 @@ msgid "Continue?"
 msgstr "Continuare?"
 
 #: trelby/finddlg.py:465
+#, python-brace-format
 msgid "Replaced {} matches"
 msgstr "Sostituite {} corrispondenze"
 
@@ -1695,6 +1705,7 @@ msgid "Files"
 msgstr "File"
 
 #: trelby/globaldata.py:96
+#, python-brace-format
 msgid ""
 "Error creating configuration directory\n"
 "'{}': {}"
@@ -1703,10 +1714,12 @@ msgstr ""
 "'{}': {}"
 
 #: trelby/gutil.py:107
+#, python-brace-format
 msgid "Error writing temporary PDF file: {}"
 msgstr "Errore nella scrittura del file PDF temporaneo: {}"
 
 #: trelby/importdlg.py:24
+#, python-brace-format
 msgid "{} lines (indented {} characters)"
 msgstr "{} righe (indentate di {} caratteri)"
 
@@ -1723,6 +1736,7 @@ msgid "Ignore"
 msgstr "Ignora"
 
 #: trelby/locationreport.py:94
+#, python-brace-format
 msgid "Lines: {} (%{} action, %{} of script), Scenes: {}, Pages: {} ({})"
 msgstr "Righe: {} (%{} azione, %{} dello script), Scene: {}, Pagine: {} ({})"
 
@@ -1735,6 +1749,7 @@ msgid "Message"
 msgstr "Messaggio"
 
 #: trelby/misc.py:996
+#, python-brace-format
 msgid ""
 "Press the key combination you\n"
 "want to bind to the command\n"
@@ -1746,18 +1761,22 @@ msgstr ""
 
 #: trelby/myimport.py:58 trelby/myimport.py:132 trelby/myimport.py:262
 #: trelby/myimport.py:389
+#, python-brace-format
 msgid "Error parsing file: {}"
 msgstr "Errore nell'analisi del file: {}"
 
 #: trelby/namesdlg.py:38
+#, python-brace-format
 msgid "No name type set before line: '{}'"
 msgstr "Nessun tipo di nome impostato prima della riga: '{}'"
 
 #: trelby/namesdlg.py:42
+#, python-brace-format
 msgid "Unknown linetype for line: '{}'"
 msgstr "Tipo di linea sconosciuto per la riga: '{}'"
 
 #: trelby/namesdlg.py:50
+#, python-brace-format
 msgid "Error loading name database: {}"
 msgstr "Errore nel caricamento del database dei nomi: {}"
 
@@ -1770,18 +1789,22 @@ msgid "Type"
 msgstr "Tipo"
 
 #: trelby/namesdlg.py:264
+#, python-brace-format
 msgid "{} names found."
 msgstr "{} nomi trovati."
 
 #: trelby/pdf.py:116
+#, python-brace-format
 msgid "LineOp contains only {} points"
 msgstr "LineOp contiene solo {} punti"
 
 #: trelby/pdf.py:317
+#, python-brace-format
 msgid "PDF.getfontNr: invalid flags {}"
 msgstr "PDF.getfontNr: flag non valide {}"
 
 #: trelby/pdf.py:329
+#, python-brace-format
 msgid ""
 "Font name \"{}\" is not known and no font file name provided. Please provide "
 "a file name for this font in the settings or use the default font."
@@ -1795,6 +1818,7 @@ msgid "Speakers"
 msgstr "Personaggi"
 
 #: trelby/scenereport.py:55
+#, python-brace-format
 msgid "     Lines: {} (%{} action), Pages: {} ({})"
 msgstr "     Righe: {} (%{} azione), Pagine: {} ({})"
 
@@ -1815,6 +1839,7 @@ msgstr ""
 "di sceneggiatura valido."
 
 #: trelby/screenplay.py:244
+#, python-brace-format
 msgid ""
 "File uses fileformat version '{}',\n"
 "which is not supported by this version\n"
@@ -1825,10 +1850,12 @@ msgstr ""
 "del programma."
 
 #: trelby/screenplay.py:292
+#, python-brace-format
 msgid "Line {} is too short."
 msgstr "La riga {} è troppo corta."
 
 #: trelby/screenplay.py:298
+#, python-brace-format
 msgid ""
 "Line {} has invalid syntax for\n"
 "config line."
@@ -1837,6 +1864,7 @@ msgstr ""
 "per la linea di configurazione."
 
 #: trelby/screenplay.py:348
+#, python-brace-format
 msgid "Line {} has invalid element type."
 msgstr "La riga {} ha un tipo di elemento non valido."
 
@@ -1882,6 +1910,7 @@ msgid "not found"
 msgstr "non trovato"
 
 #: trelby/screenplay.py:835
+#, python-brace-format
 msgid "Unknown line break style {} in generateRTF"
 msgstr "Stile di interruzione linea sconosciuto {} in generateRTF"
 
@@ -1907,6 +1936,7 @@ msgstr "La linea è troppo lunga (BUG)."
 
 #: trelby/screenplay.py:2510 trelby/screenplay.py:2519
 #: trelby/screenplay.py:2528
+#, python-brace-format
 msgid "Element type '{}' can not follow type '{}'."
 msgstr "Il tipo di elemento '{}' non può seguire il tipo '{}'."
 
@@ -1915,6 +1945,7 @@ msgid "Element contains lines with different line types (BUG)."
 msgstr "L'elemento contiene righe con tipi di linea differenti (BUG)."
 
 #: trelby/scriptreport.py:24
+#, python-brace-format
 msgid "Total lines in script: {}"
 msgstr "Totale righe nello script: {}"
 
@@ -1935,18 +1966,22 @@ msgid "Speaking characters"
 msgstr "Personaggi parlanti"
 
 #: trelby/splash.py:143
+#, python-brace-format
 msgid "No lines defined for quote at line {}"
 msgstr "Nessuna riga definita per la citazione alla riga {}"
 
 #: trelby/splash.py:149
+#, python-brace-format
 msgid "Too many lines defined for quote at line {}"
 msgstr "Troppe righe definite per la citazione alla riga {}"
 
 #: trelby/splash.py:167
+#, python-brace-format
 msgid "Error loading quotes: {}"
 msgstr "Errore nel caricamento delle citazioni: {}"
 
 #: trelby/trelbyctrl.py:134
+#, python-brace-format
 msgid ""
 "Error loading file:\n"
 "\n"
@@ -1957,6 +1992,7 @@ msgstr ""
 "{}"
 
 #: trelby/trelbyctrl.py:412
+#, python-brace-format
 msgid ""
 "The script seems to contain errors.\n"
 "Are you sure you want to {} it?"
@@ -1981,10 +2017,12 @@ msgstr ""
 "di voler scartare le modifiche?"
 
 #: trelby/trelbyctrl.py:853
+#, python-brace-format
 msgid "Enter scene number ({} - {}):"
 msgstr "Inserisci il numero della scena ({} - {}):"
 
 #: trelby/trelbyctrl.py:885
+#, python-brace-format
 msgid "Enter page number ({} - {}):"
 msgstr "Inserisci il numero della pagina ({} - {}):"
 
@@ -2098,6 +2136,7 @@ msgid "File to import"
 msgstr "File da importare"
 
 #: trelby/trelby.py:53 trelby/trelby.py:44
+#, python-brace-format
 msgid ""
 "You seem to have an invalid version\n"
 "({}) of wxWidgets installed. This\n"
@@ -2126,22 +2165,27 @@ msgstr ""
 "non Unicode. Questo non è supportato."
 
 #: trelby/truetype.py:81
+#, python-brace-format
 msgid "Table {} missing/invalid"
 msgstr "Tabella {} mancante/non valida"
 
 #: trelby/util.py:993
+#, python-brace-format
 msgid "File too large: {}"
 msgstr "File troppo grande: {}"
 
 #: trelby/util.py:1000
+#, python-brace-format
 msgid "Error loading file '{}': {}"
 msgstr "Errore nel caricamento del file '{}': {}"
 
 #: trelby/util.py:1034
+#, python-brace-format
 msgid "Error loading file '{}': Decompression failed"
 msgstr "Errore nel caricamento del file '{}': decompressione fallita"
 
 #: trelby/util.py:1061
+#, python-brace-format
 msgid "Error writing file '{}': {}"
 msgstr "Errore durante la scrittura del file '{}': {}"
 
@@ -2162,7 +2206,7 @@ msgstr ""
 "nelle impostazioni in File/Impostazioni/Cambia/Varie."
 
 #: trelby/util.py:1269
-#, python-format
+#, python-format, python-brace-format
 msgid ""
 "Currently set PDF viewer ({}) was not found.\n"
 "Change this in File/Settings/Change/Misc.\n"
@@ -2177,6 +2221,7 @@ msgstr ""
 "%s"
 
 #: trelby/watermarkdlg.py:165
+#, python-brace-format
 msgid "Generated {} files in directory {}."
 msgstr "Generati {} file nella directory {}."
 
