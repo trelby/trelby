@@ -1,6 +1,12 @@
 #!/bin/bash
 
+# Update the PO files in the `po` directory with the POT template.
+
 for i in $(find po -type f -name '*.po'); do
-  msgmerge -vU "$i" po/trelby.pot
+    echo ""
+    echo "Updating $i"
+    msgmerge --verbose --update --previous --sort-by-file "$i" po/trelby.pot
 done
 
+echo ""
+echo "End."
