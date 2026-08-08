@@ -81,7 +81,7 @@ class FindDlg(wx.Dialog):
         self.elementTypes = []
 
         for t in config.getTIs():
-            self.elements.Append(t.name)
+            self.elements.Append(_(t.name))
             self.elementTypes.append(t.lt)
 
         vsizer.Add(self.elements, 1, wx.EXPAND)

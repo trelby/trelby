@@ -31,7 +31,7 @@ class AutoCompletionDlg(wx.Dialog):
         self.elementsCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
         for t in autoCompletion.types.values():
-            self.elementsCombo.Append(t.ti.name, t.ti.lt)
+            self.elementsCombo.Append(_(t.ti.name), t.ti.lt)
 
         self.Bind(wx.EVT_COMBOBOX, self.OnElementCombo, id=self.elementsCombo.GetId())
 

@@ -147,7 +147,7 @@ class MiscPanel(wx.Panel):
 
         sizer.Add(hsizer, 0, wx.BOTTOM, 10)
 
-        setattr(self, name + _("Entry"), tmp)
+        setattr(self, name + "Entry", tmp)
 
     def OnKillFocus(self, event):
         self.OnMisc()

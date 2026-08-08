@@ -17,10 +17,10 @@ class StringsPanel(wx.Panel):
 
         gsizer = wx.FlexGridSizer(4, 2, 5, 0)
 
-        self.addEntry("strContinuedPageEnd", "(CONTINUED)", self, gsizer)
-        self.addEntry("strContinuedPageStart", "CONTINUED:", self, gsizer)
-        self.addEntry("strMore", "(MORE)", self, gsizer)
-        self.addEntry("strDialogueContinued", " (cont'd)", self, gsizer)
+        self.addEntry("strContinuedPageEnd", _("(CONTINUED)"), self, gsizer)
+        self.addEntry("strContinuedPageStart", _("CONTINUED:"), self, gsizer)
+        self.addEntry("strMore", _("(MORE)"), self, gsizer)
+        self.addEntry("strDialogueContinued", _(" (cont'd)"), self, gsizer)
 
         gsizer.AddGrowableCol(1)
         vsizer.Add(gsizer, 0, wx.EXPAND)

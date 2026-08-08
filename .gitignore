@@ -4,13 +4,26 @@
 .trelby/
 *.trelby
 !tests/fixtures/*.trelby
-.tox/
 MANIFEST
 .pybuild/
 
-# virtual environment and IDE stuff
+# virtual environment
 /venv/
+
+# IDE and Python development tools
 /.vscode/
+.coverage
+.pdbrc
+.pylintrc
+.tox/
+noxfile.py
+ruff.toml
+
+# macOS specific
+*.DS_Store
+
+# git specifics
+.pre-commit-config.yaml
 
 #Choco
 *.nupkg

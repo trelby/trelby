@@ -129,6 +129,6 @@ class KeyboardPanel(wx.Panel):
     def updateConflicts(self):
         s = self.cfg.getConflictingKeys()
         if s == None:
-            s = "None"
+            s = _("None")
 
         self.conflictsEntry.SetValue(s)

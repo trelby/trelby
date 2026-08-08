@@ -21,14 +21,14 @@ class ScriptReport:
         ls = self.sp.lines
 
         total = len(ls)
-        tf.addText(_("Total lines in script: {}".format(total)))
+        tf.addText(_("Total lines in script: {}").format(total))
 
         tf.addSpace(2.0)
 
         for t in config.getTIs():
             cnt = sum([1 for line in ls if line.lt == t.lt])
             tf.addText(
-                "        %13s:  %4d (%d%%)" % (t.name, cnt, util.pct(cnt, total))
+                "        %13s:  %4d (%d%%)" % (_(t.name), cnt, util.pct(cnt, total))
             )
 
         tf.addSpace(4.0)

@@ -24,7 +24,7 @@ class ElementsPanel(wx.Panel):
         self.elementsCombo = wx.ComboBox(self, -1, style=wx.CB_READONLY)
 
         for t in config.getTIs():
-            self.elementsCombo.Append(t.name, t.lt)
+            self.elementsCombo.Append(_(t.name), t.lt)
 
         hsizer.Add(self.elementsCombo, 0)
 
@@ -34,8 +34,8 @@ class ElementsPanel(wx.Panel):
 
         hsizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        hsizer.Add(self.addTextStyles("Screen", "screen", self))
-        hsizer.Add(self.addTextStyles("Print", "export", self), 0, wx.LEFT, 10)
+        hsizer.Add(self.addTextStyles("Screen", _("Screen"), "screen", self))
+        hsizer.Add(self.addTextStyles("Print", _("Print"), "export", self), 0, wx.LEFT, 10)
 
         vsizer.Add(hsizer, 0, wx.BOTTOM, 10)
 
@@ -130,8 +130,8 @@ class ElementsPanel(wx.Panel):
         self.elementsCombo.SetSelection(0)
         self.OnElementCombo()
 
-    def addTextStyles(self, name, prefix, parent):
-        hsizer = wx.StaticBoxSizer(wx.StaticBox(parent, -1, name), wx.HORIZONTAL)
+    def addTextStyles(self, name, label, prefix, parent):
+        hsizer = wx.StaticBoxSizer(wx.StaticBox(parent, -1, label=label), wx.HORIZONTAL)
 
         gsizer = wx.FlexGridSizer(2, 2, 0, 10)
 
@@ -141,17 +141,17 @@ class ElementsPanel(wx.Panel):
         if misc.isWindows:
             pad = 5
 
-        self.addCheckBox(_("Caps"), prefix, parent, gsizer, pad)
-        self.addCheckBox(_("Italic"), prefix, parent, gsizer, pad)
-        self.addCheckBox(_("Bold"), prefix, parent, gsizer, pad)
-        self.addCheckBox(_("Underlined"), prefix, parent, gsizer, pad)
+        self.addCheckBox("Caps", _("Caps"), prefix, parent, gsizer, pad)
+        self.addCheckBox("Italic", _("Italic"), prefix, parent, gsizer, pad)
+        self.addCheckBox("Bold", _("Bold"), prefix, parent, gsizer, pad)
+        self.addCheckBox("Underlined", _("Underlined"), prefix, parent, gsizer, pad)
 
         hsizer.Add(gsizer, 0, wx.EXPAND)
 
         return hsizer
 
-    def addCheckBox(self, name, prefix, parent, sizer, pad):
-        cb = wx.CheckBox(parent, -1, name)
+    def addCheckBox(self, name, label, prefix, parent, sizer, pad):
+        cb = wx.CheckBox(parent, -1, label=label)
         self.Bind(wx.EVT_CHECKBOX, self.OnStyleCb, id=cb.GetId())
         sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, prefix + name + "Cb", cb)

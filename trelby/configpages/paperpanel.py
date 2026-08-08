@@ -57,16 +57,16 @@ class PaperPanel(wx.Panel):
 
         gsizer = wx.FlexGridSizer(4, 5, 5, 5)
 
-        self.addMarginCtrl(_("Top"), self, gsizer)
-        self.addMarginCtrl(_("Bottom"), self, gsizer)
-        self.addMarginCtrl(_("Left"), self, gsizer)
-        self.addMarginCtrl(_("Right"), self, gsizer)
+        self.addMarginCtrl("Top", _("Top"), self, gsizer)
+        self.addMarginCtrl("Bottom", _("Bottom"), self, gsizer)
+        self.addMarginCtrl("Left", _("Left"), self, gsizer)
+        self.addMarginCtrl("Right", _("Right"), self, gsizer)
 
         bsizer.Add(gsizer, 0, wx.EXPAND | wx.ALL, 10)
 
         vsizer.Add(bsizer, 0, wx.BOTTOM, 10)
 
-        vsizer.Add(wx.StaticText(self, -1, "(1 inch = 25.4 mm)"), 0, wx.LEFT, 25)
+        vsizer.Add(wx.StaticText(self, -1, f"(1 {_('inch')} = 25.4 {_('mm')})"), 0, wx.LEFT, 25)
 
         self.linesLabel = wx.StaticText(self, -1, "")
 
@@ -103,17 +103,17 @@ class PaperPanel(wx.Panel):
     def eqFloat(self, f1, f2):
         return round(f1, 2) == round(f2, 2)
 
-    def addMarginCtrl(self, name, parent, sizer):
-        sizer.Add(wx.StaticText(parent, -1, name + ":"), 0, wx.ALIGN_CENTER_VERTICAL)
+    def addMarginCtrl(self, name, label, parent, sizer):
+        sizer.Add(wx.StaticText(parent, -1, label=label + ":"), 0, wx.ALIGN_CENTER_VERTICAL)
 
         entry = wx.TextCtrl(parent, -1)
         sizer.Add(entry, 0)
-        label = wx.StaticText(parent, -1, "mm")
+        label = wx.StaticText(parent, -1, _("mm"))
         sizer.Add(label, 0, wx.ALIGN_CENTER_VERTICAL)
 
         entry2 = wx.TextCtrl(parent, -1)
         sizer.Add(entry2, 0, wx.LEFT, 20)
-        label2 = wx.StaticText(parent, -1, "inch")
+        label2 = wx.StaticText(parent, -1, _("inch"))
         sizer.Add(label2, 0, wx.ALIGN_CENTER_VERTICAL)
 
         setattr(self, name.lower() + "EntryMm", entry)
@@ -127,7 +127,7 @@ class PaperPanel(wx.Panel):
 
     def setLines(self):
         self.cfg.recalc(False)
-        self.linesLabel.SetLabel(_("Lines per page: {}".format(self.cfg.linesOnPage)))
+        self.linesLabel.SetLabel(_("Lines per page: {}").format(self.cfg.linesOnPage))
 
     def OnPaperCombo(self, event):
         w, h = self.paperCombo.GetClientData(self.paperCombo.GetSelection())

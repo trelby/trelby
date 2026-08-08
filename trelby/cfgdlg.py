@@ -48,7 +48,7 @@ class CfgDlg(wx.Dialog):
             self.AddPage(PaperPanel, _("Paper"))
             self.AddPage(PDFPanel, "PDF")
             self.AddPage(PDFFontsPanel, _("PDF/Fonts"))
-            self.AddPage(StringsPanel, _("Strings"))
+            self.AddPage(StringsPanel, _("More && Continued"))
 
         vsizer.Add(self.listbook, 1, wx.EXPAND)
 

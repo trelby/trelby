@@ -127,7 +127,7 @@ class DisplayPanel(wx.Panel):
         self.cfg.pbi = self.pbRb.GetSelection()
 
     def updateFontLb(self):
-        names = ["Normal", "Bold", "Italic", "Bold-Italic"]
+        names = [_("Normal"), _("Bold"), _("Italic"), _("Bold-Italic")]
 
         # keep track if all fonts have the same width
         widths = set()

@@ -177,9 +177,9 @@ class TitlesDlg(wx.Dialog):
         if misc.isWindows:
             pad = 5
 
-        self.addCheckBox("Bold", self, vsizer2, pad)
-        self.addCheckBox("Italic", self, vsizer2, pad)
-        self.addCheckBox("Underlined", self, vsizer2, pad)
+        self.addCheckBox("Bold", _("Bold"), self, vsizer2, pad)
+        self.addCheckBox("Italic", _("Italic"), self, vsizer2, pad)
+        self.addCheckBox("Underlined", _("Underlined"), self, vsizer2, pad)
 
         bsizer.Add(vsizer2)
 
@@ -227,8 +227,8 @@ class TitlesDlg(wx.Dialog):
 
         self.textEntry.SetFocus()
 
-    def addCheckBox(self, name, parent, sizer, pad):
-        cb = wx.CheckBox(parent, -1, name)
+    def addCheckBox(self, name, label, parent, sizer, pad):
+        cb = wx.CheckBox(parent, -1, label=label)
         self.Bind(wx.EVT_CHECKBOX, self.OnMisc, id=cb.GetId())
         sizer.Add(cb, 0, wx.TOP, pad)
         setattr(self, name.lower() + "Cb", cb)

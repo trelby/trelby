@@ -212,9 +212,9 @@ class MyFrame(wx.Frame):
             )
 
         addTB(ID_FILE_NEW, "new.svg", _("New script"))
-        addTB(ID_FILE_OPEN, "open.svg", _("Open Script") + "..")
-        addTB(ID_FILE_SAVE, "save.svg", _("Save") + "..")
-        addTB(ID_FILE_SAVE_AS, "saveas.svg", _("Save as") + "..")
+        addTB(ID_FILE_OPEN, "open.svg", _("Open Script") + "...")
+        addTB(ID_FILE_SAVE, "save.svg", _("Save") + "...")
+        addTB(ID_FILE_SAVE_AS, "saveas.svg", _("Save as") + "...")
         addTB(ID_FILE_CLOSE, "close.svg", _("Close Script"))
         addTB(ID_TOOLBAR_SCRIPTSETTINGS, "scrset.svg", _("Script settings"))
         addTB(ID_FILE_PRINT, "pdf.svg", _("Print (via PDF)"))
@@ -521,7 +521,7 @@ class MyFrame(wx.Frame):
 
         for i, fi in enumerate(self.gd.cfgGui.fonts):
             if not util.isFixedWidth(fi.font):
-                failed.append(names[i])
+                failed.append(_(names[i]))
 
         if failed:
             wx.MessageBox(

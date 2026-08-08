@@ -29,7 +29,7 @@ class PDFPanel(wx.Panel):
         self.removeNotesCb = self.addCb(_("Omit Note elements"), vsizer, pad)
 
         self.outlineNotesCb = self.addCb(
-            _("  Draw rectangles around Note elements"), vsizer, pad
+            _("Draw rectangles around Note elements"), vsizer, pad
         )
 
         self.marginsCb = self.addCb(_("Show margins (debug)"), vsizer, pad)

@@ -59,7 +59,7 @@ class LocationReport:
         # to unpack the list)
         (self.INF_SPEAKERS,) = list(range(1))
         self.inf = []
-        for s in ["Speakers"]:
+        for s in [_("Speakers")]:
             self.inf.append(misc.CheckBoxItem(s))
 
     def generate(self) -> bytes:

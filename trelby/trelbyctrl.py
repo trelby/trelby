@@ -229,7 +229,7 @@ class MyCtrl(wx.Control):
         if fileName:
             self.setDisplayName(os.path.basename(fileName))
         else:
-            self.setDisplayName("untitled")
+            self.setDisplayName(_("untitled"))
 
         self.setTabText()
         self.gd.mainFrame.setTitle(self.fileNameDisplay)
@@ -409,10 +409,8 @@ class MyCtrl(wx.Control):
                 if (
                     wx.MessageBox(
                         _(
-                            "The script seems to contain errors.\nAre you sure you want to {} it?".format(
-                                action
-                            )
-                        ),
+                            "The script seems to contain errors.\nAre you sure you want to {} it?"
+                        ).format(action),
                         _("Confirm"),
                         wx.YES_NO | wx.NO_DEFAULT,
                         self.gd.mainFrame,
@@ -639,8 +637,8 @@ class MyCtrl(wx.Control):
         c1 = self.gd.mainFrame.tabCtrl.getPage(sel1).ctrl
         c2 = self.gd.mainFrame.tabCtrl.getPage(sel2).ctrl
 
-        sp1 = c1.getExportable("compare")
-        sp2 = c2.getExportable("compare")
+        sp1 = c1.getExportable(_("compare"))
+        sp2 = c2.getExportable(_("compare"))
 
         if not sp1 or not sp2:
             return
@@ -850,7 +848,7 @@ class MyCtrl(wx.Control):
 
         dlg = misc.TextInputDlg(
             self.gd.mainFrame,
-            _("Enter scene number ({} - {}):".format(scenes[0][0], scenes[-1][0])),
+            _("Enter scene number ({} - {}):").format(scenes[0][0], scenes[-1][0]),
             _("Goto scene"),
             validateFunc,
         )
@@ -882,7 +880,7 @@ class MyCtrl(wx.Control):
 
         dlg = misc.TextInputDlg(
             self.gd.mainFrame,
-            _("Enter page number ({} - {}):".format(pages[0], pages[-1])),
+            _("Enter page number ({} - {}):").format(pages[0], pages[-1]),
             _("Goto page"),
             validateFunc,
         )
@@ -985,7 +983,7 @@ class MyCtrl(wx.Control):
 
         types = []
         for t in config.getTIs():
-            types.append(misc.CheckBoxItem(t.name, False, t.lt))
+            types.append(misc.CheckBoxItem(_(t.name), False, t.lt))
 
         dlg = misc.CheckBoxDlg(
             self.gd.mainFrame,
@@ -1030,7 +1028,7 @@ class MyCtrl(wx.Control):
             _("Filename to save as"),
             defaultDir=dDir,
             defaultFile=dFile,
-            wildcard="Trelby files (*.trelby)|*.trelby|All files|*",
+            wildcard=_("Trelby files (*.trelby)|*.trelby|All files|*"),
             style=wx.FD_SAVE | wx.FD_OVERWRITE_PROMPT,
         )
         if dlg.ShowModal() == wx.ID_OK:
@@ -1039,7 +1037,7 @@ class MyCtrl(wx.Control):
         dlg.Destroy()
 
     def OnExportScript(self):
-        sp = self.getExportable("export")
+        sp = self.getExportable(_("export"))
         if not sp:
             return
 
@@ -1087,7 +1085,7 @@ class MyCtrl(wx.Control):
         dlg.Destroy()
 
     def OnPrint(self):
-        sp = self.getExportable("print")
+        sp = self.getExportable(_("print"))
         if not sp:
             return
 
