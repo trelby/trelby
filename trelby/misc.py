@@ -84,6 +84,7 @@ def fromGUI(s):
 # platform supports Unicode-based APIs (and Python has implemented support
 # for it), or the Unicode string converted to UTF-8 on other platforms.
 def toPath(s: str) -> AnyStr:
+    s = str(s)
     if unicodeFS:
         return s
     else:

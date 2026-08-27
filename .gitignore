@@ -12,5 +12,14 @@ MANIFEST
 /venv/
 /.vscode/
 
+# macOS specific
+*.DS_Store
+
+# coverage specific
+.coverage
+
+# git specifics
+.pre-commit-config.yaml
+
 #Choco
 *.nupkg
