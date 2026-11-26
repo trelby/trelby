@@ -166,17 +166,18 @@ class MyCtrl(wx.Control):
 
     def importFile(self, fileName):
         titlePages = False
-        if fileName.endswith("fdx"):
+        ext = fileName.lower()
+        if ext.endswith("fdx"):
             lines = myimport.importFDX(fileName, self.gd.mainFrame)
-        elif fileName.endswith("celtx"):
+        elif ext.endswith("celtx"):
             lines = myimport.importCeltx(fileName, self.gd.mainFrame)
-        elif fileName.endswith("astx"):
+        elif ext.endswith("astx"):
             lines = myimport.importAstx(fileName, self.gd.mainFrame)
-        elif fileName.endswith("fountain"):
+        elif ext.endswith("fountain"):
             lines, titlePages = myimport.importFountain(
                 fileName, self.gd.mainFrame, self.sp.titles.pages
             )
-        elif fileName.endswith("fadein"):
+        elif ext.endswith("fadein"):
             lines = myimport.importFadein(fileName, self.gd.mainFrame)
         else:
             lines = myimport.importTextFile(fileName, self.gd.mainFrame)
