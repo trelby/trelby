@@ -1,3 +1,4 @@
+import copy
 import io
 import re
 import zipfile
@@ -12,13 +13,8 @@ import trelby.misc as misc
 import trelby.screenplay as screenplay
 import trelby.titles as titles
 import trelby.util as util
-from trelby.importdlg import ImportDlg
-from trelby.indent import Indent
+from trelby.importreviewdlg import TextImportReviewDlg
 from trelby.line import Line
-
-# special linetype that means that indent contains action and scene lines,
-# and scene lines are the ones that begin with "EXT." or "INT."
-SCENE_ACTION = -2
 
 # special linetype that means don't import those lines; useful for page
 # numbers etc
@@ -437,14 +433,14 @@ def importFountain(fileName, frame, titlePages):
             s = style.sub(r"\1", s)
         return s.replace(literalstar, "*")
 
-    data = util.loadFile(fileName, frame, -1)
+    data = _loadImportText(fileName, frame)
 
     if data == None:
-        return None
+        return None, titlePages
 
     if len(data) == 0:
         wx.MessageBox(_("File is empty."), _("Error"), wx.OK, frame)
-        return None
+        return None, titlePages
 
     inf = []
     inf.append(misc.CheckBoxItem(_("Import titles to title page.")))
@@ -465,21 +461,85 @@ def importFountain(fileName, frame, titlePages):
     removeMarkdown = inf[2].selected
     importSectSyn = inf[3].selected
 
-    # pre-process data - fix newlines, remove boneyard.
+    # work on a copy, so cancelling leaves the caller's title pages alone
+    titlePages = copy.deepcopy(titlePages)
+
+    # pre-process data - fix newlines, remove boneyard. the boneyard's
+    # newlines are replaced by markers, so that original line numbers can
+    # be shown in the review.
     data = util.fixNL(data)
-    data = boneyard_re.sub("", data)
+    data = boneyard_re.sub(lambda m: "\0" * m.group().count("\n"), data)
     prelines = data.split("\n")
+
+    # nums[i] is the line number in the file of prelines[i]
+    nums = []
+    lineNo = 1
     for i in range(len(prelines)):
-        try:
-            util.toLatin1(prelines[i])
-        except:
-            prelines[i] = util.cleanInput("" + prelines[i].decode("UTF-8", "ignore"))
-    lines = []
+        nums.append(lineNo)
+        lineNo += 1 + prelines[i].count("\0")
+        prelines[i] = prelines[i].replace("\0", "")
 
     tabWidth = 4
     lns = []
     TWOSPACE = "  "
     skipone = False
+
+    # lines holding nothing but whitespace are empty lines. the one
+    # exception is exactly two spaces, which Fountain uses for an
+    # intentionally blank line inside an element.
+    for i in range(len(prelines)):
+        if prelines[i] != TWOSPACE and prelines[i].strip() == "":
+            prelines[i] = ""
+
+    lines = []
+
+    # a single period followed by a letter or digit forces a scene heading.
+    # this allows action and dialogue to start with an ellipsis.
+    def isForcedScene(s):
+        return re.match(r"^\.[^\W_]", s) is not None
+
+    def isScene(s):
+        if s.endswith(TWOSPACE):
+            return False
+        tmp = s.upper()
+        if (
+            re.match(r"^(INT|EXT|EST)[ .]", tmp)
+            or re.match(r"^(INT\.?/EXT\.?)[ .]", tmp)
+            or re.match(r"^I/E[ .]", tmp)
+        ):
+            return True
+        return False
+
+    # a character cue is all upper case, apart from extensions such as
+    # "(cont'd)" or "(V.O.)", which may be in any case.
+    def isCharacter(s):
+        if s.endswith(TWOSPACE):
+            return False
+        name = re.sub(r"\([^)]*\)?", "", s.rstrip().rstrip("^"))
+        return name.isupper()
+
+    def isParen(s):
+        return s.startswith("(") and s.endswith(")")
+
+    def isTransition(s):
+        return (s.isupper() and s.endswith("TO:")) or (
+            s.startswith(">") and not s.endswith("<")
+        )
+
+    def isCentered(s):
+        return s.startswith(">") and s.endswith("<")
+
+    def isPageBreak(s):
+        return s.startswith("===") and s.lstrip("=") == ""
+
+    def isNote(s):
+        return s.startswith("[[") and s.endswith("]]")
+
+    def isSection(s):
+        return s.startswith("#")
+
+    def isSynopsis(s):
+        return s.startswith("=") and not s.startswith("==")
 
     # First check if title lines are present:
     c = 0
@@ -492,21 +552,28 @@ def importFountain(fileName, frame, titlePages):
     # prelines[0:i] are the first bunch of lines, that could be titles.
     # Our check for title is simple:
     #   - the line does not start with 'fade'
-    #   - the first line has a single ':'
+    #   - the first line starts with a "Key:" (the value may contain more
+    #     colons, e.g. "Title: Alien: Resurrection")
+    #   - the first line is not a scene heading or transition
 
     if c > 0:
-        l = util.toInputStr(prelines[0].expandtabs(tabWidth).lstrip().lower())
-        if not l.startswith("fade") and l.count(":") == 1:
+        l = util.toInputStr(prelines[0].expandtabs(tabWidth).strip())
+        if (
+            not l.lower().startswith("fade")
+            and re.match(r"^[^\W\d_][\w '-]*:", l)
+            and not isScene(l)
+            and not isTransition(l)
+        ):
             # these are title lines. Now do what the user requested.
             if importTitlePage:
                 # Extract usable title page lines
-                kwPattern = re.compile(r"^([A-za-z][^:]+:)")
-                continuePattern = re.compile(
-                    r"^\s\s\s+"
-                )  # line begins with 3 or more spaces
+                kwPattern = re.compile(r"^([A-Za-z][^:]+:)")
+                # values on their own lines are indented by a tab or 3+ spaces
+                continuePattern = re.compile(r"^(\t|   )")
                 titleIdx = 0
                 gatheredTitles = []
                 rejects = []
+                rejectNums = []
                 l = prelines[0]
                 while l != "":
                     match = kwPattern.split(l)
@@ -515,11 +582,11 @@ def importFountain(fileName, frame, titlePages):
                         if match[2] == "":
                             follows = []
                             titleIdx += 1  # gather indented prelines
-                            nextline = continuePattern.match(prelines[titleIdx])
-                            while nextline:
+                            while titleIdx < c and continuePattern.match(
+                                prelines[titleIdx]
+                            ):
                                 follows.append(prelines[titleIdx].strip("_* \t"))
                                 titleIdx += 1
-                                nextline = continuePattern.match(prelines[titleIdx])
                             titleIdx -= 1
                             gatheredTitles.append([match[1], follows])
                         else:
@@ -527,8 +594,9 @@ def importFountain(fileName, frame, titlePages):
                     else:
                         l += TWOSPACE
                         rejects.append(l)
+                        rejectNums.append(nums[titleIdx])
                     titleIdx += 1
-                    l = prelines[titleIdx]
+                    l = prelines[titleIdx] if titleIdx < c else ""
                 # replace default titles with imported ones
                 leftX = 15.0
                 leftY = 220.0
@@ -570,6 +638,7 @@ def importFountain(fileName, frame, titlePages):
                 if not importTitles:
                     rejects += prelines[c + 1 :]
                     prelines = rejects
+                    nums = rejectNums + nums[c + 1 :]
             if importTitles:
                 # add TWOSPACE to all the title lines.
                 for i in range(c):
@@ -577,6 +646,7 @@ def importFountain(fileName, frame, titlePages):
             elif not importTitlePage:
                 # remove these lines
                 prelines = prelines[c + 1 :]
+                nums = nums[c + 1 :]
 
     for l in prelines:
         if l != TWOSPACE:
@@ -586,17 +656,17 @@ def importFountain(fileName, frame, titlePages):
 
     linesLen = len(lines)
 
+    # the start of the file counts as an empty line
     def isPrevEmpty():
-        if lns and lns[-1].text == "":
-            return True
-        return False
+        return not lns or lns[-1].text == ""
 
     def isPrevType(ltype):
         return lns and lns[-1].lt == ltype
 
-    # looks ahead to check if next line is not empty
+    # looks ahead to check if next line is empty. the end of the file
+    # counts as an empty line.
     def isNextEmpty(i):
-        return i + 1 < len(lines) and lines[i + 1] == ""
+        return i + 1 >= len(lines) or lines[i + 1] == ""
 
     def getPrevType():
         if lns:
@@ -604,42 +674,17 @@ def importFountain(fileName, frame, titlePages):
         else:
             return screenplay.ACTION
 
-    def isParen(s):
-        return s.startswith("(") and s.endswith(")")
+    # for each line in lns: line number in the file, and why it needs
+    # review (or None)
+    lnsNums = []
+    lnsIndents = []
+    lnsFlags = []
 
-    def isScene(s):
-        if s.endswith(TWOSPACE):
-            return False
-        if s.startswith(".") and not s.startswith(".."):
-            return True
-        tmp = s.upper()
-        if (
-            re.match(r"^(INT|EXT|EST)[ .]", tmp)
-            or re.match(r"^(INT\.?/EXT\.?)[ .]", tmp)
-            or re.match(r"^I/E[ .]", tmp)
-        ):
-            return True
-        return False
+    # line number of the start of a speech that may not be one
+    doubtfulSpeech = None
 
-    def isTransition(s):
-        return (s.isupper() and s.endswith("TO:")) or (
-            s.startswith(">") and not s.endswith("<")
-        )
-
-    def isCentered(s):
-        return s.startswith(">") and s.endswith("<")
-
-    def isPageBreak(s):
-        return s.startswith("===") and s.lstrip("=") == ""
-
-    def isNote(s):
-        return s.startswith("[[") and s.endswith("]]")
-
-    def isSection(s):
-        return s.startswith("#")
-
-    def isSynopsis(s):
-        return s.startswith("=") and not s.startswith("==")
+    # line number of a "(" opened in dialogue but not closed on that line
+    openParen = None
 
     # first pass - identify linetypes
     for i in range(linesLen):
@@ -662,22 +707,32 @@ def importFountain(fileName, frame, titlePages):
         elif s == TWOSPACE:
             line.lt = getPrevType()
 
-        elif isScene(s):
+        elif sl.startswith("!"):
+            # forced action
+            line.text = sl[1:]
+
+        elif isForcedScene(sl) or (isScene(sl) and isPrevEmpty() and isNextEmpty(i)):
+            # spec: a scene heading has an empty line before and after it
             line.lt = screenplay.SCENE
-            if sl.startswith("."):
-                line.text = sl[1:]
-            else:
-                line.text = sl
+            if isForcedScene(sl):
+                sl = sl[1:]
+            line.text = sl
+            if removeMarkdown:
+                # scene number, e.g. "INT. HOUSE - DAY #1A#"
+                line.text = re.sub(r"\s*#[\w.-]+#\s*$", "", line.text)
 
         elif isTransition(sl) and isPrevEmpty() and isNextEmpty(i):
             line.lt = screenplay.TRANSITION
             if line.text.startswith(">"):
                 line.text = sl[1:].lstrip()
 
-        elif s.isupper() and isPrevEmpty() and not isNextEmpty(i):
+        elif sl.startswith("@") and isPrevEmpty() and not isNextEmpty(i):
+            # forced character
             line.lt = screenplay.CHARACTER
-            if s.endswith(TWOSPACE):
-                line.lt = screenplay.ACTION
+            line.text = sl[1:]
+
+        elif isCharacter(sl) and isPrevEmpty() and not isNextEmpty(i):
+            line.lt = screenplay.CHARACTER
 
         elif isParen(sl) and (
             isPrevType(screenplay.CHARACTER) or isPrevType(screenplay.DIALOGUE)
@@ -723,9 +778,131 @@ def importFountain(fileName, frame, titlePages):
         if removeMarkdown:
             line.text = unmarkdown(line.text)
             if line.lt == screenplay.CHARACTER and line.text.endswith("^"):
-                line.text = line.text[:-1]
+                # dual dialogue marker
+                line.text = line.text[:-1].rstrip()
+            elif line.text.startswith("~"):
+                # lyrics marker
+                line.text = line.text[1:]
+
+        # lines that follow the Fountain rules, but look like a typing slip
+        flag = None
+
+        if line.lt == screenplay.CHARACTER:
+            doubtfulSpeech = None
+            name = re.sub(r"\([^)]*\)?", "", sl).strip().rstrip("^").strip()
+
+            if isScene(sl):
+                flag = _(
+                    "Looks like a scene heading, but there's no empty line "
+                    "after it, so by the Fountain rules it's a character name."
+                )
+            elif isTransition(sl):
+                flag = _(
+                    "Looks like a transition, but there's no empty line after "
+                    "it, so by the Fountain rules it's a character name."
+                )
+            elif not sl.startswith("@") and name[-1:] in (".", "!", "?"):
+                flag = _(
+                    'An upper case line ending in "{}" with text right after '
+                    "it, so by the Fountain rules it's a character name. "
+                    "Action in capitals needs an empty line after it."
+                ).format(name[-1])
+
+            if flag:
+                doubtfulSpeech = nums[i]
+
+        elif line.lt in (screenplay.DIALOGUE, screenplay.PAREN):
+            if doubtfulSpeech is not None:
+                flag = _(
+                    "Part of the speech starting on line {}, which may not "
+                    "be a speech."
+                ).format(doubtfulSpeech)
+
+            elif openParen is not None:
+                flag = _(
+                    'Continues the "(" opened on line {}. Fountain '
+                    "parentheticals must fit on one line, so it's dialogue."
+                ).format(openParen)
+                if sl.endswith(")"):
+                    openParen = None
+
+            elif sl.startswith("(") and not sl.endswith(")"):
+                flag = _(
+                    'Starts with "(" but doesn\'t end with ")" on the same '
+                    "line, so by the Fountain rules it's dialogue, not a "
+                    "parenthetical."
+                )
+                openParen = nums[i]
+
+            elif isScene(sl):
+                flag = _(
+                    "Looks like a scene heading, but there's no empty line "
+                    "before it, so by the Fountain rules it's dialogue."
+                )
+
+            elif sl.isupper() and sl.endswith("TO:"):
+                flag = _(
+                    "Looks like a transition, but there's no empty line "
+                    "before it, so by the Fountain rules it's dialogue."
+                )
+
+        else:
+            doubtfulSpeech = None
+            openParen = None
+
+            if line.lt == screenplay.ACTION and not sl.startswith("!"):
+                if isScene(sl):
+                    flag = _(
+                        "Looks like a scene heading, but it needs an empty "
+                        "line before and after it, so by the Fountain rules "
+                        "it's action."
+                    )
+                elif sl.isupper() and sl.endswith("TO:"):
+                    flag = _(
+                        "Looks like a transition, but it needs an empty line "
+                        "before and after it, so by the Fountain rules it's "
+                        "action."
+                    )
 
         lns.append(line)
+        lnsNums.append(nums[i])
+        lnsIndents.append(len(s) - len(sl))
+        lnsFlags.append(flag)
+
+    if any(lnsFlags):
+        rows = []
+        for ln, num, indent, flag in zip(lns, lnsNums, lnsIndents, lnsFlags):
+            if ln.text == "":
+                rows.append(None)
+                continue
+
+            r = ImportRow(num, indent, ln.text)
+            r.lt = ln.lt
+            r.flag = flag
+            r.line = ln
+            rows.append(r)
+
+        dlg = TextImportReviewDlg(
+            frame,
+            rows,
+            _(
+                "Line types follow the Fountain rules. The highlighted lines "
+                "follow them too, but look like typing slips."
+            ),
+            REMOVE,
+        )
+
+        if dlg.ShowModal() != wx.ID_OK:
+            dlg.Destroy()
+            return None, titlePages
+
+        dlg.Destroy()
+
+        for r in rows:
+            if r is not None:
+                r.line.lt = r.lt
+
+        lns = [ln for ln in lns if ln.lt != REMOVE]
 
     ret = []
 
@@ -743,6 +920,9 @@ def importFountain(fileName, frame, titlePages):
     # second pass - remove unneeded empty lines, and fix the linebreaks.
     for ln in lns:
         if ln.text == "":
+            if not ret:
+                # nothing before the script's first line
+                continue
             if isLastLBForced():
                 makeLastLBLast()
             else:
@@ -755,149 +935,741 @@ def importFountain(fileName, frame, titlePages):
         else:
             ret.append(ln)
 
+    # empty lines at the end of the file
+    while ret and ret[-1].text == "":
+        ret.pop()
+
+    # a file with only a title page still needs one line in the script
+    if not ret:
+        ret.append(Line(screenplay.LB_LAST, screenplay.ACTION, ""))
+
     makeLastLBLast()
     return ret, titlePages
 
 
-# import text file from fileName, return list of Line objects for the
-# screenplay or None if something went wrong. returned list always
-# contains at least one line.
-def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[Line]]:
+# ---------------------------------------------------------------------------
+# Plain text import.
+#
+# A plain text script has no markup saying what each line is, so the type
+# of a line has to be read from its layout and content. That is done with
+# the fixed rules below, and nothing is imported before the user has seen
+# the result: TextImportReviewDlg shows every line with its proposed type,
+# highlights the lines the rules can't settle unambiguously (with the
+# reason), and lists every piece of text that would be removed. The user
+# corrects what's wrong, and only then is the script imported.
+#
+# Clean-up. Proposed in the review; nothing is removed unless confirmed.
+#   C1  A line that is only a page number, "(MORE)", "CONTINUED:" or
+#       "(CONTINUED)" is not imported.
+#   C2  Scene numbers in front of a scene heading, and the same number
+#       repeated after it, are removed from the heading.
+#   C3  "(CONT'D)" after a character name is removed; Trelby adds it itself.
+#   C4  A character name repeated after a page break that interrupted a
+#       speech ("(MORE)") is not imported, nor is a "(continuing)" right
+#       after it, so the speech stays in one piece.
+#
+# Content.
+#   T1  Scene heading: starts with INT. EXT. EST. INT./EXT. or I/E.
+#   T2  Transition: all upper case, ending in "TO:", or one of FADE OUT.,
+#       FADE TO BLACK., CUT TO BLACK., SMASH CUT:, MATCH CUT:, JUMP CUT:.
+#   T3  Character name: all upper case apart from extensions in brackets
+#       such as "(V.O.)", at most 40 characters, not ending in punctuation.
+#   T4  Speech: a paragraph starting with a character name (T3) and at
+#       least one more line. A line starting with "(" begins a
+#       parenthetical that lasts until a line ending with ")"; the other
+#       lines are dialogue.
+#
+# Layout, for indented text (IMSDb, PDF text with layout kept).
+#   L1  Character indent: the indent where character names (T3) are
+#       directly followed by a line at a different indent. At least half of
+#       the lines at that indent must be such names. Most names wins.
+#   L2  Dialogue indent: the indent those following lines are most often at.
+#   L3  Parenthetical indents: indents where at least half of the lines are
+#       parentheticals inside speeches.
+#   L4  Action indent: the indent most scene headings are at or, without
+#       scene headings, the indent with most lines.
+#
+# A line's type is settled when its content and its indent agree:
+#   - A speech whose name is at the character indent and whose next line
+#     is at the dialogue or a parenthetical indent.
+#   - A scene heading at the action indent.
+#   - A transition on a line of its own.
+#   - Any other line at the action indent is action.
+# Anything else gets the type the nearest rule suggests and is flagged.
+#
+# Without a character indent (e.g. text copied from a PDF viewer, which
+# loses all indentation) only content counts:
+#   - Scene headings and transitions on a line of their own are settled.
+#   - A speech (T4) is settled when the name has at least two speeches, has
+#     an extension such as "(V.O.)", or is followed by a parenthetical.
+#     Otherwise the paragraph is flagged: it may be upper case action.
+#   - A paragraph starting with an upper case line ending in "." is
+#     flagged: it may be a speech.
+#   - Everything else is action.
+# ---------------------------------------------------------------------------
 
-    data = util.loadFile(fileName, frame, -1)
+# special linetype for lines that are not imported
+REMOVE = IGNORE
 
-    if data == None:
+# scene heading prefixes: INT. EXT. EST. INT./EXT. I/E etc.
+_SCENE_RE = re.compile(
+    r"^(?:INT\.?\s*/\s*EXT|EXT\.?\s*/\s*INT|INT|EXT|EST|I\s*/\s*E|E\s*/\s*I)"
+    r"(?:[.\s]|$)",
+    re.IGNORECASE,
+)
+
+# scene/page number such as 12, 12A, A12, 12.
+_NUM = r"[A-Z]?\d+[A-Z]{0,3}\.?"
+
+# scene number in front of a scene heading
+_LEAD_SCENE_NUM_RE = re.compile(r"^(" + _NUM + r")\s+")
+
+# scene number and/or revision asterisk set apart at the end of a line
+_TRAIL_SCENE_NUM_RE = re.compile(r"(?:\s{2,}(?:" + _NUM + r"|\*))+$")
+
+# page number lines: "12", "12.", "- 12 -", "Page 12"
+_PAGE_NUM_RE = re.compile(r"^(?:PAGE\s*)?[-–—]?\s*\d+\s*[-–—]?\.?$", re.I)
+
+# "(MORE)" at the bottom of a page, in the middle of a speech
+_MORE_RE = re.compile(r"^\(\s*MORE\s*\)$", re.I)
+
+# "CONTINUED:", "(CONTINUED)", "12 CONTINUED: (2) 12" etc.
+_CONTINUED_RE = re.compile(
+    r"^(?:" + _NUM + r"\s+)?\(?\s*CONTINUED\s*:?\s*\)?(?:\s*\(\d+\))?"
+    r"(?:\s+" + _NUM + r")?$",
+    re.I,
+)
+
+# "(CONT'D)" style extensions on character names
+_CONTD_RE = re.compile(
+    r"\s*\(\s*(?:CONT['’]?D|CONT\.?|CONTINUED|CONTINUING)\s*\)\s*$", re.I
+)
+
+# transitions
+_TRANS_RE = re.compile(
+    r"^(?:[A-Z0-9 .'\-]+ TO:|FADE OUT[.:]?|FADE TO BLACK[.:]?|CUT TO BLACK[.:]?"
+    r"|SMASH CUT:?|MATCH CUT:?|JUMP CUT:?)$"
+)
+
+
+class ImportRow:
+    """One non-empty line of a text file being imported."""
+
+    def __init__(self, lineNo, indent, text):
+        # line number in the file, starting from 1
+        self.lineNo = lineNo
+
+        # indent level, after any scene number has been removed
+        self.indent = indent
+
+        # text as written, without leading spaces
+        self.text = text
+
+        # line type, or REMOVE
+        self.lt = screenplay.ACTION
+
+        # why the rules can't settle this line's type, or None
+        self.flag = None
+
+        # whether the user has checked a flagged line
+        self.checked = False
+
+        # text with clean-up applied, if that differs from the text
+        self.cleanText = None
+
+        # the user wants the text as written, without clean-up
+        self.keepText = False
+
+        # description of the clean-up applied to this line, if any
+        self.note = None
+
+        # True if the line is a scene heading (T1)
+        self.scene = False
+
+        # True if the line is "(MORE)"
+        self.more = False
+
+        # for a character name repeated after a page break: index of the
+        # "(MORE)" row before it
+        self.joinFrom = None
+
+    def finalText(self):
+        if self.cleanText is not None and not self.keepText:
+            return self.cleanText
+
+        return self.text
+
+    def needsReview(self):
+        return self.flag is not None and not self.checked
+
+    def setType(self, lt):
+        self.lt = lt
+        if self.flag:
+            self.checked = True
+
+
+def _loadImportText(fileName, frame):
+    """Load a text file for import, returning a str or None.
+
+    Accepts UTF-8 (with or without BOM) and falls back to Windows-1252,
+    which is what most older .txt scripts floating around the web use."""
+
+    data = util.loadFile(fileName, frame, -1, True)
+
+    if data is None:
         return None
 
-    if len(data) == 0:
-        wx.MessageBox(_("File is empty."), _("Error"), wx.OK, frame)
+    for enc in ("utf-8-sig", "cp1252"):
+        try:
+            return data.decode(enc)
+        except UnicodeDecodeError:
+            pass
 
-        return None
+    return data.decode("latin-1")
+
+
+def _isSceneText(s):
+    return bool(_SCENE_RE.match(s))
+
+
+def _isTransText(s):
+    return bool(_TRANS_RE.match(s))
+
+
+def _cueName(s):
+    """Return s with extensions in brackets such as (V.O.) removed."""
+    return re.sub(r"\s*\([^)]*\)?", " ", s).strip()
+
+
+def _isCapsText(s):
+    """Upper case apart from extensions in brackets, at most 40 chars."""
+    name = _cueName(s)
+
+    return (
+        0 < len(name) <= 40
+        and re.search(r"[^\W\d_]", name) is not None
+        and name == name.upper()
+    )
+
+
+def _isCueText(s):
+    """Rule T3."""
+    if not _isCapsText(s) or _isSceneText(s) or _isTransText(s):
+        return False
+
+    name = _cueName(s)
+
+    return name[-1] not in ".!?,;:\"'" and name[0] not in "(-–—"
+
+
+def _speakerName(s):
+    return _cueName(_CONTD_RE.sub("", s)).upper()
+
+
+def _textToRows(data):
+    """Split file contents into rows: None for an empty line, ImportRow
+    otherwise. Applies the clean-up rules C1 and C2."""
 
     data = util.fixNL(data)
-    lines = data.split("\n")
+    data = data.replace("\f", "\n").replace("\xa0", " ").replace("﻿", "")
 
-    tabWidth = 4
+    rows = []
 
-    # key = indent level, value = Indent
-    indDict = {}
+    for lineNo, s in enumerate(data.split("\n"), 1):
+        s = util.toInputStr(s.expandtabs(4)).rstrip()
+        text = s.lstrip()
 
-    for i in range(len(lines)):
-        s = util.toInputStr(lines[i].rstrip().expandtabs(tabWidth))
+        if not text:
+            rows.append(None)
+            continue
 
-        # don't count empty lines towards indentation statistics
-        if s.strip() == "":
-            lines[i] = ""
+        r = ImportRow(lineNo, len(s) - len(text), text)
+        rows.append(r)
+
+        if _MORE_RE.match(text):
+            r.more = True
+            r.lt = REMOVE
+            r.note = _("Marks a speech broken by a page break.")
+            continue
+
+        if _PAGE_NUM_RE.match(text):
+            r.lt = REMOVE
+            r.note = _("Page number.")
+            continue
+
+        if _CONTINUED_RE.match(text):
+            r.lt = REMOVE
+            r.note = _("Marks a scene continuing after a page break.")
+            continue
+
+        m = _LEAD_SCENE_NUM_RE.match(text)
+        if m and _isSceneText(text[m.end() :]):
+            r.scene = True
+            r.indent += m.end()
+
+            # the same number usually repeats at the end
+            num = re.escape(m.group(1).rstrip("."))
+            clean = re.sub(r"\s+" + num + r"\.?(?:\s+\*)?$", "", text[m.end() :])
+            r.cleanText = _TRAIL_SCENE_NUM_RE.sub("", clean)
+
+        elif _isSceneText(text):
+            r.scene = True
+
+            clean = _TRAIL_SCENE_NUM_RE.sub("", text)
+            if clean != text:
+                r.cleanText = clean
+
+        if r.cleanText is not None:
+            r.note = _("Scene number removed.")
+
+    return rows
+
+
+def _isLive(r):
+    """True for rows taking part in the analysis, i.e. not empty lines and
+    not clean-up removals."""
+    return r is not None and r.lt != REMOVE
+
+
+def _paragraphs(rows):
+    """Return the paragraphs of the text as lists of row indexes. Lines
+    removed by clean-up are skipped over, so e.g. a page number doesn't
+    split a paragraph. "(MORE)" ends a paragraph, as what follows it on the
+    next page starts with the character name again."""
+
+    ret = []
+    cur = []
+
+    for i, r in enumerate(rows):
+        if r is None or r.more:
+            if cur:
+                ret.append(cur)
+                cur = []
+        elif _isLive(r):
+            cur.append(i)
+
+    if cur:
+        ret.append(cur)
+
+    return ret
+
+
+def _parenRun(rows, para, j):
+    """Return the indexes in para of the parenthetical starting at para[j]."""
+    ret = []
+
+    while j < len(para):
+        ret.append(j)
+        if rows[para[j]].text.endswith(")"):
+            break
+        j += 1
+
+    return ret
+
+
+def _isSpeechStart(rows, para):
+    """Rule T4."""
+    return len(para) >= 2 and _isCueText(rows[para[0]].text)
+
+
+class _Layout:
+    """The indents used for each element type (rules L1-L4)."""
+
+    def __init__(self, rows, paras):
+        self.char = None
+        self.dlg = None
+        self.parens = set()
+        self.action = None
+
+        lineCnt = {}
+        sceneCnt = {}
+        cues = {}
+        dlgVotes = {}
+        parenCnt = {}
+
+        for r in rows:
+            if _isLive(r):
+                lineCnt[r.indent] = lineCnt.get(r.indent, 0) + 1
+                if r.scene:
+                    sceneCnt[r.indent] = sceneCnt.get(r.indent, 0) + 1
+
+        for para in paras:
+            first = rows[para[0]]
+
+            if not _isSpeechStart(rows, para):
+                continue
+
+            if rows[para[1]].indent == first.indent:
+                continue
+
+            cues[first.indent] = cues.get(first.indent, 0) + 1
+
+            j = 1
+            while j < len(para):
+                if rows[para[j]].text.startswith("("):
+                    run = _parenRun(rows, para, j)
+                    for k in run:
+                        ind = rows[para[k]].indent
+                        parenCnt[ind] = parenCnt.get(ind, 0) + 1
+                    j = run[-1] + 1
+                    continue
+
+                ind = rows[para[j]].indent
+                if ind != first.indent:
+                    dlgVotes[ind] = dlgVotes.get(ind, 0) + 1
+                j += 1
+
+        # L1
+        best = None
+        for ind, cnt in cues.items():
+            if cnt * 2 < lineCnt[ind]:
+                continue
+            if best is None or (cnt, ind) > (cues[best], best):
+                best = ind
+        self.char = best
+
+        if self.char is None:
+            return
+
+        # L2
+        best = None
+        for ind, cnt in dlgVotes.items():
+            if ind == self.char:
+                continue
+            if best is None or (cnt, -ind) > (dlgVotes[best], -best):
+                best = ind
+        self.dlg = best
+
+        # L3
+        for ind, cnt in parenCnt.items():
+            if ind not in (self.char, self.dlg) and cnt * 2 >= lineCnt[ind]:
+                self.parens.add(ind)
+
+        # L4
+        used = {self.char, self.dlg} | self.parens
+        free = [ind for ind in lineCnt if ind not in used]
+
+        if free:
+            if any(sceneCnt.get(ind, 0) for ind in free):
+                key = lambda ind: (sceneCnt.get(ind, 0), -ind)
+            else:
+                key = lambda ind: (lineCnt[ind], -ind)
+            self.action = max(free, key=key)
+
+    def describe(self):
+        if self.char is None:
+            return _(
+                "No consistent indentation found, so line types are read "
+                "from the text alone."
+            )
+
+        parts = [_("character names at column {}").format(self.char)]
+        if self.dlg is not None:
+            parts.append(_("dialogue at column {}").format(self.dlg))
+        if self.parens:
+            parts.append(
+                _("parentheticals at column {}").format(
+                    ", ".join(str(p) for p in sorted(self.parens))
+                )
+            )
+        if self.action is not None:
+            parts.append(_("action at column {}").format(self.action))
+
+        return _("Layout found: {}.").format(", ".join(parts))
+
+    def nameFor(self, indent):
+        """Element the indent is used for, for messages."""
+        if indent == self.char:
+            return _("character names")
+        if indent == self.dlg:
+            return _("dialogue")
+        if indent in self.parens:
+            return _("parentheticals")
+        if indent == self.action:
+            return _("action")
+        return None
+
+
+def _typeSpeech(rows, para, layout, flag):
+    """Give the rows of a speech paragraph their types. If layout is given,
+    lines not at the expected indent are flagged. flag, if given, is set
+    on every line."""
+
+    first = rows[para[0]]
+    first.lt = screenplay.CHARACTER
+    first.flag = flag
+
+    clean = _CONTD_RE.sub("", first.text)
+    if clean != first.text and clean:
+        first.cleanText = clean
+        first.note = _("(CONT'D) removed; Trelby adds it where needed.")
+
+    j = 1
+    while j < len(para):
+        r = rows[para[j]]
+
+        if r.text.startswith("("):
+            run = [para[k] for k in _parenRun(rows, para, j)]
+            j += len(run)
+
+            for i in run:
+                rows[i].lt = screenplay.PAREN
+                rows[i].flag = flag
+
+                if (
+                    layout
+                    and not flag
+                    and rows[i].indent not in layout.parens
+                    and rows[i].indent != layout.dlg
+                ):
+                    rows[i].flag = _(
+                        "Parenthetical at column {}, which isn't used for "
+                        "parentheticals."
+                    ).format(rows[i].indent)
 
             continue
 
-        cnt = util.countInitial(s, " ")
+        j += 1
+        r.lt = screenplay.DIALOGUE
+        r.flag = flag
 
-        ind = indDict.get(cnt)
-        if not ind:
-            ind = Indent(cnt)
-            indDict[cnt] = ind
+        if layout and not flag and r.indent != layout.dlg:
+            if r.indent == layout.action:
+                r.lt = screenplay.ACTION
+                r.flag = _(
+                    "Action directly after dialogue, with no empty line "
+                    "between them."
+                )
+            else:
+                r.flag = _(
+                    "In a speech, but at column {} instead of the dialogue "
+                    "column {}."
+                ).format(r.indent, layout.dlg)
 
-        tmp = s.upper()
 
-        if util.multiFind(tmp, ["EXT.", "INT."]):
-            ind.sceneStart += 1
+def _typeByIndent(rows, paras, layout):
+    for para in paras:
+        first = rows[para[0]]
 
-        if util.multiFind(tmp, ["CUT TO:", "DISSOLVE TO:"]):
-            ind.trans += 1
+        if _isSpeechStart(rows, para) and not first.scene:
+            second = rows[para[1]]
+            atChar = first.indent == layout.char
+            intoSpeech = second.indent == layout.dlg or second.indent in layout.parens
 
-        if re.match(r"^ +\(.*\)$", tmp):
-            ind.paren += 1
+            if atChar and intoSpeech:
+                _typeSpeech(rows, para, layout, None)
+                continue
 
-        ind.lines.append(s.lstrip())
-        lines[i] = s
+            if intoSpeech:
+                _typeSpeech(
+                    rows,
+                    para,
+                    None,
+                    _(
+                        "Looks like a speech, but the name is at column {} "
+                        "instead of the character column {}."
+                    ).format(first.indent, layout.char),
+                )
+                continue
 
-    if len(indDict) == 0:
-        wx.MessageBox(_("File contains only empty lines."), _("Error"), wx.OK, frame)
+            if atChar:
+                _typeSpeech(
+                    rows,
+                    para,
+                    None,
+                    _(
+                        "Looks like a speech, but the line after the name is "
+                        "at column {}, which isn't used for dialogue."
+                    ).format(second.indent),
+                )
+                continue
 
-        return None
+        for i in para:
+            r = rows[i]
 
-    # scene/action indent
-    setType(SCENE_ACTION, indDict, lambda v: v.sceneStart)
+            if r.scene:
+                r.lt = screenplay.SCENE
+                if layout.action is not None and r.indent != layout.action:
+                    r.flag = _(
+                        "Scene heading at column {} instead of the action " "column {}."
+                    ).format(r.indent, layout.action)
 
-    # indent with most lines is dialogue in non-pure-action scripts
-    setType(screenplay.DIALOGUE, indDict, lambda v: len(v.lines))
+            elif len(para) == 1 and _isTransText(r.text):
+                r.lt = screenplay.TRANSITION
 
-    # remaining indent with lines is character most likely
-    setType(screenplay.CHARACTER, indDict, lambda v: len(v.lines))
+            elif r.indent == layout.action:
+                r.lt = screenplay.ACTION
 
-    # transitions
-    setType(screenplay.TRANSITION, indDict, lambda v: v.trans)
+            else:
+                r.lt = screenplay.ACTION
+                used = layout.nameFor(r.indent)
 
-    # parentheticals
-    setType(screenplay.PAREN, indDict, lambda v: v.paren)
+                if used:
+                    r.flag = _(
+                        "At the column used for {}, but not part of a "
+                        "speech. Imported as action."
+                    ).format(used)
+                else:
+                    r.flag = _(
+                        "Column {} isn't used by any element type. Imported "
+                        "as action."
+                    ).format(r.indent)
 
-    # some text files have this type of parens:
-    #
-    #        JOE
-    #      (smiling and
-    #       hopping along)
-    #
-    # this handles them.
-    parenIndent = findIndent(indDict, lambda v: v.lt == screenplay.PAREN)
-    if parenIndent != -1:
-        paren2Indent = findIndent(
-            indDict, lambda v, var: (v.lt == -1) and (v.indent == var), parenIndent + 1
-        )
 
-        if paren2Indent != -1:
-            indDict[paren2Indent].lt = screenplay.PAREN
+def _typeByContent(rows, paras):
+    speeches = {}
+    for para in paras:
+        if _isSpeechStart(rows, para) and not rows[para[0]].scene:
+            name = _speakerName(rows[para[0]].text)
+            speeches[name] = speeches.get(name, 0) + 1
 
-    # set line type to ACTION for any indents not recognized
-    for v in indDict.values():
-        if v.lt == -1:
-            v.lt = screenplay.ACTION
+    for para in paras:
+        first = rows[para[0]]
 
-    dlg = ImportDlg(frame, list(indDict.values()), SCENE_ACTION, IGNORE)
+        if first.scene:
+            first.lt = screenplay.SCENE
 
-    if dlg.ShowModal() != wx.ID_OK:
-        dlg.Destroy()
+            for i in para[1:]:
+                rows[i].lt = screenplay.SCENE if rows[i].scene else screenplay.ACTION
 
-        return None
+            continue
 
-    dlg.Destroy()
+        if len(para) == 1 and _isTransText(first.text):
+            first.lt = screenplay.TRANSITION
+            continue
+
+        if _isSpeechStart(rows, para):
+            settled = (
+                speeches[_speakerName(first.text)] >= 2
+                or "(" in first.text
+                or rows[para[1]].text.startswith("(")
+            )
+            flag = None
+            if not settled:
+                flag = _(
+                    "An upper case line followed by text: a speech, or "
+                    "action written in capitals?"
+                )
+
+            _typeSpeech(rows, para, None, flag)
+            continue
+
+        flag = None
+        if len(para) >= 2 and _isCapsText(first.text) and first.text.endswith("."):
+            flag = _(
+                'Starts with an upper case line ending in ".": action, or a ' "speech?"
+            )
+
+        for i in para:
+            rows[i].lt = screenplay.SCENE if rows[i].scene else screenplay.ACTION
+            rows[i].flag = flag
+
+
+def _markContinuations(rows):
+    """Rule C4."""
+
+    speaker = None
+    more = None
+    lastLt = None
+
+    for i, r in enumerate(rows):
+        if r is None:
+            continue
+
+        if r.more:
+            if lastLt in (screenplay.DIALOGUE, screenplay.PAREN) and speaker:
+                more = i
+            continue
+
+        if r.lt == REMOVE:
+            continue
+
+        if r.lt == screenplay.CHARACTER:
+            name = _speakerName(r.text)
+
+            if more is not None and name == speaker:
+                r.lt = REMOVE
+                r.flag = None
+                r.cleanText = None
+                r.joinFrom = more
+                r.note = _("Name repeated after a page break; the speech continues.")
+
+                nxt = next((x for x in rows[i + 1 :] if _isLive(x)), None)
+                if (
+                    nxt is not None
+                    and nxt.lt == screenplay.PAREN
+                    and nxt.text.lower() in ("(continuing)", "(cont'd)")
+                ):
+                    nxt.lt = REMOVE
+                    nxt.flag = None
+                    nxt.note = _("Repeated after a page break.")
+
+                more = None
+                continue
+
+            speaker = name
+
+        more = None
+        lastLt = r.lt
+
+
+def analyzeText(data):
+    """Work out line types for a text file's contents. Returns (rows,
+    description), where rows has None for empty lines and ImportRow
+    objects for the others, and description says what layout was found."""
+
+    rows = _textToRows(data)
+    paras = _paragraphs(rows)
+    layout = _Layout(rows, paras)
+
+    if layout.char is not None:
+        _typeByIndent(rows, paras, layout)
+    else:
+        _typeByContent(rows, paras)
+
+    _markContinuations(rows)
+
+    return rows, layout.describe()
+
+
+def rowsToLines(rows):
+    """Build screenplay lines from reviewed rows."""
+
+    # empty lines between a "(MORE)" and the repeated name after it don't
+    # end the speech, as long as both are left out
+    gap = set()
+    for i, r in enumerate(rows):
+        if (
+            r is not None
+            and r.joinFrom is not None
+            and r.lt == REMOVE
+            and rows[r.joinFrom].lt == REMOVE
+        ):
+            gap.update(range(r.joinFrom, i))
 
     ret = []
 
-    for i in range(len(lines)):
-        s = lines[i]
-        cnt = util.countInitial(s, " ")
-        s = s.lstrip()
-        sUp = s.upper()
-
-        if s:
-            lt = indDict[cnt].lt
-
-            if lt == IGNORE:
-                continue
-
-            if lt == SCENE_ACTION:
-                if s.startswith("EXT.") or s.startswith("INT."):
-                    lt = screenplay.SCENE
-                else:
-                    lt = screenplay.ACTION
-
-            if ret and (ret[-1].lt != lt):
+    for i, r in enumerate(rows):
+        if r is None:
+            if i not in gap and ret:
                 ret[-1].lb = screenplay.LB_LAST
+            continue
 
-            if lt == screenplay.CHARACTER:
-                if sUp.endswith("(CONT'D)"):
-                    s = sUp[:-8].rstrip()
+        if r.lt == REMOVE:
+            continue
 
-            elif lt == screenplay.PAREN:
-                if s == "(continuing)":
-                    s = ""
+        s = r.finalText()
 
-            if s:
-                line = screenplay.Line(screenplay.LB_SPACE, lt, s)
-                ret.append(line)
+        if not s:
+            continue
 
-        elif ret:
+        if ret and ret[-1].lt != r.lt:
+            ret[-1].lb = screenplay.LB_LAST
+
+        ret.append(screenplay.Line(screenplay.LB_SPACE, r.lt, s))
+
+        # consecutive parentheticals are separate elements
+        if r.lt == screenplay.PAREN and s.endswith(")"):
             ret[-1].lb = screenplay.LB_LAST
 
     if len(ret) == 0:
@@ -909,32 +1681,35 @@ def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[Line]]:
     return ret
 
 
-# go through indents, find the one with maximum value in something, and
-# set its linetype to given lt.
-def setType(lt, indDict, func):
-    maxCount = 0
-    found = -1
+# import text file from fileName, return list of Line objects for the
+# screenplay or None if something went wrong or the user cancelled.
+# returned list always contains at least one line.
+def importTextFile(fileName: str, frame: wx.Frame) -> Optional[List[Line]]:
 
-    for v in indDict.values():
-        # don't touch indents already set
-        if v.lt != -1:
-            continue
+    data = _loadImportText(fileName, frame)
 
-        val = func(v)
+    if data == None:
+        return None
 
-        if val > maxCount:
-            maxCount = val
-            found = v.indent
+    if len(data) == 0:
+        wx.MessageBox(_("File is empty."), _("Error"), wx.OK, frame)
 
-    if found != -1:
-        indDict[found].lt = lt
+        return None
 
+    rows, layout = analyzeText(data)
 
-# go through indents calling func(it, *vars) on each. return indent count
-# for the indent func returns True, or -1 if it returns False for each.
-def findIndent(indDict, func, *vars):
-    for v in indDict.values():
-        if func(v, *vars):
-            return v.indent
+    if not any(_isLive(r) for r in rows):
+        wx.MessageBox(_("File contains only empty lines."), _("Error"), wx.OK, frame)
 
-    return -1
+        return None
+
+    dlg = TextImportReviewDlg(frame, rows, layout, REMOVE)
+
+    if dlg.ShowModal() != wx.ID_OK:
+        dlg.Destroy()
+
+        return None
+
+    dlg.Destroy()
+
+    return rowsToLines(rows)
